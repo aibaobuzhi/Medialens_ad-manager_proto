@@ -483,7 +483,7 @@
                                         <rect x="77.5" y="79" width="5" height="10" rx="2.5" fill="#D08000"/>
                                     </svg>
                                 </div>
-                                <div class="oc-fl-title">Unlock Ad Manager</div>
+                                <div class="oc-fl-title">Unlock <span style="color:var(--blue);">AI Insights</span></div>
                                 <div class="oc-fl-desc">Find winning categories, hooks, and angles faster.</div>
                                 <div class="oc-fl-buttons">
                                     <button class="oc-fl-btn-primary" onclick="goPricing()">Upgrade Now</button>
@@ -611,7 +611,7 @@
                                         <rect x="77.5" y="79" width="5" height="10" rx="2.5" fill="#D08000"/>
                                     </svg>
                                 </div>
-                                <div class="oc-fl-title">Unlock Ad Manager</div>
+                                <div class="oc-fl-title">Unlock <span style="color:var(--blue);">AI Insights</span></div>
                                 <div class="oc-fl-desc">Find winning categories, hooks, and angles faster.</div>
                                 <div class="oc-fl-buttons">
                                     <button class="oc-fl-btn-primary" onclick="goPricing()">Upgrade Now</button>
@@ -713,7 +713,7 @@
                                         <rect x="77.5" y="79" width="5" height="10" rx="2.5" fill="#D08000"/>
                                     </svg>
                                 </div>
-                                <div class="oc-fl-title">Unlock Ad Manager</div>
+                                <div class="oc-fl-title">Unlock <span style="color:var(--blue);">AI Insights</span></div>
                                 <div class="oc-fl-desc">Find winning categories, hooks, and angles faster.</div>
                                 <div class="oc-fl-buttons">
                                     <button class="oc-fl-btn-primary" onclick="goPricing()">Upgrade Now</button>
@@ -815,7 +815,7 @@
                                         <rect x="77.5" y="79" width="5" height="10" rx="2.5" fill="#D08000"/>
                                     </svg>
                                 </div>
-                                <div class="oc-fl-title">Unlock Ad Manager</div>
+                                <div class="oc-fl-title">Unlock <span style="color:var(--blue);">AI Insights</span></div>
                                 <div class="oc-fl-desc">Find winning categories, hooks, and angles faster.</div>
                                 <div class="oc-fl-buttons">
                                     <button class="oc-fl-btn-primary" onclick="goPricing()">Upgrade Now</button>
@@ -917,7 +917,7 @@
                                         <rect x="77.5" y="79" width="5" height="10" rx="2.5" fill="#D08000"/>
                                     </svg>
                                 </div>
-                                <div class="oc-fl-title">Unlock Ad Manager</div>
+                                <div class="oc-fl-title">Unlock <span style="color:var(--blue);">AI Insights</span></div>
                                 <div class="oc-fl-desc">Find winning categories, hooks, and angles faster.</div>
                                 <div class="oc-fl-buttons">
                                     <button class="oc-fl-btn-primary" onclick="goPricing()">Upgrade Now</button>
@@ -1010,8 +1010,8 @@
                                         <rect x="77.5" y="79" width="5" height="10" rx="2.5" fill="#D08000"/>
                                     </svg>
                                 </div>
-                                <div class="oc-fl-title">Unlock Ad Manager</div>
-                                <div class="oc-fl-desc">Ask what to do next.</div>
+                                <div class="oc-fl-title">Unlock <span style="color:var(--blue);">AI Agent</span></div>
+                                <div class="oc-fl-desc">Ask AI what to do next.</div>
                                 <div class="oc-fl-buttons">
                                     <button class="oc-fl-btn-primary" onclick="goPricing()">Upgrade Now</button>
                                 </div>
@@ -1177,7 +1177,7 @@
             <div class="modal" style="width:420px;">
                 <div class="analysing-hero-band">
                     <div class="analysing-hero">&#129504;</div>
-                    <div class="analysing-title">AI is analyzing Ads...</div>
+                    <div class="analysing-title">AI is analyzing your ads...</div>
                 </div>
                 <div class="analysing-body">
                     <div class="analysing-desc">This analysis consumes tokens and may take longer with more data.</div>
@@ -1194,11 +1194,11 @@
         <div class="overlay" id="ov-ai-upgrade">
             <div class="modal" style="width:440px;">
                 <div class="modal-hd">
-                    <div class="modal-title">Unlock Campaign Groups</div>
+                    <div class="modal-title">Unlock <span style="color:var(--blue);">AI Grouping</span></div>
                     <button class="modal-close" onclick="closeOverlay('ai-upgrade')">&#10005;</button>
                 </div>
                 <div style="padding:24px 24px 16px;">
-                    <p style="font-size:13px;color:var(--secondary);line-height:1.75;">Let AI cluster campaigns by strategy, audience, and winning creatives.</p>
+                    <p style="font-size:13px;color:var(--secondary);line-height:1.75;">Cluster campaigns by product and winning creatives.</p>
                 </div>
                 <div class="modal-ft">
                     <button class="btn btn-primary" onclick="closeOverlay('ai-upgrade'); goPricing()">Upgrade Now</button>
@@ -1227,12 +1227,26 @@
             <div class="modal" style="width:380px;position:relative;">
                 <button class="m-x-btn" onclick="cancelAnalysorOff()">&#10005;</button>
                 <div class="m-conf-body">
-                    <div class="m-conf-title">Pause Ad Manager?</div>
-                    <div class="m-conf-desc">Auto-sync and AI analysis will pause for <strong id="clf-confirm-name" style="color:var(--title);"></strong>. Existing insights stay saved but won't update.</div>
+                    <div class="m-conf-title">Stop AI Analysis?</div>
+                    <div class="m-conf-desc">Data will stop syncing, and insights may become outdated.</div>
                 </div>
-                <div class="m-conf-actions">
-                    <button class="btn-pill-conf-primary" onclick="confirmAnalysorOff()">Pause</button>
-                    <button class="btn-pill-conf-outline" onclick="cancelAnalysorOff()">Cancel</button>
+                <div class="m-conf-actions" style="flex-direction:row;gap:10px;">
+                    <button class="btn-pill-conf-outline" style="border-color:#FF3F41;color:#FF3F41;" onclick="confirmAnalysorOff()">Stop Anyway</button>
+                    <button class="btn-pill-conf-primary" onclick="cancelAnalysorOff()">Keep On</button>
+                </div>
+            </div>
+        </div>
+        <!-- AI Analysis Enable Confirmation Modal (A-7.5) -->
+        <div class="overlay" id="ov-clf-confirm-enable">
+            <div class="modal" style="width:380px;position:relative;">
+                <button class="m-x-btn" onclick="cancelAnalysorOn()">&#10005;</button>
+                <div class="m-conf-body">
+                    <div class="m-conf-title">Enable AI Analysis?</div>
+                    <div class="m-conf-desc">AI will auto-sync data and analyze.</div>
+                </div>
+                <div class="m-conf-actions" style="flex-direction:row;gap:10px;">
+                    <button class="btn-pill-conf-outline" onclick="cancelAnalysorOn()">Cancel</button>
+                    <button class="btn-pill-conf-primary" onclick="confirmAnalysorOn()">Enable</button>
                 </div>
             </div>
         </div>
@@ -1341,10 +1355,26 @@ function toggleClassifier(id) {
     if (nameEl) nameEl.textContent = accountNames[id];
     showOverlay('clf-confirm');
   } else {
-    // Currently OFF → turning ON → no confirmation needed
-    classifierState[id] = true;
-    renderClassifierState();
+    // Currently OFF → turning ON → show confirmation first, revert checkbox visually
+    var cb = document.getElementById('clf-cb-' + id);
+    if (cb) cb.checked = false; // keep unchecked until user confirms
+    pendingToggleId = id;
+    showOverlay('clf-confirm-enable');
   }
+}
+
+function confirmAnalysorOn() {
+  if (pendingToggleId !== null) {
+    classifierState[pendingToggleId] = true;
+    pendingToggleId = null;
+  }
+  closeOverlay('clf-confirm-enable');
+  renderClassifierState();
+}
+
+function cancelAnalysorOn() {
+  pendingToggleId = null;
+  closeOverlay('clf-confirm-enable');
 }
 
 function confirmAnalysorOff() {
