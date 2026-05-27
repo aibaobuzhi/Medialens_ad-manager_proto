@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>弹窗 Copy 审阅 — Ad Manager Freemium</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue: #23A9F6; --blue-tint: #EEF6FF; --surface: #F7F7F7; --surface-ai: #F6F8FD;
+      --white: #FFFFFF; --title: #0A1F2C; --text: #102532; --secondary: #707070;
+      --placeholder: #CACACA; --border: #D9E3E6; --divider: #E8EEF0;
+      --success: #52C41A; --success-light: #E6FBEB; --danger: #FF3F41;
+      --warning: #FFC960; --warning-light: #FFF8EB;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #EAECF0;
+      color: var(--text);
+      font-size: 14px;
+      padding: 36px 28px 80px;
+    }
+    h1 { font-size: 20px; font-weight: 700; color: var(--title); margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: var(--secondary); margin-bottom: 8px; }
+    .meta-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; }
+    .meta-chip { background: #fff; border: 1px solid var(--border); border-radius: 20px; padding: 3px 12px; font-size: 11px; font-weight: 500; color: #445; }
+
+    /* ── Table shell ── */
+    .review-table { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--white); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
+    .review-table thead tr th { background: #1a2a38; color: #fff; font-size: 12px; font-weight: 600; padding: 14px 20px; text-align: left; white-space: nowrap; letter-spacing: 0.3px; }
+    .review-table thead tr th:first-child { border-radius: 12px 0 0 0; }
+    .review-table thead tr th:last-child  { border-radius: 0 12px 0 0; }
+    .review-table tbody tr { border-bottom: 1px solid var(--divider); }
+    .review-table tbody tr:last-child { border-bottom: none; }
+    .review-table td { vertical-align: top; padding: 20px; font-size: 13px; }
+    .col-trigger { width: 200px; }
+    .col-current { width: 360px; }
+    .col-revised { width: 360px; }
+
+    /* Group row */
+    .group-row td { background: #EEF6FF; padding: 10px 20px; font-size: 11px; font-weight: 700; color: var(--blue); letter-spacing: 0.6px; text-transform: uppercase; border-bottom: 1px solid #cce4f8; }
+
+    /* Trigger cell */
+    .trigger-id { font-size: 10px; font-weight: 700; color: var(--placeholder); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 5px; }
+    .trigger-name { font-size: 13px; font-weight: 600; color: var(--title); margin-bottom: 8px; line-height: 1.4; }
+    .trigger-desc { font-size: 11.5px; color: var(--secondary); line-height: 1.65; }
+    .trigger-tag { display: inline-block; margin-top: 8px; padding: 2px 9px; border-radius: 20px; font-size: 10px; font-weight: 600; }
+    .trigger-tag.free { background: #FFF8EB; color: #b07800; }
+    .trigger-tag.paid { background: var(--success-light); color: #389e0d; }
+    .trigger-tag.both { background: var(--blue-tint); color: var(--blue); }
+
+    /* Preview backgrounds */
+    .preview-wrap { background: #dfe4ea; border-radius: 10px; padding: 16px; display: flex; align-items: flex-start; justify-content: center; }
+    .revised-wrap { background: #e8f0fe; border-radius: 10px; padding: 16px; display: flex; align-items: flex-start; justify-content: center; }
+
+    /* ═══════════════════════════════
+       SHARED MODAL SHELL
+    ═══════════════════════════════ */
+    .m {
+      background: var(--white); border-radius: 14px;
+      box-shadow: 0 6px 28px rgba(0,0,0,0.14);
+      overflow: hidden; width: 100%; max-width: 340px; position: relative;
+    }
+    .m-x {
+      position: absolute; top: 12px; right: 12px;
+      width: 26px; height: 26px; border: none; background: rgba(0,0,0,0.05);
+      border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; color: var(--placeholder); cursor: default; z-index: 2;
+    }
+
+    /* ── Import / Notification styles ── */
+    .import-body { padding: 28px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+    .spinner { width: 44px; height: 44px; border: 4px solid rgba(35,169,246,0.2); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    .spinner-sm { width: 14px; height: 14px; border: 2px solid rgba(35,169,246,0.2); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .success-ring { width: 52px; height: 52px; border-radius: 50%; background: var(--success-light); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .import-title { font-size: 15px; font-weight: 600; color: var(--title); }
+    .import-sub { font-size: 12px; color: var(--secondary); line-height: 1.65; max-width: 260px; }
+    .m-footer-center { padding: 16px 24px 20px; display: flex; justify-content: center; }
+
+    /* ── Notification band (Type A) ── */
+    .m-notify-band { background: var(--blue-tint); border-bottom: 1px dashed rgba(35,169,246,0.4); padding: 18px 24px 14px; text-align: center; }
+    .m-notify-title { font-size: 14px; font-weight: 700; color: var(--title); line-height: 1.35; }
+    .m-notify-body { padding: 16px 24px 0; font-size: 12px; color: var(--secondary); line-height: 1.7; text-align: center; }
+
+    /* ── Analysing hero band ── */
+    .analysing-hero-band { background: linear-gradient(135deg, #1a96e0 0%, #23A9F6 50%, #73DFFF 100%); padding: 28px 24px 22px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+    .analysing-hero { width: 66px; height: 66px; border-radius: 50%; background: rgba(255,255,255,0.18); border: 2px solid rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center; font-size: 28px; }
+    .analysing-title { font-size: 16px; font-weight: 700; color: #fff; }
+    .analysing-body { padding: 20px 24px 8px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; background: var(--white); }
+    .analysing-desc { font-size: 12px; color: var(--secondary); line-height: 1.75; max-width: 270px; }
+    .analysing-progress { display: flex; align-items: center; gap: 8px; background: var(--surface-ai); border: 1px solid rgba(35,169,246,0.18); border-radius: 8px; padding: 8px 14px; font-size: 11px; color: var(--blue); font-weight: 500; }
+    .analysing-ft { padding: 14px 20px 18px; background: var(--white); display: flex; justify-content: center; }
+
+    /* ── AI Kit Enable (current) ── */
+    .aikit-modal-body { padding: 28px 24px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; background: var(--surface-ai); }
+    .aikit-hero { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #23A9F6 0%, #5B8DEF 100%); display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 14px; box-shadow: 0 6px 20px rgba(35,169,246,0.35); }
+    .aikit-modal-title { font-size: 16px; font-weight: 700; color: var(--title); margin-bottom: 10px; line-height: 1.4; }
+    .aikit-modal-desc { font-size: 12px; color: var(--secondary); line-height: 1.7; max-width: 260px; }
+    .aikit-ft { padding: 14px 20px; border-top: 1px solid var(--divider); background: var(--white); display: flex; justify-content: flex-end; gap: 8px; }
+
+    /* ── Current modal generic ── */
+    .modal-hd { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 1px solid var(--divider); }
+    .modal-title { font-size: 14px; font-weight: 600; color: var(--title); }
+    .modal-close { width: 26px; height: 26px; border: none; background: none; cursor: default; border-radius: 6px; font-size: 14px; color: var(--secondary); }
+    .modal-ft { padding: 12px 20px; border-top: 1px solid var(--divider); display: flex; justify-content: flex-end; gap: 8px; }
+
+    /* ── Demo nudge (current) ── */
+    .mock-modal { background: var(--white); border-radius: 10px; overflow: hidden; width: 100%; max-width: 320px; }
+    .mock-modal__hdr { padding: 12px 16px; border-bottom: 1px solid var(--divider); display: flex; align-items: center; justify-content: space-between; }
+    .mock-modal__title { font-size: 12px; font-weight: 600; color: var(--title); }
+    .mock-modal__close { width: 20px; height: 20px; border-radius: 4px; border: none; background: var(--surface); color: var(--secondary); cursor: default; font-size: 11px; }
+    .mock-modal__body { text-align: center; padding: 18px 16px; }
+    .mock-modal__body h3 { font-size: 13px; font-weight: 600; color: var(--title); margin-bottom: 6px; }
+    .mock-modal__body p { font-size: 11px; color: var(--secondary); line-height: 1.65; margin-bottom: 12px; }
+    .nudge-btns { display: flex; flex-direction: column; gap: 6px; }
+    .btn-mock { padding: 8px 14px; border-radius: 8px; font-size: 11px; font-weight: 500; border: none; cursor: default; font-family: 'Poppins', sans-serif; width: 100%; }
+    .btn-mock--primary { background: var(--blue); color: #fff; }
+    .btn-mock--outline { background: var(--white); color: var(--blue); border: 1px solid var(--blue); }
+    .btn-mock--ghost { background: var(--white); color: var(--secondary); border: 1px solid var(--border); font-size: 10px; }
+
+    /* ── Current turn-off confirm (before) ── */
+    .confirm-body { padding: 18px 20px 8px; }
+    .confirm-body p { font-size: 12.5px; color: var(--secondary); line-height: 1.75; }
+    .modal-ft-between { padding: 12px 20px; border-top: 1px solid var(--divider); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+
+    /* ── Shared old-style buttons ── */
+    .btn { display: inline-flex; align-items: center; height: 34px; padding: 0 14px; font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 500; border-radius: 8px; border: 1px solid var(--border); background: var(--white); color: var(--secondary); cursor: default; }
+    .btn-primary { background: var(--blue); border-color: var(--blue); color: #fff; font-weight: 600; }
+    .btn-danger { background: #FF3F41; border-color: #FF3F41; color: #fff; font-weight: 600; }
+
+    /* ── OCFeatureLimit (current) ── */
+    .ofl-preview { border-radius: 10px; padding: 24px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; width: 100%; max-width: 340px; background: #edf1f5; }
+    .oc-fl-icon { line-height: 1; margin: 6px 0 10px; }
+    .oc-fl-icon svg { width: 100px; height: auto; }
+    .oc-fl-title { font-weight: 700; font-size: 15px; color: #102532; line-height: 1.45; margin-bottom: 8px; }
+    .oc-fl-title .accent { color: var(--blue); }
+    .oc-fl-desc { font-size: 12px; line-height: 1.75; color: #707070; max-width: 260px; margin-bottom: 4px; }
+    .oc-fl-btn { display: inline-flex; align-items: center; justify-content: center; height: 40px; padding: 0 28px; border-radius: 50px; background: var(--blue); border: none; color: #fff; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; cursor: default; margin-top: 16px; }
+
+    /* ═══════════════════════════════
+       REVISED DESIGNS
+    ═══════════════════════════════ */
+
+    /* ── Type F: Action Confirmation ── */
+    .m-conf-body { padding: 32px 28px 20px; text-align: center; }
+    .m-conf-title { font-size: 17px; font-weight: 700; color: var(--title); margin-bottom: 10px; line-height: 1.4; }
+    .m-conf-desc { font-size: 13px; color: var(--secondary); line-height: 1.75; }
+    .m-conf-actions { padding: 6px 28px 28px; display: flex; flex-direction: column; gap: 10px; }
+    .btn-pill-primary { display: flex; align-items: center; justify-content: center; height: 46px; border-radius: 50px; background: var(--blue); border: none; color: #fff; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; cursor: default; width: 100%; box-shadow: 0 3px 12px rgba(35,169,246,0.3); }
+    .btn-pill-outline { display: flex; align-items: center; justify-content: center; height: 46px; border-radius: 50px; background: var(--white); border: 1.5px solid var(--blue); color: var(--blue); font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 500; cursor: default; width: 100%; }
+    .btn-pill-outline-danger { display: flex; align-items: center; justify-content: center; height: 46px; border-radius: 50px; background: var(--white); border: 1.5px solid var(--danger); color: var(--danger); font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 500; cursor: default; width: 100%; }
+
+    /* ── Type B: Growth Gate — Page Overlay ── */
+    .m-gate-wrap { background: rgba(247,247,247,0.97); border-radius: 16px; padding: 28px 24px 24px; text-align: center; width: 100%; max-width: 360px; }
+    .m-gate-illus { margin-bottom: 16px; line-height: 1; }
+    .m-gate-illus svg { width: 100px; height: auto; }
+    .m-gate-title { font-size: 16px; font-weight: 700; color: var(--title); margin-bottom: 10px; line-height: 1.4; }
+    .m-gate-desc { font-size: 12px; color: var(--secondary); line-height: 1.7; max-width: 260px; margin: 0 auto 20px; }
+    .btn-pill-gate { display: flex; align-items: center; justify-content: center; height: 46px; border-radius: 50px; background: var(--blue); border: none; color: #fff; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; cursor: default; width: 100%; box-shadow: 0 4px 14px rgba(35,169,246,0.3); }
+
+    /* ── Switch-to-Pro billing modal (upgrade gate destination) ── */
+    .pro-modal { background: var(--white); border-radius: 16px; padding: 28px 28px 24px; position: relative; width: 100%; max-width: 340px; box-shadow: 0 20px 60px rgba(16,37,50,0.18); }
+    .pro-modal-title { font-size: 20px; font-weight: 600; color: #0A1F2C; line-height: 1.3; margin-bottom: 12px; padding-right: 32px; }
+    .pro-modal-sub { font-size: 14px; color: var(--text); line-height: 1.5; margin-bottom: 16px; }
+    .pro-modal-sub .hl { color: var(--success); font-weight: 600; }
+    .billing-box { background: var(--blue-tint); border-radius: 10px; padding: 14px 16px 10px; margin-bottom: 12px; }
+    .billing-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text); margin-bottom: 8px; }
+    .billing-row:last-of-type { margin-bottom: 0; }
+    .billing-row .plan-label { font-size: 13px; font-weight: 600; color: #0A1F2C; }
+    .billing-row.addon-row { background: #F1FCFF; border-radius: 6px; padding: 6px 8px; margin: 0 -8px 8px; }
+    .billing-row .label { font-weight: 400; font-size: 12px; }
+    .billing-row .amount { font-weight: 500; font-size: 12px; }
+    .billing-row .amount.credit { color: var(--success); }
+    .billing-divider { border: none; border-top: 1px solid var(--border); margin: 8px 0; }
+    .billing-due-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+    .billing-due-label { font-size: 13px; font-weight: 700; color: #0A1F2C; }
+    .billing-due-amount { font-size: 15px; font-weight: 700; color: var(--blue); }
+    .billing-due-note { font-size: 11px; color: var(--secondary); }
+    .next-billing { font-size: 11px; color: var(--secondary); margin-bottom: 16px; margin-top: 8px; }
+    .btn-subscribe { display: block; width: 100%; padding: 13px; border-radius: 40px; border: 1px solid var(--blue); background: var(--blue); color: #fff; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; cursor: default; margin-bottom: 8px; }
+    .btn-stay { display: block; width: 100%; padding: 11px; border-radius: 40px; border: 1px solid var(--border); background: #fff; color: var(--secondary); font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 400; cursor: default; text-align: center; }
+
+    /* Gate overlay background simulation */
+    .gate-bg-sim { position: relative; width: 100%; }
+    .gate-bg-blur { display: flex; gap: 6px; margin-bottom: 8px; filter: blur(3px); opacity: 0.35; }
+    .gate-bg-card { flex: 1; height: 48px; background: #fff; border-radius: 8px; }
+    .gate-bg-bar { height: 52px; background: rgba(255,255,255,0.4); border-radius: 8px; margin-bottom: 10px; filter: blur(2px); opacity: 0.5; }
+
+    /* Design type badge */
+    .type-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-bottom: 8px; }
+    .type-f { background: #FFF1CC; color: #7a5800; }
+    .type-b { background: var(--blue-tint); color: #1a7dbf; }
+    .type-pro { background: #e8eeff; color: #001983; }
+
+    /* ─ Type G: AI Process Modal ─ */
+    .m-process-header { background: linear-gradient(160deg,#d6eefb 0%,#d8f3ef 100%); padding: 20px 20px 18px; display: flex; align-items: flex-start; gap: 14px; position: relative; }
+    .m-process-icon { width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg,#23A9F6 0%,#1dd6c8 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 3px 10px rgba(35,169,246,0.35); }
+    .m-process-icon svg { width: 24px; height: 24px; }
+    .m-process-header-text { flex: 1; padding-right: 24px; }
+    .m-process-header-title { font-size: 15px; font-weight: 700; color: #102532; line-height: 1.3; margin-bottom: 0; }
+    .m-process-header-desc { font-size: 12px; color: #707070; line-height: 1.6; margin-top: 5px; }
+    .m-process-body { background: #fff; padding: 28px 24px 20px; text-align: center; }
+    .m-process-state-title { font-size: 15px; font-weight: 700; color: #102532; margin-bottom: 10px; line-height: 1.4; }
+    .m-process-state-desc { font-size: 12px; color: #707070; line-height: 1.7; max-width: 260px; margin: 0 auto 20px; }
+    @keyframes ml-spin { to { transform: rotate(360deg); } }
+    .m-ai-spinner { width: 42px; height: 42px; border-radius: 50%; border: 3.5px solid rgba(35,169,246,0.15); border-top-color: #23A9F6; border-right-color: rgba(35,169,246,0.5); animation: ml-spin 0.85s linear infinite; margin: 0 auto 20px; }
+  </style>
+</head>
+<body>
+
+<h1>弹窗 Copy 审阅</h1>
+<div class="subtitle">来源：ad-manager-aikit-freemium.html</div>
+<div class="meta-chips">
+  <span class="meta-chip">修改后 Copy 来源：switch-to-pro-annual-modal.html</span>
+  <span class="meta-chip">设计规范：modal-guidelines.html</span>
+  <span class="meta-chip"><span style="background:#FFF1CC;color:#7a5800;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;">F</span> Action Confirmation · <span style="background:#EEF6FF;color:#1a7dbf;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;">B</span> Growth Gate Overlay · <span style="background:#e8eeff;color:#001983;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;">PRO</span> Switch-to-Pro Billing</span>
+</div>
+
+<table class="review-table">
+  <thead>
+    <tr>
+      <th class="col-trigger">触发时机</th>
+      <th class="col-current">当前 Copy</th>
+      <th class="col-revised">修改后 Copy</th>
+    </tr>
+  </thead>
+  <tbody>
+
+    <!-- ═══════════════════════ GROUP A ═══════════════════════ -->
+    <tr class="group-row"><td colspan="3">A — Overlay Modals</td></tr>
+
+    <!-- A-4 -->
+    <tr>
+      <td class="col-trigger">
+        <div class="trigger-id">A-4</div>
+        <div class="trigger-name">AI Analysing 弹窗</div>
+        <div class="trigger-desc">Paid 用户完成 Import 后点 Continue，弹出分析进行中状态。</div>
+        <span class="trigger-tag paid">Paid 专属</span>
+      </td>
+      <td class="col-current">
+        <div class="preview-wrap">
+          <div class="m">
+            <div class="analysing-hero-band">
+              <div class="analysing-hero">🧠</div>
+              <div class="analysing-title">AI is analyzing Ad campaign...</div>
+            </div>
+            <div class="analysing-body">
+              <div class="analysing-desc">MediaLens AI is analyzing Ad content data to identify top-performing categories, hooks and angles. Strategic recommendations for your campaigns are on the way!</div>
+              <div class="analysing-progress"><div class="spinner-sm"></div>&nbsp;Processing 3 accounts · 240 campaigns</div>
+            </div>
+            <div class="analysing-ft"><button class="btn btn-primary" style="border-radius:50px;height:40px;padding:0 24px;">Go to Dashboard</button></div>
+          </div>
+        </div>
+      </td>
+      <td class="col-revised">
+        <div style="margin-bottom:6px;"><span class="trigger-id" style="display:inline;margin-right:6px;">A-4</span><span class="type-badge" style="background:#d8f5f3;color:#0a7a72;">G</span> AI Process Modal</div>
+        <div class="revised-wrap" style="padding:0;overflow:hidden;">
+          <div class="m">
+            <button class="m-x">✕</button>
+            <div class="m-process-header">
+              <div class="m-process-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2C12 2 13 7 17 8C13 9 12 14 12 14C12 14 11 9 7 8C11 7 12 2 12 2Z" fill="white" opacity="0.95"/>
+                  <path d="M19 14C19 14 19.5 16.5 22 17C19.5 17.5 19 20 19 20C19 20 18.5 17.5 16 17C18.5 16.5 19 14 19 14Z" fill="white" opacity="0.75"/>
+                  <path d="M5 16C5 16 5.4 17.8 7 18C5.4 18.2 5 20 5 20C5 20 4.6 18.2 3 18C4.6 17.8 5 16 5 16Z" fill="white" opacity="0.65"/>
+                </svg>
+              </div>
+              <div class="m-process-header-text">
+                <div class="m-process-header-title">AI Analysis</div>
+              </div>
+            </div>
+            <div class="m-process-body">
+              <div class="m-ai-spinner"></div>
+              <div class="m-process-state-title">AI is analyzing your ads...</div>
+              <div class="m-process-state-desc">This analysis consumes tokens and may take longer with more data.</div>
+              <button class="btn-pill-primary">Go to Dashboard</button>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+
+    <!-- A-5 -->
+    <tr>
+      <td class="col-trigger">
+        <div class="trigger-id">A-5</div>
+        <div class="trigger-name">AI Groups Filter 升级弹窗</div>
+        <div class="trigger-desc">Free Trial 用户点击 Performance 页 <strong>All Groups</strong> chip（带🔒）时触发。</div>
+        <span class="trigger-tag free">Free Trial 专属</span>
+      </td>
+      <td class="col-current">
+        <div class="preview-wrap">
+          <div class="m">
+            <div class="modal-hd">
+              <div class="modal-title">AI Groups Filter</div>
+              <button class="modal-close">✕</button>
+            </div>
+            <div style="padding:18px 20px 12px;">
+              <p style="font-size:13px;font-weight:700;color:var(--title);margin-bottom:8px;">Unlock AI-Powered Campaign Groups</p>
+              <p style="font-size:12px;color:var(--secondary);line-height:1.75;">The <strong>All Groups</strong> filter uses AI to automatically cluster your campaigns and ad sets by strategy, audience pattern, and creative performance.</p>
+            </div>
+            <div class="modal-ft"><button class="btn btn-primary">Upgrade Now</button></div>
+          </div>
+        </div>
+      </td>
+      <td class="col-revised">
+        <div style="margin-bottom:6px;"><span class="trigger-id" style="display:inline;margin-right:6px;">A-5</span><span class="type-badge type-f">F</span> Action Confirmation Modal</div>
+        <div class="revised-wrap">
+          <div class="m" style="position:relative;">
+            <button class="m-x">✕</button>
+            <div class="m-conf-body">
+              <div class="m-conf-title">Unlock <span style="color:var(--blue);">AI Grouping</span></div>
+              <div class="m-conf-desc">Cluster campaigns by product and winning creatives.</div>
+            </div>
+            <div class="m-conf-actions">
+              <button class="btn-pill-primary">Upgrade Now</button>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+
+    <!-- A-6 -->
+    <tr>
+      <td class="col-trigger">
+        <div class="trigger-id">A-6</div>
+        <div class="trigger-name">Demo Nudge 弹窗</div>
+        <div class="trigger-desc">Free Trial 用户累计点击 Dashboard Tab 页满 5 次后，延迟 300ms 弹出。</div>
+        <span class="trigger-tag free">Free Trial 专属</span>
+      </td>
+      <td class="col-current">
+        <div class="preview-wrap">
+          <div class="mock-modal">
+            <div class="mock-modal__hdr">
+              <div class="mock-modal__title">You're getting the hang of it!</div>
+              <button class="mock-modal__close">✕</button>
+            </div>
+            <div class="mock-modal__body">
+              <h3>Ready to see your real data?</h3>
+              <p>You've explored the demo. Connect your real Ad Account to see insights from your actual campaigns — or upgrade to unlock all AI Kit features.</p>
+              <div class="nudge-btns">
+                <button class="btn-mock btn-mock--primary">Connect Ad Account</button>
+                <button class="btn-mock btn-mock--outline">Upgrade Now</button>
+                <button class="btn-mock btn-mock--ghost">Keep Exploring Demo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </td>
+      <td class="col-revised">
+        <div style="margin-bottom:6px;"><span class="trigger-id" style="display:inline;margin-right:6px;">A-6</span><span class="type-badge type-f">F</span> Action Confirmation Modal</div>
+        <div class="revised-wrap">
+          <div class="m" style="position:relative;">
+            <button class="m-x">✕</button>
+            <div class="m-conf-body">
+              <div class="m-conf-title">Find Your Own Winners?</div>
+              <div class="m-conf-desc">Connect your ad account to uncover growth signals.</div>
+            </div>
+            <div class="m-conf-actions">
+              <button class="btn-pill-primary">Connect Ad Account</button>
+              <button class="btn-pill-outline">Upgrade Now</button>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+
+    <!-- A-7 -->
+    <tr>
+      <td class="col-trigger">
+        <div class="trigger-id">A-7</div>
+        <div class="trigger-name">AI Kit 关闭确认弹窗</div>
+        <div class="trigger-desc">Paid 用户在 Ad Accounts 页将某账号 <strong>AI Kit toggle 由 ON 拨为 OFF</strong> 时触发。</div>
+        <span class="trigger-tag paid">Paid 专属</span>
+      </td>
+      <td class="col-current">
+        <div class="preview-wrap">
+          <div class="m">
+            <div class="modal-hd">
+              <div class="modal-title">Turn Off AI Kit?</div>
+              <button class="modal-close">✕</button>
+            </div>
+            <div class="confirm-body">
+              <p>Data auto-sync, AI Group, and AI Agent will be disabled for <strong style="color:var(--title);">Nike HK — Brand Awareness</strong>. Existing insights will be kept but won't update until AI Kit is re-enabled.</p>
+            </div>
+            <div class="modal-ft-between" style="padding:12px 20px 18px;">
+              <button class="btn">Cancel</button>
+              <button class="btn btn-danger">Turn Off</button>
+            </div>
+          </div>
+        </div>
+      </td>
+      <td class="col-revised">
+        <div style="margin-bottom:6px;"><span class="trigger-id" style="display:inline;margin-right:6px;">A-7</span><span class="type-badge type-f">F</span> Action Confirmation Modal</div>
+        <div class="revised-wrap">
+          <div class="m" style="position:relative;">
+            <button class="m-x">✕</button>
+            <div class="m-conf-body">
+              <div class="m-conf-title">Pause Ad Manager?</div>
+              <div class="m-conf-desc">Data will stop syncing, and insights may become outdated.</div>
+            </div>
+            <div class="m-conf-actions">
+              <button class="btn-pill-primary">Keep On</button>
+              <button class="btn-pill-outline-danger">Pause Anyway</button>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+
+    <!-- ═══════════════════════ GROUP B ═══════════════════════ -->
+    <tr class="group-row"><td colspan="3">B — OCFeatureLimit 内嵌遮罩（原版 6 个页面共用同一套 Copy → 修改后场景专属）</td></tr>
+
+    <!-- B-1 Content Intel -->
+    <tr>
+      <td class="col-trigger">
+        <div class="trigger-id">B-1</div>
+        <div class="trigger-name">Content Intel 遮罩</div>
+        <div class="trigger-desc">Free Trial 用户进入 <strong>Content Intel</strong> Tab，页面叠加毛玻璃遮罩。用户想了解内容格式表现。</div>
+        <span class="trigger-tag free">Free Trial 专属</span>
+      </td>
+      <td class="col-current">
+        <div class="preview-wrap" style="background:#eef2f7;">
+          <div class="ofl-preview">
+            <div class="oc-fl-icon"><svg viewBox="0 0 160 118" fill="none"><ellipse cx="80" cy="113" rx="58" ry="5" fill="#D8D8D8" opacity="0.7"/><rect x="8" y="98" width="144" height="12" rx="6" fill="#2D2D3E"/><rect x="20" y="93" width="120" height="7" rx="3" fill="#22223A"/><rect x="12" y="6" width="136" height="90" rx="8" fill="#22223A"/><rect x="19" y="12" width="122" height="78" rx="4" fill="#FFFFFF"/><rect x="19" y="12" width="122" height="20" rx="3" fill="#23A9F6"/><rect x="24" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/><rect x="38" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/><rect x="24" y="70" width="11" height="18" rx="2" fill="#52C41A" opacity="0.55"/><rect x="38" y="60" width="11" height="28" rx="2" fill="#52C41A" opacity="0.7"/><rect x="52" y="52" width="11" height="36" rx="2" fill="#52C41A" opacity="0.85"/><line x1="20" y1="88" x2="140" y2="88" stroke="#E8E8E8" stroke-width="1.5"/><path d="M62 66v-10a18 18 0 0 1 36 0v10" stroke="#E6A800" stroke-width="4.5" stroke-linecap="round" fill="none"/><rect x="57" y="64" width="46" height="36" rx="8" fill="#FFC960"/><circle cx="80" cy="78" r="6" fill="#D08000"/><rect x="77.5" y="79" width="5" height="10" rx="2.5" fill="#D08000"/></svg></div>
+            <div class="oc-fl-title">Upgrade to unlock <span class="accent">Ad Manager AI Kit</span></div>
+            <div class="oc-fl-desc">MediaLens AI will analyze ad data to identify top-performing categories, hooks and angles to provide deeper insights for ad performance.</div>
+            <button class="oc-fl-btn">Upgrade Now</button>
+          </div>
+        </div>
+      </td>
+      <td class="col-revised">
+        <div style="margin-bottom:6px;"><span class="type-badge type-b">B</span> Growth Gate — Page Overlay</div>
+        <div class="revised-wrap" style="background:#e0eaf5;">
+          <div class="gate-bg-sim">
+            <div class="gate-bg-blur"><div class="gate-bg-card"></div><div class="gate-bg-card"></div><div class="gate-bg-card"></div></div>
+            <div class="gate-bg-bar"></div>
+            <div class="m-gate-wrap">
+              <div class="m-gate-illus"><svg viewBox="0 0 160 118" fill="none"><ellipse cx="80" cy="113" rx="58" ry="5" fill="#D8D8D8" opacity="0.7"/><rect x="8" y="98" width="144" height="12" rx="6" fill="#2D2D3E"/><rect x="20" y="93" width="120" height="7" rx="3" fill="#22223A"/><rect x="12" y="6" width="136" height="90" rx="8" fill="#22223A"/><rect x="19" y="12" width="122" height="78" rx="4" fill="#FFFFFF"/><rect x="19" y="12" width="122" height="20" rx="3" fill="#23A9F6"/><rect x="24" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/><rect x="38" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/><rect x="24" y="70" width="11" height="18" rx="2" fill="#52C41A" opacity="0.55"/><rect x="38" y="60" width="11" height="28" rx="2" fill="#52C41A" opacity="0.7"/><rect x="52" y="52" width="11" height="36" rx="2" fill="#52C41A" opacity="0.85"/><line x1="20" y1="88" x2="140" y2="88" stroke="#E8E8E8" stroke-width="1.5"/><path d="M62 66v-10a18 18 0 0 1 36 0v10" stroke="#E6A800" stroke-width="4.5" stroke-linecap="round" fill="none"/><rect x="57" y="64" width="46" height="36" rx="8" fill="#FFC960"/><circle cx="80" cy="78" r="6" fill="#D08000"/><rect x="77.5" y="79" width="5" height="10" rx="2.5" fill="#D08000"/></svg></div>
+              <div class="m-gate-title">Unlock <span style="color:var(--blue);">AI Insights</span></div>
+              <div class="m-gate-desc">Find winning categories, hooks, and angles faster.</div>
+              <button class="btn-pill-gate">Upgrade Now</button>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+
+    <!-- B-6 AI Agent -->
+    <tr>
+      <td class="col-trigger">
+        <div class="trigger-id">B-6</div>
+        <div class="trigger-name">AI Agent 遮罩</div>
+        <div class="trigger-desc">Free Trial 用户进入 <strong>AI Agent</strong> Tab。想直接提问获得答案。</div>
+        <span class="trigger-tag free">Free Trial 专属</span>
+      </td>
+      <td class="col-current">
+        <div class="preview-wrap" style="background:#eef2f7;">
+          <div class="ofl-preview">
+            <div class="oc-fl-icon"><svg viewBox="0 0 160 118" fill="none"><ellipse cx="80" cy="113" rx="58" ry="5" fill="#D8D8D8" opacity="0.7"/><rect x="8" y="98" width="144" height="12" rx="6" fill="#2D2D3E"/><rect x="20" y="93" width="120" height="7" rx="3" fill="#22223A"/><rect x="12" y="6" width="136" height="90" rx="8" fill="#22223A"/><rect x="19" y="12" width="122" height="78" rx="4" fill="#FFFFFF"/><rect x="19" y="12" width="122" height="20" rx="3" fill="#23A9F6"/><rect x="24" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/><rect x="38" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/><rect x="24" y="70" width="11" height="18" rx="2" fill="#52C41A" opacity="0.55"/><rect x="38" y="60" width="11" height="28" rx="2" fill="#52C41A" opacity="0.7"/><rect x="52" y="52" width="11" height="36" rx="2" fill="#52C41A" opacity="0.85"/><line x1="20" y1="88" x2="140" y2="88" stroke="#E8E8E8" stroke-width="1.5"/><path d="M62 66v-10a18 18 0 0 1 36 0v10" stroke="#E6A800" stroke-width="4.5" stroke-linecap="round" fill="none"/><rect x="57" y="64" width="46" height="36" rx="8" fill="#FFC960"/><circle cx="80" cy="78" r="6" fill="#D08000"/><rect x="77.5" y="79" width="5" height="10" rx="2.5" fill="#D08000"/></svg></div>
+            <div class="oc-fl-title">Upgrade to unlock <span class="accent">Ad Manager AI Kit</span></div>
+            <div class="oc-fl-desc">MediaLens AI will analyze ad data to identify top-performing categories, hooks and angles to provide deeper insights for ad performance.</div>
+            <button class="oc-fl-btn">Upgrade Now</button>
+          </div>
+        </div>
+      </td>
+      <td class="col-revised">
+        <div style="margin-bottom:6px;"><span class="type-badge type-b">B</span> Growth Gate — Page Overlay</div>
+        <div class="revised-wrap" style="background:#e0eaf5;">
+          <div class="gate-bg-sim">
+            <div class="gate-bg-blur"><div class="gate-bg-card"></div><div class="gate-bg-card"></div><div class="gate-bg-card"></div></div>
+            <div class="gate-bg-bar"></div>
+            <div class="m-gate-wrap">
+              <div class="m-gate-illus"><svg viewBox="0 0 160 118" fill="none"><ellipse cx="80" cy="113" rx="58" ry="5" fill="#D8D8D8" opacity="0.7"/><rect x="8" y="98" width="144" height="12" rx="6" fill="#2D2D3E"/><rect x="20" y="93" width="120" height="7" rx="3" fill="#22223A"/><rect x="12" y="6" width="136" height="90" rx="8" fill="#22223A"/><rect x="19" y="12" width="122" height="78" rx="4" fill="#FFFFFF"/><rect x="19" y="12" width="122" height="20" rx="3" fill="#23A9F6"/><rect x="24" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/><rect x="38" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/><rect x="24" y="70" width="11" height="18" rx="2" fill="#52C41A" opacity="0.55"/><rect x="38" y="60" width="11" height="28" rx="2" fill="#52C41A" opacity="0.7"/><rect x="52" y="52" width="11" height="36" rx="2" fill="#52C41A" opacity="0.85"/><line x1="20" y1="88" x2="140" y2="88" stroke="#E8E8E8" stroke-width="1.5"/><path d="M62 66v-10a18 18 0 0 1 36 0v10" stroke="#E6A800" stroke-width="4.5" stroke-linecap="round" fill="none"/><rect x="57" y="64" width="46" height="36" rx="8" fill="#FFC960"/><circle cx="80" cy="78" r="6" fill="#D08000"/><rect x="77.5" y="79" width="5" height="10" rx="2.5" fill="#D08000"/></svg></div>
+              <div class="m-gate-title">Unlock <span style="color:var(--blue);">AI Agent</span></div>
+              <div class="m-gate-desc">Ask AI what to do next.</div>
+              <button class="btn-pill-gate">Subscribe Now</button>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+
+    <!-- ═══════════════════════ GROUP C ═══════════════════════ -->
+    <tr class="group-row"><td colspan="3">C — 付费转化 Modal（Free Trial 点击 Upgrade Now 后触发）</td></tr>
+
+    <!-- C-2 Upgrade Ad Manager (Split-Panel) -->
+    <tr>
+      <td class="col-trigger">
+        <div class="trigger-id">C-2</div>
+        <div class="trigger-name">升级弹窗 — Split-Panel</div>
+        <div class="trigger-desc">Free Trial 用户点击任意 <strong>Upgrade Now</strong> 后触发，展示完整的计划选择与 Ad Manager Add-on 界面。新版全功能升级弹窗。</div>
+        <span class="trigger-tag free">Free Trial 专属</span>
+      </td>
+      <td class="col-current">
+        <div class="preview-wrap" style="display:flex;align-items:center;justify-content:center;min-height:140px;">
+          <span style="font-size:13px;color:var(--placeholder);">— 全新弹窗，暂无旧版本 —</span>
+        </div>
+      </td>
+      <td class="col-revised">
+        <div style="margin-bottom:6px;"><span class="trigger-id" style="display:inline;margin-right:6px;">C-2</span><span class="type-badge" style="background:#f0e8ff;color:#5a00b0;">NEW</span> Split-Panel 升级弹窗</div>
+        <div class="revised-wrap" style="padding:8px;overflow:hidden;display:block;">
+          <div style="width:326px;height:220px;overflow:hidden;border-radius:8px;">
+            <iframe src="upgrade-ad-manager-modal.html"
+              style="width:870px;height:586px;border:none;transform:scale(0.375);transform-origin:top left;"
+              scrolling="no"
+              title="Upgrade Ad Manager Modal Preview">
+            </iframe>
+          </div>
+        </div>
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+
+<script>
+  // Inject code badge into revised column for B-1~B-6
+  document.querySelectorAll('.review-table tbody tr:not(.group-row)').forEach(function(row) {
+    var idEl = row.querySelector('.trigger-id');
+    if (!idEl) return;
+    var code = idEl.textContent.trim();
+    if (!code.startsWith('B-')) return;
+    var revisedTd = row.querySelector('.col-revised');
+    if (!revisedTd) return;
+    var firstDiv = revisedTd.querySelector('div[style*="margin-bottom:6px"]');
+    if (!firstDiv) return;
+    // Prepend code span if not already present
+    if (firstDiv.querySelector('.b-code-label')) return;
+    var codeSpan = document.createElement('span');
+    codeSpan.className = 'trigger-id b-code-label';
+    codeSpan.style.cssText = 'display:inline;margin-right:6px;';
+    codeSpan.textContent = code;
+    firstDiv.insertBefore(codeSpan, firstDiv.firstChild);
+  });
+</script>
+</body>
+</html>
