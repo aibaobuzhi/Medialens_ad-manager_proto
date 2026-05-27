@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediaLens Prototypes</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Poppins', sans-serif; background: #F7F7F7; color: #102532; min-height: 100vh; display: flex; flex-direction: column; }
+.nav { height: 64px; background: #23A9F6; display: flex; align-items: center; padding: 0 40px; }
+.nav-logo { font-size: 18px; font-weight: 700; color: #fff; }
+.nav-logo span { font-weight: 400; opacity: 0.75; }
+.page { max-width: 800px; margin: 60px auto; padding: 0 32px; }
+h1 { font-size: 22px; font-weight: 700; color: #0A1F2C; margin-bottom: 8px; }
+.sub { font-size: 13px; color: #707070; margin-bottom: 40px; }
+.list { display: flex; flex-direction: column; gap: 12px; }
+.item {
+  background: #fff;
+  border-radius: 10px;
+  border: 1.5px solid #D9E3E6;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.item:hover { border-color: #23A9F6; box-shadow: 0 2px 12px rgba(35,169,246,0.12); }
+.item-name { font-size: 14px; font-weight: 600; color: #102532; }
+.item-desc { font-size: 12px; color: #707070; margin-top: 2px; }
+.item-arrow { font-size: 16px; color: #23A9F6; }
+</style>
+</head>
+<body>
+<nav class="nav"><div class="nav-logo">Media<span>Lens</span></div></nav>
+<div class="page">
+  <h1>Prototype Index</h1>
+  <p class="sub">MediaLens Ad Manager 设计原型库</p>
+  <div class="list">
+    <a class="item" href="./modal-review-aikit-freemium.html">
+      <div>
+        <div class="item-name">弹窗 Copy 审阅（Before&After）：</div>
+        <div class="item-desc">Ad Manager Freemium — 弹窗 Copy 对比审阅</div>
+      </div>
+      <div class="item-arrow">→</div>
+    </a>
+  </div>
+</div>
+</body>
+</html>
