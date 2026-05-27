@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Upgrade to Ad Manager — MediaLens</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #23A9F6;
+      --blue-tint: #EEF6FF;
+      --title: #0A1F2C;
+      --text: #102532;
+      --secondary: #707070;
+      --border: #D9E3E6;
+      --divider: #E8EEF0;
+      --surface: #F7F7F7;
+      --white: #FFFFFF;
+      --success: #52C41A;
+      --success-light: #E6FBEB;
+      --warning: #FFC960;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #CDD8E2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,31,44,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 24px;
+    }
+
+    /* ── Modal shell ── */
+    .modal {
+      display: flex;
+      width: 860px;
+      max-width: 96vw;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(10,31,44,0.32);
+      position: relative;
+    }
+
+    /* ══════════════════════
+       LEFT PANEL
+    ══════════════════════ */
+    .panel-left {
+      width: 340px;
+      flex-shrink: 0;
+      background: linear-gradient(155deg, #0D2337 0%, #0A1C2D 55%, #071524 100%);
+      padding: 34px 28px 36px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+    .panel-left::before {
+      content: '';
+      position: absolute;
+      top: -80px; left: -80px;
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, rgba(35,169,246,0.13) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .panel-left::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(35,169,246,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .pro-badge {
+      display: inline-flex;
+      align-items: center;
+      background: var(--warning);
+      color: #5a3a00;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      width: fit-content;
+      margin-bottom: 14px;
+    }
+
+    .left-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+      margin-bottom: 6px;
+    }
+    .left-title .accent { color: var(--blue); }
+
+    .left-sub {
+      font-size: 12.5px;
+      color: rgba(255,255,255,0.48);
+      margin-bottom: 28px;
+      line-height: 1.55;
+    }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.38);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .benefit-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 12px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .benefit-check {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: rgba(82,196,26,0.14);
+      border: 1.5px solid rgba(82,196,26,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .benefit-label {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.72);
+      line-height: 1.35;
+    }
+
+    /* ══════════════════════
+       RIGHT PANEL
+    ══════════════════════ */
+    .panel-right {
+      flex: 1;
+      background: var(--white);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Scrollable body + fixed footer */
+    .panel-body {
+      flex: 1;
+      padding: 32px 32px 0;
+      overflow-y: auto;
+    }
+
+    .panel-footer {
+      padding: 20px 32px 28px;
+      border-top: 1px solid var(--divider);
+      background: var(--white);
+    }
+
+    /* Close */
+    .btn-close {
+      position: absolute;
+      top: 18px; right: 18px;
+      width: 30px; height: 30px;
+      border: none; background: none;
+      cursor: pointer;
+      color: var(--secondary);
+      font-size: 17px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+      z-index: 10;
+    }
+    .btn-close:hover { background: var(--surface); color: var(--title); }
+
+    /* Header */
+    .right-header {
+      margin-bottom: 20px;
+      padding-right: 36px;
+    }
+    .right-header-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--secondary);
+      margin-bottom: 4px;
+    }
+    .right-header-plan {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--title);
+    }
+
+    /* Plan cards — 2 column like reference */
+    .plan-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .plan-card {
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px 14px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      background: var(--white);
+    }
+    .plan-card:hover:not(.active) { border-color: #a8d8f5; }
+    .plan-card.active {
+      border-color: var(--blue);
+      background: var(--blue-tint);
+    }
+
+    .plan-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .plan-card-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--title);
+    }
+    .save-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: #1a1a1a;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 20px;
+    }
+
+    .plan-card-price {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--title);
+      line-height: 1;
+    }
+    .plan-card-unit {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--secondary);
+      margin-left: 2px;
+    }
+
+    /* Add-on section */
+    .addon-section {
+      margin-bottom: 28px;
+    }
+
+    .addon-section-header {
+      margin-bottom: 12px;
+    }
+    .addon-section-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--secondary);
+    }
+
+    /* Ad Manager card — horizontal, full-width */
+    .addon-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      transition: border-color 0.2s, background 0.2s;
+      background: var(--white);
+    }
+    .addon-card.active {
+      border-color: var(--blue);
+      background: var(--blue-tint);
+    }
+
+    .addon-card-left { display: flex; flex-direction: column; gap: 2px; }
+    .addon-card-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--title);
+    }
+    .addon-card-price {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--title);
+      line-height: 1;
+    }
+    .addon-card-unit {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--secondary);
+      margin-left: 2px;
+    }
+
+    /* Toggle */
+    .toggle-wrap { display: flex; align-items: center; }
+    .toggle-input { display: none; }
+    .toggle-slider {
+      width: 46px; height: 26px;
+      background: #D0D5D8;
+      border-radius: 26px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle-slider::after {
+      content: '';
+      position: absolute;
+      width: 20px; height: 20px;
+      background: #fff;
+      border-radius: 50%;
+      top: 3px; left: 3px;
+      transition: left 0.2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.22);
+    }
+    .toggle-input:checked + .toggle-slider { background: var(--blue); }
+    .toggle-input:checked + .toggle-slider::after { left: 23px; }
+
+    /* Total section */
+    .total-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+    .total-label {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--title);
+      padding-top: 4px;
+    }
+    .total-right { text-align: right; }
+    .total-monthly {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--title);
+      line-height: 1.1;
+    }
+    .total-monthly-unit {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--secondary);
+    }
+    .total-yearly {
+      font-size: 12px;
+      color: var(--secondary);
+      margin-top: 3px;
+    }
+
+    /* CTA */
+    .btn-upgrade {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 15px;
+      border-radius: 50px;
+      border: none;
+      background: var(--blue);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      letter-spacing: 0.01em;
+    }
+    .btn-upgrade:hover { background: #1a96df; }
+    .btn-upgrade:active { transform: scale(0.99); }
+    .btn-upgrade-star { font-size: 16px; }
+
+    /* Success overlay */
+    .success-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: var(--white);
+      border-radius: 0 20px 20px 0;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 14px;
+      padding: 40px;
+      text-align: center;
+      z-index: 20;
+    }
+    .success-overlay.show { display: flex; }
+    .success-icon {
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: var(--success-light);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .success-title { font-size: 18px; font-weight: 700; color: var(--title); }
+    .success-desc { font-size: 13px; color: var(--secondary); line-height: 1.6; }
+    .btn-done {
+      margin-top: 8px;
+      padding: 12px 40px;
+      border-radius: 50px;
+      border: none;
+      background: var(--blue);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-done:hover { background: #1a96df; }
+  </style>
+</head>
+<body>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+
+    <!-- ═══════════ LEFT ═══════════ -->
+    <div class="panel-left">
+      <div class="left-title">
+        Unlock <span class="accent">Ad Manager</span>
+      </div>
+      <div class="left-sub">Unlock AI-powered insights. Stop guessing, start winning.</div>
+
+      <div class="section-label">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M6 1L7.5 4.5H11L8.5 6.8L9.5 10.5L6 8.3L2.5 10.5L3.5 6.8L1 4.5H4.5L6 1Z" fill="#23A9F6"/>
+        </svg>
+        UNLOCKED FEATURES
+      </div>
+
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <div class="benefit-check">
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#52C41A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="benefit-label">AI Campaign Analysis</div>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-check">
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#52C41A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="benefit-label">Campaign Groups</div>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-check">
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#52C41A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="benefit-label">Content Intelligence</div>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-check">
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#52C41A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="benefit-label">Creative Intelligence</div>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-check">
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#52C41A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="benefit-label">Video Intelligence</div>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-check">
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#52C41A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="benefit-label">AI Agent</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ RIGHT ═══════════ -->
+    <div class="panel-right">
+      <button class="btn-close" onclick="closeModal()">&#10005;</button>
+
+      <div class="panel-body">
+
+        <!-- Header: 2 lines -->
+        <div class="right-header">
+          <div class="right-header-label" id="right-header-label">Choose your plan</div>
+          <div style="display:flex;align-items:baseline;gap:10px;">
+            <div class="right-header-plan">Lite Plan</div>
+            <span style="font-size:12px;font-weight:600;color:var(--blue);cursor:pointer;">change &rsaquo;</span>
+          </div>
+        </div>
+
+        <!-- Plan cards -->
+        <div class="plan-cards">
+          <div class="plan-card active" id="card-monthly" onclick="selectPlan('monthly')">
+            <div class="plan-card-top">
+              <span class="plan-card-name">Pay monthly</span>
+            </div>
+            <div>
+              <span class="plan-card-price">US$64</span>
+              <span class="plan-card-unit">/per month</span>
+            </div>
+          </div>
+
+          <div class="plan-card" id="card-yearly" onclick="selectPlan('yearly')">
+            <div class="plan-card-top">
+              <span class="plan-card-name">Pay yearly</span>
+              <span class="save-badge">&#128293; Save 15%</span>
+            </div>
+            <div>
+              <span class="plan-card-price">US$75.26</span>
+              <span class="plan-card-unit">/per month</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add-on section -->
+        <div class="addon-section">
+          <div class="addon-section-header">
+            <span class="addon-section-label">Add on</span>
+          </div>
+
+          <div class="addon-card active" id="addon-card">
+            <div class="addon-card-left">
+              <span class="addon-card-name">Ad Manager</span>
+              <div>
+                <span class="addon-card-price">US$3,000</span>
+                <span class="addon-card-unit">/month</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /panel-body -->
+
+      <!-- Fixed footer -->
+      <div class="panel-footer">
+        <div class="total-section">
+          <span class="total-label">Today's Total</span>
+          <div class="total-right">
+            <div>
+              <span class="total-monthly" id="total-mo-val">US$314</span>
+              <span class="total-monthly-unit">/per month</span>
+            </div>
+            <div class="total-yearly" id="total-yr-val">Billed US$3,768 annually</div>
+          </div>
+        </div>
+
+        <button class="btn-upgrade" onclick="confirmUpgrade()">
+          <span class="btn-upgrade-star">&#10022;</span>
+          Upgrade now
+        </button>
+      </div>
+
+      <!-- Success overlay -->
+      <div class="success-overlay" id="successOverlay">
+        <div class="success-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <path d="M6 14.5L11.5 20L22 9" stroke="#52C41A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="success-title">Subscription Confirmed!</div>
+        <div class="success-desc" id="successDesc"></div>
+        <button class="btn-done" onclick="closeModal()">Done</button>
+      </div>
+    </div><!-- /panel-right -->
+
+  </div>
+</div>
+
+<script>
+  var currentPlan = 'monthly';
+  var ADDON_MO = 3000;
+
+  var PLANS = {
+    monthly: { base: 64    },
+    yearly:  { base: 75.26 }
+  };
+
+  function fmt(n) {
+    return 'US$' + n.toLocaleString('en-US', {
+      minimumFractionDigits: n % 1 === 0 ? 0 : 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  function updateUI() {
+    var p = PLANS[currentPlan];
+    var mo = p.base + ADDON_MO;
+    var yr = mo * 12;
+    document.getElementById('total-mo-val').textContent = fmt(mo);
+    document.getElementById('total-yr-val').textContent = 'Billed ' + fmt(yr) + ' annually';
+  }
+
+  function selectPlan(plan) {
+    currentPlan = plan;
+    document.getElementById('card-monthly').classList.toggle('active', plan === 'monthly');
+    document.getElementById('card-yearly').classList.toggle('active', plan === 'yearly');
+    updateUI();
+  }
+
+  function confirmUpgrade() {
+    var p = PLANS[currentPlan];
+    var addonOn = document.getElementById('addon-toggle').checked;
+    var mo = p.base + (addonOn ? p.addonMo : 0);
+    var yr = mo * 12;
+    var planLabel = currentPlan === 'monthly' ? 'monthly' : 'yearly';
+    var addonLabel = addonOn ? ' + Ad Manager' : '';
+    var desc = 'You\'re now on the Lite Plan' + addonLabel + '.<br/>Billed at '
+      + fmt(mo) + '/month (' + fmt(yr) + '/year) going forward.';
+    document.getElementById('successDesc').innerHTML = desc;
+    document.getElementById('successOverlay').classList.add('show');
+  }
+
+  function closeModal() {
+    document.getElementById('overlay').style.display = 'none';
+  }
+
+  document.getElementById('overlay').addEventListener('click', function(e) {
+    if (e.target === this) {
+      this.style.display = 'flex';
+      document.getElementById('successOverlay').classList.remove('show');
+      selectPlan('monthly');
+    }
+  });
+
+  // Init
+  updateUI();
+</script>
+
+</body>
+</html>
