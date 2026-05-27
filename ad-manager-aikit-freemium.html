@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Ad Manager — AI Kit Freemium &amp; Paid Flows</title>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+        <style>*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; } :root { --blue: #23A9F6; --blue-tint: #EEF6FF; --surface: #F7F7F7; --surface-ai: #F6F8FD; --white: #FFFFFF; --title: #0A1F2C; --text: #102532; --secondary: #707070; --placeholder: #CACACA; --border: #D9E3E6; --divider: #E8EEF0; --success: #52C41A; --success-light: #E6FBEB; --danger: #FF3F41; --warning: #FFC960; --warning-light: #FFF8EB; } body { font-family: 'Poppins', sans-serif; background: var(--surface); color: var(--text); font-size: 14px; } /* ─── Demo Nav Bar (top — page navigation only) ──── */.demo-bar { position: fixed; top: 0; left: 0; right: 0; height: 40px; background: #0f172a; display: flex; align-items: center; padding: 0 14px; gap: 5px; z-index: 9999; overflow-x: auto; white-space: nowrap; } .demo-label { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.6px; margin-right: 2px; flex-shrink: 0; } .demo-btn { padding: 2px 10px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.12); background: transparent; color: rgba(255,255,255,0.5); font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 500; cursor: pointer; transition: all 0.15s; white-space: nowrap; flex-shrink: 0; } .demo-btn:hover { border-color: rgba(255,255,255,0.35); color: rgba(255,255,255,0.9); } .demo-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; } /* ─── User Switcher — bottom-right floating panel ── */.user-switcher { position: fixed; bottom: 24px; right: 24px; z-index: 9998; background: #1a1a2e; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 6px 28px rgba(0,0,0,0.35); min-width: 160px; } .us-label { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.7px; } .us-btns { display: flex; flex-direction: column; gap: 6px; } .us-btn { padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); background: transparent; color: rgba(255,255,255,0.6); font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.15s; text-align: left; line-height: 1.4; } .us-btn:hover { border-color: rgba(255,255,255,0.4); color: #fff; } .us-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; } .us-btn-sub { display: block; font-size: 10px; font-weight: 400; opacity: 0.75; margin-top: 1px; } /* ─── App Shell ──────────────────────────────────── */.shell { padding-top: calc(40px + 64px); padding-left: 72px; min-height: 100vh; } /* ─── Top Nav ────────────────────────────────────── */.top-nav { position: fixed; top: 40px; left: 0; right: 0; height: 64px; background: var(--blue); display: flex; align-items: center; padding: 0 24px; gap: 14px; z-index: 100; box-shadow: 0 2px 10px rgba(35,169,246,0.3); } .nav-logo { font-size: 17px; font-weight: 700; color: #fff; letter-spacing: -0.2px; flex-shrink: 0; } .nav-logo span { font-weight: 400; opacity: 0.75; } .nav-spacer { flex: 1; } .trial-badge { display: flex; align-items: center; gap: 7px; background: rgba(0,0,0,0.18); border-radius: 20px; padding: 5px 13px; font-size: 12px; color: rgba(255,255,255,0.9); } .upgrade-btn { background: #fff; color: var(--blue); font-weight: 700; font-size: 12px; padding: 6px 16px; border-radius: 8px; border: none; cursor: pointer; font-family: 'Poppins', sans-serif; } .paid-badge { display: flex; align-items: center; gap: 5px; background: rgba(82,196,26,0.2); border: 1px solid rgba(82,196,26,0.4); color: #fff; border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; } .nav-avatar { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.25); border: 2px solid rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; cursor: pointer; flex-shrink: 0; } /* ─── Sidebar ────────────────────────────────────── */.sidebar { position: fixed; top: calc(40px + 64px); bottom: 0; left: 0; width: 72px; background: var(--white); border-right: 1px solid var(--divider); display: flex; flex-direction: column; align-items: center; padding: 16px 0; gap: 4px; z-index: 90; } .sb-item { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.15s, color 0.15s; color: var(--placeholder); position: relative; } .sb-item:hover { background: var(--blue-tint); color: var(--blue); } .sb-item.active { background: var(--blue-tint); color: var(--blue); } .sb-item.active::before { content: ''; position: absolute; left: -8px; top: 50%; transform: translateY(-50%); width: 4px; height: 24px; background: var(--blue); border-radius: 0 4px 4px 0; } .sb-item svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; } /* ─── Main ───────────────────────────────────────── */.main { padding: 28px 32px; max-width: 1200px; } .page { display: none; } .page.visible { display: block; } .page-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; } .page-title { font-size: 22px; font-weight: 600; color: var(--title); letter-spacing: -0.2px; } .breadcrumb { font-size: 12px; color: var(--secondary); margin-bottom: 16px; display: flex; align-items: center; gap: 6px; } .breadcrumb .bc-active { color: var(--blue); font-weight: 500; } /* ─── Buttons ────────────────────────────────────── */.btn { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 16px; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 500; border-radius: 8px; border: 1px solid var(--border); background: var(--white); color: var(--secondary); cursor: pointer; transition: all 0.15s; white-space: nowrap; } .btn:hover { border-color: #b8cbd0; background: #f9fafb; } .btn-primary { background: var(--blue); border-color: var(--blue); color: #fff; font-weight: 600; box-shadow: 0 2px 8px rgba(35,169,246,0.3); } .btn-primary:hover { background: #1a9ee0; border-color: #1a9ee0; } .btn-outline { background: var(--white); border-color: var(--blue); color: var(--blue); font-weight: 500; } .btn-outline:hover { background: var(--blue-tint); } .btn-lg { height: 42px; padding: 0 24px; font-size: 14px; } .btn-sm { height: 30px; padding: 0 12px; font-size: 12px; border-radius: 6px; } /* ─── Cards ──────────────────────────────────────── */.card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; } /* ─── DemoDisclaimer bar (matches real component) ── */.demo-disclaimer { display: flex; min-height: 24px; padding: 12px 20px; justify-content: space-between; align-items: center; border-radius: 8px; background: var(--blue); color: #fff; font-family: Poppins; font-size: 12px; font-weight: 500; margin-bottom: 16px; } .disclaimer-left { display: flex; align-items: center; gap: 12px; } .disclaimer-bell { width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: #fff; stroke-width: 2; } .disclaimer-view-group { display: flex; flex-direction: column; gap: 2px; } .disclaimer-view-title { font-size: 13px; font-weight: 600; line-height: 1.4; } .disclaimer-view-desc { font-size: 11px; font-weight: 400; opacity: 0.85; line-height: 1.4; } .disclaimer-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-left: 12px; } .disclaimer-view-btn { display: flex; align-items: center; padding: 6px 12px; border: 1px solid #fff; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 500; white-space: nowrap; transition: background 0.2s; } .disclaimer-view-btn:hover { background: rgba(255,255,255,0.15); } .disclaimer-close { display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 4px; cursor: pointer; opacity: 0.75; font-size: 14px; transition: opacity 0.2s; } .disclaimer-close:hover { opacity: 1; background: rgba(255,255,255,0.15); } /* ─── AI Classifier Toggle (Paid — per account) ──── */.clf-cell { display: none; align-items: center; gap: 8px; } .clf-toggle { position: relative; display: inline-block; width: 38px; height: 21px; flex-shrink: 0; cursor: pointer; } .clf-toggle input { opacity: 0; width: 0; height: 0; position: absolute; } .clf-slider { position: absolute; inset: 0; border-radius: 21px; background: #ccc; transition: background 0.2s; } .clf-slider::before { content: ''; position: absolute; width: 15px; height: 15px; border-radius: 50%; left: 3px; top: 3px; background: white; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); } .clf-toggle input:checked ~ .clf-slider { background: var(--success); } .clf-toggle input:checked ~ .clf-slider::before { transform: translateX(17px); } .clf-label { font-size: 12px; color: var(--secondary); white-space: nowrap; } .clf-label.paused { color: var(--placeholder); } /* ─── Classifier-Off Warning Banner (AI pages) ───── */.classifier-warn-bar { display: none; align-items: center; gap: 10px; background: var(--warning-light); border: 1px solid rgba(255,201,96,0.55); border-radius: 8px; padding: 10px 16px; font-size: 13px; color: #7a5200; margin-bottom: 12px; } .classifier-warn-bar svg { width: 16px; height: 16px; flex-shrink: 0; } /* ─── Info Banner (AI Kit off notice) ───────────── */.info-banner { display: flex; align-items: center; gap: 10px; background: var(--blue-tint); border: 1px solid rgba(35,169,246,0.25); border-radius: 10px; padding: 12px 16px; font-size: 13px; color: var(--text); margin-bottom: 20px; } .info-banner svg { color: var(--blue); flex-shrink: 0; width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; } /* ─── AI Kit Chip ────────────────────────────────── */.aikit-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; flex-shrink: 0; } .aikit-chip.off { background: #f0f0f0; color: var(--secondary); } .aikit-chip.on { background: var(--success-light); color: #389e0d; } /* ─── Accounts Table ─────────────────────────────── */.section-hd { display: flex; align-items: center; gap: 8px; padding: 12px 20px; border-bottom: 1px solid var(--divider); background: #fafbfc; } .section-hd-name { font-size: 13px; font-weight: 600; color: var(--title); } .section-hd-count { font-size: 11px; color: var(--placeholder); margin-left: auto; } .acc-table { width: 100%; border-collapse: collapse; } .acc-table th { text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 600; color: var(--secondary); background: #fafbfc; border-bottom: 1px solid var(--divider); white-space: nowrap; } .acc-table td { padding: 14px 16px; font-size: 13px; border-bottom: 1px solid #f5f7fa; vertical-align: middle; } .acc-table tbody tr { cursor: pointer; transition: background 0.12s; } .acc-table tbody tr:hover td { background: #f2f8fd; } .acc-table tr:last-child td { border-bottom: none; } .dot-live { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; color: var(--success); } .dot-live::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--success); flex-shrink: 0; } .tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; } .tag-success { background: var(--success-light); color: #389e0d; } .tag-warning { background: var(--warning-light); color: #b07800; } .tag-neutral { background: #f0f0f0; color: var(--secondary); } /* ─── Dashboard Tabs ─────────────────────────────── */.dash-tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--divider); margin-bottom: 20px; overflow-x: auto; } .dash-tab { padding: 10px 14px; font-size: 13px; font-weight: 500; color: var(--secondary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; flex-shrink: 0; } .dash-tab:hover { color: var(--blue); } .dash-tab.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 600; } .tab-lock { font-size: 10px; color: var(--placeholder); } /* ─── Filter Bar ─────────────────────────────────── */.filter-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; } .filter-chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; border: 1px solid var(--border); background: var(--white); color: var(--secondary); cursor: pointer; transition: all 0.15s; } .filter-chip:hover, .filter-chip.active { border-color: var(--blue); color: var(--blue); background: var(--blue-tint); } .filter-chip-ai { display: inline-flex; align-items: center; gap: 5px; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1.5px dashed var(--blue); background: var(--blue-tint); color: var(--blue); cursor: pointer; transition: all 0.15s; } .filter-chip-ai:hover { background: #daeeff; } .filter-chip-ai.unlocked { border-style: solid; } .filter-chip-ai svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; } .chip-lock { font-size: 10px; margin-left: 2px; } /* ─── KPI / Mock Charts ──────────────────────────── */.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; } .kpi-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; } .kpi-label { font-size: 10px; font-weight: 600; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; } .kpi-val { font-size: 26px; font-weight: 700; color: var(--title); line-height: 1.1; } .kpi-delta { font-size: 11px; font-weight: 600; margin-top: 5px; } .kpi-delta.up { color: var(--success); } .kpi-delta.dn { color: var(--danger); } .mock-chart { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 16px; } .mock-chart-title { font-size: 13px; font-weight: 600; color: var(--title); margin-bottom: 16px; } .bars { display: flex; align-items: flex-end; gap: 8px; height: 100px; } .bar { flex: 1; border-radius: 4px 4px 0 0; } .bar-label-row { display: flex; gap: 8px; margin-top: 6px; } .bar-label { flex: 1; font-size: 9px; color: var(--placeholder); text-align: center; } .mock-table-wrap { background: var(--white); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 16px; } .mock-table { width: 100%; border-collapse: collapse; } .mock-table th { padding: 10px 14px; font-size: 11px; font-weight: 600; color: var(--secondary); text-align: left; border-bottom: 1px solid var(--divider); background: #fafbfc; } .mock-table td { padding: 11px 14px; font-size: 12px; border-bottom: 1px solid #f5f7fa; } .mock-table tr:last-child td { border-bottom: none; } .mock-row { display: grid; gap: 14px; margin-bottom: 14px; } .mock-row.cols-2 { grid-template-columns: 1.5fr 1fr; } /* ─── OCFeatureLimit style inline overlay ────────── *//* Mirrors the real OCFeatureLimit component exactly:
+   position:relative container, ::before frosted-glass,
+   content z-index:2 centered 500px wide */.locked-wrap { position: relative; min-height: 520px; } /* The ::before creates the frosted backdrop — matches real code */.oc-feature-limit { position: absolute; inset: 0; z-index: 10; } .oc-feature-limit::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); z-index: 1; } .oc-feature-limit.hidden { display: none; } .oc-fl-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 0; width: 420px; margin: 80px auto; text-align: center; background: rgba(255,255,255,0.97); border-radius: 20px; padding: 32px 28px 28px; box-shadow: 0 8px 40px rgba(0,0,0,0.10); } .oc-fl-icon { line-height: 1; margin: 0 0 14px; } .oc-fl-icon svg { width: 130px; height: auto; } .oc-fl-title { font-weight: 700; font-size: 17px; text-align: center; color: #102532; line-height: 1.4; margin-bottom: 10px; } .oc-fl-desc { font-family: Poppins; font-weight: 400; font-size: 13.5px; line-height: 1.75; text-align: center; color: #707070; max-width: 380px; margin-bottom: 4px; } .oc-fl-buttons { display: flex; gap: 12px; margin-top: 24px; } .oc-fl-buttons { margin-top: 20px; width: 100%; } .oc-fl-btn-primary { display: flex; align-items: center; justify-content: center; height: 46px; padding: 0; border-radius: 50px; background: var(--blue); border: none; color: #fff; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; box-shadow: 0 4px 14px rgba(35,169,246,0.35); transition: background 0.15s; } .oc-fl-btn-primary:hover { background: #1a9ee0; } .oc-fl-btn-outline { display: inline-flex; align-items: center; justify-content: center; height: 46px; padding: 0 32px; border-radius: 50px; background: transparent; border: 1.5px solid var(--blue); color: var(--blue); font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s; } .oc-fl-btn-outline:hover { background: var(--blue-tint); } /* ─── Overlay Backdrop ───────────────────────────── */.overlay { display: none; position: fixed; inset: 0; background: rgba(10,31,44,0.52); z-index: 500; align-items: center; justify-content: center; } .overlay.visible { display: flex; } /* ─── Modal ──────────────────────────────────────── */.modal { background: var(--white); border-radius: 14px; box-shadow: 0 8px 40px rgba(0,0,0,0.16); overflow: hidden; max-width: 95vw; max-height: 92vh; animation: modalIn 0.2s ease; } @keyframes modalIn { from {  opacity: 0;  transform: scale(0.96) translateY(-6px); }  to {  opacity: 1;  transform: none; } } .modal-hd { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px 14px; border-bottom: 1px solid var(--divider); } .modal-title { font-size: 15px; font-weight: 600; color: var(--title); } .modal-close { width: 28px; height: 28px; border: none; background: none; cursor: pointer; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--secondary); transition: background 0.12s; } .modal-close:hover { background: var(--surface); } .modal-ft { padding: 14px 24px; border-top: 1px solid var(--divider); display: flex; justify-content: flex-end; gap: 10px; } .modal-ft-center { padding: 14px 24px; border-top: 1px solid var(--divider); display: flex; justify-content: center; } .modal-ft-between { padding: 14px 24px; border-top: 1px solid var(--divider); display: flex; justify-content: space-between; align-items: center; gap: 10px; } /* ─── Import Modal ───────────────────────────────── */.import-body { padding: 36px 28px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; } .spinner { width: 48px; height: 48px; border: 4px solid rgba(35,169,246,0.2); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; } .spinner-sm { width: 16px; height: 16px; border-width: 2px; } @keyframes spin { to {  transform: rotate(360deg); } } .success-ring { width: 60px; height: 60px; border-radius: 50%; background: var(--success-light); display: flex; align-items: center; justify-content: center; font-size: 26px; } .import-title { font-size: 16px; font-weight: 600; color: var(--title); } .import-sub { font-size: 13px; color: var(--secondary); line-height: 1.65; max-width: 320px; } /* ─── AI Kit Enable Modal ────────────────────────── */.aikit-modal-body { padding: 36px 32px 24px; display: flex; flex-direction: column; align-items: center; text-align: center; background: var(--surface-ai); } .aikit-hero { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #23A9F6 0%, #5B8DEF 100%); display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 20px; box-shadow: 0 6px 20px rgba(35,169,246,0.35); } .aikit-modal-title { font-size: 18px; font-weight: 700; color: var(--title); margin-bottom: 12px; letter-spacing: -0.2px; } .aikit-modal-title .accent { color: var(--blue); } .aikit-modal-desc { font-size: 13px; color: var(--secondary); line-height: 1.75; max-width: 300px; } .aikit-ft { padding: 16px 24px; border-top: 1px solid var(--divider); background: var(--white); display: flex; justify-content: flex-end; gap: 10px; } /* ─── AI Analysing Modal ─────────────────────────── */.analysing-hero-band { background: linear-gradient(135deg, #1a96e0 0%, #23A9F6 50%, #73DFFF 100%); padding: 36px 32px 28px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; } .analysing-hero { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.18); border: 2.5px solid rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center; font-size: 34px; animation: breathe 2.2s ease-in-out infinite; } @keyframes breathe { 0%, 100% {  transform: scale(1);  box-shadow: 0 0 0 0 rgba(255,255,255,0.3); }  50% {  transform: scale(1.06);  box-shadow: 0 0 0 10px rgba(255,255,255,0); } } .analysing-title { font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.2px; } .analysing-body { padding: 24px 32px 8px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; background: var(--white); } .analysing-desc { font-size: 13px; color: var(--secondary); line-height: 1.75; max-width: 300px; } .analysing-progress { display: flex; align-items: center; gap: 8px; background: var(--surface-ai); border: 1px solid rgba(35,169,246,0.18); border-radius: 8px; padding: 10px 16px; font-size: 12px; color: var(--blue); font-weight: 500; } .analysing-ft { padding: 16px 24px 20px; background: var(--white); display: flex; justify-content: center; } /* ─── AI Upgrade Modal (All Groups) ─────────────── */.upgrade-body { padding: 28px 28px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; } .upgrade-kit-badge { display: inline-flex; align-items: center; gap: 5px; background: var(--blue-tint); border: 1.5px solid rgba(35,169,246,0.3); border-radius: 20px; padding: 4px 14px; font-size: 11px; font-weight: 600; color: var(--blue); margin-bottom: 16px; } .upgrade-icon { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #23A9F6, #73DFFF); display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 16px; box-shadow: 0 4px 16px rgba(35,169,246,0.3); } .upgrade-title { font-size: 17px; font-weight: 700; color: var(--title); margin-bottom: 8px; } .upgrade-desc { font-size: 13px; color: var(--secondary); line-height: 1.7; margin-bottom: 20px; max-width: 300px; } .upgrade-features { background: var(--surface-ai); border: 1px solid #d0e8f8; border-radius: 10px; padding: 14px 18px; text-align: left; width: 100%; margin-bottom: 4px; } .upgrade-feat-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text); padding: 4px 0; } .upgrade-feat-item::before { content: '\2713'; color: var(--blue); font-weight: 700; font-size: 13px; flex-shrink: 0; } /* ─── Pricing Page ───────────────────────────────── */.pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; } .pricing-card { background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 28px 22px; position: relative; } .pricing-card.featured { border: 2px solid var(--blue); } .popular-badge { position: absolute; top: 0; left: 50%; transform: translateX(-50%); background: var(--blue); color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.4px; padding: 4px 14px; border-radius: 0 0 8px 8px; } .pricing-icon { font-size: 22px; margin-bottom: 10px; } .pricing-name { font-size: 15px; font-weight: 700; color: var(--title); margin-bottom: 4px; } .pricing-price { font-size: 30px; font-weight: 700; color: var(--title); } .pricing-period { font-size: 12px; color: var(--secondary); margin-bottom: 20px; } .pricing-feat-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--secondary); padding: 4px 0; } .pricing-feat-item::before { content: '\2713'; color: var(--blue); font-weight: 700; font-size: 12px; flex-shrink: 0; } .pricing-feat-off { font-size: 12px; color: var(--placeholder); padding: 4px 0; padding-left: 18px; } /* ─── Demo Landing ───────────────────────────────── */.demo-hero { background: var(--surface-ai); border-radius: 16px; padding: 36px 32px; text-align: center; margin-bottom: 24px; } .feature-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; } .feature-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 22px 18px; } .feature-card-icon { font-size: 26px; margin-bottom: 10px; } .feature-card-title { font-size: 14px; font-weight: 600; color: var(--title); margin-bottom: 6px; } .feature-card-desc { font-size: 12px; color: var(--secondary); line-height: 1.6; } /* ─── Demo Nudge Modal (growth-journey style) ─── */.mock-modal { background: var(--white); border-radius: 10px; width: 400px; max-width: 94%; box-shadow: 0 8px 32px rgba(0,0,0,.2); overflow: hidden; } .mock-modal__hdr { padding: 14px 18px; border-bottom: 1px solid var(--divider); display: flex; align-items: center; justify-content: space-between; } .mock-modal__title { font-size: 13px; font-weight: 600; color: var(--title); } .mock-modal__close { width: 22px; height: 22px; border-radius: 5px; border: none; background: var(--surface); color: var(--secondary); cursor: pointer; font-size: 12px; } .mock-nudge-modal .mock-modal__body { text-align: center; padding: 20px 18px; } .mock-nudge-modal h3 { font-size: 14px; font-weight: 600; color: var(--title); margin-bottom: 7px; } .mock-nudge-modal p { font-size: 11px; color: var(--secondary); line-height: 1.6; margin-bottom: 14px; } .mock-nudge-modal .nudge-btns { display: flex; flex-direction: column; gap: 7px; } .btn-mock { padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 500; border: none; cursor: pointer; font-family: 'Poppins', sans-serif; } .btn-mock--primary { background: var(--blue); color: #fff; } .btn-mock--outline { background: var(--white); color: var(--blue); border: 1px solid var(--blue); } .btn-mock--ghost { background: var(--white); color: var(--secondary); border: 1px solid var(--border); } /* ─── Type F: Action Confirmation Modal ── */ .m-conf-body { padding: 32px 28px 20px; text-align: center; } .m-conf-title { font-size: 17px; font-weight: 700; color: var(--title); margin-bottom: 10px; line-height: 1.4; } .m-conf-desc { font-size: 13px; color: var(--secondary); line-height: 1.75; margin-bottom: 4px; } .m-conf-actions { padding: 4px 28px 28px; display: flex; flex-direction: column; gap: 10px; } .btn-pill-conf-primary { display: flex; align-items: center; justify-content: center; height: 46px; border-radius: 50px; background: var(--blue); border: none; color: #fff; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; box-shadow: 0 3px 12px rgba(35,169,246,0.35); transition: background 0.15s; } .btn-pill-conf-primary:hover { background: #1a9ee0; } .btn-pill-conf-outline { display: flex; align-items: center; justify-content: center; height: 46px; border-radius: 50px; background: var(--white); border: 1.5px solid var(--blue); color: var(--blue); font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; width: 100%; transition: background 0.15s; } .btn-pill-conf-outline:hover { background: var(--blue-tint); } .m-x-btn { position: absolute; top: 14px; right: 14px; width: 28px; height: 28px; border: none; background: rgba(0,0,0,0.05); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--placeholder); cursor: pointer; z-index: 2; font-family: 'Poppins', sans-serif; }</style>
+    </head>
+    <body>
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- DEMO NAV BAR (top — page navigation only)          -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <div class="demo-bar">
+            <span class="demo-label">View</span>
+            <button class="demo-btn active" id="dnav-accounts" onclick="goPage('accounts')">Ad Accounts</button>
+            <button class="demo-btn" id="dnav-performance" onclick="goPage('performance')">Performance</button>
+            <button class="demo-btn" id="dnav-content-intel" onclick="goPage('content-intel')">Content Intel</button>
+            <button class="demo-btn" id="dnav-creative-intel" onclick="goPage('creative-intel')">Creative Intel</button>
+            <button class="demo-btn" id="dnav-video-intel" onclick="goPage('video-intel')">Video Intel</button>
+            <button class="demo-btn" id="dnav-angle-topic" onclick="goPage('angle-topic')">Angle/Topic</button>
+            <button class="demo-btn" id="dnav-ad-set" onclick="goPage('ad-set')">Ad Set Analysis</button>
+            <button class="demo-btn" id="dnav-ai-agent" onclick="goPage('ai-agent')">AI Agent</button>
+        </div>
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- USER SWITCHER — bottom-right floating panel        -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <div class="user-switcher">
+            <div class="us-label">Preview as</div>
+            <div class="us-btns">
+                <button class="us-btn active" id="btn-free" onclick="setUser('free')">Free Trial</button>
+                <button class="us-btn" id="btn-paid" onclick="setUser('paid')">Paid User<span class="us-btn-sub">Ad Manager</span>
+                </button>
+            </div>
+        </div>
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- TOP NAV                                            -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <nav class="top-nav">
+            <div class="nav-logo">Media<span>Lens</span>
+            </div>
+            <div class="nav-spacer"></div>
+            <div id="nav-trial" class="trial-badge">&#128336; 14 days left in trial</div>
+            <button id="nav-upgrade" class="upgrade-btn" onclick="goPricing()">Upgrade Now</button>
+            <div id="nav-paid" class="paid-badge" style="display:none;">&#10003; Ad Manager Pro</div>
+            <div style="width:12px;"></div>
+            <div class="nav-avatar">JL</div>
+        </nav>
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- SIDEBAR                                            -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <aside class="sidebar">
+            <div class="sb-item" title="Home">
+                <svg viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+                    <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+                    <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+                </svg>
+            </div>
+            <div class="sb-item" title="Social Pulses">
+                <svg viewBox="0 0 24 24">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
+            </div>
+            <div class="sb-item active" title="Ad Manager" onclick="goPage('accounts')">
+                <svg viewBox="0 0 24 24">
+                    <rect x="2" y="5" width="20" height="14" rx="2"/>
+                    <path d="M2 10h20"/>
+                </svg>
+            </div>
+            <div class="sb-item" title="AI Agent">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="4"/>
+                    <path d="M12 2v2M12 20v2M2 12h2M20 12h2"/>
+                </svg>
+            </div>
+        </aside>
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- MAIN CONTENT                                       -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <div class="shell">
+            <div class="main">
+                <!-- ── AD ACCOUNTS ──────────────────────────────── -->
+                <div class="page visible" id="page-accounts">
+                    <div class="breadcrumb">
+                        <span>Ad Manager</span>
+                        <span style="color:var(--placeholder)">›</span>
+                        <span class="bc-active">Ad Accounts</span>
+                    </div>
+                    <!-- DemoDisclaimer bar — matches real DemoDisclaimer component -->
+                    <div class="demo-disclaimer" id="demo-disclaimer-bar">
+                        <div class="disclaimer-left">
+                            <svg class="disclaimer-bell" viewBox="0 0 24 24">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                            </svg>
+                            <div class="disclaimer-view-group">
+                                <span class="disclaimer-view-title">See MediaLens in action</span>
+                                <span class="disclaimer-view-desc">Explore with sample Beauty Brand data</span>
+                            </div>
+                        </div>
+                        <div class="disclaimer-right">
+                            <div class="disclaimer-view-btn" onclick="goDemo()">View Demo</div>
+                            <div class="disclaimer-close" onclick="document.getElementById('demo-disclaimer-bar').style.display='none'" title="Hide demo bar">&#10005;</div>
+                        </div>
+                    </div>
+                    <div class="page-hd">
+                        <h1 class="page-title">Ad Accounts</h1>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <button class="btn btn-primary" onclick="doImport()">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0">
+                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                Import
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card" style="margin-bottom:16px;">
+                        <div class="section-hd">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#23A9F6" stroke-width="2" style="flex-shrink:0;">
+                                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                                <line x1="8" y1="21" x2="16" y2="21"/>
+                                <line x1="12" y1="17" x2="12" y2="21"/>
+                            </svg>
+                            <span class="section-hd-name">Facebook / Meta</span>
+                            <span class="section-hd-count">3 accounts</span>
+                        </div>
+                        <table class="acc-table">
+                            <thead>
+                                <tr>
+                                    <th>Account Name</th>
+                                    <th>Account ID</th>
+                                    <th>Status</th>
+                                    <th>Last Sync</th>
+                                    <th id="ai-col-header">AI Analysis</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr onclick="handleAccClick()">
+                                    <td><strong>Nike HK &mdash; Brand Awareness</strong></td>
+                                    <td style="color:var(--secondary);font-size:12px;">act_120120823456</td>
+                                    <td><span class="dot-live">Active</span></td>
+                                    <td style="color:var(--secondary);font-size:12px;">2025-05-24 09:41</td>
+                                    <td>
+                                        <span class="tag tag-neutral" id="ai-tag-1">&#129302; Not enabled</span>
+                                        <div class="clf-cell" id="clf-cell-1">
+                                            <label class="clf-toggle" onclick="event.stopPropagation();handleAIKitToggle(1)">
+                                                <input type="checkbox" id="clf-cb-1" checked>
+                                                <span class="clf-slider"></span>
+                                            </label>
+                                            <span class="clf-label" id="clf-lbl-1">Auto-sync</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr onclick="handleAccClick()">
+                                    <td><strong>Nike HK &mdash; Performance</strong></td>
+                                    <td style="color:var(--secondary);font-size:12px;">act_120120823789</td>
+                                    <td><span class="dot-live">Active</span></td>
+                                    <td style="color:var(--secondary);font-size:12px;">2025-05-24 09:41</td>
+                                    <td>
+                                        <span class="tag tag-neutral" id="ai-tag-2">&#129302; Not enabled</span>
+                                        <div class="clf-cell" id="clf-cell-2">
+                                            <label class="clf-toggle" onclick="event.stopPropagation();handleAIKitToggle(2)">
+                                                <input type="checkbox" id="clf-cb-2" checked>
+                                                <span class="clf-slider"></span>
+                                            </label>
+                                            <span class="clf-label" id="clf-lbl-2">Auto-sync</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr onclick="handleAccClick()">
+                                    <td><strong>Nike HK &mdash; Retargeting</strong></td>
+                                    <td style="color:var(--secondary);font-size:12px;">act_120120823012</td>
+                                    <td><span class="tag tag-warning">&#9888; Pending</span></td>
+                                    <td style="color:var(--secondary);font-size:12px;">Never</td>
+                                    <td>
+                                        <span class="tag tag-neutral" id="ai-tag-3">&#129302; Not enabled</span>
+                                        <div class="clf-cell" id="clf-cell-3">
+                                            <label class="clf-toggle" onclick="event.stopPropagation();handleAIKitToggle(3)">
+                                                <input type="checkbox" id="clf-cb-3" checked>
+                                                <span class="clf-slider"></span>
+                                            </label>
+                                            <span class="clf-label" id="clf-lbl-3">Auto-sync</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="classifier-warn-bar" id="acc-analysor-warn" style="margin-top:12px;">
+                        <svg viewBox="0 0 20 20" fill="none">
+                            <path d="M10 3L2 17h16L10 3z" fill="#FFF8EB" stroke="#FFC960" stroke-width="1.2"/>
+                            <line x1="10" y1="9" x2="10" y2="13" stroke="#b07800" stroke-width="1.5" stroke-linecap="round"/>
+                            <circle cx="10" cy="15.2" r="0.9" fill="#b07800"/>
+                        </svg>
+                        <span>AI Kit is off for one or more accounts. Turn on to restore AI Kit access.</span>
+                    </div>
+                    <p style="font-size:12px;color:var(--placeholder);margin-top:12px;">Click <strong>Import</strong> to see post-import flow &nbsp;&middot;&nbsp; click any <strong>account row</strong> to see recurring gate (Free Trial)</p>
+                </div>
+                <!-- ── PERFORMANCE DASHBOARD ────────────────────── -->
+                <div class="page" id="page-performance">
+                    <div class="page-hd">
+                        <h1 class="page-title">Dashboard</h1>
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn">Last 30 days &#9660;</button>
+                            <button class="btn">All Campaigns &#9660;</button>
+                        </div>
+                    </div>
+                    <div class="dash-tabs">
+                        <div class="dash-tab active">Performance</div>
+                        <div class="dash-tab" onclick="goPage('content-intel')">Content Intel <span class="tab-lock" id="tl-ci">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('creative-intel')">Creative Intel <span class="tab-lock" id="tl-cr">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('video-intel')">Video Intel <span class="tab-lock" id="tl-vi">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('angle-topic')">Angle/Topic <span class="tab-lock" id="tl-at">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('ad-set')">Ad Set Analysis <span class="tab-lock" id="tl-as">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('ai-agent')">AI Agent <span class="tab-lock" id="tl-aa">&#128274;</span>
+                        </div>
+                    </div>
+                    <div class="filter-bar">
+                        <button class="filter-chip active">All Campaigns</button>
+                        <button class="filter-chip">TOFU</button>
+                        <button class="filter-chip">MOFU</button>
+                        <button class="filter-chip">BOFU</button>
+                        <div style="width:1px;height:20px;background:var(--divider);"></div>
+                        <button class="filter-chip-ai" id="all-groups-btn" onclick="handleAllGroups()">
+                            <svg viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="4"/>
+                                <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+                            </svg>
+                            All Groups
+                            <span class="chip-lock" id="all-groups-lock">&#128274;</span>
+                        </button>
+                    </div>
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-label">Total Spend</div>
+                            <div class="kpi-val">$48,320</div>
+                            <div class="kpi-delta up">&#8593; 12.4% vs prior period</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">ROAS</div>
+                            <div class="kpi-val">3.42x</div>
+                            <div class="kpi-delta dn">&#8595; 0.18x vs prior period</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Impressions</div>
+                            <div class="kpi-val">2.1M</div>
+                            <div class="kpi-delta up">&#8593; 8.7%</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Conversions</div>
+                            <div class="kpi-val">1,284</div>
+                            <div class="kpi-delta up">&#8593; 5.2%</div>
+                        </div>
+                    </div>
+                    <div class="mock-chart">
+                        <div class="mock-chart-title">Spend &amp; ROAS Trend &mdash; Last 30 Days</div>
+                        <div class="bars">
+                            <div class="bar" style="height:55%;background:#23A9F6;opacity:0.65;"></div>
+                            <div class="bar" style="height:70%;background:#23A9F6;opacity:0.75;"></div>
+                            <div class="bar" style="height:48%;background:#23A9F6;opacity:0.58;"></div>
+                            <div class="bar" style="height:82%;background:#23A9F6;opacity:0.85;"></div>
+                            <div class="bar" style="height:65%;background:#23A9F6;opacity:0.72;"></div>
+                            <div class="bar" style="height:92%;background:#23A9F6;opacity:0.95;"></div>
+                            <div class="bar" style="height:61%;background:#23A9F6;opacity:0.68;"></div>
+                            <div class="bar" style="height:78%;background:#23A9F6;opacity:0.82;"></div>
+                            <div class="bar" style="height:54%;background:#23A9F6;opacity:0.62;"></div>
+                            <div class="bar" style="height:88%;background:#23A9F6;opacity:0.92;"></div>
+                            <div class="bar" style="height:71%;background:#23A9F6;opacity:0.77;"></div>
+                            <div class="bar" style="height:100%;background:#23A9F6;opacity:1;"></div>
+                        </div>
+                        <div class="bar-label-row">
+                            <div class="bar-label">Apr 26</div>
+                            <div class="bar-label">Apr 29</div>
+                            <div class="bar-label">May 2</div>
+                            <div class="bar-label">May 5</div>
+                            <div class="bar-label">May 8</div>
+                            <div class="bar-label">May 11</div>
+                            <div class="bar-label">May 14</div>
+                            <div class="bar-label">May 17</div>
+                            <div class="bar-label">May 20</div>
+                            <div class="bar-label">May 21</div>
+                            <div class="bar-label">May 23</div>
+                            <div class="bar-label">May 25</div>
+                        </div>
+                    </div>
+                    <div class="mock-table-wrap">
+                        <table class="mock-table">
+                            <thead>
+                                <tr>
+                                    <th>Campaign</th>
+                                    <th>Objective</th>
+                                    <th>Spend</th>
+                                    <th>ROAS</th>
+                                    <th>CPA</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Brand Summer 2025</strong></td>
+                                    <td>Awareness</td>
+                                    <td>$12,400</td>
+                                    <td>2.8x</td>
+                                    <td>$24.20</td>
+                                    <td><span class="dot-live">Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Performance Max Q2</strong></td>
+                                    <td>Sales</td>
+                                    <td>$18,920</td>
+                                    <td>4.1x</td>
+                                    <td>$14.80</td>
+                                    <td><span class="dot-live">Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Retargeting &mdash; Cart</strong></td>
+                                    <td>Sales</td>
+                                    <td>$9,200</td>
+                                    <td>5.2x</td>
+                                    <td>$11.40</td>
+                                    <td><span class="dot-live">Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Lead Gen HK</strong></td>
+                                    <td>Leads</td>
+                                    <td>$7,800</td>
+                                    <td>3.0x</td>
+                                    <td>$21.60</td>
+                                    <td><span class="tag tag-warning" style="font-size:11px;">Paused</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- ── CONTENT INTEL ─────────────────────────────── -->
+                <div class="page" id="page-content-intel">
+                    <div class="page-hd">
+                        <h1 class="page-title">Dashboard</h1>
+                    </div>
+                    <div class="dash-tabs">
+                        <div class="dash-tab" onclick="goPage('performance')">Performance</div>
+                        <div class="dash-tab active">Content Intel <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('creative-intel')">Creative Intel <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('video-intel')">Video Intel <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('angle-topic')">Angle/Topic <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('ad-set')">Ad Set Analysis <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('ai-agent')">AI Agent <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                    </div>
+                    <div class="classifier-warn-bar ai-clf-warn">
+                        <svg viewBox="0 0 20 20" fill="none">
+                            <path d="M10 3L2 17h16L10 3z" fill="#FFF8EB" stroke="#FFC960" stroke-width="1.2"/>
+                            <line x1="10" y1="9" x2="10" y2="13" stroke="#b07800" stroke-width="1.5" stroke-linecap="round"/>
+                            <circle cx="10" cy="15.2" r="0.9" fill="#b07800"/>
+                        </svg>
+                        <span>Data sync is off, so insights may be outdated. <span style="color:#23A9F6;font-weight:600;cursor:pointer;">Enable now</span></span>
+                    </div>
+                    <div class="demo-disclaimer ai-demo-bar">
+                        <div class="disclaimer-left">
+                            <svg class="disclaimer-bell" viewBox="0 0 24 24">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                            </svg>
+                            <div class="disclaimer-view-group">
+                                <span class="disclaimer-view-title">See MediaLens in action</span>
+                                <span class="disclaimer-view-desc">Explore with sample Beauty Brand data</span>
+                            </div>
+                        </div>
+                        <div class="disclaimer-right">
+                            <div class="disclaimer-view-btn" onclick="goDemo()">View Demo</div>
+                            <div class="disclaimer-close" onclick="this.closest('.ai-demo-bar').style.display='none'" title="Hide demo bar">&#10005;</div>
+                        </div>
+                    </div>
+                    <div class="locked-wrap">
+                        <!-- Background content -->
+                        <div class="kpi-grid">
+                            <div class="kpi-card">
+                                <div class="kpi-label">Top Format</div>
+                                <div class="kpi-val">Video</div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-label">Content Score</div>
+                                <div class="kpi-val">87/100</div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-label">Avg Engagement</div>
+                                <div class="kpi-val">4.2%</div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-label">Best Category</div>
+                                <div class="kpi-val">Lifestyle</div>
+                            </div>
+                        </div>
+                        <div class="mock-row cols-2">
+                            <div class="mock-chart">
+                                <div class="mock-chart-title">Content Performance by Format</div>
+                                <div class="bars">
+                                    <div class="bar" style="height:80%;background:#73DFFF;"></div>
+                                    <div class="bar" style="height:55%;background:#73DFFF;"></div>
+                                    <div class="bar" style="height:70%;background:#73DFFF;"></div>
+                                    <div class="bar" style="height:45%;background:#73DFFF;"></div>
+                                </div>
+                            </div>
+                            <div class="mock-chart">
+                                <div class="mock-chart-title">Engagement by Day</div>
+                                <div class="bars">
+                                    <div class="bar" style="height:60%;background:#5B8DEF;"></div>
+                                    <div class="bar" style="height:75%;background:#5B8DEF;"></div>
+                                    <div class="bar" style="height:40%;background:#5B8DEF;"></div>
+                                    <div class="bar" style="height:85%;background:#5B8DEF;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mock-table-wrap">
+                            <table class="mock-table">
+                                <thead>
+                                    <tr>
+                                        <th>Content Category</th>
+                                        <th>Reach</th>
+                                        <th>CTR</th>
+                                        <th>ROAS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Product Showcase</td>
+                                        <td>450K</td>
+                                        <td>2.8%</td>
+                                        <td>4.1x</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Brand Story</td>
+                                        <td>320K</td>
+                                        <td>1.9%</td>
+                                        <td>2.8x</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- OCFeatureLimit overlay -->
+                        <div class="oc-feature-limit" id="ofl-content-intel">
+                            <div class="oc-fl-content">
+                                <div class="oc-fl-icon">
+                                    <svg viewBox="0 0 160 118" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <ellipse cx="80" cy="113" rx="58" ry="5" fill="#D8D8D8" opacity="0.7"/>
+                                        <rect x="8" y="98" width="144" height="12" rx="6" fill="#2D2D3E"/>
+                                        <rect x="20" y="93" width="120" height="7" rx="3" fill="#22223A"/>
+                                        <rect x="12" y="6" width="136" height="90" rx="8" fill="#22223A"/>
+                                        <rect x="19" y="12" width="122" height="78" rx="4" fill="#FFFFFF"/>
+                                        <rect x="19" y="12" width="122" height="20" rx="3" fill="#23A9F6"/>
+                                        <rect x="24" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="38" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="52" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="66" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="80" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="24" y="70" width="11" height="18" rx="2" fill="#52C41A" opacity="0.45"/>
+                                        <rect x="38" y="60" width="11" height="28" rx="2" fill="#52C41A" opacity="0.6"/>
+                                        <rect x="52" y="52" width="11" height="36" rx="2" fill="#52C41A" opacity="0.8"/>
+                                        <rect x="66" y="62" width="11" height="26" rx="2" fill="#52C41A" opacity="0.65"/>
+                                        <rect x="80" y="56" width="11" height="32" rx="2" fill="#52C41A" opacity="0.75"/>
+                                        <rect x="94" y="66" width="11" height="22" rx="2" fill="#52C41A" opacity="0.55"/>
+                                        <rect x="108" y="58" width="11" height="30" rx="2" fill="#52C41A" opacity="0.7"/>
+                                        <line x1="20" y1="88" x2="140" y2="88" stroke="#E8E8E8" stroke-width="1.5"/>
+                                        <path d="M62 66v-10a18 18 0 0 1 36 0v10" stroke="#E6A800" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+                                        <rect x="57" y="64" width="46" height="36" rx="8" fill="#FFC960"/>
+                                        <circle cx="80" cy="78" r="6" fill="#D08000"/>
+                                        <rect x="77.5" y="79" width="5" height="10" rx="2.5" fill="#D08000"/>
+                                    </svg>
+                                </div>
+                                <div class="oc-fl-title">Unlock Ad Manager</div>
+                                <div class="oc-fl-desc">Find winning categories, hooks, and angles faster.</div>
+                                <div class="oc-fl-buttons">
+                                    <button class="oc-fl-btn-primary" onclick="goPricing()">Upgrade Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ── CREATIVE INTEL ────────────────────────────── -->
+                <div class="page" id="page-creative-intel">
+                    <div class="page-hd">
+                        <h1 class="page-title">Dashboard</h1>
+                    </div>
+                    <div class="dash-tabs">
+                        <div class="dash-tab" onclick="goPage('performance')">Performance</div>
+                        <div class="dash-tab" onclick="goPage('content-intel')">Content Intel <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab active">Creative Intel <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('video-intel')">Video Intel <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('angle-topic')">Angle/Topic <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('ad-set')">Ad Set Analysis <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('ai-agent')">AI Agent <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                    </div>
+                    <div class="classifier-warn-bar ai-clf-warn">
+                        <svg viewBox="0 0 20 20" fill="none">
+                            <path d="M10 3L2 17h16L10 3z" fill="#FFF8EB" stroke="#FFC960" stroke-width="1.2"/>
+                            <line x1="10" y1="9" x2="10" y2="13" stroke="#b07800" stroke-width="1.5" stroke-linecap="round"/>
+                            <circle cx="10" cy="15.2" r="0.9" fill="#b07800"/>
+                        </svg>
+                        <span>Data sync is off, so insights may be outdated. <span style="color:#23A9F6;font-weight:600;cursor:pointer;">Enable now</span></span>
+                    </div>
+                    <div class="demo-disclaimer ai-demo-bar">
+                        <div class="disclaimer-left">
+                            <svg class="disclaimer-bell" viewBox="0 0 24 24">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                            </svg>
+                            <div class="disclaimer-view-group">
+                                <span class="disclaimer-view-title">See MediaLens in action</span>
+                                <span class="disclaimer-view-desc">Explore with sample Beauty Brand data</span>
+                            </div>
+                        </div>
+                        <div class="disclaimer-right">
+                            <div class="disclaimer-view-btn" onclick="goDemo()">View Demo</div>
+                            <div class="disclaimer-close" onclick="this.closest('.ai-demo-bar').style.display='none'" title="Hide demo bar">&#10005;</div>
+                        </div>
+                    </div>
+                    <div class="locked-wrap">
+                        <div class="kpi-grid">
+                            <div class="kpi-card">
+                                <div class="kpi-label">Top Creative</div>
+                                <div class="kpi-val">Video A</div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-label">Creative Score</div>
+                                <div class="kpi-val">91/100</div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-label">Hook Rate</div>
+                                <div class="kpi-val">68%</div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-label">Brand Recall</div>
+                                <div class="kpi-val">&#8593; 23%</div>
+                            </div>
+                        </div>
+                        <div class="mock-chart" style="height:160px;"></div>
+                        <div class="mock-table-wrap">
+                            <table class="mock-table">
+                                <thead>
+                                    <tr>
+                                        <th>Creative Asset</th>
+                                        <th>Impressions</th>
+                                        <th>CTR</th>
+                                        <th>ROAS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Video Ad A &mdash; 15s</td>
+                                        <td>820K</td>
+                                        <td>3.4%</td>
+                                        <td>4.9x</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Carousel &mdash; Lifestyle</td>
+                                        <td>540K</td>
+                                        <td>2.1%</td>
+                                        <td>3.2x</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="oc-feature-limit" id="ofl-creative-intel">
+                            <div class="oc-fl-content">
+                                <div class="oc-fl-icon">
+                                    <svg viewBox="0 0 160 118" fill="none">
+                                        <ellipse cx="80" cy="113" rx="58" ry="5" fill="#D8D8D8" opacity="0.7"/>
+                                        <rect x="8" y="98" width="144" height="12" rx="6" fill="#2D2D3E"/>
+                                        <rect x="20" y="93" width="120" height="7" rx="3" fill="#22223A"/>
+                                        <rect x="12" y="6" width="136" height="90" rx="8" fill="#22223A"/>
+                                        <rect x="19" y="12" width="122" height="78" rx="4" fill="#FFFFFF"/>
+                                        <rect x="19" y="12" width="122" height="20" rx="3" fill="#23A9F6"/>
+                                        <rect x="24" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="38" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="52" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="66" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="80" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="24" y="70" width="11" height="18" rx="2" fill="#52C41A" opacity="0.45"/>
+                                        <rect x="38" y="60" width="11" height="28" rx="2" fill="#52C41A" opacity="0.6"/>
+                                        <rect x="52" y="52" width="11" height="36" rx="2" fill="#52C41A" opacity="0.8"/>
+                                        <rect x="66" y="62" width="11" height="26" rx="2" fill="#52C41A" opacity="0.65"/>
+                                        <rect x="80" y="56" width="11" height="32" rx="2" fill="#52C41A" opacity="0.75"/>
+                                        <rect x="94" y="66" width="11" height="22" rx="2" fill="#52C41A" opacity="0.55"/>
+                                        <rect x="108" y="58" width="11" height="30" rx="2" fill="#52C41A" opacity="0.7"/>
+                                        <line x1="20" y1="88" x2="140" y2="88" stroke="#E8E8E8" stroke-width="1.5"/>
+                                        <path d="M62 66v-10a18 18 0 0 1 36 0v10" stroke="#E6A800" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+                                        <rect x="57" y="64" width="46" height="36" rx="8" fill="#FFC960"/>
+                                        <circle cx="80" cy="78" r="6" fill="#D08000"/>
+                                        <rect x="77.5" y="79" width="5" height="10" rx="2.5" fill="#D08000"/>
+                                    </svg>
+                                </div>
+                                <div class="oc-fl-title">Unlock Ad Manager</div>
+                                <div class="oc-fl-desc">Find winning categories, hooks, and angles faster.</div>
+                                <div class="oc-fl-buttons">
+                                    <button class="oc-fl-btn-primary" onclick="goPricing()">Upgrade Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ── VIDEO INTEL ───────────────────────────────── -->
+                <div class="page" id="page-video-intel">
+                    <div class="page-hd">
+                        <h1 class="page-title">Dashboard</h1>
+                    </div>
+                    <div class="dash-tabs">
+                        <div class="dash-tab" onclick="goPage('performance')">Performance</div>
+                        <div class="dash-tab" onclick="goPage('content-intel')">Content Intel <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('creative-intel')">Creative Intel <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab active">Video Intel <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('angle-topic')">Angle/Topic <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('ad-set')">Ad Set Analysis <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('ai-agent')">AI Agent <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                    </div>
+                    <div class="classifier-warn-bar ai-clf-warn">
+                        <svg viewBox="0 0 20 20" fill="none">
+                            <path d="M10 3L2 17h16L10 3z" fill="#FFF8EB" stroke="#FFC960" stroke-width="1.2"/>
+                            <line x1="10" y1="9" x2="10" y2="13" stroke="#b07800" stroke-width="1.5" stroke-linecap="round"/>
+                            <circle cx="10" cy="15.2" r="0.9" fill="#b07800"/>
+                        </svg>
+                        <span>Data sync is off, so insights may be outdated. <span style="color:#23A9F6;font-weight:600;cursor:pointer;">Enable now</span></span>
+                    </div>
+                    <div class="demo-disclaimer ai-demo-bar">
+                        <div class="disclaimer-left">
+                            <svg class="disclaimer-bell" viewBox="0 0 24 24">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                            </svg>
+                            <div class="disclaimer-view-group">
+                                <span class="disclaimer-view-title">See MediaLens in action</span>
+                                <span class="disclaimer-view-desc">Explore with sample Beauty Brand data</span>
+                            </div>
+                        </div>
+                        <div class="disclaimer-right">
+                            <div class="disclaimer-view-btn" onclick="goDemo()">View Demo</div>
+                            <div class="disclaimer-close" onclick="this.closest('.ai-demo-bar').style.display='none'" title="Hide demo bar">&#10005;</div>
+                        </div>
+                    </div>
+                    <div class="locked-wrap">
+                        <div class="kpi-grid">
+                            <div class="kpi-card">
+                                <div class="kpi-label">Avg Watch Time</div>
+                                <div class="kpi-val">18.4s</div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-label">ThruPlay Rate</div>
+                                <div class="kpi-val">32%</div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-label">Hook Score</div>
+                                <div class="kpi-val">74/100</div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-label">Drop-off Point</div>
+                                <div class="kpi-val">Sec 8</div>
+                            </div>
+                        </div>
+                        <div class="mock-chart" style="height:160px;"></div>
+                        <div class="oc-feature-limit" id="ofl-video-intel">
+                            <div class="oc-fl-content">
+                                <div class="oc-fl-icon">
+                                    <svg viewBox="0 0 160 118" fill="none">
+                                        <ellipse cx="80" cy="113" rx="58" ry="5" fill="#D8D8D8" opacity="0.7"/>
+                                        <rect x="8" y="98" width="144" height="12" rx="6" fill="#2D2D3E"/>
+                                        <rect x="20" y="93" width="120" height="7" rx="3" fill="#22223A"/>
+                                        <rect x="12" y="6" width="136" height="90" rx="8" fill="#22223A"/>
+                                        <rect x="19" y="12" width="122" height="78" rx="4" fill="#FFFFFF"/>
+                                        <rect x="19" y="12" width="122" height="20" rx="3" fill="#23A9F6"/>
+                                        <rect x="24" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="38" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="52" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="66" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="80" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="24" y="70" width="11" height="18" rx="2" fill="#52C41A" opacity="0.45"/>
+                                        <rect x="38" y="60" width="11" height="28" rx="2" fill="#52C41A" opacity="0.6"/>
+                                        <rect x="52" y="52" width="11" height="36" rx="2" fill="#52C41A" opacity="0.8"/>
+                                        <rect x="66" y="62" width="11" height="26" rx="2" fill="#52C41A" opacity="0.65"/>
+                                        <rect x="80" y="56" width="11" height="32" rx="2" fill="#52C41A" opacity="0.75"/>
+                                        <rect x="94" y="66" width="11" height="22" rx="2" fill="#52C41A" opacity="0.55"/>
+                                        <rect x="108" y="58" width="11" height="30" rx="2" fill="#52C41A" opacity="0.7"/>
+                                        <line x1="20" y1="88" x2="140" y2="88" stroke="#E8E8E8" stroke-width="1.5"/>
+                                        <path d="M62 66v-10a18 18 0 0 1 36 0v10" stroke="#E6A800" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+                                        <rect x="57" y="64" width="46" height="36" rx="8" fill="#FFC960"/>
+                                        <circle cx="80" cy="78" r="6" fill="#D08000"/>
+                                        <rect x="77.5" y="79" width="5" height="10" rx="2.5" fill="#D08000"/>
+                                    </svg>
+                                </div>
+                                <div class="oc-fl-title">Unlock Ad Manager</div>
+                                <div class="oc-fl-desc">Find winning categories, hooks, and angles faster.</div>
+                                <div class="oc-fl-buttons">
+                                    <button class="oc-fl-btn-primary" onclick="goPricing()">Upgrade Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ── ANGLE / TOPIC ─────────────────────────────── -->
+                <div class="page" id="page-angle-topic">
+                    <div class="page-hd">
+                        <h1 class="page-title">Dashboard</h1>
+                    </div>
+                    <div class="dash-tabs">
+                        <div class="dash-tab" onclick="goPage('performance')">Performance</div>
+                        <div class="dash-tab" onclick="goPage('content-intel')">Content Intel <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('creative-intel')">Creative Intel <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('video-intel')">Video Intel <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab active">Angle/Topic <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('ad-set')">Ad Set Analysis <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('ai-agent')">AI Agent <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                    </div>
+                    <div class="classifier-warn-bar ai-clf-warn">
+                        <svg viewBox="0 0 20 20" fill="none">
+                            <path d="M10 3L2 17h16L10 3z" fill="#FFF8EB" stroke="#FFC960" stroke-width="1.2"/>
+                            <line x1="10" y1="9" x2="10" y2="13" stroke="#b07800" stroke-width="1.5" stroke-linecap="round"/>
+                            <circle cx="10" cy="15.2" r="0.9" fill="#b07800"/>
+                        </svg>
+                        <span>Data sync is off, so insights may be outdated. <span style="color:#23A9F6;font-weight:600;cursor:pointer;">Enable now</span></span>
+                    </div>
+                    <div class="demo-disclaimer ai-demo-bar">
+                        <div class="disclaimer-left">
+                            <svg class="disclaimer-bell" viewBox="0 0 24 24">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                            </svg>
+                            <div class="disclaimer-view-group">
+                                <span class="disclaimer-view-title">See MediaLens in action</span>
+                                <span class="disclaimer-view-desc">Explore with sample Beauty Brand data</span>
+                            </div>
+                        </div>
+                        <div class="disclaimer-right">
+                            <div class="disclaimer-view-btn" onclick="goDemo()">View Demo</div>
+                            <div class="disclaimer-close" onclick="this.closest('.ai-demo-bar').style.display='none'" title="Hide demo bar">&#10005;</div>
+                        </div>
+                    </div>
+                    <div class="locked-wrap">
+                        <div class="kpi-grid">
+                            <div class="kpi-card">
+                                <div class="kpi-label">Top Angle</div>
+                                <div class="kpi-val">Performance</div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-label">Top Topic</div>
+                                <div class="kpi-val">Durability</div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-label">Message Clarity</div>
+                                <div class="kpi-val">88%</div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-label">Angles Covered</div>
+                                <div class="kpi-val">6</div>
+                            </div>
+                        </div>
+                        <div class="mock-chart" style="height:160px;"></div>
+                        <div class="oc-feature-limit" id="ofl-angle-topic">
+                            <div class="oc-fl-content">
+                                <div class="oc-fl-icon">
+                                    <svg viewBox="0 0 160 118" fill="none">
+                                        <ellipse cx="80" cy="113" rx="58" ry="5" fill="#D8D8D8" opacity="0.7"/>
+                                        <rect x="8" y="98" width="144" height="12" rx="6" fill="#2D2D3E"/>
+                                        <rect x="20" y="93" width="120" height="7" rx="3" fill="#22223A"/>
+                                        <rect x="12" y="6" width="136" height="90" rx="8" fill="#22223A"/>
+                                        <rect x="19" y="12" width="122" height="78" rx="4" fill="#FFFFFF"/>
+                                        <rect x="19" y="12" width="122" height="20" rx="3" fill="#23A9F6"/>
+                                        <rect x="24" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="38" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="52" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="66" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="80" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="24" y="70" width="11" height="18" rx="2" fill="#52C41A" opacity="0.45"/>
+                                        <rect x="38" y="60" width="11" height="28" rx="2" fill="#52C41A" opacity="0.6"/>
+                                        <rect x="52" y="52" width="11" height="36" rx="2" fill="#52C41A" opacity="0.8"/>
+                                        <rect x="66" y="62" width="11" height="26" rx="2" fill="#52C41A" opacity="0.65"/>
+                                        <rect x="80" y="56" width="11" height="32" rx="2" fill="#52C41A" opacity="0.75"/>
+                                        <rect x="94" y="66" width="11" height="22" rx="2" fill="#52C41A" opacity="0.55"/>
+                                        <rect x="108" y="58" width="11" height="30" rx="2" fill="#52C41A" opacity="0.7"/>
+                                        <line x1="20" y1="88" x2="140" y2="88" stroke="#E8E8E8" stroke-width="1.5"/>
+                                        <path d="M62 66v-10a18 18 0 0 1 36 0v10" stroke="#E6A800" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+                                        <rect x="57" y="64" width="46" height="36" rx="8" fill="#FFC960"/>
+                                        <circle cx="80" cy="78" r="6" fill="#D08000"/>
+                                        <rect x="77.5" y="79" width="5" height="10" rx="2.5" fill="#D08000"/>
+                                    </svg>
+                                </div>
+                                <div class="oc-fl-title">Unlock Ad Manager</div>
+                                <div class="oc-fl-desc">Find winning categories, hooks, and angles faster.</div>
+                                <div class="oc-fl-buttons">
+                                    <button class="oc-fl-btn-primary" onclick="goPricing()">Upgrade Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ── AD SET ANALYSIS ──────────────────────────── -->
+                <div class="page" id="page-ad-set">
+                    <div class="page-hd">
+                        <h1 class="page-title">Dashboard</h1>
+                    </div>
+                    <div class="dash-tabs">
+                        <div class="dash-tab" onclick="goPage('performance')">Performance</div>
+                        <div class="dash-tab" onclick="goPage('content-intel')">Content Intel <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('creative-intel')">Creative Intel <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('video-intel')">Video Intel <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('angle-topic')">Angle/Topic <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab active">Ad Set Analysis <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('ai-agent')">AI Agent <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                    </div>
+                    <div class="classifier-warn-bar ai-clf-warn">
+                        <svg viewBox="0 0 20 20" fill="none">
+                            <path d="M10 3L2 17h16L10 3z" fill="#FFF8EB" stroke="#FFC960" stroke-width="1.2"/>
+                            <line x1="10" y1="9" x2="10" y2="13" stroke="#b07800" stroke-width="1.5" stroke-linecap="round"/>
+                            <circle cx="10" cy="15.2" r="0.9" fill="#b07800"/>
+                        </svg>
+                        <span>Data sync is off, so insights may be outdated. <span style="color:#23A9F6;font-weight:600;cursor:pointer;">Enable now</span></span>
+                    </div>
+                    <div class="demo-disclaimer ai-demo-bar">
+                        <div class="disclaimer-left">
+                            <svg class="disclaimer-bell" viewBox="0 0 24 24">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                            </svg>
+                            <div class="disclaimer-view-group">
+                                <span class="disclaimer-view-title">See MediaLens in action</span>
+                                <span class="disclaimer-view-desc">Explore with sample Beauty Brand data</span>
+                            </div>
+                        </div>
+                        <div class="disclaimer-right">
+                            <div class="disclaimer-view-btn" onclick="goDemo()">View Demo</div>
+                            <div class="disclaimer-close" onclick="this.closest('.ai-demo-bar').style.display='none'" title="Hide demo bar">&#10005;</div>
+                        </div>
+                    </div>
+                    <div class="locked-wrap">
+                        <div class="kpi-grid">
+                            <div class="kpi-card">
+                                <div class="kpi-label">Active Ad Sets</div>
+                                <div class="kpi-val">24</div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-label">Best Ad Set</div>
+                                <div class="kpi-val">LAL 3%</div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-label">Avg CPA</div>
+                                <div class="kpi-val">$18.40</div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-label">Budget Util.</div>
+                                <div class="kpi-val">84%</div>
+                            </div>
+                        </div>
+                        <div class="mock-chart" style="height:160px;"></div>
+                        <div class="oc-feature-limit" id="ofl-ad-set">
+                            <div class="oc-fl-content">
+                                <div class="oc-fl-icon">
+                                    <svg viewBox="0 0 160 118" fill="none">
+                                        <ellipse cx="80" cy="113" rx="58" ry="5" fill="#D8D8D8" opacity="0.7"/>
+                                        <rect x="8" y="98" width="144" height="12" rx="6" fill="#2D2D3E"/>
+                                        <rect x="20" y="93" width="120" height="7" rx="3" fill="#22223A"/>
+                                        <rect x="12" y="6" width="136" height="90" rx="8" fill="#22223A"/>
+                                        <rect x="19" y="12" width="122" height="78" rx="4" fill="#FFFFFF"/>
+                                        <rect x="19" y="12" width="122" height="20" rx="3" fill="#23A9F6"/>
+                                        <rect x="24" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="38" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="52" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="66" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="80" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="24" y="70" width="11" height="18" rx="2" fill="#52C41A" opacity="0.45"/>
+                                        <rect x="38" y="60" width="11" height="28" rx="2" fill="#52C41A" opacity="0.6"/>
+                                        <rect x="52" y="52" width="11" height="36" rx="2" fill="#52C41A" opacity="0.8"/>
+                                        <rect x="66" y="62" width="11" height="26" rx="2" fill="#52C41A" opacity="0.65"/>
+                                        <rect x="80" y="56" width="11" height="32" rx="2" fill="#52C41A" opacity="0.75"/>
+                                        <rect x="94" y="66" width="11" height="22" rx="2" fill="#52C41A" opacity="0.55"/>
+                                        <rect x="108" y="58" width="11" height="30" rx="2" fill="#52C41A" opacity="0.7"/>
+                                        <line x1="20" y1="88" x2="140" y2="88" stroke="#E8E8E8" stroke-width="1.5"/>
+                                        <path d="M62 66v-10a18 18 0 0 1 36 0v10" stroke="#E6A800" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+                                        <rect x="57" y="64" width="46" height="36" rx="8" fill="#FFC960"/>
+                                        <circle cx="80" cy="78" r="6" fill="#D08000"/>
+                                        <rect x="77.5" y="79" width="5" height="10" rx="2.5" fill="#D08000"/>
+                                    </svg>
+                                </div>
+                                <div class="oc-fl-title">Unlock Ad Manager</div>
+                                <div class="oc-fl-desc">Find winning categories, hooks, and angles faster.</div>
+                                <div class="oc-fl-buttons">
+                                    <button class="oc-fl-btn-primary" onclick="goPricing()">Upgrade Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ── AI AGENT ──────────────────────────────────── -->
+                <div class="page" id="page-ai-agent">
+                    <div class="page-hd">
+                        <h1 class="page-title">Dashboard</h1>
+                    </div>
+                    <div class="dash-tabs">
+                        <div class="dash-tab" onclick="goPage('performance')">Performance</div>
+                        <div class="dash-tab" onclick="goPage('content-intel')">Content Intel <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('creative-intel')">Creative Intel <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('video-intel')">Video Intel <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('angle-topic')">Angle/Topic <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab" onclick="goPage('ad-set')">Ad Set Analysis <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                        <div class="dash-tab active">AI Agent <span class="tab-lock ai-tab-lock">&#128274;</span>
+                        </div>
+                    </div>
+                    <div class="classifier-warn-bar ai-clf-warn">
+                        <svg viewBox="0 0 20 20" fill="none">
+                            <path d="M10 3L2 17h16L10 3z" fill="#FFF8EB" stroke="#FFC960" stroke-width="1.2"/>
+                            <line x1="10" y1="9" x2="10" y2="13" stroke="#b07800" stroke-width="1.5" stroke-linecap="round"/>
+                            <circle cx="10" cy="15.2" r="0.9" fill="#b07800"/>
+                        </svg>
+                        <span>Data sync is off, so insights may be outdated. <span style="color:#23A9F6;font-weight:600;cursor:pointer;">Enable now</span></span>
+                    </div>
+                    <div class="demo-disclaimer ai-demo-bar">
+                        <div class="disclaimer-left">
+                            <svg class="disclaimer-bell" viewBox="0 0 24 24">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                            </svg>
+                            <div class="disclaimer-view-group">
+                                <span class="disclaimer-view-title">See MediaLens in action</span>
+                                <span class="disclaimer-view-desc">Explore with sample Beauty Brand data</span>
+                            </div>
+                        </div>
+                        <div class="disclaimer-right">
+                            <div class="disclaimer-view-btn" onclick="goDemo()">View Demo</div>
+                            <div class="disclaimer-close" onclick="this.closest('.ai-demo-bar').style.display='none'" title="Hide demo bar">&#10005;</div>
+                        </div>
+                    </div>
+                    <div class="locked-wrap">
+                        <div style="background:var(--surface-ai);border-radius:12px;padding:24px;height:380px;display:flex;flex-direction:column;gap:14px;">
+                            <div style="display:flex;gap:10px;align-items:flex-start;">
+                                <div style="width:32px;height:32px;background:var(--blue);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;">&#129302;</div>
+                                <div style="background:var(--white);border-radius:0 10px 10px 10px;padding:12px 16px;font-size:13px;max-width:60%;line-height:1.6;border:1px solid var(--divider);">Which campaigns should I pause this week based on ROAS?</div>
+                            </div>
+                            <div style="display:flex;gap:10px;align-items:flex-start;justify-content:flex-end;">
+                                <div style="background:var(--blue);border-radius:10px 0 10px 10px;padding:12px 16px;font-size:13px;max-width:65%;line-height:1.6;color:#fff;">Based on last 7 days, I recommend pausing Lead Gen HK (ROAS 2.1x, below P25) and reviewing Brand Summer 2025 budget...</div>
+                                <div style="width:32px;height:32px;background:var(--placeholder);border-radius:50%;flex-shrink:0;"></div>
+                            </div>
+                        </div>
+                        <div class="oc-feature-limit" id="ofl-ai-agent">
+                            <div class="oc-fl-content">
+                                <div class="oc-fl-icon">
+                                    <svg viewBox="0 0 160 118" fill="none">
+                                        <ellipse cx="80" cy="113" rx="58" ry="5" fill="#D8D8D8" opacity="0.7"/>
+                                        <rect x="8" y="98" width="144" height="12" rx="6" fill="#2D2D3E"/>
+                                        <rect x="20" y="93" width="120" height="7" rx="3" fill="#22223A"/>
+                                        <rect x="12" y="6" width="136" height="90" rx="8" fill="#22223A"/>
+                                        <rect x="19" y="12" width="122" height="78" rx="4" fill="#FFFFFF"/>
+                                        <rect x="19" y="12" width="122" height="20" rx="3" fill="#23A9F6"/>
+                                        <rect x="24" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="38" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="52" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="66" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="80" y="17" width="10" height="10" rx="2" fill="rgba(255,255,255,0.75)"/>
+                                        <rect x="24" y="70" width="11" height="18" rx="2" fill="#52C41A" opacity="0.45"/>
+                                        <rect x="38" y="60" width="11" height="28" rx="2" fill="#52C41A" opacity="0.6"/>
+                                        <rect x="52" y="52" width="11" height="36" rx="2" fill="#52C41A" opacity="0.8"/>
+                                        <rect x="66" y="62" width="11" height="26" rx="2" fill="#52C41A" opacity="0.65"/>
+                                        <rect x="80" y="56" width="11" height="32" rx="2" fill="#52C41A" opacity="0.75"/>
+                                        <rect x="94" y="66" width="11" height="22" rx="2" fill="#52C41A" opacity="0.55"/>
+                                        <rect x="108" y="58" width="11" height="30" rx="2" fill="#52C41A" opacity="0.7"/>
+                                        <line x1="20" y1="88" x2="140" y2="88" stroke="#E8E8E8" stroke-width="1.5"/>
+                                        <path d="M62 66v-10a18 18 0 0 1 36 0v10" stroke="#E6A800" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+                                        <rect x="57" y="64" width="46" height="36" rx="8" fill="#FFC960"/>
+                                        <circle cx="80" cy="78" r="6" fill="#D08000"/>
+                                        <rect x="77.5" y="79" width="5" height="10" rx="2.5" fill="#D08000"/>
+                                    </svg>
+                                </div>
+                                <div class="oc-fl-title">Unlock Ad Manager</div>
+                                <div class="oc-fl-desc">Ask what to do next.</div>
+                                <div class="oc-fl-buttons">
+                                    <button class="oc-fl-btn-primary" onclick="goPricing()">Upgrade Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ── PRICING ───────────────────────────────────── -->
+                <div class="page" id="page-pricing">
+                    <div class="page-hd">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <button class="btn" onclick="goBack()">&#8592; Back</button>
+                            <h1 class="page-title">Upgrade Plan</h1>
+                        </div>
+                    </div>
+                    <div style="text-align:center;margin-bottom:32px;">
+                        <p style="font-size:15px;color:var(--secondary);">Unlock the full power of <strong style="color:var(--blue);">Ad Manager AI Kit</strong></p>
+                    </div>
+                    <div class="pricing-grid">
+                        <div class="pricing-card">
+                            <div class="pricing-icon">&#128202;</div>
+                            <div class="pricing-name">Free Trial</div>
+                            <div class="pricing-price">$0</div>
+                            <div class="pricing-period">Current plan</div>
+                            <div>
+                                <div class="pricing-feat-item">Import Ad Accounts</div>
+                                <div class="pricing-feat-item">Performance Dashboard</div>
+                                <div class="pricing-feat-off">&#10005; AI Kit Features</div>
+                            </div>
+                            <button class="btn" style="width:100%;margin-top:20px;justify-content:center;" disabled>Current Plan</button>
+                        </div>
+                        <div class="pricing-card featured">
+                            <div class="popular-badge">Most Popular</div>
+                            <div class="pricing-icon" style="margin-top:14px;">&#9889;</div>
+                            <div class="pricing-name">Ad Manager Pro</div>
+                            <div class="pricing-price">$299</div>
+                            <div class="pricing-period">/month</div>
+                            <div>
+                                <div class="pricing-feat-item">Everything in Free</div>
+                                <div class="pricing-feat-item">Content Intelligence</div>
+                                <div class="pricing-feat-item">Creative Intelligence</div>
+                                <div class="pricing-feat-item">Video Intelligence</div>
+                                <div class="pricing-feat-item">Angle/Topic Analysis</div>
+                                <div class="pricing-feat-item">Ad Set Analysis</div>
+                                <div class="pricing-feat-item">AI Agent (unlimited)</div>
+                                <div class="pricing-feat-item">AI Groups Filter</div>
+                            </div>
+                            <button class="btn btn-primary" style="width:100%;margin-top:20px;justify-content:center;">Upgrade Now</button>
+                        </div>
+                        <div class="pricing-card">
+                            <div class="pricing-icon">&#127970;</div>
+                            <div class="pricing-name">Enterprise</div>
+                            <div class="pricing-price">Custom</div>
+                            <div class="pricing-period">Contact sales</div>
+                            <div>
+                                <div class="pricing-feat-item">Everything in Pro</div>
+                                <div class="pricing-feat-item">Custom AI models</div>
+                                <div class="pricing-feat-item">Dedicated CSM</div>
+                                <div class="pricing-feat-item">SLA &amp; compliance</div>
+                            </div>
+                            <button class="btn btn-outline" style="width:100%;margin-top:20px;justify-content:center;">Contact Sales</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- ── DEMO PAGE ─────────────────────────────────── -->
+                <div class="page" id="page-demo">
+                    <div class="page-hd">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <button class="btn" onclick="goBack()">&#8592; Back</button>
+                            <h1 class="page-title">Ad Manager AI Kit &mdash; Demo</h1>
+                        </div>
+                    </div>
+                    <div class="demo-hero">
+                        <div style="font-size:42px;margin-bottom:12px;">&#10024;</div>
+                        <h2 style="font-size:20px;font-weight:700;color:var(--title);margin-bottom:8px;">See AI Kit in Action</h2>
+                        <p style="font-size:14px;color:var(--secondary);line-height:1.7;max-width:520px;margin:0 auto;">Explore how Ad Manager AI Kit analyzes your real campaign data to surface insights unavailable in Meta Ads Manager alone.</p>
+                    </div>
+                    <div class="feature-cards">
+                        <div class="feature-card">
+                            <div class="feature-card-icon">&#128221;</div>
+                            <div class="feature-card-title">Content Intelligence</div>
+                            <div class="feature-card-desc">Understand which content formats and styles generate the best ROI.</div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-card-icon">&#127912;</div>
+                            <div class="feature-card-title">Creative Intelligence</div>
+                            <div class="feature-card-desc">AI-scored creative performance with visual and copy analysis.</div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-card-icon">&#127918;</div>
+                            <div class="feature-card-title">Video Intelligence</div>
+                            <div class="feature-card-desc">Hook scores, watch curves, and drop-off analysis.</div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-card-icon">&#128161;</div>
+                            <div class="feature-card-title">Angle/Topic Analysis</div>
+                            <div class="feature-card-desc">Which messaging angles resonate best with your audience.</div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-card-icon">&#128202;</div>
+                            <div class="feature-card-title">Ad Set Analysis</div>
+                            <div class="feature-card-desc">Audience segmentation performance and budget recommendations.</div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-card-icon">&#129302;</div>
+                            <div class="feature-card-title">AI Agent</div>
+                            <div class="feature-card-desc">Chat with your ad data — instant answers and recommendations.</div>
+                        </div>
+                    </div>
+                    <div style="text-align:center;margin-top:32px;">
+                        <button class="btn btn-primary btn-lg" onclick="goPricing()">Start Upgrade</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end .main / .shell -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- MODALS                                             -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- Import Modal -->
+        <div class="overlay" id="ov-import">
+            <div class="modal" style="width:440px;">
+                <div id="import-loading">
+                    <div class="modal-hd">
+                        <div class="modal-title">Importing Ad Accounts</div>
+                    </div>
+                    <div class="import-body">
+                        <div class="spinner"></div>
+                        <div class="import-title">Connecting to Meta Ads Manager&hellip;</div>
+                        <div class="import-sub">Fetching your ad accounts and syncing campaign data via the Facebook Marketing API.</div>
+                    </div>
+                </div>
+                <div id="import-success" style="display:none;">
+                    <div class="modal-hd">
+                        <div class="modal-title">Import Complete</div>
+                        <button class="modal-close" onclick="onImportContinue()">&#10005;</button>
+                    </div>
+                    <div class="import-body">
+                        <div class="success-ring">&#10003;</div>
+                        <div class="import-title">3000 Accounts Imported Successfully.</div>
+                    </div>
+                    <div class="modal-ft">
+                        <button class="btn btn-primary" onclick="onImportContinue()">Continue</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- AI Kit Enable Modal (Free Trial) -->
+        <div class="overlay" id="ov-aikit-enable">
+            <div class="modal" style="width:420px;">
+                <div class="aikit-modal-body">
+                    <div class="aikit-hero">&#129302;</div>
+                    <div class="aikit-modal-title">Unlock AI-Powered Insights</div>
+                    <div class="aikit-modal-desc">Find winning categories, hooks, and angles faster.</div>
+                </div>
+                <div class="aikit-ft">
+                    <button class="btn btn-primary" onclick="onAIKitEnable()">Upgrade Now</button>
+                </div>
+            </div>
+        </div>
+        <!-- AI Analysing Modal (Paid User) -->
+        <div class="overlay" id="ov-ai-analysing">
+            <div class="modal" style="width:420px;">
+                <div class="analysing-hero-band">
+                    <div class="analysing-hero">&#129504;</div>
+                    <div class="analysing-title">AI is analyzing Ads...</div>
+                </div>
+                <div class="analysing-body">
+                    <div class="analysing-desc">This analysis consumes tokens and may take longer with more data.</div>
+                    <div class="analysing-progress">
+                        <div class="spinner spinner-sm"></div> Processing X / Y
+                    </div>
+                </div>
+                <div class="analysing-ft">
+                    <button class="btn btn-primary btn-lg" onclick="closeOverlay('ai-analysing'); goPage('performance')">Go to Dashboard</button>
+                </div>
+            </div>
+        </div>
+        <!-- AI Upgrade Modal (All Groups filter) -->
+        <div class="overlay" id="ov-ai-upgrade">
+            <div class="modal" style="width:440px;">
+                <div class="modal-hd">
+                    <div class="modal-title">Unlock Campaign Groups</div>
+                    <button class="modal-close" onclick="closeOverlay('ai-upgrade')">&#10005;</button>
+                </div>
+                <div style="padding:24px 24px 16px;">
+                    <p style="font-size:13px;color:var(--secondary);line-height:1.75;">Let AI cluster campaigns by strategy, audience, and winning creatives.</p>
+                </div>
+                <div class="modal-ft">
+                    <button class="btn btn-primary" onclick="closeOverlay('ai-upgrade'); goPricing()">Upgrade Now</button>
+                </div>
+            </div>
+        </div>
+        <!-- Demo Nudge Modal (triggered after 5 dashboard tab clicks, Free Trial) -->
+        <div class="overlay" id="ov-demo-nudge">
+            <div class="mock-modal mock-nudge-modal">
+                <div class="mock-modal__hdr">
+                    <div class="mock-modal__title">Find Your Own Winners?</div>
+                    <button class="mock-modal__close" onclick="closeOverlay('demo-nudge')">&#10005;</button>
+                </div>
+                <div class="mock-modal__body">
+                    <h3>Find Your Own Winners?</h3>
+                    <p>Connect your ad account to uncover growth signals.</p>
+                    <div class="nudge-btns">
+                        <button class="btn-mock btn-mock--primary" style="width:100%;" onclick="closeOverlay('demo-nudge'); goPage('accounts')">Connect Ad Account</button>
+                        <button class="btn-mock btn-mock--outline" style="width:100%;" onclick="closeOverlay('demo-nudge'); goPricing()">Upgrade Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- AI Analysor Turn-Off Confirmation Modal — Type F: Action Confirmation -->
+        <div class="overlay" id="ov-clf-confirm">
+            <div class="modal" style="width:380px;position:relative;">
+                <button class="m-x-btn" onclick="cancelAnalysorOff()">&#10005;</button>
+                <div class="m-conf-body">
+                    <div class="m-conf-title">Pause Ad Manager?</div>
+                    <div class="m-conf-desc">Auto-sync and AI analysis will pause for <strong id="clf-confirm-name" style="color:var(--title);"></strong>. Existing insights stay saved but won't update.</div>
+                </div>
+                <div class="m-conf-actions">
+                    <button class="btn-pill-conf-primary" onclick="confirmAnalysorOff()">Pause</button>
+                    <button class="btn-pill-conf-outline" onclick="cancelAnalysorOff()">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- JAVASCRIPT                                         -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <script>
+var userType = 'free';
+var aiKitEnabled = false;
+var currentPage = 'accounts';
+var classifierState = {1: true, 2: true, 3: true}; // true = ON (paid users only)
+var pendingToggleId = null;
+var accountNames = {1: 'Nike HK \u2014 Brand Awareness', 2: 'Nike HK \u2014 Performance', 3: 'Nike HK \u2014 Retargeting'};
+var prevPage = 'accounts';
+
+/* ── User Type ────────────────────────────────────── */
+function setUser(type) {
+  userType = type;
+  aiKitEnabled = false;
+  document.getElementById('btn-free').classList.toggle('active', type === 'free');
+  document.getElementById('btn-paid').classList.toggle('active', type === 'paid');
+  document.getElementById('nav-trial').style.display   = type === 'free' ? 'flex' : 'none';
+  document.getElementById('nav-upgrade').style.display = type === 'free' ? 'block' : 'none';
+  document.getElementById('nav-paid').style.display    = type === 'paid' ? 'flex' : 'none';
+  demoTabCount = 0;
+  renderAIKitState();
+}
+
+/* ── Render AI Kit State ──────────────────────────── */
+function renderAIKitState() {
+  var kitOn = (userType === 'paid') || (userType === 'free' && aiKitEnabled);
+
+  // AI analysis tags vs classifier toggles
+  var isPaid = (userType === 'paid');
+  var aiColHeader = document.getElementById('ai-col-header');
+  if (aiColHeader) aiColHeader.textContent = 'AI Analysis';
+
+  // Always show toggles; hide legacy tags
+  [1, 2, 3].forEach(function(id) {
+    var tag = document.getElementById('ai-tag-' + id);
+    var cell = document.getElementById('clf-cell-' + id);
+    if (tag) tag.style.display = 'none';
+    if (cell) cell.style.display = 'flex';
+    if (!isPaid) {
+      var cb = document.getElementById('clf-cb-' + id);
+      var lbl = document.getElementById('clf-lbl-' + id);
+      if (cb) cb.checked = false;
+      if (lbl) { lbl.textContent = 'Not enabled'; lbl.className = 'clf-label paused'; }
+    }
+  });
+
+  // Info banner
+  var banner = document.getElementById('aikit-banner');
+  if (banner) banner.style.display = (!kitOn && userType === 'free') ? 'flex' : 'none';
+
+  // Tab lock icons on Performance page
+  ['ci','cr','vi','at','as','aa'].forEach(function(k) {
+    var el = document.getElementById('tl-' + k);
+    if (el) el.style.display = kitOn ? 'none' : 'inline';
+  });
+
+  // Tab lock icons on AI pages
+  document.querySelectorAll('.ai-tab-lock').forEach(function(el) {
+    el.style.display = kitOn ? 'none' : 'inline';
+  });
+
+  // All Groups chip lock icon & style
+  var agLock = document.getElementById('all-groups-lock');
+  if (agLock) agLock.style.display = kitOn ? 'none' : 'inline';
+  var agBtn = document.getElementById('all-groups-btn');
+  if (agBtn) { if (kitOn) agBtn.classList.add('unlocked'); else agBtn.classList.remove('unlocked'); }
+
+  // OCFeatureLimit overlays — show/hide
+  var oflIds = ['ofl-content-intel','ofl-creative-intel','ofl-video-intel','ofl-angle-topic','ofl-ad-set','ofl-ai-agent'];
+  oflIds.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { if (!kitOn) el.classList.remove('hidden'); else el.classList.add('hidden'); }
+  });
+
+  // AI page demo disclaimer bars — show for free users without AI Kit
+  document.querySelectorAll('.ai-demo-bar').forEach(function(el) {
+    el.style.display = (!kitOn) ? 'flex' : 'none';
+  });
+
+  // Classifier warning bars — only relevant for paid users
+  renderClassifierState();
+}
+
+/* ── AI Kit Toggle Router ────────────────────────── */
+function handleAIKitToggle(id) {
+  if (userType === 'free') {
+    showOverlay('aikit-enable');
+  } else {
+    toggleClassifier(id);
+  }
+}
+
+/* ── AI Analysor Toggle ──────────────────────────── */
+function toggleClassifier(id) {
+  if (classifierState[id]) {
+    // Currently ON → turning OFF → show confirmation first, revert checkbox visually
+    var cb = document.getElementById('clf-cb-' + id);
+    if (cb) cb.checked = true; // keep checked until user confirms
+    pendingToggleId = id;
+    var nameEl = document.getElementById('clf-confirm-name');
+    if (nameEl) nameEl.textContent = accountNames[id];
+    showOverlay('clf-confirm');
+  } else {
+    // Currently OFF → turning ON → no confirmation needed
+    classifierState[id] = true;
+    renderClassifierState();
+  }
+}
+
+function confirmAnalysorOff() {
+  if (pendingToggleId !== null) {
+    classifierState[pendingToggleId] = false;
+    pendingToggleId = null;
+  }
+  closeOverlay('clf-confirm');
+  renderClassifierState();
+}
+
+function cancelAnalysorOff() {
+  pendingToggleId = null;
+  closeOverlay('clf-confirm');
+  // checkbox already visually stayed ON — no further action needed
+}
+
+function renderClassifierState() {
+  var isPaid = (userType === 'paid');
+  if (!isPaid) {
+    document.querySelectorAll('.ai-clf-warn').forEach(function(el) { el.style.display = 'none'; });
+    var accWarn = document.getElementById('acc-analysor-warn');
+    if (accWarn) accWarn.style.display = 'none';
+    return;
+  }
+  // Update toggle checkboxes and labels
+  [1, 2, 3].forEach(function(id) {
+    var cb = document.getElementById('clf-cb-' + id);
+    var lbl = document.getElementById('clf-lbl-' + id);
+    var isOn = classifierState[id];
+    if (cb) cb.checked = isOn;
+    if (lbl) { lbl.textContent = isOn ? 'Auto-sync' : 'Paused'; lbl.className = isOn ? 'clf-label' : 'clf-label paused'; }
+  });
+  // Show warnings if any analysor is OFF
+  var anyOff = [1,2,3].some(function(id) { return !classifierState[id]; });
+  document.querySelectorAll('.ai-clf-warn').forEach(function(el) {
+    el.style.display = anyOff ? 'flex' : 'none';
+  });
+  var accWarn = document.getElementById('acc-analysor-warn');
+  if (accWarn) accWarn.style.display = anyOff ? 'flex' : 'none';
+}
+
+/* ── Demo Tab Click Counter (Free Trial only) ────── */
+var demoTabCount = 0;
+var DEMO_TAB_PAGES = ['performance','content-intel','creative-intel','video-intel','angle-topic','ad-set','ai-agent'];
+
+/* ── Page Navigation ─────────────────────────────── */
+function goPage(name) {
+  prevPage = currentPage;
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('visible'); });
+  var target = document.getElementById('page-' + name);
+  if (target) { target.classList.add('visible'); currentPage = name; }
+  document.querySelectorAll('.demo-btn[id^="dnav-"]').forEach(function(b) { b.classList.remove('active'); });
+  var nb = document.getElementById('dnav-' + name);
+  if (nb) nb.classList.add('active');
+  renderAIKitState();
+  window.scrollTo(0, 0);
+
+  // Count dashboard tab clicks for free trial users and nudge after 5
+  if (userType === 'free' && DEMO_TAB_PAGES.indexOf(name) !== -1) {
+    demoTabCount++;
+    if (demoTabCount >= 5) {
+      demoTabCount = 0;
+      setTimeout(function() { showOverlay('demo-nudge'); }, 300);
+    }
+  }
+}
+function goBack() { goPage(prevPage || 'accounts'); }
+function goPricing() { goPage('pricing'); }
+function goDemo() { goPage('demo'); }
+
+/* ── Import Flow ─────────────────────────────────── */
+function doImport() {
+  document.getElementById('import-loading').style.display = 'block';
+  document.getElementById('import-success').style.display = 'none';
+  showOverlay('import');
+  setTimeout(function() {
+    document.getElementById('import-loading').style.display = 'none';
+    document.getElementById('import-success').style.display = 'block';
+  }, 1800);
+}
+function onImportContinue() {
+  closeOverlay('import');
+  setTimeout(function() {
+    if (userType === 'free' && !aiKitEnabled) showOverlay('aikit-enable');
+    else if (userType === 'paid') showOverlay('ai-analysing');
+  }, 200);
+}
+
+/* ── Account Row Click ───────────────────────────── */
+function handleAccClick() {
+  var kitOn = (userType === 'paid') || (userType === 'free' && aiKitEnabled);
+  if (!kitOn) showOverlay('aikit-enable');
+  else goPage('performance');
+}
+
+/* ── AI Kit Modal Actions ────────────────────────── */
+function onAIKitLater()  { closeOverlay('aikit-enable'); goPage('performance'); }
+function onAIKitEnable() { closeOverlay('aikit-enable'); goPricing(); }
+
+/* ── All Groups Filter ───────────────────────────── */
+function handleAllGroups() {
+  var kitOn = (userType === 'paid') || (userType === 'free' && aiKitEnabled);
+  if (!kitOn) showOverlay('ai-upgrade');
+  else document.getElementById('all-groups-btn').classList.toggle('active');
+}
+
+/* ── Overlay Helpers ─────────────────────────────── */
+function showOverlay(name) { var el = document.getElementById('ov-' + name); if (el) el.classList.add('visible'); }
+function closeOverlay(name) { var el = document.getElementById('ov-' + name); if (el) el.classList.remove('visible'); }
+document.querySelectorAll('.overlay').forEach(function(ov) {
+  ov.addEventListener('click', function(e) { if (e.target === ov) ov.classList.remove('visible'); });
+});
+
+/* ── Init ────────────────────────────────────────── */
+setUser('free');
+goPage('accounts');
+</script>
+    </body>
+</html>
