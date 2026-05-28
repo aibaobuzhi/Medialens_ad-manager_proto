@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add-on Store — All States | MediaLens</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#23A9F6;
+  --blue-tint:#EEF6FF;
+  --blue-light:#73DFFF;
+  --title:#0A1F2C;
+  --text:#102532;
+  --secondary:#828282;
+  --regular:#707070;
+  --page:#F7F7F7;
+  --white:#FFFFFF;
+  --border:#D9E3E6;
+  --divider:#E8EEF0;
+  --danger:#FF3F41;
+  --danger-light:#FFECEC;
+  --success:#52C41A;
+  --success-light:#E6FBEB;
+  --warning:#FFC960;
+  --warning-light:#FFF8EB;
+}
+body{font-family:'Poppins',system-ui,sans-serif;background:var(--page);color:var(--text);font-size:14px;line-height:1.5;}
+
+/* NAV */
+.nav{background:var(--blue);height:60px;display:flex;align-items:center;padding:0 32px;gap:16px;position:sticky;top:0;z-index:200;}
+.nav-logo{font-size:17px;font-weight:600;color:#fff;}
+.nav-sep{color:rgba(255,255,255,0.4);font-size:18px;font-weight:300;}
+.nav-page{font-size:13px;color:rgba(255,255,255,0.8);}
+
+/* LAYOUT */
+.layout{display:flex;min-height:calc(100vh - 60px);}
+.sidebar{width:220px;background:var(--white);border-right:1px solid var(--divider);flex-shrink:0;padding:24px 0;}
+.sidebar-user{padding:0 20px 20px;border-bottom:1px solid var(--divider);margin-bottom:8px;}
+.sidebar-avatar{width:36px;height:36px;border-radius:50%;background:var(--blue-tint);display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:8px;}
+.sidebar-name{font-size:13px;font-weight:600;color:var(--title);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sidebar-email{font-size:11px;color:var(--secondary);}
+.sidebar-nav{padding:4px 0;}
+.sidebar-item{padding:9px 20px;font-size:13px;color:var(--regular);cursor:pointer;border-left:3px solid transparent;transition:all 0.15s;}
+.sidebar-item:hover{background:var(--page);color:var(--text);}
+.sidebar-item.active{color:var(--blue);font-weight:500;background:var(--blue-tint);border-left-color:var(--blue);}
+.sidebar-section{padding:16px 20px 4px;font-size:11px;font-weight:600;color:var(--secondary);text-transform:uppercase;letter-spacing:0.5px;}
+.sidebar-team{padding:12px 20px;border-top:1px solid var(--divider);margin-top:8px;}
+.team-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--title);margin-bottom:2px;}
+.team-plan{display:inline-block;padding:1px 8px;border-radius:20px;font-size:10px;font-weight:600;background:#FFF7E6;color:#D46B08;}
+.team-plan.lite{background:#F0F9FF;color:#0369A1;}
+
+/* MAIN */
+.main{flex:1;padding:28px 32px;overflow-y:auto;}
+.page-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
+.back-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--regular);font-size:16px;transition:background 0.15s;}
+.back-btn:hover{background:var(--page);}
+.page-title{font-size:20px;font-weight:600;color:var(--title);}
+
+/* SCENARIO TABS */
+.scenario-bar{display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap;}
+.scenario-btn{padding:6px 16px;border-radius:20px;border:1px solid var(--border);background:var(--white);font-size:12px;font-weight:500;color:var(--regular);cursor:pointer;transition:all 0.15s;font-family:'Poppins',sans-serif;}
+.scenario-btn:hover{border-color:var(--blue);color:var(--blue);}
+.scenario-btn.active{background:var(--blue);border-color:var(--blue);color:#fff;}
+.scenario-label{background:var(--blue-tint);border-radius:8px;padding:10px 16px;margin-bottom:20px;font-size:13px;color:var(--blue);font-weight:500;display:flex;align-items:center;gap:8px;}
+
+/* CARD GRID */
+.card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+@media(max-width:900px){.card-grid{grid-template-columns:repeat(2,1fr);}}
+
+/* ADDON CARD */
+.addon-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;flex-direction:column;transition:box-shadow 0.2s;position:relative;}
+.addon-card:hover{box-shadow:0 2px 12px rgba(0,0,0,0.08);}
+.addon-card.locked{opacity:0.8;}
+.addon-card.active{border-color:var(--success);}
+.addon-card.recommended{border-color:var(--blue);box-shadow:0 2px 12px rgba(35,169,246,0.15);}
+.addon-card.new-addon{border-color:#722ED1;box-shadow:0 2px 12px rgba(114,46,209,0.12);}
+
+.card-badge-new{position:absolute;top:-1px;right:16px;background:#722ED1;color:#fff;font-size:9px;font-weight:600;padding:2px 8px;border-radius:0 0 4px 4px;letter-spacing:0.5px;text-transform:uppercase;}
+.card-badge-rec{position:absolute;top:-1px;right:16px;background:var(--blue);color:#fff;font-size:9px;font-weight:600;padding:2px 8px;border-radius:0 0 4px 4px;letter-spacing:0.5px;text-transform:uppercase;}
+
+.card-body{flex:1;}
+.card-type-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+
+/* Tags */
+.tag{display:inline-flex;align-items:center;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:500;}
+.tag-recurring{background:var(--blue-tint);color:var(--blue);}
+.tag-feature{background:var(--success-light);color:#389E0D;}
+.tag-onetime{background:#F5F5F5;color:#666;}
+.tag-active{background:var(--success-light);color:var(--success);}
+.tag-new{background:#F9F0FF;color:#722ED1;}
+
+.card-icon{font-size:26px;color:var(--blue);margin-bottom:8px;}
+.card-icon.purple{color:#722ED1;}
+.card-name{font-size:15px;font-weight:600;color:var(--title);margin-bottom:4px;}
+.card-desc{font-size:12px;color:var(--secondary);margin-bottom:12px;line-height:1.4;}
+
+.card-price{font-size:18px;font-weight:600;color:var(--title);}
+.card-price-interval{font-size:12px;font-weight:400;color:var(--secondary);}
+.card-price-original{font-size:13px;color:#C0C4CC;text-decoration:line-through;margin-right:4px;}
+
+.card-req{font-size:12px;color:var(--warning);display:flex;align-items:center;gap:4px;margin-top:6px;margin-bottom:8px;}
+.card-req .dot{width:5px;height:5px;border-radius:50%;background:var(--warning);flex-shrink:0;}
+
+.card-current{font-size:13px;color:var(--text);font-weight:500;margin:8px 0;}
+.card-balance{margin:8px 0;}
+.card-balance-label{font-size:12px;color:var(--text);margin-bottom:4px;}
+.card-balance-bar{height:6px;background:#EEF6FF;border-radius:3px;overflow:hidden;}
+.card-balance-fill{height:100%;border-radius:3px;background:linear-gradient(88deg,#23A9F6 0%,#73DFFF 100%);transition:width 0.3s;}
+.card-balance-fill.low{background:linear-gradient(90deg,#FF8F33 0%,#FF3F41 100%);}
+
+.card-pending{display:flex;align-items:center;gap:8px;padding:8px 10px;margin:8px 0;background:var(--warning-light);border:1px solid #FAECD8;border-radius:6px;font-size:12px;color:#A05B00;line-height:1.4;}
+.card-pending-text{flex:1;}
+
+.card-action{margin-top:14px;display:flex;gap:8px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:7px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;font-family:'Poppins',sans-serif;border:none;flex:1;}
+.btn-primary{background:var(--blue);color:#fff;border:1.5px solid var(--blue);}
+.btn-primary:hover{background:#1A97E0;}
+.btn-outline{background:var(--white);color:var(--blue);border:1.5px solid var(--blue);}
+.btn-outline:hover{background:var(--blue-tint);}
+.btn-outline-gray{background:var(--white);color:var(--regular);border:1.5px solid var(--border);}
+.btn-outline-gray:hover{background:var(--page);}
+.btn-warning-outline{background:var(--white);color:#A05B00;border:1.5px solid var(--warning);font-size:11px;padding:4px 10px;flex:none;}
+
+/* MODAL OVERLAY */
+.modal-overlay{position:fixed;inset:0;background:rgba(10,31,44,0.5);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--white);border-radius:12px;width:480px;max-width:90vw;padding:0;box-shadow:0 8px 32px rgba(0,0,0,0.14);transform:translateY(8px);transition:transform 0.2s;}
+.modal-overlay.open .modal{transform:translateY(0);}
+.modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-size:16px;font-weight:600;color:var(--title);}
+.modal-close{width:28px;height:28px;border-radius:6px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--secondary);font-size:18px;}
+.modal-close:hover{background:var(--page);}
+.modal-body{padding:20px 24px;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--divider);display:flex;justify-content:flex-end;gap:10px;}
+.modal-footer .btn{flex:none;min-width:100px;}
+
+.modal-info-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.modal-icon{font-size:28px;color:var(--blue);flex-shrink:0;}
+.modal-icon.purple{color:#722ED1;}
+.modal-addon-name{font-size:15px;font-weight:600;color:var(--title);margin-bottom:2px;}
+.modal-addon-desc{font-size:12px;color:var(--secondary);}
+
+.pricing-table{background:var(--page);border-radius:8px;padding:4px 0;margin-bottom:14px;}
+.pricing-row{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;font-size:13px;border-bottom:1px solid var(--divider);}
+.pricing-row:last-child{border-bottom:none;}
+.pricing-label{color:var(--regular);}
+.pricing-value{font-weight:600;color:var(--title);}
+.pricing-value.blue{color:var(--blue);}
+.pricing-value.prorated{font-weight:400;}
+.pricing-prorated{font-size:11px;color:var(--secondary);margin-left:4px;font-weight:400;}
+
+.qty-control{display:flex;align-items:center;gap:10px;}
+.qty-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--regular);}
+.qty-btn:hover{border-color:var(--blue);color:var(--blue);}
+.qty-val{font-size:15px;font-weight:600;color:var(--title);min-width:24px;text-align:center;}
+
+.trust{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--secondary);margin-top:12px;}
+.trust-dot{width:6px;height:6px;border-radius:50%;background:var(--success);}
+
+.legal{font-size:11px;color:var(--secondary);margin-top:10px;line-height:1.5;}
+.legal a{color:var(--blue);text-decoration:none;}
+
+/* MANAGE MODAL */
+.manage-section{margin-bottom:16px;}
+.manage-label{font-size:12px;font-weight:600;color:var(--secondary);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:8px;}
+.manage-row{display:flex;align-items:center;justify-content:space-between;font-size:13px;padding:4px 0;}
+.cancel-warning{background:var(--danger-light);border:1px solid #FFCCC7;border-radius:8px;padding:12px 14px;font-size:12px;color:#8A0000;display:flex;gap:8px;align-items:flex-start;margin-top:8px;}
+
+/* TOOLTIP */
+[data-tip]{position:relative;cursor:help;}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#0A1F2C;color:#fff;font-size:11px;padding:6px 10px;border-radius:6px;white-space:nowrap;z-index:400;pointer-events:none;}
+
+/* SECTION DIVIDER */
+.section-divider{border:none;border-top:1px solid var(--divider);margin:32px 0;}
+.section-label{font-size:11px;font-weight:600;color:var(--secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav">
+  <span class="nav-logo">MediaLens</span>
+  <span class="nav-sep">/</span>
+  <span class="nav-page">Add-on Store — All States Prototype</span>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-user">
+      <div class="sidebar-avatar">👤</div>
+      <div class="sidebar-name">julietest</div>
+      <div class="sidebar-email">julie.li+5@presslogic.com</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="sidebar-item">My Account</div>
+      <div class="sidebar-item">Ad Intelligence</div>
+      <div class="sidebar-item">Article</div>
+      <div class="sidebar-item">Verified Browsers</div>
+    </div>
+    <div class="sidebar-team">
+      <div class="team-badge">julie.li+5's team ▾</div><br>
+      <span id="sidebar-plan-badge" class="team-plan">Free</span>
+      <span style="font-size:12px;color:var(--secondary);margin-left:6px;">1 member</span>
+      <br><span id="sidebar-billing-cycle" style="font-size:11px;color:var(--secondary);margin-top:4px;display:inline-block;">Annual billing</span>
+    </div>
+    <div class="sidebar-nav">
+      <div class="sidebar-item">Team Details</div>
+      <div class="sidebar-item">Manage Team Users</div>
+      <div class="sidebar-item">Quota and Usage</div>
+      <div class="sidebar-item active">Plans and billing</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="page-header">
+      <button class="back-btn">&#8592;</button>
+      <h1 class="page-title">Add-on Store</h1>
+    </div>
+
+    <!-- SCENARIO TABS -->
+    <div class="scenario-bar">
+      <button class="scenario-btn active" onclick="setScenario('free')">Free Plan (all locked)</button>
+      <button class="scenario-btn" onclick="setScenario('lite')">Lite Plan</button>
+      <button class="scenario-btn" onclick="setScenario('basic')">Basic Plan</button>
+      <button class="scenario-btn" onclick="setScenario('premium')">Premium Plan (active addons)</button>
+      <button class="scenario-btn" onclick="setScenario('pending')">Pending Reduction</button>
+    </div>
+    <div class="scenario-label" id="scenario-desc">
+      <span>&#9432;</span>
+      <span id="scenario-text">Free Plan — all addons are locked. "Upgrade to Unlock" navigates to Plans &amp; Billing page.</span>
+    </div>
+
+    <!-- CARD GRID -->
+    <div class="card-grid" id="card-grid"></div>
+  </div>
+</div>
+
+<!-- PURCHASE MODAL -->
+<div class="modal-overlay" id="purchase-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="purchase-modal-title">Subscribe to Extra User Account</div>
+      <button class="modal-close" onclick="closeModal('purchase-modal')">&#215;</button>
+    </div>
+    <div class="modal-body" id="purchase-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline-gray" style="flex:none;min-width:90px;" onclick="closeModal('purchase-modal')">Cancel</button>
+      <button class="btn btn-primary" style="flex:none;min-width:110px;" id="purchase-confirm-btn">Subscribe</button>
+    </div>
+  </div>
+</div>
+
+<!-- MANAGE MODAL -->
+<div class="modal-overlay" id="manage-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="manage-modal-title">Manage Add-on</div>
+      <button class="modal-close" onclick="closeModal('manage-modal')">&#215;</button>
+    </div>
+    <div class="modal-body" id="manage-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline-gray" style="flex:none;min-width:90px;" onclick="closeModal('manage-modal')">Close</button>
+      <button class="btn btn-primary" style="flex:none;min-width:110px;" id="manage-confirm-btn">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const ADDONS = [
+  {
+    id: 'competitor',
+    name: 'Extra Competitor Analysis',
+    desc: 'Additional competitor analysis page slot',
+    type: 'recurring',
+    isOneTime: false,
+    price: 641.10,
+    monthlyPrice: 53.43,
+    interval: 'year',
+    allowedPlans: ['basic','premium'],
+    addonType: 'competitor',
+    unitLabel: 'slot',
+  },
+  {
+    id: 'myPage',
+    name: 'Extra My Page Analysis',
+    desc: 'Additional My Page analysis quota',
+    type: 'recurring',
+    isOneTime: false,
+    price: 641.10,
+    monthlyPrice: 53.43,
+    interval: 'year',
+    allowedPlans: ['basic','premium'],
+    addonType: 'myPage',
+    unitLabel: 'slot',
+  },
+  {
+    id: 'userAccount',
+    name: 'Extra User Account',
+    desc: 'Additional user seat',
+    type: 'recurring',
+    isOneTime: false,
+    price: 641.10,
+    monthlyPrice: 53.43,
+    interval: 'year',
+    allowedPlans: ['premium'],
+    addonType: 'userAccount',
+    unitLabel: 'seat',
+  },
+  {
+    id: 'leaderboard',
+    name: 'Leader Board',
+    desc: 'Full leaderboard analytics module',
+    type: 'recurring',
+    isOneTime: true,
+    price: 3846.20,
+    monthlyPrice: 320.52,
+    interval: 'year',
+    allowedPlans: ['basic','premium'],
+    addonType: 'leaderboard',
+    altPrice: 'HK$3,000/mo',
+  },
+  {
+    id: 'socialListening',
+    name: 'Social Listening (LIHKG + BK)',
+    desc: 'Social listening coverage for LIHKG and Baby Kingdom',
+    type: 'recurring',
+    isOneTime: true,
+    price: 3846.20,
+    monthlyPrice: 320.52,
+    interval: 'year',
+    allowedPlans: ['premium'],
+    addonType: 'socialListening',
+    altPrice: 'HK$3,000/mo',
+  },
+  {
+    id: 'tokenTopUp',
+    name: 'AI Token Top-up (1M)',
+    desc: '1,000,000 AI tokens — unused tokens roll over',
+    type: 'one_time',
+    isOneTime: false,
+    price: 32.06,
+    monthlyPrice: null,
+    interval: null,
+    allowedPlans: ['premium'],
+    addonType: 'tokenTopUp',
+    packSize: '1,000,000 tokens',
+  },
+  {
+    id: 'adManagerAiKit',
+    name: 'Ad Manager',
+    desc: 'Ad manager coverage for AI analysis',
+    type: 'recurring',
+    isOneTime: true,
+    price: 3846.20,
+    monthlyPrice: 320.52,
+    interval: 'year',
+    allowedPlans: ['lite','basic','premium'],
+    addonType: 'adManagerAiKit',
+    altPrice: 'HK$3,000/mo',
+    isNew: true,
+  },
+];
+
+const PLAN_ORDER = ['free','lite','basic','premium'];
+
+const SCENARIOS = {
+  free: {
+    plan: 'free',
+    billingCycle: 'yearly',
+    label: 'Free Plan — all addons are locked. "Upgrade to Unlock" navigates to Plans &amp; Billing page.',
+    activeAddons: {},
+    pending: {},
+  },
+  lite: {
+    plan: 'lite',
+    billingCycle: 'monthly',
+    label: 'Lite Plan — <strong>Monthly subscription</strong>. Ad Manager is now eligible (minimum plan = Lite). Others requiring Basic/Premium remain locked.',
+    activeAddons: {},
+    pending: {},
+  },
+  basic: {
+    plan: 'basic',
+    billingCycle: 'monthly',
+    label: 'Basic Plan — <strong>Monthly subscription</strong>. Competitor, MyPage, Leaderboard, Ad Manager are eligible. UserAccount and Social Listening still locked (require Premium).',
+    activeAddons: { leaderboard: { quantity: 1 } },
+    pending: {},
+  },
+  premium: {
+    plan: 'premium',
+    billingCycle: 'monthly',
+    label: 'Premium Plan — <strong>Monthly subscription</strong>. All addons eligible. Extra User Account active ×2, AI Token Top-up purchased ×3, Leader Board active, Social Listening active.',
+    activeAddons: {
+      userAccount: { quantity: 2 },
+      leaderboard: { quantity: 1 },
+      socialListening: { quantity: 1 },
+      tokenTopUp: { quantity: 3 },
+      adManagerAiKit: { quantity: 1 },
+    },
+    pending: {},
+  },
+  pending: {
+    plan: 'premium',
+    billingCycle: 'monthly',
+    label: 'Premium Plan — <strong>Monthly subscription</strong>, with pending reductions. Extra User Account scheduled to reduce from 2→1 next period. Leader Board scheduled for cancellation.',
+    activeAddons: {
+      userAccount: { quantity: 2, pendingReduction: true, nextPeriodQuantity: 1 },
+      leaderboard: { quantity: 1, pendingCancellation: true, nextPeriodQuantity: 0 },
+      socialListening: { quantity: 1 },
+      tokenTopUp: { quantity: 1 },
+      adManagerAiKit: { quantity: 1 },
+    },
+    pending: {},
+  },
+};
+
+let currentScenario = 'free';
+
+function isEligible(addon, plan) {
+  if (addon.allowedPlans.length === 0) return true;
+  return addon.allowedPlans.includes(plan);
+}
+
+function formatPrice(amount) {
+  return 'US$' + Number(amount).toLocaleString('en-US', {minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function getAddonPricing(addon, billingCycle) {
+  if (!addon.interval) return { price: addon.price, interval: null };
+  if (billingCycle === 'monthly' && addon.monthlyPrice != null) {
+    return { price: addon.monthlyPrice, interval: 'month' };
+  }
+  return { price: addon.price, interval: addon.interval };
+}
+
+function getTypeTag(addon) {
+  if (addon.isOneTime) return '<span class="tag tag-feature">Feature</span>';
+  if (addon.type === 'recurring') return '<span class="tag tag-recurring">Recurring</span>';
+  return '<span class="tag tag-onetime">One-time</span>';
+}
+
+function getRequiredPlanText(addon) {
+  const plans = addon.allowedPlans.map(p => p.charAt(0).toUpperCase() + p.slice(1));
+  if (plans.length === 0) return '';
+  if (plans.length === 1) return `Requires ${plans[0]} or above`;
+  return `Requires ${plans.join(' / ')} or above`;
+}
+
+function renderCard(addon, scenario) {
+  const sc = SCENARIOS[scenario];
+  const plan = sc.plan;
+  const billingCycle = sc.billingCycle;
+  const eligible = isEligible(addon, plan);
+  const activeData = sc.activeAddons[addon.id];
+  const isActive = !!activeData;
+  const isPending = isActive && (activeData.pendingReduction || activeData.pendingCancellation);
+  const pricing = getAddonPricing(addon, billingCycle);
+
+  let cardClass = 'addon-card';
+  if (!eligible) cardClass += ' locked';
+  if (isActive) cardClass += ' active';
+  if (addon.isNew) cardClass += ' new-addon';
+
+  // Badge
+  let badge = '';
+  if (addon.isNew) badge = '<div class="card-badge-new">NEW</div>';
+
+  // Type tags
+  let typeTags = getTypeTag(addon);
+  if (isActive) {
+    const activeLabel = addon.type === 'one_time'
+      ? `Purchased ×${activeData.quantity}`
+      : `Active ×${activeData.quantity}`;
+    typeTags += ` <span class="tag tag-active">${activeLabel}</span>`;
+  }
+
+  // Icon
+  const iconClass = addon.isNew ? 'card-icon purple' : 'card-icon';
+  const iconEmoji = addon.isNew ? '🤖' : '🧩';
+
+  // Price row
+  const intervalLabel = pricing.interval ? `/${pricing.interval}` : '';
+  let priceHtml = `<div class="card-price">${formatPrice(pricing.price)}<span class="card-price-interval">${intervalLabel}</span></div>`;
+  // Only show altPrice (monthly alternative) when on yearly billing
+  if (billingCycle === 'yearly' && addon.altPrice) {
+    priceHtml += `<div style="font-size:11px;color:var(--secondary);margin-top:2px;">or ${addon.altPrice}</div>`;
+  }
+
+  // Required plan hint
+  let reqHtml = '';
+  if (!eligible) {
+    reqHtml = `<div class="card-req"><span class="dot"></span> ${getRequiredPlanText(addon)}</div>`;
+  }
+
+  // Current quantity
+  let currentHtml = '';
+  if (isActive && !addon.isOneTime && addon.type === 'recurring') {
+    currentHtml = `<div class="card-current">Currently: ${activeData.quantity} ${addon.unitLabel || 'units'}</div>`;
+  }
+
+  // Token balance (consumable)
+  let balanceHtml = '';
+  if (addon.type === 'one_time' && isActive) {
+    const balance = activeData.quantity * 1000000;
+    const pct = 65;
+    balanceHtml = `
+      <div class="card-balance">
+        <div class="card-balance-label">Balance: ${(balance * 0.65 / 1000000).toFixed(1)}M / ${(balance/1000000).toFixed(0)}M tokens</div>
+        <div class="card-balance-bar"><div class="card-balance-fill" style="width:${pct}%"></div></div>
+      </div>`;
+  }
+
+  // Pending reduction
+  let pendingHtml = '';
+  if (isPending) {
+    let pendingText = '';
+    if (activeData.pendingCancellation) {
+      pendingText = `Cancelling all next period (${activeData.quantity} unit${activeData.quantity>1?'s':''})`;
+    } else {
+      const reducing = activeData.quantity - activeData.nextPeriodQuantity;
+      pendingText = `Reducing to ${activeData.nextPeriodQuantity} next period (${reducing} pending cancellation)`;
+    }
+    pendingHtml = `
+      <div class="card-pending">
+        <span class="card-pending-text">${pendingText}</span>
+        <button class="btn btn-warning-outline" onclick="handleRecover('${addon.id}')">Recover</button>
+      </div>`;
+  }
+
+  // Action buttons
+  let actionHtml = '';
+  if (!eligible) {
+    actionHtml = `<button class="btn btn-outline" onclick="goUpgrade()">🔒 Upgrade to Unlock</button>`;
+  } else if (isActive && addon.isOneTime) {
+    actionHtml = `<button class="btn btn-outline-gray" onclick="openManageModal('${addon.id}')">Manage</button>`;
+  } else if (isActive && addon.type === 'recurring' && !addon.isOneTime) {
+    actionHtml = `
+      <button class="btn btn-primary" onclick="openPurchaseModal('${addon.id}')">Add More</button>
+      <button class="btn btn-outline-gray" onclick="openManageModal('${addon.id}')">Manage</button>`;
+  } else if (isActive && addon.type === 'one_time') {
+    actionHtml = `<button class="btn btn-primary" onclick="openPurchaseModal('${addon.id}')">Buy More</button>`;
+  } else if (!isActive && addon.type === 'recurring') {
+    actionHtml = `<button class="btn btn-primary" onclick="openPurchaseModal('${addon.id}')">Subscribe</button>`;
+  } else {
+    actionHtml = `<button class="btn btn-primary" onclick="openPurchaseModal('${addon.id}')">Purchase</button>`;
+  }
+
+  return `
+    <div class="${cardClass}">
+      ${badge}
+      <div class="card-body">
+        <div class="card-type-row">${typeTags}</div>
+        <div class="${iconClass}">${iconEmoji}</div>
+        <div class="card-name">${addon.name}</div>
+        <div class="card-desc">${addon.desc}</div>
+        <div style="margin-bottom:6px;">${priceHtml}</div>
+        ${reqHtml}
+        ${currentHtml}
+        ${balanceHtml}
+        ${pendingHtml}
+      </div>
+      <div class="card-action">${actionHtml}</div>
+    </div>`;
+}
+
+function renderGrid(scenario) {
+  const grid = document.getElementById('card-grid');
+  grid.innerHTML = ADDONS.map(a => renderCard(a, scenario)).join('');
+}
+
+function setScenario(key) {
+  currentScenario = key;
+  const sc = SCENARIOS[key];
+  document.querySelectorAll('.scenario-btn').forEach((b,i) => {
+    b.classList.toggle('active', Object.keys(SCENARIOS)[i] === key);
+  });
+  document.getElementById('scenario-text').innerHTML = sc.label;
+  const planBadge = document.getElementById('sidebar-plan-badge');
+  planBadge.textContent = sc.plan.charAt(0).toUpperCase() + sc.plan.slice(1);
+  planBadge.className = 'team-plan' + (sc.plan === 'lite' ? ' lite' : '');
+  const cycleEl = document.getElementById('sidebar-billing-cycle');
+  if (cycleEl) {
+    cycleEl.textContent = sc.billingCycle === 'monthly' ? 'Monthly billing' : 'Annual billing';
+    cycleEl.style.color = sc.billingCycle === 'monthly' ? 'var(--blue)' : 'var(--secondary)';
+  }
+  renderGrid(key);
+}
+
+function goUpgrade() {
+  alert('Navigating to Plans & Billing page (billing-info route)...\n\nIn production: $router.push({ name: "billing-info" })');
+}
+
+function handleRecover(addonId) {
+  alert(`Recovering pending cancellation for addon: ${addonId}\n\nIn production: calls POST /subscriptions/recoverAddon`);
+}
+
+// PURCHASE MODAL
+function openPurchaseModal(addonId) {
+  const addon = ADDONS.find(a => a.id === addonId);
+  const sc = SCENARIOS[currentScenario];
+  const billingCycle = sc.billingCycle;
+  const activeData = sc.activeAddons[addonId];
+  const isAddMore = !!activeData && addon.type === 'recurring' && !addon.isOneTime;
+  const pricing = getAddonPricing(addon, billingCycle);
+  const intervalLabel = pricing.interval ? `/${pricing.interval}` : '';
+
+  const titleEl = document.getElementById('purchase-modal-title');
+  const bodyEl = document.getElementById('purchase-modal-body');
+  const confirmBtn = document.getElementById('purchase-confirm-btn');
+
+  const iconClass = addon.isNew ? 'purple' : '';
+  const iconEmoji = addon.isNew ? '🤖' : '🧩';
+
+  if (addon.isOneTime && addon.type === 'recurring') {
+    // Feature addon
+    titleEl.textContent = `Subscribe to ${addon.name}`;
+    confirmBtn.textContent = 'Subscribe';
+    bodyEl.innerHTML = `
+      <div class="modal-info-row">
+        <div class="modal-icon ${iconClass}">${iconEmoji}</div>
+        <div>
+          <div class="modal-addon-name">${addon.name}</div>
+          <div class="modal-addon-desc">${addon.desc}</div>
+        </div>
+      </div>
+      <div class="pricing-table">
+        <div class="pricing-row"><span class="pricing-label">Unit price</span><span class="pricing-value">${formatPrice(pricing.price)}${intervalLabel}</span></div>
+        <div class="pricing-row"><span class="pricing-label">Next charge</span><span class="pricing-value">Immediately</span></div>
+        <div class="pricing-row"><span class="pricing-label">Payment</span><span class="pricing-value">Visa •••• 4242</span></div>
+      </div>
+      <div class="trust"><span class="trust-dot"></span> Secured by Stripe &nbsp;·&nbsp; PCI DSS compliant</div>
+      <div class="legal">By proceeding, you agree to our <a href="#">Terms of Service and Privacy Policy</a>.</div>`;
+  } else if (addon.type === 'recurring' && !addon.isOneTime) {
+    // Quantity addon
+    const currentQty = activeData ? activeData.quantity : 0;
+    const addQty = 1;
+    // For monthly: prorate ~13 days remaining (~0.45); for yearly: ~7 months remaining (~0.6)
+    const proratedFactor = billingCycle === 'monthly' ? 0.45 : 0.6;
+    const prorated = (pricing.price * addQty * proratedFactor).toFixed(2);
+    const newTotal = pricing.price * (currentQty + addQty);
+    const title = isAddMore ? `Add More ${addon.name}` : `Subscribe to ${addon.name}`;
+    titleEl.textContent = title;
+    confirmBtn.textContent = isAddMore ? 'Add More' : 'Subscribe';
+    bodyEl.innerHTML = `
+      <div class="modal-info-row">
+        <div class="modal-icon">${iconEmoji}</div>
+        <div>
+          <div class="modal-addon-name">${addon.name}</div>
+          <div class="modal-addon-desc">${addon.desc}</div>
+        </div>
+      </div>
+      <div class="pricing-table">
+        ${currentQty > 0 ? `<div class="pricing-row"><span class="pricing-label">Current</span><span class="pricing-value">${currentQty} ${addon.unitLabel||'units'}</span></div>` : ''}
+        <div class="pricing-row">
+          <span class="pricing-label">${currentQty > 0 ? 'Add quantity' : 'Quantity'}</span>
+          <span class="pricing-value">
+            <span class="qty-control">
+              <button class="qty-btn" onclick="changeQty(-1)">−</button>
+              <span class="qty-val" id="modal-qty">1</span>
+              <button class="qty-btn" onclick="changeQty(1)">+</button>
+            </span>
+          </span>
+        </div>
+        <div class="pricing-row"><span class="pricing-label">Unit price</span><span class="pricing-value">${formatPrice(pricing.price)}${intervalLabel}</span></div>
+        <div class="pricing-row"><span class="pricing-label">${currentQty > 0 ? 'Additional cost' : 'Total'}</span><span class="pricing-value prorated">US$${prorated} <span class="pricing-prorated">(prorated)</span></span></div>
+        <div class="pricing-row"><span class="pricing-label">${currentQty > 0 ? 'New total' : 'Next billing'}</span><span class="pricing-value blue">${formatPrice(newTotal)}${intervalLabel}</span></div>
+        <div class="pricing-row"><span class="pricing-label">Next charge</span><span class="pricing-value">Immediately</span></div>
+        <div class="pricing-row"><span class="pricing-label">Payment</span><span class="pricing-value">Visa •••• 4242</span></div>
+      </div>
+      <div class="trust"><span class="trust-dot"></span> Secured by Stripe &nbsp;·&nbsp; PCI DSS compliant</div>
+      <div class="legal">By proceeding, you agree to our <a href="#">Terms of Service and Privacy Policy</a>.</div>`;
+  } else {
+    // One-time consumable
+    titleEl.textContent = `Purchase ${addon.name}`;
+    confirmBtn.textContent = 'Purchase';
+    bodyEl.innerHTML = `
+      <div class="modal-info-row">
+        <div class="modal-icon">${iconEmoji}</div>
+        <div>
+          <div class="modal-addon-name">${addon.name}</div>
+          <div class="modal-addon-desc">${addon.desc}</div>
+        </div>
+      </div>
+      <div class="pricing-table">
+        <div class="pricing-row">
+          <span class="pricing-label">Packs</span>
+          <span class="pricing-value">
+            <span class="qty-control">
+              <button class="qty-btn" onclick="changeQty(-1)">−</button>
+              <span class="qty-val" id="modal-qty">1</span>
+              <button class="qty-btn" onclick="changeQty(1)">+</button>
+            </span>
+          </span>
+        </div>
+        <div class="pricing-row"><span class="pricing-label">Pack size</span><span class="pricing-value">1,000,000 tokens</span></div>
+        <div class="pricing-row"><span class="pricing-label">After purchase</span><span class="pricing-value blue">1,000,000 tokens</span></div>
+        <div class="pricing-row"><span class="pricing-label">Total price</span><span class="pricing-value">${formatPrice(addon.price)}</span></div>
+        <div class="pricing-row"><span class="pricing-label">Payment</span><span class="pricing-value">Visa •••• 4242</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--secondary);margin-top:8px;">⚡ One-time charge, no subscription</div>
+      <div class="trust"><span class="trust-dot"></span> Secured by Stripe &nbsp;·&nbsp; PCI DSS compliant</div>
+      <div class="legal">By proceeding, you agree to our <a href="#">Terms of Service and Privacy Policy</a>.</div>`;
+  }
+
+  document.getElementById('purchase-modal').classList.add('open');
+}
+
+function changeQty(delta) {
+  const el = document.getElementById('modal-qty');
+  if (!el) return;
+  const val = Math.max(1, Math.min(10, parseInt(el.textContent) + delta));
+  el.textContent = val;
+}
+
+// MANAGE MODAL
+function openManageModal(addonId) {
+  const addon = ADDONS.find(a => a.id === addonId);
+  const sc = SCENARIOS[currentScenario];
+  const billingCycle = sc.billingCycle;
+  const activeData = sc.activeAddons[addonId];
+  const pricing = getAddonPricing(addon, billingCycle);
+  const intervalLabel = pricing.interval ? `/${pricing.interval}` : '';
+
+  document.getElementById('manage-modal-title').textContent = `Manage ${addon.name}`;
+  const bodyEl = document.getElementById('manage-modal-body');
+  const confirmBtn = document.getElementById('manage-confirm-btn');
+
+  const iconClass = addon.isNew ? 'purple' : '';
+  const iconEmoji = addon.isNew ? '🤖' : '🧩';
+
+  if (addon.isOneTime) {
+    confirmBtn.textContent = 'Cancel Add-on';
+    confirmBtn.className = 'btn btn-primary';
+    confirmBtn.style.background = 'var(--danger)';
+    confirmBtn.style.borderColor = 'var(--danger)';
+    bodyEl.innerHTML = `
+      <div class="modal-info-row">
+        <div class="modal-icon ${iconClass}">${iconEmoji}</div>
+        <div>
+          <div class="modal-addon-name">${addon.name}</div>
+          <div class="modal-addon-desc">Currently active · Renews ${formatPrice(pricing.price)}${intervalLabel}</div>
+        </div>
+      </div>
+      <div class="manage-section">
+        <div class="manage-label">Cancellation</div>
+        <div class="manage-row"><span>Takes effect</span><span style="font-weight:600;">End of current period</span></div>
+        <div class="manage-row"><span>Access until</span><span style="font-weight:600;color:var(--success);">Jun 25, 2026</span></div>
+      </div>
+      <div class="cancel-warning">
+        <span>⚠️</span>
+        <span>You've used <strong>78%</strong> of this feature this month. Cancelling now means losing access at period end. Are you sure?</span>
+      </div>`;
+  } else {
+    const currentQty = activeData ? activeData.quantity : 1;
+    confirmBtn.textContent = 'Save Changes';
+    confirmBtn.className = 'btn btn-primary';
+    confirmBtn.style.background = '';
+    confirmBtn.style.borderColor = '';
+    bodyEl.innerHTML = `
+      <div class="modal-info-row">
+        <div class="modal-icon">${iconEmoji}</div>
+        <div>
+          <div class="modal-addon-name">${addon.name}</div>
+          <div class="modal-addon-desc">Currently: ${currentQty} ${addon.unitLabel||'units'}</div>
+        </div>
+      </div>
+      <div class="manage-section">
+        <div class="manage-label">Adjust Quantity</div>
+        <div class="manage-row">
+          <span>New quantity (next period)</span>
+          <span class="qty-control">
+            <button class="qty-btn" onclick="changeQty(-1)">−</button>
+            <span class="qty-val" id="modal-qty">${currentQty}</span>
+            <button class="qty-btn" onclick="changeQty(1)">+</button>
+          </span>
+        </div>
+        <div style="font-size:12px;color:var(--secondary);margin-top:8px;">Reduction takes effect at the end of current billing period.</div>
+      </div>
+      <div class="manage-section" style="margin-top:16px;">
+        <div class="manage-label">Or cancel entirely</div>
+        <button class="btn btn-outline" style="flex:none;color:var(--danger);border-color:var(--danger);width:100%;font-size:13px;" onclick="alert('Opens CancelAddonModal with usage % and retention nudge')">Cancel This Add-on</button>
+      </div>`;
+  }
+
+  document.getElementById('manage-modal').classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  const btn = document.getElementById('manage-confirm-btn');
+  if (btn) { btn.style.background=''; btn.style.borderColor=''; }
+}
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
+});
+
+// INIT
+setScenario('free');
+</script>
+</body>
+</html>
