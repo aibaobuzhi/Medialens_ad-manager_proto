@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unlock Ad Manager — MediaLens</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+      background: rgba(10, 31, 44, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    /* ── Modal shell ── */
+    .modal {
+      background: #FFFFFF;
+      border-radius: 12px;
+      padding: 32px;
+      width: 480px;
+      max-width: 100%;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      position: relative;
+      max-height: 92vh;
+      overflow-y: auto;
+    }
+    .modal::-webkit-scrollbar { width: 4px; }
+    .modal::-webkit-scrollbar-track { background: transparent; }
+    .modal::-webkit-scrollbar-thumb { background: #D9E3E6; border-radius: 4px; }
+
+    /* ── Close button ── */
+    .modal-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #707070;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: background 0.15s;
+    }
+    .modal-close:hover { background: #F7F7F7; color: #102532; }
+
+    /* ── Header ── */
+    .modal-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #0A1F2C;
+      line-height: 32px;
+      padding-right: 36px;
+      margin-bottom: 6px;
+    }
+    .modal-subtitle {
+      font-size: 13px;
+      font-weight: 400;
+      color: #707070;
+      line-height: 20px;
+      margin-bottom: 24px;
+    }
+
+    /* ── Section header row ── */
+    .section-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #102532;
+    }
+    .badge-best-value {
+      background: #E6FBEB;
+      color: #52C41A;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 9px;
+      border-radius: 20px;
+      line-height: 18px;
+    }
+    .change-plan-link {
+      font-size: 13px;
+      font-weight: 500;
+      color: #23A9F6;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+    }
+    .change-plan-link:hover { text-decoration: underline; }
+
+    /* ── Plan card (selected = blue border) ── */
+    .plan-card {
+      border: 1.5px solid #23A9F6;
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: #FFFFFF;
+      cursor: pointer;
+    }
+    .addon-card {
+      border: 1px solid #D9E3E6;
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: #FFFFFF;
+      margin-bottom: 20px;
+    }
+
+    /* ── Icon box ── */
+    .plan-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: #23A9F6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* ── Plan info ── */
+    .plan-info { flex: 1; }
+    .plan-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #0A1F2C;
+      line-height: 22px;
+    }
+    .plan-desc {
+      font-size: 12px;
+      font-weight: 400;
+      color: #707070;
+      line-height: 19px;
+      margin-top: 3px;
+    }
+
+    /* ── Plan price ── */
+    .plan-price { text-align: right; flex-shrink: 0; }
+    .plan-price-main {
+      font-size: 22px;
+      font-weight: 600;
+      color: #0A1F2C;
+      line-height: 28px;
+    }
+    .plan-price-main span {
+      font-size: 13px;
+      font-weight: 400;
+      color: #707070;
+    }
+    .plan-price-billing {
+      font-size: 11px;
+      color: #707070;
+      line-height: 18px;
+    }
+
+    /* ── Plus divider ── */
+    .plus-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 12px 0 10px;
+    }
+    .plus-line { flex: 1; height: 1px; background: #E8EEF0; }
+    .plus-sign {
+      color: #CACACA;
+      font-size: 16px;
+      font-weight: 400;
+      flex-shrink: 0;
+      line-height: 1;
+      user-select: none;
+    }
+
+    /* ── Section 2 label ── */
+    .section-label-plain {
+      font-size: 14px;
+      font-weight: 600;
+      color: #102532;
+      margin-bottom: 10px;
+    }
+
+    /* ── Payment summary ── */
+    .payment-summary {
+      background: #F7F7F7;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .payment-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #102532;
+      margin-bottom: 12px;
+    }
+    .payment-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 7px;
+    }
+    .payment-row:last-child { margin-bottom: 0; }
+    .payment-label {
+      font-size: 13px;
+      font-weight: 400;
+      color: #707070;
+    }
+    .payment-value {
+      font-size: 13px;
+      font-weight: 400;
+      color: #707070;
+    }
+    .payment-divider {
+      height: 1px;
+      background: #E8EEF0;
+      margin: 10px 0;
+    }
+    .payment-due-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #102532;
+    }
+    .payment-due-value {
+      font-size: 17px;
+      font-weight: 600;
+      color: #23A9F6;
+    }
+    .payment-note {
+      font-size: 12px;
+      color: #828282;
+    }
+    .payment-note-right {
+      font-size: 12px;
+      color: #828282;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ── Yearly banner ── */
+    .yearly-banner {
+      background: #EEF6FF;
+      border-radius: 10px;
+      padding: 11px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .yearly-banner:hover { background: #daeffe; }
+    .yearly-left {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #23A9F6;
+    }
+    .yearly-right {
+      font-size: 13px;
+      font-weight: 500;
+      color: #23A9F6;
+    }
+
+    /* ── CTA button ── */
+    .cta-btn {
+      width: 100%;
+      background: #23A9F6;
+      color: #FFFFFF;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      height: 48px;
+      cursor: pointer;
+      margin-bottom: 12px;
+      transition: background 0.15s;
+      letter-spacing: 0;
+    }
+    .cta-btn:hover { background: #1a96de; }
+    .cta-btn:active { background: #1587c8; }
+
+    /* ── Footer ── */
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #828282;
+    }
+    .footer-dot { color: #CACACA; }
+  </style>
+</head>
+<body>
+
+<div class="modal">
+
+  <!-- Close -->
+  <button class="modal-close" onclick="this.closest('body').style.opacity='0.3'">&#x2715;</button>
+
+  <!-- Header -->
+  <h1 class="modal-title">Unlock Ad Manager</h1>
+  <p class="modal-subtitle">Upgrade your plan and add Ad Manager to continue.</p>
+
+  <!-- ── Section 1: Recommended plan ── -->
+  <div class="section-row">
+    <div class="section-label">
+      <span>Recommended plan</span>
+      <span class="badge-best-value">Best value</span>
+    </div>
+    <a class="change-plan-link">Change plan &rsaquo;</a>
+  </div>
+
+  <div class="plan-card">
+    <!-- Star icon -->
+    <div class="plan-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <path d="M11 2.5l2.47 5.3 5.53.8-4 4.1 .95 5.55L11 15.6l-4.95 2.65.95-5.55-4-4.1 5.53-.8L11 2.5z" fill="white"/>
+      </svg>
+    </div>
+    <div class="plan-info">
+      <div class="plan-name">Pro Plan</div>
+      <div class="plan-desc">Everything in Lite, plus advanced<br>analytics and team tools.</div>
+    </div>
+    <div class="plan-price">
+      <div class="plan-price-main">$65.20<span> /mo</span></div>
+      <div class="plan-price-billing">Billed monthly</div>
+    </div>
+  </div>
+
+  <!-- Plus divider -->
+  <div class="plus-divider">
+    <div class="plus-line"></div>
+    <div class="plus-sign">+</div>
+    <div class="plus-line"></div>
+  </div>
+
+  <!-- ── Section 2: Ad Manager add-on ── -->
+  <div class="section-label-plain">Ad Manager add-on</div>
+
+  <div class="addon-card">
+    <!-- Monitor / chart icon -->
+    <div class="plan-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <rect x="2" y="3" width="18" height="12" rx="2" stroke="white" stroke-width="1.5"/>
+        <path d="M8 15v3M11 15v3M14 15v3M5.5 18h11" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M6 11l3.5-3.5 2.5 2.5 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="plan-info">
+      <div class="plan-name">Ad Manager</div>
+      <div class="plan-desc">AI Insights, AI Agent &amp; AI Grouping<br>for your ad campaigns.</div>
+    </div>
+    <div class="plan-price">
+      <div class="plan-price-main">$65.20<span> /mo</span></div>
+    </div>
+  </div>
+
+  <!-- ── Payment summary ── -->
+  <div class="payment-summary">
+    <div class="payment-title">Payment summary</div>
+    <div class="payment-row">
+      <span class="payment-label">Pro Plan (Monthly)</span>
+      <span class="payment-value">$65.20 /mo</span>
+    </div>
+    <div class="payment-row">
+      <span class="payment-label">Ad Manager add-on</span>
+      <span class="payment-value">$65.20 /mo</span>
+    </div>
+    <div class="payment-divider"></div>
+    <div class="payment-row">
+      <span class="payment-due-label">Due today</span>
+      <span class="payment-due-value">$40.00</span>
+    </div>
+    <div class="payment-row" style="margin-top:5px;">
+      <span class="payment-note">One-time setup &amp; token pack</span>
+      <span class="payment-note-right">
+        <!-- Info icon -->
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <circle cx="6.5" cy="6.5" r="5.5" stroke="#828282" stroke-width="1.1"/>
+          <path d="M6.5 5.8v3.5M6.5 4.2v.5" stroke="#828282" stroke-width="1.1" stroke-linecap="round"/>
+        </svg>
+        No recurring charges today
+      </span>
+    </div>
+  </div>
+
+  <!-- ── Yearly savings banner ── -->
+  <div class="yearly-banner">
+    <div class="yearly-left">
+      <!-- Shield icon -->
+      <svg width="15" height="16" viewBox="0 0 15 16" fill="none">
+        <path d="M7.5 1.5L13 3.5V8c0 3-2.5 5.5-5.5 6.5C2 13.5 2 8 2 8V3.5L7.5 1.5z" stroke="#23A9F6" stroke-width="1.3" fill="none"/>
+        <path d="M5 8l2 2 3-3" stroke="#23A9F6" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Yearly saves 15% on your plan
+    </div>
+    <div class="yearly-right">See savings &rsaquo;</div>
+  </div>
+
+  <!-- ── CTA ── -->
+  <button class="cta-btn">Upgrade &amp; Add Ad Manager</button>
+
+  <!-- ── Footer ── -->
+  <div class="modal-footer">
+    <!-- Lock icon -->
+    <svg width="11" height="13" viewBox="0 0 11 13" fill="none">
+      <rect x="1" y="5.5" width="9" height="7" rx="1.5" stroke="#828282" stroke-width="1.1"/>
+      <path d="M3 5.5V4a2.5 2.5 0 015 0v1.5" stroke="#828282" stroke-width="1.1"/>
+    </svg>
+    Secure checkout
+    <span class="footer-dot">&bull;</span>
+    Cancel anytime
+  </div>
+
+</div>
+
+</body>
+</html>
