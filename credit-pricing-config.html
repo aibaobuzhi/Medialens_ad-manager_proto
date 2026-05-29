@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Model Pricing Configuration — Medialens</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Poppins', sans-serif; background: #F7F7F7; color: #102532; min-height: 100vh; }
+
+  .nav { background: #23A9F6; height: 64px; display: flex; align-items: center; padding: 0 32px; gap: 10px; }
+  .nav-logo { color: #fff; font-size: 20px; font-weight: 700; }
+  .nav-sep { color: rgba(255,255,255,0.5); }
+  .nav-sub { color: rgba(255,255,255,0.85); font-size: 14px; }
+
+  .page { max-width: 1200px; margin: 0 auto; padding: 36px 24px 80px; }
+  .breadcrumb { font-size: 12px; color: #707070; margin-bottom: 10px; display: flex; gap: 6px; }
+  .breadcrumb a { color: #707070; text-decoration: none; }
+  .page-title { font-size: 26px; font-weight: 700; color: #0A1F2C; margin-bottom: 24px; }
+  .page-title span { font-weight: 400; color: #707070; font-size: 16px; margin-left: 10px; }
+
+  .card { background: #fff; border-radius: 12px; border: 1px solid #D9E3E6; padding: 28px; margin-bottom: 16px; }
+
+  /* ── MARKUP ── */
+  .markup-card { display: grid; grid-template-columns: 160px 1fr 280px; gap: 28px; align-items: center; }
+  .markup-label { font-size: 11px; font-weight: 600; letter-spacing: 1px; color: #707070; text-transform: uppercase; margin-bottom: 6px; }
+  .markup-number { display: flex; align-items: baseline; gap: 5px; }
+  .markup-number .big { font-size: 52px; font-weight: 700; color: #0A1F2C; line-height: 1; }
+  .markup-number .pct { font-size: 22px; color: #707070; font-weight: 500; }
+  .slider-ticks { display: flex; justify-content: space-between; font-size: 11px; color: #CACACA; margin-bottom: 6px; }
+  input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 2px; background: #D9E3E6; outline: none; cursor: pointer; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #0A1F2C; border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.22); cursor: pointer; }
+  .formula-block { background: #F7F7F7; border-radius: 10px; padding: 16px 20px; }
+  .formula-expr { font-size: 13px; color: #102532; line-height: 1.8; }
+  .formula-expr .hi { font-size: 20px; font-weight: 700; color: #0A1F2C; }
+  .formula-note { font-size: 11px; color: #707070; margin-top: 4px; }
+
+  /* ── BANNER ── */
+  .preview-banner { background: #FFF8EB; border: 1px solid #FFC960; border-radius: 10px; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  .preview-banner.hidden { display: none; }
+  .preview-text { font-size: 13px; color: #102532; display: flex; align-items: center; gap: 8px; }
+  .preview-actions { display: flex; gap: 10px; }
+
+  /* ── BUTTONS ── */
+  .btn { height: 38px; padding: 0 18px; border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; border: none; }
+  .btn-outline { background: #fff; border: 1.5px solid #D9E3E6; color: #102532; }
+  .btn-outline:hover { border-color: #102532; }
+  .btn-primary { background: #0A1F2C; color: #fff; }
+  .btn-primary:hover { background: #1a3548; }
+  .btn-sm { height: 32px; padding: 0 14px; font-size: 12px; }
+  .btn-ghost { background: none; border: 1.5px dashed #D9E3E6; color: #707070; }
+  .btn-ghost:hover { border-color: #23A9F6; color: #23A9F6; background: #F1FCFF; }
+  .icon-btn { background: none; border: none; cursor: pointer; color: #CACACA; font-size: 15px; padding: 4px 5px; border-radius: 6px; transition: all 0.15s; }
+  .icon-btn:hover { color: #102532; background: #F7F7F7; }
+  .icon-btn.danger:hover { color: #FF3F41; background: #FFECEC; }
+
+  /* ── PRODUCT FILTER ── */
+  .product-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .product-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 36px; padding: 0 14px;
+    border-radius: 20px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid #D9E3E6;
+    background: #fff; color: #707070;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .product-pill:hover { border-color: #23A9F6; color: #23A9F6; }
+  .product-pill.active { background: #0A1F2C; border-color: #0A1F2C; color: #fff; }
+  .product-pill .pill-actions { display: none; align-items: center; gap: 2px; margin-left: 4px; }
+  .product-pill.active .pill-actions { display: flex; }
+  .pill-icon { background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.6); font-size: 13px; padding: 2px 3px; border-radius: 4px; line-height: 1; transition: all 0.12s; }
+  .pill-icon:hover { color: #fff; background: rgba(255,255,255,0.2); }
+  .pill-icon.danger:hover { color: #FF3F41; background: rgba(255,63,65,0.2); }
+  .product-section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #707070; margin-bottom: 12px; }
+
+  /* ── MODEL SELECTOR ── */
+  .model-selector-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .select-model { height: 44px; padding: 0 14px; border-radius: 10px; border: 1.5px solid #D9E3E6; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; color: #102532; background: #fff; cursor: pointer; min-width: 220px; }
+  .vendor-badge { display: inline-flex; align-items: center; height: 28px; padding: 0 14px; border-radius: 20px; font-size: 12px; font-weight: 600; background: #EEF6FF; color: #23A9F6; border: 1px solid #73DFFF; }
+  .type-badge { display: inline-flex; align-items: center; height: 28px; padding: 0 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .type-badge.token { background: #E6FBEB; color: #52C41A; border: 1px solid #52C41A; }
+  .doc-link { font-size: 12px; color: #707070; text-decoration: none; }
+  .doc-link:hover { color: #23A9F6; }
+
+  /* ── PARAMS TABLE ── */
+  .params-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .params-title { font-size: 16px; font-weight: 600; }
+  .params-count { font-size: 13px; color: #707070; margin-top: 2px; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { font-size: 11px; font-weight: 600; letter-spacing: 0.7px; text-transform: uppercase; color: #707070; padding: 0 0 12px; border-bottom: 1px solid #E8EEF0; text-align: left; }
+  thead th.right { text-align: right; }
+  tbody tr { border-bottom: 1px solid #E8EEF0; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody td { padding: 13px 0; font-size: 14px; vertical-align: middle; }
+  .dir-badge { display: inline-flex; align-items: center; height: 26px; padding: 0 12px; border-radius: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+  .dir-badge.input { background: #EEF6FF; color: #23A9F6; }
+  .dir-badge.output { background: #FFF8EB; color: #FFC960; }
+  .col-vendor { text-align: right; color: #CACACA; font-size: 13px; }
+  .col-adj { text-align: right; font-size: 14px; color: #102532; font-weight: 500; }
+  .col-adj-header { text-align: right; }
+  .internal-tag { display: block; font-size: 10px; color: #FF3F41; font-weight: 600; margin-top: 2px; }
+  .col-credits { text-align: right; font-size: 18px; font-weight: 700; color: #0A1F2C; }
+  .col-credits.preview-changed { color: #23A9F6; }
+  .col-credits small { font-size: 10px; font-weight: 500; color: #707070; display: block; }
+  .col-actions { text-align: right; width: 72px; }
+  .adj-note { font-size: 10px; color: #52C41A; font-weight: 600; margin-left: 4px; }
+  .adj-same { font-size: 10px; color: #CACACA; margin-left: 4px; }
+  .stat-bar { background: #F6F8FD; border-radius: 10px; padding: 16px 20px; display: flex; gap: 40px; align-items: center; margin-top: 20px; border: 1px solid #D9E3E6; flex-wrap: wrap; }
+  .stat .lbl { font-size: 10px; color: #707070; font-weight: 600; text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 3px; }
+  .stat .val { font-size: 18px; font-weight: 700; color: #0A1F2C; }
+  .stat .val.blue { color: #23A9F6; }
+  .stat .sub { font-size: 10px; color: #707070; margin-top: 2px; }
+
+  /* ── SECTION DIVIDER ── */
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin: 32px 0 16px; }
+  .section-title { font-size: 18px; font-weight: 700; color: #0A1F2C; }
+  .section-title span { font-size: 13px; font-weight: 400; color: #707070; margin-left: 8px; }
+
+  /* ── SCENARIO CARD ── */
+  .scenario-card { background: #fff; border-radius: 12px; border: 1px solid #D9E3E6; margin-bottom: 16px; overflow: hidden; }
+  .scenario-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid #E8EEF0;
+    background: #F7F7F7;
+  }
+  .scenario-name-wrap { display: flex; align-items: center; gap: 10px; }
+  .scenario-name { font-size: 15px; font-weight: 700; color: #0A1F2C; }
+  .scenario-name-input {
+    font-size: 15px; font-weight: 700; color: #0A1F2C;
+    border: 1.5px solid #23A9F6; border-radius: 8px;
+    padding: 4px 10px; font-family: 'Poppins', sans-serif;
+    outline: none; background: #fff;
+    display: none;
+  }
+  .scenario-actions { display: flex; gap: 4px; align-items: center; }
+
+  /* scenario table */
+  .scenario-body { padding: 0 24px 20px; }
+  .scenario-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+  .scenario-table thead th {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.7px; text-transform: uppercase;
+    color: #707070; padding: 0 8px 10px 0; border-bottom: 1px solid #E8EEF0; text-align: left;
+  }
+  .scenario-table thead th.right { text-align: right; }
+  .scenario-table tbody tr { border-bottom: 1px solid #E8EEF0; }
+  .scenario-table tbody tr:last-child { border-bottom: none; }
+  .scenario-table tbody td { padding: 11px 8px 11px 0; font-size: 13px; vertical-align: middle; }
+  .scenario-table tbody td.right { text-align: right; }
+  .scenario-table .total-row td {
+    font-weight: 700; font-size: 13px; color: #0A1F2C;
+    padding-top: 14px; border-top: 2px solid #D9E3E6; border-bottom: none;
+  }
+  .scenario-table .total-row td.right { text-align: right; }
+  .model-chip {
+    display: inline-block; font-size: 10px; font-weight: 600;
+    padding: 2px 8px; border-radius: 6px;
+    background: #EEF6FF; color: #23A9F6;
+    white-space: nowrap;
+  }
+  .num-cell { text-align: right; font-variant-numeric: tabular-nums; }
+  .scenario-footer { padding: 0 24px 20px; }
+
+  /* ── MODAL ── */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(10,31,44,0.4); z-index: 100; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #fff; border-radius: 14px; padding: 28px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+  .modal-sm { width: 400px; }
+  .modal-md { width: 520px; }
+  .modal h3 { font-size: 17px; font-weight: 700; margin-bottom: 20px; }
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-size: 11px; font-weight: 600; color: #707070; margin-bottom: 5px; display: block; }
+  .form-input { width: 100%; height: 40px; padding: 0 12px; border: 1.5px solid #D9E3E6; border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 14px; color: #102532; outline: none; }
+  .form-input:focus { border-color: #23A9F6; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-hint { font-size: 11px; color: #707070; margin-top: 4px; }
+  .form-hint.warn { color: #FFC960; }
+  .computed-block { background: #F6F8FD; border-radius: 10px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; margin: 14px 0 4px; }
+  .computed-block .cl { font-size: 13px; color: #707070; }
+  .computed-block .cr { font-size: 24px; font-weight: 700; color: #0A1F2C; }
+  .modal-formula { font-size: 11px; color: #707070; margin-bottom: 14px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">Medialens</div>
+  <span class="nav-sep">/</span>
+  <div class="nav-sub">Admin</div>
+</nav>
+
+<div class="page">
+
+  <div class="breadcrumb">
+    <a href="#">Models · 模型</a><span>/</span><span>Pricing · 定价</span>
+  </div>
+  <div class="page-title">
+    Model Pricing Configuration
+    <span>（模型定价配置）</span>
+  </div>
+
+  <!-- ── MARKUP RATE CARD ── -->
+  <div class="card markup-card">
+    <div>
+      <div class="markup-label">Markup Rate · 加价率</div>
+      <div class="markup-number">
+        <span class="big" id="markupDisplay">50</span>
+        <span class="pct">%</span>
+      </div>
+    </div>
+    <div>
+      <div class="slider-ticks">
+        <span>0%</span><span>20%</span><span>40%</span><span>60%</span><span>80%</span><span>99%</span>
+      </div>
+      <input type="range" id="markupSlider" min="0" max="99" value="50" step="1">
+    </div>
+    <div class="formula-block">
+      <div class="markup-label">Formula · 公式</div>
+      <div class="formula-expr">
+        credits = adj_cost × (1 + <span class="hi" id="markupFormula">0.50</span>) × 100
+      </div>
+      <div class="formula-note">1 credit = $0.01 &nbsp;·&nbsp; Token models: per 1M tokens</div>
+    </div>
+  </div>
+
+  <!-- PREVIEW BANNER -->
+  <div class="preview-banner hidden" id="previewBanner">
+    <div class="preview-text">
+      ⊙ &nbsp;Preview · 预览中 — Markup Rate
+      <strong id="prevFrom" style="color:#0A1F2C"></strong> →
+      <strong id="prevTo" style="color:#23A9F6"></strong>,
+      click Save to apply
+    </div>
+    <div class="preview-actions">
+      <button class="btn btn-outline" onclick="resetMarkup()">↺ Reset · 撤销</button>
+      <button class="btn btn-primary" onclick="saveMarkup()">✓ Save Changes · 保存</button>
+    </div>
+  </div>
+
+  <!-- ── PRODUCT FILTER ── -->
+  <div class="card" style="padding: 20px 28px;">
+    <div class="product-section-label">Product Selection · 产品选择</div>
+    <div class="product-bar" id="productBar">
+      <!-- rendered by JS -->
+    </div>
+  </div>
+
+  <!-- ── MODEL SELECTOR ── -->
+  <div class="card" style="padding: 18px 28px;">
+    <div class="model-selector-row">
+      <select class="select-model" id="modelSelect" onchange="switchModel()">
+        <option value="0">Gemini 2.5 Flash</option>
+        <option value="1">gemini-3.5-flash</option>
+      </select>
+      <span class="vendor-badge" id="vendorBadge">google</span>
+      <span class="type-badge token" id="typeBadge">token-based</span>
+      <a href="https://ai.google.dev/gemini-api/docs/pricing?hl=zh-cn#gemini-2.5-flash" target="_blank" class="doc-link" id="docLink">ai.google.dev/gemini-api/docs/pricing ↗</a>
+    </div>
+  </div>
+
+  <!-- ── PARAMS TABLE ── -->
+  <div class="card">
+    <div class="params-header">
+      <div>
+        <div class="params-title">Parameters · 参数定价</div>
+        <div class="params-count" id="paramCount"></div>
+      </div>
+      <button class="btn btn-primary" onclick="openAddModal()">+ Add · 新增</button>
+    </div>
+    <table id="paramsTable">
+      <thead id="tableHead"></thead>
+      <tbody id="paramsBody"></tbody>
+    </table>
+    <div class="stat-bar">
+      <div class="stat">
+        <div class="lbl">Markup Rate</div>
+        <div class="val blue" id="statRate">50%</div>
+      </div>
+      <div class="stat">
+        <div class="lbl">Theoretical Gross Margin</div>
+        <div class="val" id="statMargin">33.3%</div>
+        <div class="sub">based on adjusted cost · rate ÷ (1 + rate)</div>
+      </div>
+      <div class="stat">
+        <div class="lbl">1 Credit</div>
+        <div class="val">$0.01</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SCENARIOS SECTION ── -->
+  <div id="scenariosSection">
+    <div class="section-header">
+      <div class="section-title">Scenarios · 场景模拟 <span id="scenarioProductLabel"></span></div>
+      <button class="btn btn-primary" onclick="openNewScenarioModal()">+ Add Scenario · 新增场景</button>
+    </div>
+    <div id="scenariosList"></div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- ── PRICING PARAM MODAL ── -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal modal-md">
+    <h3 id="modalTitle">Add Pricing Row</h3>
+    <div id="tokenFields">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Direction · 方向</label>
+          <select class="form-input" id="inputDirection">
+            <option value="input">Input</option>
+            <option value="output">Output</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Token Type · 类型</label>
+          <select class="form-input" id="inputTokenType">
+            <option>text</option><option>image</option><option>video</option><option>audio</option><option>others</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div id="callFields" style="display:none">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Group · 分组</label>
+          <input class="form-input" id="inputGroup" placeholder="Aspect Ratio">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Name · 名称</label>
+          <input class="form-input" id="inputName" placeholder="1:1">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Value · 取值（展示用）</label>
+        <input class="form-input" id="inputValue" placeholder="2048×2048">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Vendor Cost <span style="color:#FF3F41;font-size:10px">(internal)</span></label>
+        <input class="form-input" id="inputVendorCost" type="number" step="0.0001" placeholder="0.003" oninput="onCostInput()">
+        <div class="form-hint" id="unitHint">USD per 1M tokens</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Adjusted Cost · 调整成本</label>
+        <input class="form-input" id="inputAdjCost" type="number" step="0.0001" placeholder="0.010" oninput="updatePreviewCredit()">
+        <div class="form-hint warn" id="adjHint"></div>
+      </div>
+    </div>
+    <div class="computed-block">
+      <span class="cl" id="creditLabel">Computed Credits / 1M tokens</span>
+      <span class="cr" id="previewCredit">—</span>
+    </div>
+    <div class="modal-formula" id="modalFormula">—</div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modalOverlay')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveParam()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── PRODUCT MODAL ── -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal modal-sm">
+    <h3 id="productModalTitle">New Product</h3>
+    <div class="form-group">
+      <label class="form-label">Product Name · 产品名称</label>
+      <input class="form-input" id="inputProductName" placeholder="e.g. Ad Manager">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('productModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveProduct()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── SCENARIO NAME MODAL ── -->
+<div class="modal-overlay" id="scenarioModal">
+  <div class="modal modal-sm">
+    <h3 id="scenarioModalTitle">New Scenario</h3>
+    <div class="form-group">
+      <label class="form-label">Scenario Name · 场景名称</label>
+      <input class="form-input" id="inputScenarioName" placeholder="e.g. Initial cost">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('scenarioModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveScenario()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── SCENARIO ROW MODAL ── -->
+<div class="modal-overlay" id="scenarioRowModal">
+  <div class="modal modal-md">
+    <h3>Add Row · 新增行</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Model · 模型</label>
+        <select class="form-input" id="srModel" onchange="onSrModelChange()">
+          <option value="0">Gemini 2.5 Flash</option>
+          <option value="1">gemini-3.5-flash</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Direction · 方向</label>
+        <select class="form-input" id="srDir">
+          <option value="input">Input</option>
+          <option value="output">Output</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Token Type · 类型</label>
+      <select class="form-input" id="srType">
+        <option>text</option><option>image</option><option>video</option><option>audio</option><option>others</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Simulated Tokens · 模拟 Token 数</label>
+      <input class="form-input" id="srTokens" type="number" placeholder="1000000" oninput="updateSrPreview()">
+    </div>
+    <div class="computed-block" style="flex-direction:column; align-items:flex-start; gap:8px;">
+      <div style="display:flex; justify-content:space-between; width:100%;">
+        <span style="font-size:12px;color:#707070">Vendor Adj Cost</span>
+        <span style="font-weight:600" id="srVendorAdjCost">—</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; width:100%;">
+        <span style="font-size:12px;color:#707070">Markup Credits</span>
+        <span style="font-weight:600" id="srMarkupCredit">—</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; width:100%;">
+        <span style="font-size:12px;color:#707070">Markup Price (USD)</span>
+        <span style="font-weight:700;font-size:18px" id="srMarkupPrice">—</span>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('scenarioRowModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSrRow()">Add Row</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════
+
+const models = [
+  {
+    name: "Gemini 2.5 Flash", vendor: "google",
+    doc: "https://ai.google.dev/gemini-api/docs/pricing?hl=zh-cn#gemini-2.5-flash",
+    type: "token",
+    rows: [
+      { dir: "input",  type: "text",   vendorCost: 0.30, adjCost: 1.00 },
+      { dir: "input",  type: "image",  vendorCost: 0.30, adjCost: 1.00 },
+      { dir: "input",  type: "video",  vendorCost: 0.30, adjCost: 1.00 },
+      { dir: "input",  type: "audio",  vendorCost: 1.00, adjCost: 1.00 },
+      { dir: "input",  type: "others", vendorCost: 1.00, adjCost: 1.00 },
+      { dir: "output", type: "text",   vendorCost: 2.50, adjCost: 2.50 },
+    ]
+  },
+  {
+    name: "gemini-3.5-flash", vendor: "google",
+    doc: "https://ai.google.dev/gemini-api/docs/pricing?hl=zh-cn#gemini-3.5-flash",
+    type: "token",
+    rows: [
+      { dir: "input",  type: "text",   vendorCost: 1.50, adjCost: 1.50 },
+      { dir: "input",  type: "image",  vendorCost: 1.50, adjCost: 1.50 },
+      { dir: "input",  type: "video",  vendorCost: 1.50, adjCost: 1.50 },
+      { dir: "input",  type: "audio",  vendorCost: 1.50, adjCost: 1.50 },
+      { dir: "input",  type: "others", vendorCost: 1.50, adjCost: 1.50 },
+      { dir: "output", type: "text",   vendorCost: 9.00, adjCost: 9.00 },
+    ]
+  }
+];
+
+let products = [
+  { id: 1, name: "Ad Manager" }
+];
+let nextProductId = 2;
+
+let scenarios = [
+  {
+    id: 1, productId: 1, name: "Initial cost",
+    rows: [
+      { modelIdx: 0, dir: "input",  type: "text",   tokens: 2487249 },
+      { modelIdx: 0, dir: "input",  type: "image",  tokens: 4338225 },
+      { modelIdx: 0, dir: "output", type: "text",   tokens: 501306  },
+      { modelIdx: 0, dir: "input",  type: "text",   tokens: 1525449 },
+      { modelIdx: 0, dir: "input",  type: "image",  tokens: 984696  },
+      { modelIdx: 0, dir: "input",  type: "video",  tokens: 29822246},
+      { modelIdx: 0, dir: "input",  type: "audio",  tokens: 2837916 },
+      { modelIdx: 0, dir: "output", type: "text",   tokens: 377559  },
+    ]
+  },
+  {
+    id: 2, productId: 1, name: "AI agent",
+    rows: [
+      { modelIdx: 0, dir: "input",  type: "text",   tokens: 182000 },
+      { modelIdx: 0, dir: "output", type: "text",   tokens: 78000  },
+    ]
+  },
+  {
+    id: 3, productId: 1, name: "Image ad AI analysis (1000 ads)",
+    rows: [
+      { modelIdx: 0, dir: "input",  type: "text",   tokens: 387000 },
+      { modelIdx: 0, dir: "input",  type: "image",  tokens: 675000 },
+      { modelIdx: 0, dir: "output", type: "text",   tokens: 78000  },
+    ]
+  }
+];
+let nextScenarioId = 4;
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let savedRate    = 50;
+let currentRate  = 50;
+let currentIdx   = 0;
+let editingRowIdx = null;
+let currentProductId = 1;
+let editingProductId = null;
+let editingScenarioId = null;
+let targetScenarioId = null; // for adding rows to a scenario
+
+// ═══════════════════════════════════════════════════════════════
+// MARKUP SLIDER
+// ═══════════════════════════════════════════════════════════════
+const slider = document.getElementById('markupSlider');
+slider.addEventListener('input', () => {
+  currentRate = parseInt(slider.value);
+  document.getElementById('markupDisplay').textContent = currentRate;
+  document.getElementById('markupFormula').textContent = (currentRate/100).toFixed(2);
+  document.getElementById('prevFrom').textContent = savedRate + '%';
+  document.getElementById('prevTo').textContent = currentRate + '%';
+  const banner = document.getElementById('previewBanner');
+  currentRate !== savedRate ? banner.classList.remove('hidden') : banner.classList.add('hidden');
+  renderTable(); updateStats(); renderScenarios();
+});
+function resetMarkup() {
+  currentRate = savedRate;
+  slider.value = savedRate;
+  document.getElementById('markupDisplay').textContent = savedRate;
+  document.getElementById('markupFormula').textContent = (savedRate/100).toFixed(2);
+  document.getElementById('previewBanner').classList.add('hidden');
+  renderTable(); updateStats(); renderScenarios();
+}
+function saveMarkup() {
+  savedRate = currentRate;
+  document.getElementById('previewBanner').classList.add('hidden');
+  renderTable();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MODEL SWITCH
+// ═══════════════════════════════════════════════════════════════
+function switchModel() {
+  currentIdx = parseInt(document.getElementById('modelSelect').value);
+  const m = models[currentIdx];
+  document.getElementById('vendorBadge').textContent = m.vendor;
+  const docEl = document.getElementById('docLink');
+  docEl.href = m.doc;
+  docEl.textContent = m.doc.replace('https://', '') + ' ↗';
+  const tb = document.getElementById('typeBadge');
+  tb.textContent = 'token-based';
+  tb.className = 'type-badge token';
+  renderTable(); updateStats();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CREDIT CALC
+// ═══════════════════════════════════════════════════════════════
+function calcCredits(adjCost, type) {
+  const raw = adjCost * (1 + currentRate/100) * 100;
+  return type === 'token' ? Math.round(raw * 10000) / 10000 : Math.ceil(raw);
+}
+function savedCredits(adjCost, type) {
+  const raw = adjCost * (1 + savedRate/100) * 100;
+  return type === 'token' ? Math.round(raw * 10000) / 10000 : Math.ceil(raw);
+}
+function getAdjCost(modelIdx, dir, type) {
+  const row = models[modelIdx].rows.find(r => r.dir === dir && r.type === type);
+  return row ? row.adjCost : 0;
+}
+function getVendorCost(modelIdx, dir, type) {
+  const row = models[modelIdx].rows.find(r => r.dir === dir && r.type === type);
+  return row ? row.vendorCost : 0;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PARAMS TABLE
+// ═══════════════════════════════════════════════════════════════
+function renderTable() {
+  const m = models[currentIdx];
+  const head = document.getElementById('tableHead');
+  const body = document.getElementById('paramsBody');
+
+  head.innerHTML = `<tr>
+    <th style="width:100px">Direction</th>
+    <th style="width:120px">Token Type</th>
+    <th class="right" style="width:200px">Vendor Cost /1M <span style="font-weight:400;text-transform:none;color:#CACACA">(internal)</span></th>
+    <th class="right col-adj-header" style="width:200px">Adjusted Cost /1M<span class="internal-tag">markup 计算基准</span></th>
+    <th class="right" style="width:150px">Credits /1M tokens</th>
+    <th class="right" style="width:72px">Actions</th>
+  </tr>`;
+
+  let html = '';
+  m.rows.forEach((r, i) => {
+    const c  = calcCredits(r.adjCost, 'token');
+    const sc = savedCredits(r.adjCost, 'token');
+    const changed  = c !== sc;
+    const adjusted = r.adjCost !== r.vendorCost;
+    const adjNote  = adjusted ? `<span class="adj-note">↑ floor</span>` : `<span class="adj-same">= vendor</span>`;
+    html += `<tr>
+      <td><span class="dir-badge ${r.dir}">${r.dir.toUpperCase()}</span></td>
+      <td><strong>${r.type}</strong></td>
+      <td class="col-vendor">$${r.vendorCost.toFixed(4)}</td>
+      <td class="col-adj">$${r.adjCost.toFixed(4)} ${adjNote}</td>
+      <td class="col-credits ${changed?'preview-changed':''}" title="${changed?'saved: '+sc:''}">
+        ${c}<small>/1M</small>
+      </td>
+      <td class="col-actions">
+        <button class="icon-btn" onclick="openEditModal(${i})">✎</button>
+        <button class="icon-btn danger" onclick="deleteRow(${i})">⌫</button>
+      </td>
+    </tr>`;
+  });
+  body.innerHTML = html;
+  document.getElementById('paramCount').textContent = `${m.rows.length} token type(s) configured`;
+}
+
+function updateStats() {
+  const r = currentRate / 100;
+  document.getElementById('statRate').textContent = currentRate + '%';
+  document.getElementById('statMargin').textContent = ((r/(1+r))*100).toFixed(1) + '%';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PRODUCT FILTER
+// ═══════════════════════════════════════════════════════════════
+function renderProducts() {
+  const bar = document.getElementById('productBar');
+  let html = '';
+  products.forEach(p => {
+    const active = p.id === currentProductId;
+    html += `
+      <div class="product-pill ${active?'active':''}" onclick="selectProduct(${p.id})">
+        <span>${p.name}</span>
+        <span class="pill-actions">
+          <button class="pill-icon" onclick="event.stopPropagation(); openEditProductModal(${p.id})" title="Rename">✎</button>
+          <button class="pill-icon danger" onclick="event.stopPropagation(); deleteProduct(${p.id})" title="Delete">✕</button>
+        </span>
+      </div>`;
+  });
+  html += `<button class="btn btn-ghost btn-sm" onclick="openNewProductModal()">+ New Product</button>`;
+  bar.innerHTML = html;
+
+  // update scenario section label
+  const prod = products.find(p => p.id === currentProductId);
+  document.getElementById('scenarioProductLabel').textContent = prod ? `— ${prod.name}` : '';
+}
+
+function selectProduct(id) {
+  currentProductId = id;
+  renderProducts();
+  renderScenarios();
+}
+
+function openNewProductModal() {
+  editingProductId = null;
+  document.getElementById('productModalTitle').textContent = 'New Product · 新建产品';
+  document.getElementById('inputProductName').value = '';
+  document.getElementById('productModal').classList.add('open');
+}
+
+function openEditProductModal(id) {
+  editingProductId = id;
+  const p = products.find(x => x.id === id);
+  document.getElementById('productModalTitle').textContent = 'Rename Product · 编辑产品名称';
+  document.getElementById('inputProductName').value = p.name;
+  document.getElementById('productModal').classList.add('open');
+}
+
+function saveProduct() {
+  const name = document.getElementById('inputProductName').value.trim();
+  if (!name) return;
+  if (editingProductId !== null) {
+    products.find(p => p.id === editingProductId).name = name;
+  } else {
+    const id = nextProductId++;
+    products.push({ id, name });
+    currentProductId = id;
+  }
+  closeModal('productModal');
+  renderProducts();
+  renderScenarios();
+}
+
+function deleteProduct(id) {
+  if (!confirm('Delete this product and all its scenarios?')) return;
+  products = products.filter(p => p.id !== id);
+  scenarios = scenarios.filter(s => s.productId !== id);
+  if (currentProductId === id) {
+    currentProductId = products.length ? products[0].id : null;
+  }
+  renderProducts();
+  renderScenarios();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SCENARIOS
+// ═══════════════════════════════════════════════════════════════
+function fmtNum(n) { return n.toLocaleString('en-US', { maximumFractionDigits: 6 }); }
+function fmtUSD(n) { return '$' + n.toFixed(6); }
+function fmtCredits(n) { return n.toFixed(4); }
+
+function calcScenarioRow(row) {
+  const adjCost        = getAdjCost(row.modelIdx, row.dir, row.type);
+  const vendorCost     = getVendorCost(row.modelIdx, row.dir, row.type);
+  const rawVendorCost  = (row.tokens / 1_000_000) * vendorCost;
+  const vendorAdjCost  = (row.tokens / 1_000_000) * adjCost;
+  const markupCredit   = vendorAdjCost * (1 + currentRate / 100) * 100;
+  const markupPriceUSD = markupCredit * 0.01;
+  return { rawVendorCost, vendorAdjCost, markupCredit, markupPriceUSD };
+}
+
+function renderScenarios() {
+  const list = document.getElementById('scenariosList');
+  const productScenarios = scenarios.filter(s => s.productId === currentProductId);
+
+  if (!productScenarios.length) {
+    list.innerHTML = `<div style="text-align:center; padding:40px; color:#CACACA; font-size:14px;">
+      No scenarios yet — click "Add Scenario" to create one.
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = productScenarios.map(sc => {
+    let totalRawVendor = 0, totalVendorAdj = 0, totalCredits = 0, totalUSD = 0;
+
+    const rowsHtml = sc.rows.map((r, ri) => {
+      const { rawVendorCost, vendorAdjCost, markupCredit, markupPriceUSD } = calcScenarioRow(r);
+      totalRawVendor += rawVendorCost;
+      totalVendorAdj += vendorAdjCost;
+      totalCredits   += markupCredit;
+      totalUSD       += markupPriceUSD;
+
+      const mName = models[r.modelIdx] ? models[r.modelIdx].name : '—';
+      return `<tr>
+        <td><span class="model-chip">${mName}</span></td>
+        <td><span class="dir-badge ${r.dir}" style="font-size:10px;height:22px;padding:0 8px">${r.dir.toUpperCase()}</span></td>
+        <td><strong>${r.type}</strong></td>
+        <td class="num-cell right">${fmtNum(r.tokens)}</td>
+        <td class="num-cell right">${fmtUSD(rawVendorCost)}</td>
+        <td class="num-cell right">${fmtUSD(vendorAdjCost)}</td>
+        <td class="num-cell right">${fmtCredits(markupCredit)}</td>
+        <td class="num-cell right">$${markupPriceUSD.toFixed(6)}</td>
+        <td style="text-align:right;width:60px">
+          <button class="icon-btn danger" onclick="deleteScenarioRow(${sc.id}, ${ri})">⌫</button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    return `
+    <div class="scenario-card" id="sc-${sc.id}">
+      <div class="scenario-head">
+        <div class="scenario-name-wrap">
+          <span class="scenario-name" id="scname-${sc.id}">${sc.name}</span>
+          <input class="scenario-name-input" id="scname-input-${sc.id}"
+            value="${sc.name}"
+            onblur="saveScenarioNameInline(${sc.id})"
+            onkeydown="if(event.key==='Enter')this.blur()">
+        </div>
+        <div class="scenario-actions">
+          <button class="icon-btn" onclick="startRenameScenario(${sc.id})" title="Rename">✎</button>
+          <button class="icon-btn danger" onclick="deleteScenario(${sc.id})" title="Delete">⌫</button>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <table class="scenario-table">
+          <thead>
+            <tr>
+              <th style="width:140px">Model</th>
+              <th style="width:80px">Direction</th>
+              <th style="width:90px">Type</th>
+              <th class="right" style="width:130px">Simulated Tokens</th>
+              <th class="right" style="width:130px">Vendor Cost</th>
+              <th class="right" style="width:140px">Vendor Adj Cost</th>
+              <th class="right" style="width:120px">Markup Credits</th>
+              <th class="right" style="width:130px">Markup Price (USD)</th>
+              <th style="width:60px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+            <tr class="total-row">
+              <td colspan="4" style="color:#707070;font-size:12px">Total · 合计</td>
+              <td class="right">$${totalRawVendor.toFixed(6)}</td>
+              <td class="right">$${totalVendorAdj.toFixed(6)}</td>
+              <td class="right">${fmtCredits(totalCredits)}</td>
+              <td class="right">$${totalUSD.toFixed(6)}</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="scenario-footer">
+        <button class="btn btn-ghost btn-sm" onclick="openScenarioRowModal(${sc.id})">+ Add Row · 新增行</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openNewScenarioModal() {
+  editingScenarioId = null;
+  document.getElementById('scenarioModalTitle').textContent = 'New Scenario · 新建场景';
+  document.getElementById('inputScenarioName').value = '';
+  document.getElementById('scenarioModal').classList.add('open');
+}
+
+function saveScenario() {
+  const name = document.getElementById('inputScenarioName').value.trim();
+  if (!name) return;
+  if (editingScenarioId !== null) {
+    scenarios.find(s => s.id === editingScenarioId).name = name;
+  } else {
+    scenarios.push({ id: nextScenarioId++, productId: currentProductId, name, rows: [] });
+  }
+  closeModal('scenarioModal');
+  renderScenarios();
+}
+
+function startRenameScenario(id) {
+  document.getElementById('scname-' + id).style.display = 'none';
+  const inp = document.getElementById('scname-input-' + id);
+  inp.style.display = 'block';
+  inp.focus();
+  inp.select();
+}
+
+function saveScenarioNameInline(id) {
+  const inp = document.getElementById('scname-input-' + id);
+  const name = inp.value.trim();
+  if (name) {
+    scenarios.find(s => s.id === id).name = name;
+  }
+  renderScenarios();
+}
+
+function deleteScenario(id) {
+  if (!confirm('Delete this scenario?')) return;
+  scenarios = scenarios.filter(s => s.id !== id);
+  renderScenarios();
+}
+
+function deleteScenarioRow(scenarioId, rowIdx) {
+  const sc = scenarios.find(s => s.id === scenarioId);
+  sc.rows.splice(rowIdx, 1);
+  renderScenarios();
+}
+
+// ─── SCENARIO ROW MODAL ───────────────────────────────────────
+function openScenarioRowModal(scenarioId) {
+  targetScenarioId = scenarioId;
+  document.getElementById('srTokens').value = '';
+  document.getElementById('srModel').value = '0';
+  document.getElementById('srDir').value = 'input';
+  document.getElementById('srType').value = 'text';
+  updateSrPreview();
+  document.getElementById('scenarioRowModal').classList.add('open');
+}
+
+function onSrModelChange() { updateSrPreview(); }
+
+function updateSrPreview() {
+  const modelIdx = parseInt(document.getElementById('srModel').value);
+  const dir      = document.getElementById('srDir').value;
+  const type     = document.getElementById('srType').value;
+  const tokens   = parseFloat(document.getElementById('srTokens').value);
+
+  if (isNaN(tokens) || tokens <= 0) {
+    document.getElementById('srVendorAdjCost').textContent = '—';
+    document.getElementById('srMarkupCredit').textContent  = '—';
+    document.getElementById('srMarkupPrice').textContent   = '—';
+    return;
+  }
+  const adjCost        = getAdjCost(modelIdx, dir, type);
+  const vendorAdjCost  = (tokens / 1_000_000) * adjCost;
+  const markupCredit   = vendorAdjCost * (1 + currentRate / 100) * 100;
+  const markupPriceUSD = markupCredit * 0.01;
+  document.getElementById('srVendorAdjCost').textContent = fmtUSD(vendorAdjCost);
+  document.getElementById('srMarkupCredit').textContent  = fmtCredits(markupCredit);
+  document.getElementById('srMarkupPrice').textContent   = '$' + markupPriceUSD.toFixed(6);
+}
+
+function saveSrRow() {
+  const tokens = parseFloat(document.getElementById('srTokens').value);
+  if (isNaN(tokens) || tokens <= 0) { alert('Enter a valid token count.'); return; }
+  const sc = scenarios.find(s => s.id === targetScenarioId);
+  sc.rows.push({
+    modelIdx: parseInt(document.getElementById('srModel').value),
+    dir:      document.getElementById('srDir').value,
+    type:     document.getElementById('srType').value,
+    tokens
+  });
+  closeModal('scenarioRowModal');
+  renderScenarios();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PRICING PARAM MODAL
+// ═══════════════════════════════════════════════════════════════
+function openAddModal() {
+  editingRowIdx = null;
+  const m = models[currentIdx];
+  document.getElementById('modalTitle').textContent = 'Add Token Pricing Row';
+  document.getElementById('tokenFields').style.display = '';
+  document.getElementById('callFields').style.display = 'none';
+  document.getElementById('unitHint').textContent = 'USD per 1M tokens';
+  document.getElementById('creditLabel').textContent = 'Credits / 1M tokens';
+  document.getElementById('inputVendorCost').value = '';
+  document.getElementById('inputAdjCost').value = '';
+  document.getElementById('previewCredit').textContent = '—';
+  document.getElementById('adjHint').textContent = '';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function openEditModal(idx) {
+  editingRowIdx = idx;
+  const r = models[currentIdx].rows[idx];
+  document.getElementById('modalTitle').textContent = 'Edit Token Pricing';
+  document.getElementById('tokenFields').style.display = '';
+  document.getElementById('callFields').style.display = 'none';
+  document.getElementById('unitHint').textContent = 'USD per 1M tokens';
+  document.getElementById('creditLabel').textContent = 'Credits / 1M tokens';
+  document.getElementById('inputDirection').value = r.dir;
+  document.getElementById('inputTokenType').value = r.type;
+  document.getElementById('inputVendorCost').value = r.vendorCost;
+  document.getElementById('inputAdjCost').value = r.adjCost;
+  updatePreviewCredit();
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function onCostInput() {
+  const v = parseFloat(document.getElementById('inputVendorCost').value);
+  const adj = document.getElementById('inputAdjCost');
+  if (!isNaN(v) && adj.value === '') adj.value = v;
+  updatePreviewCredit();
+}
+
+function updatePreviewCredit() {
+  const adj = parseFloat(document.getElementById('inputAdjCost').value);
+  if (!isNaN(adj) && adj > 0) {
+    const c = calcCredits(adj, 'token');
+    document.getElementById('previewCredit').textContent = c;
+    document.getElementById('modalFormula').textContent =
+      `$${adj.toFixed(4)} × (1 + ${currentRate}%) × 100 = ${c} credits / 1M tokens`;
+  } else {
+    document.getElementById('previewCredit').textContent = '—';
+    document.getElementById('modalFormula').textContent = '—';
+  }
+}
+
+function saveParam() {
+  const vendorCost = parseFloat(document.getElementById('inputVendorCost').value);
+  const adjCost    = parseFloat(document.getElementById('inputAdjCost').value);
+  if (isNaN(vendorCost) || isNaN(adjCost)) { alert('Fill in both cost fields.'); return; }
+  const row = {
+    dir:  document.getElementById('inputDirection').value,
+    type: document.getElementById('inputTokenType').value,
+    vendorCost, adjCost
+  };
+  const m = models[currentIdx];
+  if (editingRowIdx !== null) m.rows[editingRowIdx] = row;
+  else m.rows.push(row);
+  closeModal('modalOverlay');
+  renderTable(); updateStats();
+}
+
+function deleteRow(idx) {
+  if (!confirm('Delete this row?')) return;
+  models[currentIdx].rows.splice(idx, 1);
+  renderTable(); updateStats();
+}
+
+// close modals on backdrop click
+['modalOverlay','productModal','scenarioModal','scenarioRowModal'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => {
+    if (e.target.id === id) closeModal(id);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+renderTable();
+updateStats();
+renderProducts();
+renderScenarios();
+</script>
+</body>
+</html>
