@@ -62,10 +62,10 @@
     }
     .hero-inner {
       max-width: 1200px; margin: 0 auto;
-      display: flex; align-items: flex-end; gap: 72px;
+      display: flex; align-items: flex-end; gap: 48px;
       position: relative; z-index: 1;
     }
-    .hero-left { flex: 1; padding-bottom: 80px; }
+    .hero-left { flex: 0 0 600px; padding-bottom: 80px; }
 
     .hero-badge {
       display: inline-flex; align-items: center; gap: 6px;
@@ -88,8 +88,8 @@
     }
 
     .hero-title {
-      font-size: 52px; font-weight: 700; color: #fff;
-      line-height: 60px; letter-spacing: -0.6px; margin-bottom: 20px;
+      font-size: 58px; font-weight: 700; color: #fff;
+      line-height: 64px; letter-spacing: -0.8px; margin-bottom: 20px;
     }
     .hero-title .accent { color: #23A9F6; }
 
@@ -131,7 +131,7 @@
     .btn-hero-ghost:hover { border-color: rgba(255,255,255,0.45); color: #fff; }
 
     /* Hero mockup */
-    .hero-right { flex: 1.15; display: flex; justify-content: flex-end; align-items: flex-end; }
+    .hero-right { flex: 1; display: flex; justify-content: flex-end; align-items: flex-end; margin-right: -32px; }
     .hero-mockup {
       width: 100%; max-width: 580px;
       background: #0d2035;
@@ -603,37 +603,14 @@
       <div class="hero-badge"><span class="badge-pulse"></span>Ad Manager</div>
 
       <h1 class="hero-title">
-        Find Winning Campaigns.<br>Cut Waste.
+        Spot Winning Ads.<br>Cut Waste with AI.
       </h1>
       <p class="hero-subtitle">
-        Stop guessing. Let AI surface winners, kill waste, and tell you exactly what to do next.
+        Ad Manager uses AI to analyze your campaigns, creatives, hooks, and audiences — helping your team find winners faster and cut wasted spend.
       </p>
 
       <!-- Selling point tags -->
-      <div class="hero-tags">
-        <span class="hero-tag">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1l1.1 3H11L8.4 6l.9 3L6 7.3 2.7 9l.9-3L1 4h3.9L6 1z" fill="#23A9F6"/></svg>
-          AI Insights
-        </span>
-        <span class="hero-tag">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="10" height="7" rx="1.5" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/><circle cx="4" cy="5.5" r="0.8" fill="rgba(255,255,255,0.6)"/><circle cx="6" cy="5.5" r="0.8" fill="rgba(255,255,255,0.6)"/><circle cx="8" cy="5.5" r="0.8" fill="rgba(255,255,255,0.6)"/><path d="M4 9v2M6 9v2M8 9v2" stroke="rgba(255,255,255,0.6)" stroke-width="1.2" stroke-linecap="round"/></svg>
-          AI Agent
-        </span>
-        <span class="hero-tag">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="4.5" height="4.5" rx="1" stroke="rgba(255,255,255,0.6)" stroke-width="1.1"/><rect x="6.5" y="1" width="4.5" height="4.5" rx="1" stroke="rgba(255,255,255,0.6)" stroke-width="1.1"/><rect x="1" y="6.5" width="4.5" height="4.5" rx="1" stroke="rgba(255,255,255,0.6)" stroke-width="1.1"/><rect x="6.5" y="6.5" width="4.5" height="4.5" rx="1" stroke="rgba(255,255,255,0.6)" stroke-width="1.1"/></svg>
-          AI Grouping
-        </span>
-        <span class="hero-tag">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 9l3-3.5 2.5 2 3.5-5.5" stroke="rgba(255,255,255,0.6)" stroke-width="1.2" stroke-linecap="round"/></svg>
-          Performance &amp; Benchmarks
-        </span>
-        <span class="hero-tag">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1.5" y="1.5" width="9" height="9" rx="2" stroke="rgba(255,255,255,0.6)" stroke-width="1.1"/><path d="M4 6h4M6 4v4" stroke="rgba(255,255,255,0.6)" stroke-width="1.1" stroke-linecap="round"/></svg>
-          Meta Ads
-        </span>
-      </div>
-
-      <div class="hero-actions">
+            <div class="hero-actions">
         <button class="btn-hero-primary">Start Free Trial</button>
         <button class="btn-hero-ghost">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M5.8 5.2l3 1.8-3 1.8V5.2z" fill="currentColor"/></svg>
@@ -689,9 +666,9 @@
             <div class="ai-action-card" style="border-left-color:#FF3F41;">
               <div class="ai-action-icon" style="background:rgba(255,63,65,0.15);">⏸</div>
               <div class="ai-action-body">
-                <div class="ai-action-label" style="color:#FF3F41;">Pause Now</div>
+                <div class="ai-action-label" style="color:#FF3F41;">Review Budget</div>
                 <div class="ai-action-title">BA-CL-02-33 · Static Image</div>
-                <div class="ai-action-sub">CPA $1,026 — 10× your avg · Saves <span style="color:#FFC960;font-weight:600;">$2,054/mo</span></div>
+                <div class="ai-action-sub">CPA is 10× higher than account average · <span style="color:#FFC960;font-weight:600;">Reduce wasted spend</span></div>
               </div>
             </div>
 
@@ -699,9 +676,9 @@
             <div class="ai-action-card" style="border-left-color:#52C41A;">
               <div class="ai-action-icon" style="background:rgba(82,196,26,0.15);">🚀</div>
               <div class="ai-action-body">
-                <div class="ai-action-label" style="color:#52C41A;">Scale Budget</div>
+                <div class="ai-action-label" style="color:#52C41A;">Increase Budget</div>
                 <div class="ai-action-title">BA-CL-02-47 · Video 30s</div>
-                <div class="ai-action-sub">ROAS 5.8x · Top performer · <span style="color:#73DFFF;font-weight:600;">+$4.2k projected</span></div>
+                <div class="ai-action-sub">ROAS 5.8× · Top-performing creative · <span style="color:#73DFFF;font-weight:600;">Capture more conversions</span></div>
               </div>
             </div>
 
@@ -711,7 +688,7 @@
               <div class="ai-action-body">
                 <div class="ai-action-label" style="color:#FFC960;">Refresh Creative</div>
                 <div class="ai-action-title">Story Ads · 6 creatives</div>
-                <div class="ai-action-sub">CTR ▼ 38% · Fatigue detected · <span style="color:#FFC960;font-weight:600;">Act before CTR drops further</span></div>
+                <div class="ai-action-sub">CTR down 38% · Creative fatigue detected · <span style="color:#FFC960;font-weight:600;">Prevent further performance drop</span></div>
               </div>
             </div>
 
@@ -721,14 +698,14 @@
               <div class="ai-action-body">
                 <div class="ai-action-label" style="color:#23A9F6;">Increase Budget</div>
                 <div class="ai-action-title">BA-CL-02-36 · Carousel</div>
-                <div class="ai-action-sub">Conv. rate 8.4% — 3× avg · <span style="color:#73DFFF;font-weight:600;">+60% budget = +$3.1k revenue</span></div>
+                <div class="ai-action-sub">Conversion rate 3× above average · <span style="color:#73DFFF;font-weight:600;">Scale a proven ad pattern</span></div>
               </div>
             </div>
 
             <!-- ROAS lift -->
             <div class="roas-result-card">
               <div>
-                <div style="font-size:9px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:4px;">Projected ROAS After Actions</div>
+                <div style="font-size:9px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:4px;">Potential ROAS upside</div>
                 <div style="display:flex;align-items:center;gap:8px;">
                   <div class="roas-before">2.1x</div>
                   <div class="roas-arrow">→</div>
@@ -737,7 +714,7 @@
               </div>
               <div class="roas-lift">
                 <div class="roas-lift-val">▲ +128%</div>
-                <div class="roas-lift-label">projected lift</div>
+                <div class="roas-lift-label">based on winning creative patterns</div>
               </div>
             </div>
           </div>
@@ -774,8 +751,8 @@
   <!-- ── Row 1: AI Insights (text left, visual right) ── -->
   <div class="feature-row" style="padding-top:88px; gap:64px;">
     <div class="feat-text">
-      <h2 class="feat-title">Know which creative<br>actually wins.</h2>
-      <p class="feat-desc">See exactly which videos, images, and content angles drive results — and which ones are quietly draining your budget. Stop guessing, start scaling what works.</p>
+      <h2 class="feat-title">Spot winning creative<br>patterns.</h2>
+      <p class="feat-desc">See which creatives, hooks, and formats are driving results — and which ones may be wasting budget.</p>
     </div>
 
     <div class="feat-visual">
@@ -874,8 +851,8 @@
   <!-- ── Row 2: AI Agent (visual left, text right) ── -->
   <div class="feature-row reverse" style="padding-top:72px; gap:64px;">
     <div class="feat-text">
-      <h2 class="feat-title">Ask anything.<br>Get answers instantly.</h2>
-      <p class="feat-desc">Your 24/7 ad analyst — no dashboards, no waiting. Ask in plain language, get answers from your live Meta data.</p>
+      <h2 class="feat-title">Ask your ad data<br>anything.</h2>
+      <p class="feat-desc">Get instant answers from your Meta Ads performance data, from ROAS trends to creative fatigue and audience performance.</p>
     </div>
 
     <div class="feat-visual">
@@ -911,11 +888,11 @@
     </div>
   </div>
 
-  <!-- ── Row 3: AI Grouping (text left, visual right) ── -->
+  <!-- ── Row 3: Campaign Grouping (text left, visual right) ── -->
   <div class="feature-row" style="padding-top:72px; gap:64px;">
     <div class="feat-text">
-      <h2 class="feat-title">Group by strategy.<br>Compare everything.</h2>
-      <p class="feat-desc">Auto-segment by product, brand, or angle. Scale what's working, cut what's not — no spreadsheets required.</p>
+      <h2 class="feat-title">Turn messy campaigns<br>into clear groups.</h2>
+      <p class="feat-desc">Group campaigns by strategy, product, audience, or creative angle, so performance comparisons become easier.</p>
     </div>
 
     <div class="feat-visual" style="background:#EEF4F8;">
@@ -1004,8 +981,8 @@
   <!-- ── Row 4: Benchmarks (visual left, text right) ── -->
   <div class="feature-row reverse" style="padding-top:72px; padding-bottom:88px; gap:64px;">
     <div class="feat-text">
-      <h2 class="feat-title">Know if you're<br>winning or bleeding.</h2>
-      <p class="feat-desc">See how your campaigns stack up against the market at every stage of the funnel.</p>
+      <h2 class="feat-title">See what good<br>looks like.</h2>
+      <p class="feat-desc">Benchmark campaign performance by funnel stage and understand whether your ads are below average, competitive, or leading.</p>
     </div>
 
     <div class="feat-visual">
@@ -1073,8 +1050,8 @@
 <section class="cta-section">
   <div class="cta-glow"></div>
   <div class="cta-inner">
-    <h2 class="cta-title">Stop guessing.<br>Start scaling.</h2>
-    <p class="cta-sub">Connect your Meta Ads account and let AI find the wins. Free to start — no credit card required.</p>
+    <h2 class="cta-title">Find your next<br>winning ad faster.</h2>
+    <p class="cta-sub">Start with your Meta Ads data and let AI surface the creative patterns, audiences, and campaigns worth scaling.</p>
     <div class="cta-btns">
       <button class="btn-cta-p">Start Free Trial</button>
       <button class="btn-cta-g">View Pricing</button>
