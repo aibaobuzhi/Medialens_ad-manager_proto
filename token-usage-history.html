@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Token Usage — MediaLens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --brand-blue: #23A9F6;
+  --brand-blue-tint: #EEF6FF;
+  --title: #0A1F2C;
+  --text-primary: #102532;
+  --text-regular: #707070;
+  --text-secondary: #828282;
+  --text-placeholder: #CACACA;
+  --surface-white: #FFFFFF;
+  --surface-page: #F7F7F7;
+  --surface-ai: #F6F8FD;
+  --border: #D9E3E6;
+  --divider: #E8EEF0;
+  --danger: #FF3F41;
+  --danger-light: #FFECEC;
+  --success: #52C41A;
+  --success-light: #E6FBEB;
+  --warning: #FFC960;
+  --warning-light: #FFF8EB;
+  --addon-green: #17A84A;
+  --addon-green-tint: #EDFAF3;
+}
+
+body {
+  font-family: 'Poppins', 'Noto Sans HK', system-ui, sans-serif;
+  background: var(--surface-page);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 22px;
+  min-height: 100vh;
+}
+
+/* ── Top Nav ── */
+.top-nav {
+  background: var(--brand-blue);
+  height: 72px;
+  display: flex; align-items: center; padding: 0 32px;
+  justify-content: space-between;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 600; color: #fff; letter-spacing: -0.3px; }
+.nav-logo-icon { width: 32px; height: 32px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.nav-logo-icon svg { width: 20px; height: 20px; }
+.nav-right { display: flex; align-items: center; gap: 20px; }
+.nav-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--brand-blue-tint); color: var(--brand-blue); font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255,255,255,0.5); }
+.nav-user { color: #fff; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.nav-help { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+/* ── Layout ── */
+.layout { display: flex; padding-top: 72px; min-height: 100vh; }
+
+/* ── Sidebar ── */
+.sidebar { width: 200px; background: var(--surface-white); border-right: 1px solid var(--divider); padding: 20px 0; position: fixed; top: 72px; bottom: 0; left: 0; overflow-y: auto; }
+.sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; color: var(--text-regular); font-size: 13px; cursor: pointer; transition: background 0.15s; }
+.sidebar-item:hover { background: var(--brand-blue-tint); color: var(--brand-blue); }
+.sidebar-item.active { background: var(--brand-blue-tint); color: var(--brand-blue); border-left: 3px solid var(--brand-blue); padding-left: 17px; font-weight: 500; }
+.sidebar-item svg { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.7; }
+.sidebar-item.active svg { opacity: 1; }
+.sidebar-divider { height: 1px; background: var(--divider); margin: 8px 0; }
+
+/* ── Main ── */
+.main { margin-left: 200px; flex: 1; display: flex; min-height: calc(100vh - 72px); }
+
+/* ── Settings Nav ── */
+.settings-nav { width: 220px; background: var(--surface-white); border-right: 1px solid var(--divider); padding: 24px 0; flex-shrink: 0; }
+.settings-user-card { padding: 0 20px 20px; border-bottom: 1px solid var(--divider); margin-bottom: 8px; }
+.settings-user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--brand-blue-tint); color: var(--brand-blue); font-weight: 600; font-size: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+.settings-user-name { font-size: 14px; font-weight: 600; color: var(--title); }
+.settings-user-email { font-size: 12px; color: var(--text-secondary); }
+.settings-nav-item { display: block; padding: 9px 20px; font-size: 13px; color: var(--text-regular); cursor: pointer; transition: all 0.15s; }
+.settings-nav-item:hover { background: var(--brand-blue-tint); color: var(--brand-blue); }
+.settings-nav-item.active { background: var(--brand-blue-tint); color: var(--brand-blue); font-weight: 500; }
+.settings-team-card { padding: 16px 20px; border-top: 1px solid var(--divider); margin-top: 8px; }
+.team-avatar { width: 32px; height: 32px; border-radius: 8px; background: var(--brand-blue); color: #fff; font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+.team-plan-tag { display: inline-block; background: #7B61FF; color: #fff; font-size: 10px; font-weight: 600; padding: 1px 7px; border-radius: 20px; margin-left: 4px; }
+
+/* ── Content ── */
+.content { flex: 1; padding: 32px 32px 48px; overflow-y: auto; }
+
+/* ── Breadcrumb ── */
+.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; }
+.breadcrumb a { color: var(--brand-blue); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb svg { width: 12px; height: 12px; }
+
+/* ── Page Header ── */
+.page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
+.page-title { font-size: 22px; font-weight: 600; color: var(--title); line-height: 30px; }
+.page-subtitle { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+
+/* ── Buttons ── */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; font-family: inherit; font-size: 13px; font-weight: 500; line-height: 20px; border-radius: 8px; cursor: pointer; border: none; transition: all 0.15s; white-space: nowrap; }
+.btn-secondary { background: var(--surface-white); color: var(--text-regular); border: 1px solid var(--border); }
+.btn-secondary:hover { border-color: var(--brand-blue); color: var(--brand-blue); background: var(--brand-blue-tint); }
+.btn svg { width: 14px; height: 14px; }
+
+/* ── Available Card ── */
+.available-card {
+  background: var(--surface-white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 28px;
+  display: flex; align-items: center; gap: 0;
+  margin-bottom: 20px;
+}
+.avail-main { flex-shrink: 0; padding-right: 28px; border-right: 1px solid var(--divider); margin-right: 28px; min-width: 200px; }
+.avail-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
+.avail-label svg { width: 14px; height: 14px; color: var(--text-placeholder); }
+.avail-number { font-size: 40px; font-weight: 600; color: var(--title); line-height: 1.1; margin-bottom: 4px; }
+.avail-sub { font-size: 12px; color: var(--text-secondary); }
+.avail-pools { display: flex; align-items: center; gap: 28px; flex: 1; }
+.avail-pool { display: flex; flex-direction: column; gap: 3px; }
+.avail-pool-label { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-regular); font-weight: 500; }
+.avail-pool-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.avail-pool-dot.plan { background: var(--brand-blue); }
+.avail-pool-dot.addon { background: var(--addon-green); }
+.avail-pool-value { font-size: 20px; font-weight: 600; color: var(--title); padding-left: 14px; }
+.avail-sep { width: 1px; height: 44px; background: var(--divider); flex-shrink: 0; }
+.avail-reset { display: flex; align-items: center; gap: 10px; padding-left: 28px; border-left: 1px solid var(--divider); margin-left: 28px; flex-shrink: 0; }
+.avail-reset-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--surface-page); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.avail-reset-icon svg { width: 16px; height: 16px; color: var(--text-secondary); }
+.avail-reset-text { font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
+
+/* ── Token Pool Cards ── */
+.token-pools { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+
+.pool-card { background: var(--surface-white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.pool-card-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 14px; border-bottom: 1px solid var(--divider); }
+.pool-card-title { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--title); }
+.pool-card-title svg { width: 16px; height: 16px; }
+.pool-header-badges { display: flex; align-items: center; gap: 6px; }
+
+.pool-type-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; }
+.pool-type-badge.plan { background: var(--brand-blue-tint); color: var(--brand-blue); }
+.pool-type-badge.addon { background: var(--addon-green-tint); color: var(--addon-green); }
+.pool-type-badge svg { width: 10px; height: 10px; }
+
+.reset-badge { display: inline-flex; align-items: center; gap: 4px; background: var(--warning-light); color: #8A5B00; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; }
+.reset-badge svg { width: 11px; height: 11px; }
+
+.pool-card-body { padding: 18px 20px 20px; }
+.pool-stats-row { display: flex; align-items: flex-start; gap: 0; margin-bottom: 14px; }
+.pool-stat { flex: 1; }
+.pool-stat + .pool-stat { padding-left: 16px; border-left: 1px solid var(--divider); margin-left: 16px; }
+.pool-stat-label { font-size: 10px; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.4px; text-transform: uppercase; margin-bottom: 4px; }
+.pool-stat-value { font-size: 24px; font-weight: 600; line-height: 1.1; margin-bottom: 3px; }
+.pool-stat-value.plan-used { color: var(--brand-blue); }
+.pool-stat-value.plan-rem  { color: var(--title); }
+.pool-stat-value.addon-used { color: var(--addon-green); }
+.pool-stat-value.addon-rem  { color: var(--title); }
+.pool-stat-sub { font-size: 11px; color: var(--text-secondary); }
+
+.pool-progress { height: 5px; background: var(--border); border-radius: 9999px; overflow: hidden; margin-bottom: 12px; }
+.pool-progress-fill { height: 100%; border-radius: 9999px; transition: width 0.8s ease; }
+.pool-progress-fill.plan  { background: var(--brand-blue); }
+.pool-progress-fill.addon { background: var(--addon-green); }
+
+.pool-footer { display: flex; align-items: flex-start; gap: 6px; font-size: 11px; line-height: 1.55; }
+.pool-footer svg { width: 12px; height: 12px; flex-shrink: 0; margin-top: 1px; }
+.pool-footer.plan  { color: #8A5B00; }
+.pool-footer.addon { color: var(--addon-green); }
+
+/* ── Chart Card ── */
+.chart-card { background: var(--surface-white); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; }
+.chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.chart-title { font-size: 15px; font-weight: 600; color: var(--title); }
+.chart-subtitle { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.period-tabs { display: flex; background: var(--surface-page); border-radius: 8px; padding: 3px; gap: 2px; }
+.period-tab { padding: 4px 14px; font-size: 12px; font-weight: 500; border-radius: 6px; cursor: pointer; color: var(--text-regular); transition: all 0.15s; border: none; background: transparent; font-family: inherit; }
+.period-tab.active { background: var(--surface-white); color: var(--brand-blue); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.period-tab:hover:not(.active) { color: var(--text-primary); }
+
+.bar-chart { display: flex; align-items: flex-end; gap: 5px; height: 140px; padding-bottom: 28px; position: relative; }
+.bar-chart::after { content: ''; position: absolute; left: 0; right: 0; bottom: 28px; height: 1px; background: var(--divider); }
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; cursor: pointer; }
+.bar-col:hover .bar { opacity: 0.75; }
+.bar-col:hover .bar-tip { display: block; }
+.bar { width: 100%; border-radius: 3px 3px 0 0; background: var(--brand-blue); opacity: 0.6; min-height: 2px; transition: opacity 0.15s; }
+.bar-label { position: absolute; bottom: -22px; font-size: 9px; color: var(--text-placeholder); white-space: nowrap; }
+.bar-tip { display: none; position: absolute; bottom: calc(100% + 7px); left: 50%; transform: translateX(-50%); background: var(--title); color: #fff; font-size: 10px; padding: 4px 8px; border-radius: 5px; white-space: nowrap; z-index: 20; pointer-events: none; }
+.bar-tip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 4px solid transparent; border-top-color: var(--title); }
+
+.chart-legend { display: flex; align-items: center; gap: 20px; margin-top: 16px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-secondary); }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* ── Filter Bar ── */
+.filter-bar { display: flex; align-items: flex-end; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.filter-group { display: flex; flex-direction: column; gap: 4px; }
+.filter-group-label { font-size: 10px; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.3px; text-transform: uppercase; }
+.filter-select-wrap { position: relative; display: flex; align-items: center; }
+.filter-select-wrap > svg { position: absolute; left: 9px; width: 13px; height: 13px; color: var(--text-secondary); pointer-events: none; }
+.filter-select { height: 36px; padding: 0 28px 0 28px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-white); color: var(--text-primary); font-size: 12px; font-family: inherit; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23CACACA' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; transition: border-color 0.15s; min-width: 130px; }
+.filter-select:focus { outline: none; border-color: var(--brand-blue); }
+.filter-search-wrap { position: relative; }
+.filter-search-wrap > svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 13px; height: 13px; color: var(--text-placeholder); pointer-events: none; }
+.filter-search { height: 36px; padding: 0 12px 0 30px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-white); color: var(--text-primary); font-size: 12px; font-family: inherit; transition: border-color 0.15s; min-width: 180px; }
+.filter-search:focus { outline: none; border-color: var(--brand-blue); }
+.filter-search::placeholder { color: var(--text-placeholder); }
+
+/* ── History Table ── */
+.history-card { background: var(--surface-white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+.history-header { display: flex; align-items: center; gap: 8px; padding: 16px 20px; border-bottom: 1px solid var(--divider); font-size: 15px; font-weight: 600; color: var(--title); }
+.history-header svg { width: 18px; height: 18px; color: var(--brand-blue); }
+.history-count { font-size: 11px; color: var(--text-secondary); background: var(--surface-page); padding: 2px 8px; border-radius: 20px; margin-left: 4px; }
+
+table.ht { width: 100%; border-collapse: collapse; }
+table.ht thead th { padding: 9px 16px; text-align: left; font-size: 11px; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.4px; text-transform: uppercase; background: var(--surface-page); border-bottom: 1px solid var(--divider); white-space: nowrap; }
+table.ht thead th:last-child { text-align: right; }
+table.ht tbody tr { border-bottom: 1px solid var(--divider); transition: background 0.1s; }
+table.ht tbody tr:last-child { border-bottom: none; }
+table.ht tbody tr:hover { background: #FAFCFF; }
+table.ht td { padding: 12px 16px; font-size: 13px; color: var(--text-primary); vertical-align: middle; }
+table.ht td:last-child { text-align: right; font-weight: 600; }
+/* token total row */
+table.ht tfoot tr { background: var(--surface-page); border-top: 2px solid var(--divider); }
+table.ht tfoot td { padding: 11px 16px; font-size: 13px; font-weight: 600; color: var(--title); }
+table.ht tfoot td:last-child { text-align: right; }
+/* token value colors */
+.tok-neg { color: var(--danger); }
+.tok-pos { color: var(--addon-green); }
+.tok-total-neg { color: var(--danger); font-size: 14px; }
+.tok-total-pos { color: var(--addon-green); font-size: 14px; }
+
+.td-date { font-weight: 500; white-space: nowrap; }
+.td-member { display: flex; align-items: center; gap: 8px; }
+.member-av { width: 26px; height: 26px; border-radius: 50%; font-size: 10px; font-weight: 700; color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+.pagination { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-top: 1px solid var(--divider); }
+.page-info { font-size: 12px; color: var(--text-secondary); }
+.page-controls { display: flex; gap: 4px; }
+.page-btn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface-white); color: var(--text-regular); font-size: 11px; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.page-btn:hover { border-color: var(--brand-blue); color: var(--brand-blue); }
+.page-btn.active { background: var(--brand-blue); color: #fff; border-color: var(--brand-blue); }
+.page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ── Info Banner ── */
+.info-banner { display: flex; align-items: center; gap: 10px; background: var(--surface-ai); border: 1px solid #C8DCFF; border-radius: 10px; padding: 12px 16px; font-size: 12px; color: #3B5BA5; }
+.info-banner svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--brand-blue); }
+</style>
+</head>
+<body>
+
+<!-- Top Nav -->
+<nav class="top-nav">
+  <div class="nav-logo">
+    <div class="nav-logo-icon">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#23A9F6" stroke-width="2"/><path d="M7 12h10M12 7v10" stroke="#23A9F6" stroke-width="2" stroke-linecap="round"/></svg>
+    </div>
+    MEDIA <span style="color:rgba(255,255,255,0.7);font-weight:400;margin:0 1px">&#8202;</span> LENS
+  </div>
+  <div class="nav-right">
+    <div class="nav-help">?</div>
+    <div class="nav-avatar">J</div>
+    <div class="nav-user">Julie Li <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+</nav>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+    <div class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>My Pages</div>
+    <div class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Competitor Analysis</div>
+    <div class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Buzz (Market Insights)</div>
+    <div class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>Leader Board</div>
+    <div class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Social Listening</div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Ad Manager</div>
+    <div class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Ad Intelligence</div>
+    <div class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg>AIGC</div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Account</div>
+  </aside>
+
+  <div class="main">
+    <!-- Settings Nav -->
+    <div class="settings-nav">
+      <div class="settings-user-card">
+        <div class="settings-user-avatar">J</div>
+        <div class="settings-user-name">Julie Li</div>
+        <div class="settings-user-email">julie.li@presslogic.com</div>
+      </div>
+      <div class="settings-nav-item">My Account</div>
+      <div class="settings-nav-item">Ad Intelligence</div>
+      <div class="settings-nav-item">Article</div>
+      <div class="settings-nav-item">Verified Browsers</div>
+      <div class="settings-team-card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <div class="team-avatar">P</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--title)">PL - Hong Kong <span class="team-plan-tag">Enterprise</span></div>
+            <div style="font-size:12px;color:var(--text-secondary)">139 members</div>
+          </div>
+        </div>
+      </div>
+      <div class="settings-nav-item">Team Details</div>
+      <div class="settings-nav-item">Manage Team Users</div>
+      <div class="settings-nav-item active">Quota and Usage</div>
+      <div class="settings-nav-item">Plans and Billing</div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <a href="#">Quota and Usage</a>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        <span>AI Token Usage</span>
+      </div>
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <div class="page-title">AI Token Usage</div>
+          <div class="page-subtitle">Track token consumption by time, team member, and feature module</div>
+        </div>
+        <button class="btn btn-secondary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export CSV
+        </button>
+      </div>
+
+      <!-- Available Card -->
+      <div class="available-card">
+        <div class="avail-main">
+          <div class="avail-label">
+            AVAILABLE
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div class="avail-number">62,550</div>
+          <div class="avail-sub">37,550 plan + 25,000 add-on</div>
+        </div>
+        <div style="flex:1"></div>
+        <button onclick="this.innerHTML='&check; Requested'" style="display:inline-flex;align-items:center;gap:7px;padding:8px 20px;font-size:13px;font-weight:600;border-radius:8px;border:1.5px solid var(--brand-blue);background:var(--brand-blue-tint);color:var(--brand-blue);cursor:pointer;font-family:inherit;white-space:nowrap;transition:all 0.15s" onmouseenter="this.style.background='#d6ecfe'" onmouseleave="this.style.background='var(--brand-blue-tint)'">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          Add Tokens
+        </button>
+      </div>
+
+      <!-- Pool Cards -->
+      <div class="token-pools">
+
+        <!-- Plan Tokens -->
+        <div class="pool-card">
+          <div class="pool-card-header">
+            <div class="pool-card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--brand-blue)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              Plan Tokens
+            </div>
+            <div class="pool-header-badges">
+              <span class="pool-type-badge plan">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                Billing Period
+              </span>
+              <span class="reset-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+                Resets 29 Jun 2026
+              </span>
+            </div>
+          </div>
+          <div class="pool-card-body">
+            <div class="pool-stats-row">
+              <div class="pool-stat">
+                <div class="pool-stat-label">Allocated</div>
+                <div class="pool-stat-value" style="color:var(--title)">50,000</div>
+                <div class="pool-stat-sub">Premium Plan · per period</div>
+              </div>
+              <div class="pool-stat">
+                <div class="pool-stat-label">Used This Period</div>
+                <div class="pool-stat-value plan-used">12,450</div>
+                <div class="pool-stat-sub">24.9% consumed</div>
+              </div>
+              <div class="pool-stat">
+                <div class="pool-stat-label">Remaining</div>
+                <div class="pool-stat-value plan-rem">37,550</div>
+                <div class="pool-stat-sub">expires end of period</div>
+              </div>
+            </div>
+            <div class="pool-progress"><div class="pool-progress-fill plan" style="width:24.9%"></div></div>
+            <div class="pool-footer plan">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Unused plan tokens expire at the end of each billing period and do not carry over.
+            </div>
+          </div>
+        </div>
+
+        <!-- Add-on Tokens -->
+        <div class="pool-card">
+          <div class="pool-card-header">
+            <div class="pool-card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--addon-green)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              Add-on Tokens
+            </div>
+            <span class="pool-type-badge addon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Never Expires
+            </span>
+          </div>
+          <div class="pool-card-body">
+            <div class="pool-stats-row">
+              <div class="pool-stat">
+                <div class="pool-stat-label">Total Purchased</div>
+                <div class="pool-stat-value" style="color:var(--title)">30,000</div>
+                <div class="pool-stat-sub">across all top-ups</div>
+              </div>
+              <div class="pool-stat">
+                <div class="pool-stat-label">Used</div>
+                <div class="pool-stat-value addon-used">5,000</div>
+                <div class="pool-stat-sub">16.7% consumed</div>
+              </div>
+              <div class="pool-stat">
+                <div class="pool-stat-label">Remaining</div>
+                <div class="pool-stat-value addon-rem">25,000</div>
+                <div class="pool-stat-sub">no expiry</div>
+              </div>
+            </div>
+            <div class="pool-progress"><div class="pool-progress-fill addon" style="width:16.7%"></div></div>
+            <div class="pool-footer addon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Add-on tokens are consumed only after plan tokens are fully used up. They never expire.
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /token-pools -->
+
+      <!-- Chart -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Daily Token Consumption</div>
+            <div class="chart-subtitle">Tokens consumed per day across all team members and features</div>
+          </div>
+          <div class="period-tabs">
+            <button class="period-tab" onclick="switchPeriod(this,'7d')">7 Days</button>
+            <button class="period-tab active" onclick="switchPeriod(this,'30d')">30 Days</button>
+            <button class="period-tab" onclick="switchPeriod(this,'90d')">90 Days</button>
+          </div>
+        </div>
+        <div id="barChart" class="bar-chart"></div>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--brand-blue)"></div>Ad Intelligence</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#7B94E8"></div>AIGC</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--warning)"></div>Buzz</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--success)"></div>Social Listening</div>
+          <div class="legend-item" style="margin-left:auto;font-size:11px;color:var(--text-placeholder)">Hover bars for details</div>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <div class="filter-group">
+          <div class="filter-group-label">Date Range</div>
+          <div class="filter-select-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <select class="filter-select">
+              <option>Last 30 days</option>
+              <option>Last 7 days</option>
+              <option>Last 90 days</option>
+              <option>Custom range</option>
+            </select>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Team Member</div>
+          <div class="filter-select-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            <select class="filter-select">
+              <option>All members</option>
+              <option>Organization</option>
+              <option>Julie Li</option>
+              <option>Chris Wong</option>
+              <option>Amy Chan</option>
+              <option>David Lee</option>
+              <option>Sarah Ng</option>
+              <option>System</option>
+            </select>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Feature Module</div>
+          <div class="filter-select-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+            <select class="filter-select">
+              <option>All modules</option>
+              <option>Ad Intelligence</option>
+              <option>AIGC</option>
+              <option>Buzz</option>
+              <option>Social Listening</option>
+              <option>Competitor Analysis</option>
+              <option>My Pages</option>
+              <option>AI Assistant</option>
+              <option>Article</option>
+            </select>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Token Source</div>
+          <div class="filter-select-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+            <select class="filter-select" style="min-width:120px">
+              <option>All sources</option>
+              <option>Plan tokens</option>
+              <option>Add-on tokens</option>
+            </select>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Search</div>
+          <div class="filter-search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input class="filter-search" type="text" placeholder="Search action or keyword…">
+          </div>
+        </div>
+      </div>
+
+      <!-- Usage History -->
+      <div class="history-card">
+        <div class="history-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Usage History
+          <span class="history-count">42 records</span>
+        </div>
+        <table class="ht" id="historyTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Team Member</th>
+              <th>Feature Module</th>
+              <th>Action</th>
+              <th>Tokens</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+          <tfoot id="tableFoot"></tfoot>
+        </table>
+        <div class="pagination">
+          <div class="page-info">Showing 1–15 of 42 records</div>
+          <div class="page-controls">
+            <button class="page-btn" disabled><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <span style="font-size:11px;color:var(--text-secondary);padding:0 2px">…</span>
+            <button class="page-btn"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Banner -->
+      <div class="info-banner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Plan tokens are used first. Add-on tokens are used only after plan tokens run out. Tokens are shared across the team.
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function fmtNum(n) { return n.toLocaleString(); }
+
+const users = [
+  { name:'Julie Li',   initials:'JL', color:'#23A9F6' },
+  { name:'Chris Wong', initials:'CW', color:'#7B94E8' },
+  { name:'Amy Chan',   initials:'AC', color:'#52C41A' },
+  { name:'David Lee',  initials:'DL', color:'#FFC960' },
+  { name:'Sarah Ng',   initials:'SN', color:'#FF3F41' },
+  { name:'System',     initials:'S',  color:'#828282' },
+];
+
+// positive = credit (green), negative = consumption (red)
+const tableRows = [
+  { date:'Jun 20', user:users[0], module:'Ad Intelligence',    action:'AI Analysis & Content Ideas',    tokens: -7200 },
+  { date:'Jun 19', user:users[1], module:'AI Assistant',       action:'Ask question',                   tokens:  -850 },
+  { date:'Jun 18', user:users[5], module:'Billing',            action:'Plan renewal — Premium',         tokens:+50000 },
+  { date:'Jun 18', user:users[5], module:'Ad Manager',         action:'AI Classifier (auto-sync)',      tokens: -2400 },
+  { date:'Jun 17', user:users[2], module:'Competitor Analysis',action:'AI Analysis',                    tokens: -1100 },
+  { date:'Jun 16', user:users[3], module:'Buzz',               action:'AI Polish',                      tokens:  -430 },
+  { date:'Jun 15', user:users[4], module:'Social Listening',   action:'AI Polish',                      tokens:  -310 },
+  { date:'Jun 14', user:users[0], module:'Article',            action:'Rewrite',                        tokens:  -680 },
+  { date:'Jun 13', user:users[1], module:'My Pages',           action:'AI Analysis',                    tokens:  -520 },
+  { date:'Jun 12', user:users[5], module:'Sales Portal',       action:'Add-on top-up (manual)',         tokens:+30000 },
+  { date:'Jun 12', user:users[2], module:'Leader Board',       action:'AI Analysis',                    tokens:  -290 },
+  { date:'Jun 11', user:users[5], module:'Ad Manager',         action:'AI Classifier (auto-sync)',      tokens: -3100 },
+  { date:'Jun 10', user:users[3], module:'AIGC',               action:'Generate Post Copy',             tokens:  -760 },
+  { date:'Jun 9',  user:users[4], module:'Ad Intelligence',    action:'AI Analysis & Content Ideas',    tokens: -1850 },
+  { date:'Jun 8',  user:users[0], module:'AI Assistant',       action:'Ask question',                   tokens:  -420 },
+];
+
+function renderTable() {
+  const body = document.getElementById('tableBody');
+  const foot = document.getElementById('tableFoot');
+
+  body.innerHTML = tableRows.map(r => {
+    const isPos = r.tokens > 0;
+    const cls   = isPos ? 'tok-pos' : 'tok-neg';
+    const sign  = isPos ? '+' : '−';
+    const abs   = Math.abs(r.tokens);
+    return `<tr>
+      <td class="td-date">${r.date}</td>
+      <td><div class="td-member"><div class="member-av" style="background:${r.user.color}">${r.user.initials}</div>${r.user.name}</div></td>
+      <td>${r.module}</td>
+      <td style="color:var(--text-regular)">${r.action}</td>
+      <td class="${cls}">${sign}${fmtNum(abs)}</td>
+    </tr>`;
+  }).join('');
+
+  const total = tableRows.reduce((s, r) => s + r.tokens, 0);
+  const totCls  = total >= 0 ? 'tok-total-pos' : 'tok-total-neg';
+  const totSign = total >= 0 ? '+' : '−';
+  foot.innerHTML = `<tr>
+    <td colspan="4" style="color:var(--text-secondary);font-size:12px;font-weight:500;letter-spacing:0.2px">TOTAL TOKENS (this view)</td>
+    <td class="${totCls}">${totSign}${fmtNum(Math.abs(total))}</td>
+  </tr>`;
+}
+
+renderTable();
+
+// Chart
+function buildData(days) {
+  const out = [], now = new Date('2026-06-01');
+  const step = days <= 7 ? 1 : days <= 30 ? 3 : 7;
+  for (let i = days-1; i >= 0; i--) {
+    const d = new Date(now); d.setDate(d.getDate()-i);
+    const label = (i % step === 0 || i === 0)
+      ? d.toLocaleDateString('en-HK',{month:'short',day:'numeric'}) : '';
+    out.push({ label, val: rand(500,9000), isToday: i===0 });
+  }
+  return out;
+}
+const data30 = buildData(30), data7 = buildData(7), data90 = buildData(90);
+
+function renderChart(data) {
+  const maxVal = Math.max(...data.map(d=>d.val));
+  document.getElementById('barChart').innerHTML = data.map((d,i) => {
+    const h = Math.max(3, Math.round((d.val/maxVal)*100));
+    return `<div class="bar-col">
+      <div class="bar${d.isToday?' today':''}" style="height:${h}px">
+        <div class="bar-tip">${d.label||''}${d.label?'<br>':''}${fmtNum(d.val)} tokens</div>
+      </div>
+      <div class="bar-label">${d.label}</div>
+    </div>`;
+  }).join('');
+}
+
+function switchPeriod(btn, period) {
+  document.querySelectorAll('.period-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderChart(period==='7d'?data7:period==='30d'?data30:data90);
+}
+
+renderChart(data30);
+</script>
+</body>
+</html>
