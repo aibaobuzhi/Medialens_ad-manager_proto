@@ -741,6 +741,27 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
   </div>
 </div>
 
+<!-- ── Turn Off Confirmation Modal ── -->
+<div class="modal-overlay" id="turnoff-modal" onclick="if(event.target===this)closeTurnOffModal()">
+  <div class="modal" style="width:420px;">
+    <div style="width:44px;height:44px;border-radius:50%;background:#FFF8EB;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E6A817" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <div class="modal-title" style="font-size:17px;">Turn off Auto Recharge?</div>
+    <div style="font-size:14px;color:#707070;line-height:1.7;margin:10px 0 24px;">
+      Your tokens won't be automatically topped up. If your balance runs out, AI features will stop working until you manually purchase a Token Pack.
+    </div>
+    <div style="background:#F7F7F7;border-radius:8px;padding:12px 14px;font-size:13px;color:#828282;margin-bottom:24px;display:flex;align-items:flex-start;gap:8px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CACACA" stroke-width="2" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      You can re-enable Auto Recharge at any time from Plans &amp; Billing.
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn btn-primary" style="width:100%;justify-content:center;height:40px;" onclick="closeTurnOffModal()">Keep Auto Recharge On</button>
+      <button class="btn btn-secondary" style="width:100%;justify-content:center;height:40px;color:#FF3F41;border-color:#FFD0D0;" onclick="confirmTurnOff()">Turn Off</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── Payment Method Modal ── -->
 <div class="modal-overlay" id="payment-modal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
@@ -844,18 +865,31 @@ function refreshToggleUI() {
   else { t.classList.remove('on'); l.textContent = 'Off'; }
 }
 
+function openTurnOffModal() {
+  document.getElementById('turnoff-modal').classList.add('open');
+}
+
+function closeTurnOffModal() {
+  document.getElementById('turnoff-modal').classList.remove('open');
+}
+
+function confirmTurnOff() {
+  closeTurnOffModal();
+  arOn = false;
+  currentState = 'disabled';
+  document.querySelectorAll('.demo-btn').forEach(function(b,i){ b.classList.toggle('active', i===0); });
+  refreshToggleUI();
+  document.getElementById('banner-suspended').style.display = 'none';
+  document.getElementById('banner-cap').style.display = 'none';
+  document.getElementById('ar-settings').style.display = 'none';
+  document.getElementById('no-payment-prompt').style.display = 'none';
+  setBadge('disabled','Disabled');
+}
+
 function toggleAR() {
   if (arOn) {
-    // Turn off
-    arOn = false;
-    currentState = 'disabled';
-    document.querySelectorAll('.demo-btn').forEach(function(b,i){ b.classList.toggle('active', i===0); });
-    refreshToggleUI();
-    document.getElementById('banner-suspended').style.display = 'none';
-    document.getElementById('banner-cap').style.display = 'none';
-    document.getElementById('ar-settings').style.display = 'none';
-    document.getElementById('no-payment-prompt').style.display = 'none';
-    setBadge('disabled','Disabled');
+    // Show confirmation before turning off
+    openTurnOffModal();
   } else {
     // Turn on
     arOn = true;
