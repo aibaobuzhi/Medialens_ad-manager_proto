@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auto Recharge Settings — MediaLens</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532;font-size:14px;}
+
+/* ── Top Nav ── */
+.top-nav{
+  height:72px;background:#23A9F6;
+  display:flex;align-items:center;padding:0 32px;gap:16px;
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  box-shadow:0 2px 8px rgba(35,169,246,0.25);
+}
+.nav-logo{color:#fff;font-size:18px;font-weight:600;letter-spacing:-0.3px;}
+.nav-logo span{opacity:0.7;font-weight:400;}
+.nav-spacer{flex:1;}
+.nav-links{display:flex;gap:28px;}
+.nav-link{color:rgba(255,255,255,0.8);font-size:13px;cursor:pointer;transition:color .15s;}
+.nav-link:hover,.nav-link.active{color:#fff;}
+.nav-avatar{
+  width:36px;height:36px;border-radius:9999px;
+  background:rgba(255,255,255,0.25);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:13px;font-weight:600;cursor:pointer;
+}
+
+/* ── Layout ── */
+.layout{display:flex;padding-top:72px;min-height:100vh;}
+
+/* ── Sidebar ── */
+.sidebar{
+  width:220px;background:#fff;
+  border-right:1px solid #E8EEF0;
+  padding:20px 0;
+  position:fixed;top:72px;bottom:0;left:0;
+  overflow-y:auto;
+}
+.sidebar-group-label{
+  font-size:10px;font-weight:600;color:#CACACA;
+  letter-spacing:1px;text-transform:uppercase;
+  padding:0 18px 6px;margin-top:16px;
+}
+.sidebar-group-label:first-child{margin-top:0;}
+.sidebar-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 18px;font-size:13px;font-weight:400;
+  color:#707070;cursor:pointer;
+  border-right:3px solid transparent;
+  transition:all .15s;
+}
+.sidebar-item:hover{background:#F7F7F7;color:#102532;}
+.sidebar-item.active{
+  background:#EEF6FF;color:#23A9F6;font-weight:600;
+  border-right-color:#23A9F6;
+}
+.sidebar-item svg{width:16px;height:16px;flex-shrink:0;opacity:0.5;}
+.sidebar-item.active svg{opacity:1;}
+
+/* ── Main ── */
+.main{margin-left:220px;flex:1;padding:28px 32px 48px;}
+
+/* ── Page header ── */
+.breadcrumb{font-size:12px;color:#828282;margin-bottom:6px;}
+.breadcrumb a{color:#23A9F6;cursor:pointer;text-decoration:none;}
+.breadcrumb a:hover{text-decoration:underline;}
+.page-title{font-size:22px;font-weight:600;color:#0A1F2C;margin-bottom:20px;}
+
+/* ── Sub tabs ── */
+.sub-tabs{display:flex;gap:0;border-bottom:1px solid #E8EEF0;margin-bottom:24px;}
+.sub-tab{
+  padding:10px 20px;font-size:13px;font-weight:400;
+  color:#707070;cursor:pointer;
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+  transition:all .15s;
+}
+.sub-tab:hover{color:#23A9F6;}
+.sub-tab.active{color:#23A9F6;font-weight:600;border-bottom-color:#23A9F6;}
+
+/* ── Cards ── */
+.card{
+  background:#fff;border:1px solid #D9E3E6;
+  border-radius:12px;padding:24px;margin-bottom:16px;
+}
+.card-title{font-size:16px;font-weight:600;color:#0A1F2C;margin-bottom:4px;}
+
+/* ── Token Balance ── */
+.token-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 10px;}
+.token-bucket{background:#F7F7F7;border-radius:8px;padding:14px 16px;}
+.tb-label{font-size:12px;font-weight:500;color:#707070;margin-bottom:4px;}
+.tb-value{font-size:22px;font-weight:600;color:#102532;line-height:1.2;margin-bottom:2px;}
+.tb-meta{font-size:11px;color:#828282;}
+.bar-wrap{background:#E8EEF0;border-radius:999px;height:5px;margin-top:10px;}
+.bar-fill{height:100%;border-radius:999px;background:#23A9F6;}
+.bar-fill.warn{background:#FFC960;}
+.bar-fill.danger{background:#FF3F41;}
+.token-total{font-size:12px;color:#828282;}
+.token-total strong{color:#102532;}
+
+/* ── Auto Recharge section header ── */
+.ar-header{
+  display:flex;align-items:center;
+  justify-content:space-between;margin-bottom:6px;
+}
+.ar-title-row{display:flex;align-items:center;gap:10px;}
+.ar-title{font-size:16px;font-weight:600;color:#0A1F2C;}
+.ar-desc{font-size:13px;color:#707070;margin-bottom:16px;line-height:1.6;}
+
+/* ── Status badge ── */
+.status-badge{
+  font-size:11px;font-weight:600;
+  padding:3px 10px;border-radius:28px;line-height:18px;
+}
+.sb-disabled{background:#F5F5F5;color:#BDBDBD;}
+.sb-active{background:#E6FBEB;color:#52C41A;}
+.sb-suspended{background:#FFECEC;color:#FF3F41;}
+.sb-cap{background:#FFF8EB;color:#E6A817;}
+
+/* ── Toggle ── */
+.toggle-row{display:flex;align-items:center;gap:8px;}
+.toggle{
+  width:42px;height:23px;background:#CACACA;
+  border-radius:999px;position:relative;cursor:pointer;
+  transition:background .2s;flex-shrink:0;
+}
+.toggle.on{background:#23A9F6;}
+.toggle::after{
+  content:'';position:absolute;
+  width:17px;height:17px;background:#fff;
+  border-radius:50%;top:3px;left:3px;
+  transition:left .2s;
+  box-shadow:0 1px 4px rgba(0,0,0,0.18);
+}
+.toggle.on::after{left:22px;}
+.toggle-label{font-size:13px;color:#707070;}
+
+/* ── Alert banners ── */
+.alert-banner{
+  border-radius:8px;padding:14px 16px;
+  margin-bottom:20px;display:flex;
+  align-items:flex-start;gap:12px;
+}
+.ab-danger{background:#FFECEC;border:1px solid #FFCACA;}
+.ab-warning{background:#FFF8EB;border:1px solid #FFE5A0;}
+.ab-icon{font-size:15px;flex-shrink:0;margin-top:1px;}
+.ab-body{flex:1;}
+.ab-title{font-size:14px;font-weight:600;margin-bottom:3px;}
+.ab-danger .ab-title{color:#FF3F41;}
+.ab-warning .ab-title{color:#D48A00;}
+.ab-desc{font-size:13px;color:#707070;line-height:1.6;margin-bottom:10px;}
+.ab-actions{display:flex;gap:8px;}
+
+/* ── Divider ── */
+.divider{height:1px;background:#E8EEF0;margin:20px 0;}
+
+/* ── Settings form ── */
+.settings-form{display:flex;flex-direction:column;gap:20px;}
+.form-row{display:flex;flex-direction:column;gap:7px;}
+.form-label{font-size:13px;font-weight:400;color:#707070;display:flex;align-items:center;gap:5px;}
+.form-helper{font-size:11px;color:#828282;}
+
+/* ── Radio group ── */
+.radio-group{display:flex;flex-direction:column;gap:10px;}
+.radio-option{
+  display:flex;align-items:flex-start;gap:10px;
+  cursor:pointer;padding:10px 12px;
+  border:1px solid #D9E3E6;border-radius:8px;
+  transition:all .15s;
+}
+.radio-option:hover{border-color:#23A9F6;background:#F8FCFF;}
+.radio-option.selected{border-color:#23A9F6;background:#EEF6FF;}
+.radio-dot{
+  width:17px;height:17px;border-radius:50%;
+  border:2px solid #D9E3E6;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  margin-top:2px;transition:border-color .15s;
+}
+.radio-option.selected .radio-dot{border-color:#23A9F6;}
+.radio-dot-inner{
+  width:8px;height:8px;background:#23A9F6;border-radius:50%;
+  display:none;
+}
+.radio-option.selected .radio-dot-inner{display:block;}
+.radio-text{font-size:14px;font-weight:500;color:#102532;}
+.radio-sub{font-size:12px;color:#828282;margin-top:2px;}
+
+/* ── Select ── */
+.select-input{
+  height:40px;border:1px solid #D9E3E6;border-radius:8px;
+  padding:0 32px 0 12px;font-family:'Poppins',sans-serif;font-size:14px;
+  color:#102532;background:#fff;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23707070' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+  cursor:pointer;width:260px;
+}
+.select-input:focus{outline:none;border-color:#23A9F6;}
+
+/* ── Payment method display ── */
+.payment-card-display{
+  display:inline-flex;align-items:center;gap:10px;
+  background:#F7F7F7;border:1px solid #D9E3E6;
+  border-radius:8px;padding:10px 14px;
+}
+.card-brand{
+  width:34px;height:22px;background:#1A1F71;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:8px;font-weight:700;letter-spacing:0.3px;
+}
+.card-brand.mc{background:linear-gradient(135deg,#EB001B 0%,#FF5F00 50%,#F79E1B 100%);}
+.card-number{font-size:14px;font-weight:500;color:#102532;}
+.card-exp{font-size:11px;color:#828282;}
+
+/* ── Usage summary box ── */
+.usage-box{background:#F7F7F7;border-radius:8px;padding:14px 16px;}
+.usage-row{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:8px;
+}
+.usage-label{font-size:12px;color:#707070;}
+.usage-value{font-size:13px;font-weight:600;color:#102532;}
+.usage-bar-wrap{background:#E8EEF0;border-radius:999px;height:6px;}
+.usage-bar-fill{height:100%;border-radius:999px;background:#23A9F6;transition:width .4s,background .3s;}
+.usage-note{font-size:11px;color:#828282;margin-top:8px;}
+
+/* ── Buttons ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  height:36px;padding:0 16px;border-radius:8px;
+  font-family:'Poppins',sans-serif;font-size:13px;font-weight:500;
+  cursor:pointer;border:none;transition:all .15s;white-space:nowrap;
+  line-height:1;
+}
+.btn-primary{background:#23A9F6;color:#fff;border:1px solid #23A9F6;}
+.btn-primary:hover{background:#1a99e0;}
+.btn-outline{background:#fff;color:#23A9F6;border:1px solid #23A9F6;}
+.btn-outline:hover{background:#EEF6FF;}
+.btn-secondary{background:#fff;color:#707070;border:1px solid #D9E3E6;}
+.btn-secondary:hover{background:#F7F7F7;}
+.btn-danger-outline{background:#fff;color:#FF3F41;border:1px solid #FF3F41;}
+.btn-danger-outline:hover{background:#FFECEC;}
+.btn-sm{height:30px;font-size:12px;padding:0 12px;}
+
+/* ── Notification list ── */
+.notif-list{display:flex;flex-direction:column;}
+.notif-item{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:15px 0;
+  border-bottom:1px solid #E8EEF0;
+}
+.notif-item:last-child{border-bottom:none;}
+.notif-info{flex:1;}
+.notif-name{
+  font-size:14px;font-weight:500;color:#102532;
+  margin-bottom:3px;display:flex;align-items:center;gap:8px;
+}
+.notif-desc{font-size:12px;color:#828282;line-height:1.5;}
+.required-badge{
+  font-size:10px;font-weight:600;
+  background:#FFECEC;color:#FF3F41;
+  padding:2px 8px;border-radius:20px;letter-spacing:0.2px;
+}
+
+/* ── Toggle for notifications (smaller, right-aligned) ── */
+.toggle-notif{
+  width:36px;height:20px;
+  flex-shrink:0;margin-left:16px;
+}
+.toggle-notif::after{width:14px;height:14px;}
+.toggle-notif.on::after{left:18px;}
+
+/* ── No-payment prompt ── */
+.no-payment-prompt{
+  background:#F7F7F7;border-radius:8px;
+  padding:14px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;
+}
+
+/* ── Tooltip ── */
+.tooltip-wrap{position:relative;display:inline-flex;cursor:help;}
+.tip-icon{
+  width:15px;height:15px;border-radius:50%;
+  background:#E8EEF0;color:#828282;font-size:9px;font-weight:600;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.tip-popup{
+  position:absolute;bottom:calc(100% + 7px);left:50%;
+  transform:translateX(-50%);
+  background:#0A1F2C;color:#fff;font-size:12px;
+  padding:8px 12px;border-radius:6px;
+  width:230px;line-height:1.5;
+  pointer-events:none;opacity:0;
+  transition:opacity .15s;z-index:50;
+}
+.tip-popup::after{
+  content:'';position:absolute;top:100%;left:50%;
+  transform:translateX(-50%);
+  border:5px solid transparent;border-top-color:#0A1F2C;
+}
+.tooltip-wrap:hover .tip-popup{opacity:1;}
+
+/* ── Demo state switcher ── */
+.demo-switcher{
+  position:fixed;bottom:24px;right:24px;
+  background:#fff;border:1px solid #D9E3E6;
+  border-radius:12px;padding:12px 16px;
+  box-shadow:0 4px 16px rgba(0,0,0,0.08);
+  z-index:200;
+}
+.demo-label{
+  font-size:9px;font-weight:600;color:#CACACA;
+  letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;
+}
+.demo-btns{display:flex;gap:5px;}
+.demo-btn{
+  padding:5px 11px;border-radius:999px;
+  font-size:12px;font-weight:500;cursor:pointer;
+  border:1px solid #D9E3E6;background:#fff;color:#707070;
+  transition:all .15s;
+}
+.demo-btn.active{background:#102532;color:#fff;border-color:#102532;}
+
+/* ── Modal ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(10,31,44,0.5);z-index:300;
+  align-items:center;justify-content:center;
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:#fff;border-radius:12px;padding:32px;
+  width:460px;box-shadow:0 8px 32px rgba(0,0,0,0.14);
+  position:relative;
+}
+.modal-title{font-size:18px;font-weight:600;color:#0A1F2C;margin-bottom:4px;}
+.modal-subtitle{font-size:12px;color:#828282;margin-bottom:22px;line-height:1.6;}
+.modal-close{
+  position:absolute;top:14px;right:14px;
+  width:30px;height:30px;border-radius:50%;
+  border:none;background:#F7F7F7;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;color:#707070;
+}
+.modal-close:hover{background:#E8EEF0;}
+.modal-form{display:flex;flex-direction:column;gap:14px;}
+.modal-input{
+  width:100%;height:40px;border:1px solid #D9E3E6;
+  border-radius:8px;padding:0 12px;
+  font-family:'Poppins',sans-serif;font-size:14px;color:#102532;
+}
+.modal-input:focus{outline:none;border-color:#23A9F6;}
+.modal-input::placeholder{color:#BDBDBD;}
+.modal-row{display:flex;gap:12px;}
+.modal-row .form-row{flex:1;}
+.stripe-note{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;color:#AEAEAE;margin-top:10px;
+}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;}
+
+/* ── Disabled overlay for settings ── */
+.settings-disabled{opacity:0.45;pointer-events:none;}
+</style>
+</head>
+<body>
+
+<!-- Top Nav -->
+<nav class="top-nav">
+  <div class="nav-logo">Media<span>Lens</span></div>
+  <div class="nav-spacer"></div>
+  <div class="nav-links">
+    <div class="nav-link">Dashboard</div>
+    <div class="nav-link">Ad Manager</div>
+    <div class="nav-link">Reports</div>
+  </div>
+  <div style="width:1px;height:28px;background:rgba(255,255,255,0.25);margin:0 8px;"></div>
+  <div class="nav-avatar">JL</div>
+</nav>
+
+<!-- Layout -->
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-group-label">Account</div>
+
+    <div class="sidebar-item">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 10a4 4 0 100-8 4 4 0 000 8zm-7 8a7 7 0 1114 0H3z"/></svg>
+      Profile
+    </div>
+    <div class="sidebar-item">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM2 8a2 2 0 114 0A2 2 0 012 8zm14 8a6 6 0 00-11.8-1.4 7 7 0 0011.8 1.4zM2 16a6 6 0 0111.8-1.4A7 7 0 002 16z"/></svg>
+      Team Members
+    </div>
+    <div class="sidebar-item active">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM2 9v7a2 2 0 002 2h12a2 2 0 002-2V9H2zm5 3a1 1 0 011-1h4a1 1 0 110 2H8a1 1 0 01-1-1z"/></svg>
+      Plans &amp; Billing
+    </div>
+    <div class="sidebar-item">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/></svg>
+      Notifications
+    </div>
+    <div class="sidebar-item">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+      API &amp; Integrations
+    </div>
+    <div class="sidebar-item">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+      Security
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="breadcrumb">
+      <a>Account Settings</a> &nbsp;/&nbsp; Plans &amp; Billing
+    </div>
+    <div class="page-title">Plans &amp; Billing</div>
+
+    <!-- Sub tabs -->
+    <div class="sub-tabs">
+      <div class="sub-tab">Overview</div>
+      <div class="sub-tab active">AI Tokens</div>
+      <div class="sub-tab">Payment Method</div>
+      <div class="sub-tab">Invoices</div>
+    </div>
+
+    <!-- ── Token Balance Card ── -->
+    <div class="card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;">
+        <div class="card-title">Token Balance</div>
+        <span style="font-size:12px;color:#828282;">Billing date: Jul 4, 2026</span>
+      </div>
+      <!-- Total Balance Hero -->
+      <div style="display:flex;align-items:center;gap:32px;padding:12px 0 8px;">
+
+        <!-- Big total remaining -->
+        <div style="flex-shrink:0;min-width:180px;">
+          <div style="font-size:40px;font-weight:600;color:#23A9F6;line-height:1;margin-bottom:6px;">48,200</div>
+          <div style="font-size:12px;color:#828282;margin-bottom:10px;">tokens remaining</div>
+          <!-- Usage bar (how much consumed) -->
+          <div class="bar-wrap" style="margin-bottom:5px;">
+            <div class="bar-fill" style="width:90.4%;background:#FF3F41;border-radius:999px;"></div>
+          </div>
+          <div style="font-size:11px;color:#707070;">90.4% used &nbsp;·&nbsp; 9.6% remaining</div>
+        </div>
+
+        <!-- Vertical rule -->
+        <div style="width:1px;height:88px;background:#E8EEF0;flex-shrink:0;"></div>
+
+        <!-- Bucket breakdown -->
+        <div style="display:flex;gap:32px;flex:1;">
+
+          <!-- Subscription -->
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+              <span style="width:8px;height:8px;background:#23A9F6;border-radius:50%;display:inline-block;"></span>
+              <span style="font-size:11px;font-weight:600;color:#707070;letter-spacing:0.4px;text-transform:uppercase;">Subscription</span>
+            </div>
+            <div style="font-size:20px;font-weight:600;color:#102532;line-height:1.2;margin-bottom:2px;">48,200 <span style="font-size:13px;font-weight:400;color:#828282;">remaining</span></div>
+            <div style="font-size:11px;color:#828282;margin-bottom:7px;">451,800 used of 500,000 &nbsp;·&nbsp; resets Jul 4</div>
+            <div class="bar-wrap"><div class="bar-fill" style="width:90.4%;background:#FF3F41;"></div></div>
+            <div style="font-size:10px;color:#828282;margin-top:4px;">90.4% used</div>
+          </div>
+
+          <!-- Divider -->
+          <div style="width:1px;height:70px;background:#E8EEF0;flex-shrink:0;align-self:center;"></div>
+
+          <!-- Pack -->
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+              <span style="width:8px;height:8px;background:#17A84A;border-radius:50%;display:inline-block;"></span>
+              <span style="font-size:11px;font-weight:600;color:#707070;letter-spacing:0.4px;text-transform:uppercase;">Pack</span>
+            </div>
+            <div style="font-size:20px;font-weight:600;color:#BDBDBD;line-height:1.2;margin-bottom:2px;">0 <span style="font-size:13px;font-weight:400;color:#BDBDBD;">remaining</span></div>
+            <div style="font-size:11px;color:#BDBDBD;margin-bottom:7px;">No pack purchased &nbsp;·&nbsp; carries over monthly</div>
+            <div class="bar-wrap"><div class="bar-fill" style="width:0%;background:#17A84A;"></div></div>
+            <div style="font-size:10px;color:#BDBDBD;margin-top:4px;">—</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-primary">Buy Token Pack&nbsp; + $250</button>
+        <button class="btn btn-secondary">View Usage History</button>
+      </div>
+    </div>
+
+    <!-- ── Auto Recharge Card ── -->
+    <div class="card" id="ar-card">
+
+      <!-- Suspended Banner -->
+      <div class="alert-banner ab-danger" id="banner-suspended" style="display:none;">
+        <div class="ab-icon">⚠️</div>
+        <div class="ab-body">
+          <div class="ab-title">Payment Failed — Auto Recharge Suspended</div>
+          <div class="ab-desc">Your card ending in 4242 was declined on Jun 2, 2026 (Insufficient funds). Auto Recharge is now suspended — your tokens will not be automatically refilled.</div>
+          <div class="ab-actions">
+            <button class="btn btn-danger-outline btn-sm" onclick="openModal()">Update Payment Method</button>
+            <button class="btn btn-secondary btn-sm" onclick="reactivate()">Reactivate Anyway</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cap Reached Banner -->
+      <div class="alert-banner ab-warning" id="banner-cap" style="display:none;">
+        <div class="ab-icon">🔔</div>
+        <div class="ab-body">
+          <div class="ab-title">Monthly Cap Reached — Auto Recharge Paused</div>
+          <div class="ab-desc">You've reached your $500/month Auto Recharge limit for June. Auto Recharge will automatically resume on Jul 1, 2026. You can still purchase Token Packs manually.</div>
+          <div class="ab-actions">
+            <button class="btn btn-secondary btn-sm">Buy Token Pack Manually</button>
+            <button class="btn btn-outline btn-sm" onclick="increaseCap()">Increase Monthly Cap</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Header -->
+      <div class="ar-header">
+        <div class="ar-title-row">
+          <div class="ar-title">Auto Recharge</div>
+          <div class="status-badge sb-disabled" id="status-badge">Disabled</div>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle" id="ar-toggle" onclick="toggleAR()"></div>
+          <span class="toggle-label" id="toggle-label">Off</span>
+        </div>
+      </div>
+
+      <div class="ar-desc">
+        Automatically purchase 1 Token Pack ($250) when your balance drops below the threshold. Helps prevent unexpected service interruptions.
+      </div>
+
+      <!-- No Payment Method Prompt -->
+      <div id="no-payment-prompt" style="display:none;">
+        <div class="divider"></div>
+        <div class="no-payment-prompt">
+          <div>
+            <div style="font-size:14px;font-weight:500;color:#102532;margin-bottom:3px;">No payment method on file</div>
+            <div style="font-size:12px;color:#828282;">Add a credit card to enable Auto Recharge.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openModal()">Add Payment Method</button>
+        </div>
+      </div>
+
+      <!-- Settings Panel -->
+      <div id="ar-settings" style="display:none;">
+        <div class="divider"></div>
+        <div class="settings-form" id="settings-form-inner">
+
+          <!-- Refill Threshold -->
+          <div class="form-row">
+            <div class="form-label">
+              Refill Threshold
+              <div class="tooltip-wrap">
+                <span class="tip-icon">?</span>
+                <div class="tip-popup">Auto Recharge triggers when Total Balance (Subscription + Pack combined) drops below this percentage of Total Quota.</div>
+              </div>
+            </div>
+            <div class="radio-group">
+              <label class="radio-option" id="radio-5" onclick="selectThreshold('5')">
+                <div class="radio-dot"><div class="radio-dot-inner"></div></div>
+                <div>
+                  <div class="radio-text">5% of Total Quota</div>
+                  <div class="radio-sub">Trigger when balance drops below 25,000 tokens — more aggressive refill</div>
+                </div>
+              </label>
+              <label class="radio-option selected" id="radio-10" onclick="selectThreshold('10')">
+                <div class="radio-dot"><div class="radio-dot-inner"></div></div>
+                <div>
+                  <div class="radio-text">10% of Total Quota</div>
+                  <div class="radio-sub">Trigger when balance drops below 50,000 tokens — currently below this threshold</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Refill Amount -->
+          <div class="form-row">
+            <div class="form-label">
+              Refill Amount
+              <div class="tooltip-wrap">
+                <span class="tip-icon">?</span>
+                <div class="tip-popup">Fixed at 1 pack per recharge to prevent unexpected large charges. You can always purchase additional packs manually.</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="background:#F5F5F5;border:1px solid #D9E3E6;border-radius:8px;padding:9px 14px;font-size:14px;color:#828282;cursor:not-allowed;width:260px;">1 Token Pack &mdash; $250.00 USD</div>
+              <span style="font-size:12px;color:#828282;">Fixed per recharge</span>
+            </div>
+          </div>
+
+          <!-- Monthly Cap -->
+          <div class="form-row">
+            <div class="form-label">
+              Monthly Cap
+              <div class="tooltip-wrap">
+                <span class="tip-icon">?</span>
+                <div class="tip-popup">Maximum Auto Recharge spend per calendar month. Resets on the 1st of every month. Manual purchases are not affected by this cap.</div>
+              </div>
+            </div>
+            <select class="select-input" id="monthly-cap">
+              <option value="250">$250 / month &nbsp;·&nbsp; 1 pack</option>
+              <option value="500" selected>$500 / month &nbsp;·&nbsp; 2 packs</option>
+              <option value="750">$750 / month &nbsp;·&nbsp; 3 packs</option>
+              <option value="1000">$1,000 / month &nbsp;·&nbsp; 4 packs</option>
+            </select>
+            <div class="form-helper">Cap resets on Jul 1, 2026 &nbsp;·&nbsp; Daily cooldown: max 1 recharge per day</div>
+          </div>
+
+          <!-- Payment Method -->
+          <div class="form-row">
+            <div class="form-label">Payment Method</div>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <div class="payment-card-display">
+                <div class="card-brand">VISA</div>
+                <div>
+                  <div class="card-number">**** **** **** 4242</div>
+                  <div class="card-exp">Exp 08/27</div>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="openModal()">Change Payment Method</button>
+            </div>
+          </div>
+
+          <!-- Monthly Usage Summary -->
+          <div class="divider" style="margin:4px 0;"></div>
+          <div class="form-row">
+            <div class="form-label">June 2026 Auto Recharge</div>
+            <div class="usage-box">
+              <div class="usage-row">
+                <span class="usage-label">Amount charged this month</span>
+                <span class="usage-value" id="usage-amount">$250 of $500 cap</span>
+              </div>
+              <div class="usage-bar-wrap">
+                <div class="usage-bar-fill" id="usage-bar" style="width:50%"></div>
+              </div>
+              <div class="usage-note" id="usage-note">
+                Last recharge: Jun 2, 2026 — 1 pack added &nbsp;·&nbsp;
+                <strong style="color:#52C41A;">1 more recharge available this month</strong>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Email Notification Preferences ── -->
+    <div class="card">
+      <div style="margin-bottom:16px;">
+        <div class="card-title">Email Notification Preferences</div>
+        <div style="font-size:13px;color:#707070;margin-top:3px;">Notifications are sent to all Org Admins. Delivery is immediate for alerts; daily digest for summaries.</div>
+      </div>
+
+      <div class="notif-list">
+
+        <!-- N-01 -->
+        <div class="notif-item">
+          <div class="notif-info">
+            <div class="notif-name">Low Balance Warning</div>
+            <div class="notif-desc">Sent when Total Balance drops below your threshold and Auto Recharge is off. Subject: "Your AI Token balance is running low"</div>
+          </div>
+          <div class="toggle toggle-notif on" onclick="this.classList.toggle('on')"></div>
+        </div>
+
+        <!-- N-02 -->
+        <div class="notif-item">
+          <div class="notif-info">
+            <div class="notif-name">Auto Recharge Successful</div>
+            <div class="notif-desc">Sent each time a Token Pack is automatically purchased. Includes new balance and monthly cap usage.</div>
+          </div>
+          <div class="toggle toggle-notif on" onclick="this.classList.toggle('on')"></div>
+        </div>
+
+        <!-- N-03 Required -->
+        <div class="notif-item">
+          <div class="notif-info">
+            <div class="notif-name">
+              Auto Recharge Failed
+              <span class="required-badge">Required</span>
+            </div>
+            <div class="notif-desc">Sent when a charge attempt fails. Auto Recharge is suspended until resolved. This notification cannot be disabled.</div>
+          </div>
+          <div class="toggle toggle-notif on" style="opacity:0.4;cursor:not-allowed;"></div>
+        </div>
+
+        <!-- N-04 -->
+        <div class="notif-item">
+          <div class="notif-info">
+            <div class="notif-name">Monthly Cap Reached</div>
+            <div class="notif-desc">Sent when Auto Recharge is paused for the month. Includes remaining days and manual purchase option.</div>
+          </div>
+          <div class="toggle toggle-notif on" onclick="this.classList.toggle('on')"></div>
+        </div>
+
+        <!-- N-05 -->
+        <div class="notif-item">
+          <div class="notif-info">
+            <div class="notif-name">Monthly Cap Approaching <span style="font-size:11px;font-weight:400;color:#23A9F6;margin-left:4px;">at 80%</span></div>
+            <div class="notif-desc">Sent when 80% of Monthly Cap has been used in the current month. Gives advance notice before cap is reached.</div>
+          </div>
+          <div class="toggle toggle-notif" onclick="this.classList.toggle('on')"></div>
+        </div>
+
+        <!-- N-06 -->
+        <div class="notif-item">
+          <div class="notif-info">
+            <div class="notif-name">Subscription Tokens Expiring Soon</div>
+            <div class="notif-desc">Sent 3 days before billing date when &gt;80% of Subscription Tokens are used. Subscription Tokens do not carry over.</div>
+          </div>
+          <div class="toggle toggle-notif" onclick="this.classList.toggle('on')"></div>
+        </div>
+
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;margin-top:20px;">
+        <button class="btn btn-primary" onclick="saveNotifPrefs(this)">Save Preferences</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── Demo State Switcher ── -->
+<div class="demo-switcher">
+  <div class="demo-label">Demo State</div>
+  <div class="demo-btns">
+    <button class="demo-btn active" data-state="disabled" onclick="setDemoState('disabled',this)">Disabled</button>
+    <button class="demo-btn" data-state="active" onclick="setDemoState('active',this)">Active</button>
+    <button class="demo-btn" data-state="suspended" onclick="setDemoState('suspended',this)">Suspended</button>
+    <button class="demo-btn" data-state="cap-reached" onclick="setDemoState('cap-reached',this)">Cap Reached</button>
+  </div>
+</div>
+
+<!-- ── Payment Method Modal ── -->
+<div class="modal-overlay" id="payment-modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+    <div class="modal-title" id="modal-title">Update Payment Method</div>
+    <div class="modal-subtitle">Processed securely via Stripe. MediaLens never stores your full card details.</div>
+
+    <div class="modal-form">
+      <div class="form-row">
+        <div class="form-label">Cardholder Name</div>
+        <input class="modal-input" type="text" placeholder="Full name as shown on card">
+      </div>
+      <div class="form-row">
+        <div class="form-label">Card Number</div>
+        <input class="modal-input" type="text" placeholder="1234  5678  9012  3456">
+      </div>
+      <div class="modal-row">
+        <div class="form-row">
+          <div class="form-label">Expiry Date</div>
+          <input class="modal-input" type="text" placeholder="MM / YY">
+        </div>
+        <div class="form-row">
+          <div class="form-label">CVC</div>
+          <input class="modal-input" type="text" placeholder="3-digit code">
+        </div>
+      </div>
+    </div>
+
+    <div class="stripe-note">
+      <svg width="14" height="14" viewBox="0 0 20 20" fill="#AEAEAE"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+      Secured by Stripe &nbsp;·&nbsp; Visa &nbsp;·&nbsp; Mastercard &nbsp;·&nbsp; AMEX
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCard()">Save Payment Method</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var arOn = false;
+var hasCard = true; // set true for demo (card already added)
+var currentState = 'disabled';
+
+function setDemoState(state, btn) {
+  currentState = state;
+  document.querySelectorAll('.demo-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+
+  // Banners
+  document.getElementById('banner-suspended').style.display = state === 'suspended' ? 'flex' : 'none';
+  document.getElementById('banner-cap').style.display = state === 'cap-reached' ? 'flex' : 'none';
+
+  if (state === 'disabled') {
+    arOn = false;
+    refreshToggleUI();
+    document.getElementById('ar-settings').style.display = 'none';
+    document.getElementById('no-payment-prompt').style.display = 'none';
+    setBadge('disabled','Disabled');
+  } else {
+    arOn = true;
+    refreshToggleUI();
+    document.getElementById('ar-settings').style.display = 'block';
+    document.getElementById('no-payment-prompt').style.display = 'none';
+
+    // Disabled overlay on settings for suspended/cap
+    var inner = document.getElementById('settings-form-inner');
+    if (state === 'suspended') {
+      setBadge('suspended','Suspended');
+      inner.classList.add('settings-disabled');
+    } else if (state === 'cap-reached') {
+      setBadge('cap','Cap Reached');
+      inner.classList.remove('settings-disabled');
+      // Update usage bar to 100%
+      document.getElementById('usage-amount').textContent = '$500 of $500 cap';
+      document.getElementById('usage-bar').style.width = '100%';
+      document.getElementById('usage-bar').style.background = '#FFC960';
+      document.getElementById('usage-note').innerHTML = 'Last recharge: Jun 10, 2026 &nbsp;·&nbsp; <strong style="color:#E6A817;">Monthly cap reached — resumes Jul 1</strong>';
+    } else {
+      setBadge('active','Active');
+      inner.classList.remove('settings-disabled');
+      document.getElementById('usage-amount').textContent = '$250 of $500 cap';
+      document.getElementById('usage-bar').style.width = '50%';
+      document.getElementById('usage-bar').style.background = '#23A9F6';
+      document.getElementById('usage-note').innerHTML = 'Last recharge: Jun 2, 2026 — 1 pack added &nbsp;·&nbsp; <strong style="color:#52C41A;">1 more recharge available this month</strong>';
+    }
+  }
+}
+
+function setBadge(cls, label) {
+  var b = document.getElementById('status-badge');
+  b.className = 'status-badge sb-' + cls;
+  b.textContent = label;
+}
+
+function refreshToggleUI() {
+  var t = document.getElementById('ar-toggle');
+  var l = document.getElementById('toggle-label');
+  if (arOn) { t.classList.add('on'); l.textContent = 'On'; }
+  else { t.classList.remove('on'); l.textContent = 'Off'; }
+}
+
+function toggleAR() {
+  if (arOn) {
+    // Turn off
+    arOn = false;
+    currentState = 'disabled';
+    document.querySelectorAll('.demo-btn').forEach(function(b,i){ b.classList.toggle('active', i===0); });
+    refreshToggleUI();
+    document.getElementById('banner-suspended').style.display = 'none';
+    document.getElementById('banner-cap').style.display = 'none';
+    document.getElementById('ar-settings').style.display = 'none';
+    document.getElementById('no-payment-prompt').style.display = 'none';
+    setBadge('disabled','Disabled');
+  } else {
+    // Turn on
+    arOn = true;
+    refreshToggleUI();
+    if (!hasCard) {
+      document.getElementById('no-payment-prompt').style.display = 'flex';
+      setBadge('disabled','Disabled');
+    } else {
+      currentState = 'active';
+      document.querySelectorAll('.demo-btn').forEach(function(b,i){ b.classList.toggle('active', i===1); });
+      document.getElementById('ar-settings').style.display = 'block';
+      document.getElementById('settings-form-inner').classList.remove('settings-disabled');
+      setBadge('active','Active');
+    }
+  }
+}
+
+function selectThreshold(val) {
+  document.getElementById('radio-5').classList.toggle('selected', val === '5');
+  document.getElementById('radio-10').classList.toggle('selected', val === '10');
+}
+
+function reactivate() {
+  currentState = 'active';
+  document.querySelectorAll('.demo-btn').forEach(function(b,i){ b.classList.toggle('active', i===1); });
+  setDemoState('active', null);
+  document.querySelectorAll('.demo-btn')[1].classList.add('active');
+}
+
+function increaseCap() {
+  document.getElementById('monthly-cap').value = '750';
+  reactivate();
+}
+
+function openModal() {
+  document.getElementById('payment-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('payment-modal').classList.remove('open');
+}
+
+function saveCard() {
+  hasCard = true;
+  closeModal();
+  if (arOn && currentState !== 'active') {
+    reactivate();
+  } else if (!arOn) {
+    toggleAR();
+  }
+  // Show success toast
+  showToast('Payment method saved successfully.');
+}
+
+function saveNotifPrefs(btn) {
+  btn.textContent = 'Saved!';
+  btn.style.background = '#52C41A';
+  btn.style.borderColor = '#52C41A';
+  setTimeout(function() {
+    btn.textContent = 'Save Preferences';
+    btn.style.background = '';
+    btn.style.borderColor = '';
+  }, 2000);
+}
+
+function showToast(msg) {
+  var t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:80px;right:24px;background:#0A1F2C;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:400;box-shadow:0 4px 16px rgba(0,0,0,0.15);';
+  document.body.appendChild(t);
+  setTimeout(function(){ t.remove(); }, 3000);
+}
+
+// Init
+setDemoState('disabled', document.querySelectorAll('.demo-btn')[0]);
+</script>
+</body>
+</html>
