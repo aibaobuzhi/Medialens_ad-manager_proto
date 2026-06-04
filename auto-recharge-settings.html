@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Auto Recharge Settings — MediaLens</title>
+<title>Auto Refill Settings — MediaLens</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -101,7 +101,7 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
 .token-total{font-size:12px;color:#828282;}
 .token-total strong{color:#102532;}
 
-/* ── Auto Recharge section header ── */
+/* ── Auto Refill section header ── */
 .ar-header{
   display:flex;align-items:center;
   justify-content:space-between;margin-bottom:6px;
@@ -493,15 +493,15 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
       </div>
     </div>
 
-    <!-- ── Auto Recharge Card ── -->
+    <!-- ── Auto Refill Card ── -->
     <div class="card" id="ar-card">
 
       <!-- Suspended Banner -->
       <div class="alert-banner ab-danger" id="banner-suspended" style="display:none;">
         <div class="ab-icon">⚠️</div>
         <div class="ab-body">
-          <div class="ab-title">Payment Failed — Auto Recharge Suspended</div>
-          <div class="ab-desc">Your card ending in 4242 was declined on Jun 2, 2026 (Insufficient funds). Auto Recharge is now suspended — your tokens will not be automatically refilled.</div>
+          <div class="ab-title">Payment Failed — Auto Refill Suspended</div>
+          <div class="ab-desc">Your card ending in 4242 was declined on Jun 2, 2026 (Insufficient funds). Auto Refill is now suspended — your tokens will not be automatically refilled.</div>
           <div class="ab-actions">
             <button class="btn btn-danger-outline btn-sm" onclick="openModal()">Update Payment Method</button>
             <button class="btn btn-secondary btn-sm" onclick="reactivate()">Reactivate Anyway</button>
@@ -513,8 +513,8 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
       <div class="alert-banner ab-warning" id="banner-cap" style="display:none;">
         <div class="ab-icon">🔔</div>
         <div class="ab-body">
-          <div class="ab-title">Monthly Cap Reached — Auto Recharge Paused</div>
-          <div class="ab-desc">You've reached your $500/month Auto Recharge limit for June. Auto Recharge will automatically resume on Jul 1, 2026. You can still purchase Token Packs manually.</div>
+          <div class="ab-title">Monthly Cap Reached — Auto Refill Paused</div>
+          <div class="ab-desc">You've reached your $500/month Auto Refill limit for June. Auto Refill will automatically resume on Jul 1, 2026. You can still purchase Token Packs manually.</div>
           <div class="ab-actions">
             <button class="btn btn-secondary btn-sm">Buy Token Pack Manually</button>
             <button class="btn btn-outline btn-sm" onclick="increaseCap()">Increase Monthly Cap</button>
@@ -525,7 +525,7 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
       <!-- Header -->
       <div class="ar-header">
         <div class="ar-title-row">
-          <div class="ar-title">Auto Recharge</div>
+          <div class="ar-title">Auto Refill</div>
           <div class="status-badge sb-disabled" id="status-badge">Disabled</div>
         </div>
         <div class="toggle-row">
@@ -538,13 +538,30 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
         Automatically purchase 1 Token Pack ($250) when your balance drops below the threshold. Helps prevent unexpected service interruptions.
       </div>
 
+      <!-- Post Turn-Off Banner -->
+      <div id="post-turnoff-banner" style="display:none;">
+        <div class="divider"></div>
+        <div style="background:#FFF8EB;border:1px solid #FFE5A0;border-radius:8px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;">
+          <div style="font-size:15px;flex-shrink:0;margin-top:1px;">⚠️</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:#D48A00;margin-bottom:3px;">Auto Refill is now off</div>
+            <div style="font-size:13px;color:#707070;line-height:1.6;margin-bottom:10px;">Your current balance is <strong style="color:#102532;">48,200 tokens (9.6%)</strong> — already below your previous refill threshold. If tokens run out, AI features will stop working until you manually purchase a pack.</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-primary btn-sm" onclick="buyPack()">Buy Token Pack &nbsp;+$250</button>
+              <button class="btn btn-outline btn-sm" onclick="reEnableRefill()">Re-enable Auto Refill</button>
+              <button class="btn btn-secondary btn-sm" onclick="dismissPostTurnoff()" style="margin-left:auto;">Dismiss</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- No Payment Method Prompt -->
       <div id="no-payment-prompt" style="display:none;">
         <div class="divider"></div>
         <div class="no-payment-prompt">
           <div>
             <div style="font-size:14px;font-weight:500;color:#102532;margin-bottom:3px;">No payment method on file</div>
-            <div style="font-size:12px;color:#828282;">Add a credit card to enable Auto Recharge.</div>
+            <div style="font-size:12px;color:#828282;">Add a credit card to enable Auto Refill.</div>
           </div>
           <button class="btn btn-primary btn-sm" onclick="openModal()">Add Payment Method</button>
         </div>
@@ -561,7 +578,7 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
               Refill Threshold
               <div class="tooltip-wrap">
                 <span class="tip-icon">?</span>
-                <div class="tip-popup">Auto Recharge triggers when Total Balance (Subscription + Pack combined) drops below this percentage of Total Quota.</div>
+                <div class="tip-popup">Auto Refill triggers when Total Balance (Subscription + Pack combined) drops below this percentage of Total Quota.</div>
               </div>
             </div>
             <div class="radio-group">
@@ -603,7 +620,7 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
               Monthly Cap
               <div class="tooltip-wrap">
                 <span class="tip-icon">?</span>
-                <div class="tip-popup">Maximum Auto Recharge spend per calendar month. Resets on the 1st of every month. Manual purchases are not affected by this cap.</div>
+                <div class="tip-popup">Maximum Auto Refill spend per calendar month. Resets on the 1st of every month. Manual purchases are not affected by this cap.</div>
               </div>
             </div>
             <select class="select-input" id="monthly-cap">
@@ -633,7 +650,7 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
           <!-- Monthly Usage Summary -->
           <div class="divider" style="margin:4px 0;"></div>
           <div class="form-row">
-            <div class="form-label">June 2026 Auto Recharge</div>
+            <div class="form-label">June 2026 Auto Refill</div>
             <div class="usage-box">
               <div class="usage-row">
                 <span class="usage-label">Amount charged this month</span>
@@ -667,7 +684,7 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
         <div class="notif-item">
           <div class="notif-info">
             <div class="notif-name">Low Balance Warning</div>
-            <div class="notif-desc">Sent when Total Balance drops below your threshold and Auto Recharge is off. Subject: "Your AI Token balance is running low"</div>
+            <div class="notif-desc">Sent when Total Balance drops below your threshold and Auto Refill is off. Subject: "Your AI Token balance is running low"</div>
           </div>
           <div class="toggle toggle-notif on" onclick="this.classList.toggle('on')"></div>
         </div>
@@ -675,7 +692,7 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
         <!-- N-02 -->
         <div class="notif-item">
           <div class="notif-info">
-            <div class="notif-name">Auto Recharge Successful</div>
+            <div class="notif-name">Auto Refill Successful</div>
             <div class="notif-desc">Sent each time a Token Pack is automatically purchased. Includes new balance and monthly cap usage.</div>
           </div>
           <div class="toggle toggle-notif on" onclick="this.classList.toggle('on')"></div>
@@ -685,10 +702,10 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
         <div class="notif-item">
           <div class="notif-info">
             <div class="notif-name">
-              Auto Recharge Failed
+              Auto Refill Failed
               <span class="required-badge">Required</span>
             </div>
-            <div class="notif-desc">Sent when a charge attempt fails. Auto Recharge is suspended until resolved. This notification cannot be disabled.</div>
+            <div class="notif-desc">Sent when a charge attempt fails. Auto Refill is suspended until resolved. This notification cannot be disabled.</div>
           </div>
           <div class="toggle toggle-notif on" style="opacity:0.4;cursor:not-allowed;"></div>
         </div>
@@ -697,7 +714,7 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
         <div class="notif-item">
           <div class="notif-info">
             <div class="notif-name">Monthly Cap Reached</div>
-            <div class="notif-desc">Sent when Auto Recharge is paused for the month. Includes remaining days and manual purchase option.</div>
+            <div class="notif-desc">Sent when Auto Refill is paused for the month. Includes remaining days and manual purchase option.</div>
           </div>
           <div class="toggle toggle-notif on" onclick="this.classList.toggle('on')"></div>
         </div>
@@ -747,16 +764,16 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
     <div style="width:44px;height:44px;border-radius:50%;background:#FFF8EB;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E6A817" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
     </div>
-    <div class="modal-title" style="font-size:17px;">Turn off Auto Recharge?</div>
+    <div class="modal-title" style="font-size:17px;">Turn off Auto Refill?</div>
     <div style="font-size:14px;color:#707070;line-height:1.7;margin:10px 0 24px;">
       Your tokens won't be automatically topped up. If your balance runs out, AI features will stop working until you manually purchase a Token Pack.
     </div>
     <div style="background:#F7F7F7;border-radius:8px;padding:12px 14px;font-size:13px;color:#828282;margin-bottom:24px;display:flex;align-items:flex-start;gap:8px;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CACACA" stroke-width="2" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      You can re-enable Auto Recharge at any time from Plans &amp; Billing.
+      You can re-enable Auto Refill at any time from Plans &amp; Billing.
     </div>
     <div style="display:flex;flex-direction:column;gap:10px;">
-      <button class="btn btn-primary" style="width:100%;justify-content:center;height:40px;" onclick="closeTurnOffModal()">Keep Auto Recharge On</button>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;height:40px;" onclick="closeTurnOffModal()">Keep Auto Refill On</button>
       <button class="btn btn-secondary" style="width:100%;justify-content:center;height:40px;color:#FF3F41;border-color:#FFD0D0;" onclick="confirmTurnOff()">Turn Off</button>
     </div>
   </div>
@@ -815,6 +832,8 @@ function setDemoState(state, btn) {
   // Banners
   document.getElementById('banner-suspended').style.display = state === 'suspended' ? 'flex' : 'none';
   document.getElementById('banner-cap').style.display = state === 'cap-reached' ? 'flex' : 'none';
+
+  document.getElementById('post-turnoff-banner').style.display = 'none';
 
   if (state === 'disabled') {
     arOn = false;
@@ -884,6 +903,22 @@ function confirmTurnOff() {
   document.getElementById('ar-settings').style.display = 'none';
   document.getElementById('no-payment-prompt').style.display = 'none';
   setBadge('disabled','Disabled');
+  // Show post-turn-off guidance
+  document.getElementById('post-turnoff-banner').style.display = 'block';
+}
+
+function dismissPostTurnoff() {
+  document.getElementById('post-turnoff-banner').style.display = 'none';
+}
+
+function buyPack() {
+  dismissPostTurnoff();
+  showToast('Redirecting to Token Pack purchase…');
+}
+
+function reEnableRefill() {
+  dismissPostTurnoff();
+  toggleAR();
 }
 
 function toggleAR() {
