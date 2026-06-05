@@ -498,53 +498,23 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
           <div class="qc-bar-wrap"><div class="qc-bar-fill" style="width:100%;background:#52C41A;"></div></div>
         </div>
 
-        <!-- AI Tokens — full-width special card -->
-        <div class="ai-token-card" style="grid-column:1/-1;">
-          <!-- Left: clickable area → go to billing AI tokens -->
-          <div class="ai-left" onclick="switchView('billing')" title="Click to manage in Plans &amp; Billing">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-              <div>
-                <div class="qc-label" style="color:#23A9F6;">AI Tokens</div>
-                <div style="font-size:11px;color:#828282;">Plans &amp; Billing → AI Tokens &nbsp;→</div>
-              </div>
-              <span style="font-size:11px;color:#23A9F6;font-weight:500;padding:3px 10px;background:#EEF6FF;border-radius:20px;">Manage ›</span>
+        <!-- AI Tokens -->
+        <div class="quota-card" style="grid-column:span 2;border-color:#23A9F6;" onclick="switchView('billing')" title="Click to manage in Plans &amp; Billing">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+            <div>
+              <div class="qc-label" style="color:#23A9F6;">AI Tokens</div>
+              <div class="qc-value">451,800 <span style="font-size:14px;font-weight:400;color:#828282;">/ 500,000</span></div>
+              <div class="qc-sub">48,200 remaining &nbsp;·&nbsp; resets Jul 4</div>
+              <div class="qc-bar-wrap"><div class="qc-bar-fill" style="width:90.4%;background:#FF3F41;"></div></div>
             </div>
-            <!-- Balance display -->
-            <div style="display:flex;align-items:flex-end;gap:8px;margin-bottom:6px;">
-              <span style="font-size:32px;font-weight:600;color:#23A9F6;line-height:1;">48,200</span>
-              <span style="font-size:13px;color:#828282;margin-bottom:4px;">tokens remaining</span>
-            </div>
-            <!-- Usage bar -->
-            <div style="background:#E8EEF0;border-radius:999px;height:5px;margin-bottom:5px;">
-              <div style="height:100%;border-radius:999px;background:#FF3F41;width:90.4%;"></div>
-            </div>
-            <div style="font-size:11px;color:#707070;">90.4% used &nbsp;·&nbsp; 9.6% remaining &nbsp;·&nbsp; Subscription resets Jul 4, 2026</div>
-            <!-- Breakdown -->
-            <div style="display:flex;gap:24px;margin-top:14px;">
-              <div>
-                <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#23A9F6;margin-right:4px;"></span>
-                <span style="font-size:11px;color:#707070;">Subscription: <strong style="color:#102532;">48,200</strong> remaining</span>
-              </div>
-              <div>
-                <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#BDBDBD;margin-right:4px;"></span>
-                <span style="font-size:11px;color:#BDBDBD;">Pack: 0 remaining</span>
+            <!-- Auto Refill toggle — stop click propagation -->
+            <div onclick="event.stopPropagation()" style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;margin-left:20px;">
+              <div style="font-size:11px;font-weight:600;color:#707070;">Auto Refill</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="status-badge sb-disabled" id="quota-status-badge">Disabled</div>
+                <div class="toggle" id="quota-ar-toggle" onclick="toggleARFromQuota()" style="flex-shrink:0;"></div>
               </div>
             </div>
-          </div>
-
-          <!-- Divider -->
-          <div class="ai-right"></div>
-
-          <!-- Right: Auto Refill toggle + status -->
-          <div class="ai-actions">
-            <div style="font-size:12px;font-weight:600;color:#102532;margin-bottom:2px;">Auto Refill</div>
-            <div style="font-size:12px;color:#828282;margin-bottom:14px;line-height:1.5;">Auto-purchase 1 pack ($250) when balance drops below threshold.</div>
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-              <div class="toggle" id="quota-ar-toggle" onclick="toggleARFromQuota()" style="flex-shrink:0;"></div>
-              <span id="quota-toggle-label" style="font-size:13px;color:#707070;">Off</span>
-              <div class="status-badge sb-disabled" id="quota-status-badge">Disabled</div>
-            </div>
-            <button class="btn btn-outline btn-sm" style="width:100%;justify-content:center;" onclick="switchView('billing')">Full Settings ›</button>
           </div>
         </div>
 
@@ -1222,11 +1192,9 @@ function switchView(view) {
 
 function syncQuotaBadge() {
   var qtog = document.getElementById('quota-ar-toggle');
-  var qlbl = document.getElementById('quota-toggle-label');
   var qbdg = document.getElementById('quota-status-badge');
   if (arOn) {
     qtog.classList.add('on');
-    qlbl.textContent = 'On';
     if (currentState === 'suspended') {
       qbdg.className = 'status-badge sb-suspended'; qbdg.textContent = 'Suspended';
     } else if (currentState === 'cap-reached') {
@@ -1236,7 +1204,6 @@ function syncQuotaBadge() {
     }
   } else {
     qtog.classList.remove('on');
-    qlbl.textContent = 'Off';
     qbdg.className = 'status-badge sb-disabled'; qbdg.textContent = 'Disabled';
   }
 }
