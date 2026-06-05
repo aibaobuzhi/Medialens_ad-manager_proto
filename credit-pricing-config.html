@@ -150,7 +150,7 @@
     <div>
       <div class="markup-label">Markup Rate · 加价率</div>
       <div class="markup-number">
-        <span class="big" id="markupDisplay">50</span>
+        <span class="big" id="markupDisplay">100</span>
         <span class="pct">%</span>
       </div>
     </div>
@@ -158,10 +158,10 @@
       <div class="slider-ticks">
         <span>0%</span><span>200%</span><span>400%</span><span>600%</span><span>800%</span><span>1000%</span>
       </div>
-      <input type="range" id="markupSlider" min="0" max="1000" value="50" step="1">
+      <input type="range" id="markupSlider" min="0" max="1000" value="100" step="1">
       <div style="display:flex;align-items:center;gap:6px;margin-top:8px;">
         <span style="font-size:11px;color:#707070;">Direct input · 直接输入：</span>
-        <input type="number" id="markupInput" min="0" max="1000" value="50" step="1"
+        <input type="number" id="markupInput" min="0" max="1000" value="100" step="1"
           style="width:72px;padding:4px 8px;border:1px solid #D9E3E6;border-radius:6px;font-size:13px;font-weight:600;color:#0A1F2C;text-align:center;"
           oninput="onMarkupInput()">
         <span style="font-size:12px;color:#707070;">%</span>
@@ -178,7 +178,7 @@
         </div>
       </div>
       <div class="formula-expr">
-        credits = adj_cost × (1 + <span class="hi" id="markupFormula">0.50</span>) ÷ <span class="cv" id="formulaCreditVal">$0.01</span>
+        credits = adj_cost × (1 + <span class="hi" id="markupFormula">1.00</span>) ÷ <span class="cv" id="formulaCreditVal">$0.01</span>
       </div>
       <div class="formula-note" id="formulaNote">all rows: per 1M tokens &nbsp;·&nbsp; prices via official vendor docs or b.ai</div>
     </div>
@@ -524,8 +524,8 @@ const models = [
 // ═══════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════
-let savedRate    = 50;
-let currentRate  = 50;
+let savedRate    = 100;
+let currentRate  = 100;
 let currentIdx   = 0;
 let editingRowIdx = null;
 let creditValue  = 0.01;   // USD per credit — 1 credit = $0.01
