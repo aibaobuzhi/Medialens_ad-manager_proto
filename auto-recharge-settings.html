@@ -366,6 +366,66 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
 /* ── Disabled overlay for settings ── */
 .settings-disabled{opacity:0.45;pointer-events:none;}
 
+/* ── Settings sections ── */
+.setting-section{padding:20px 0;border-top:1px solid #E8EEF0;}
+.setting-section:first-child{border-top:none;padding-top:16px;}
+.ss-title{font-size:14px;font-weight:600;color:#102532;margin-bottom:4px;}
+.ss-desc{font-size:13px;color:#828282;margin-bottom:14px;line-height:1.6;}
+
+/* ── Trigger pills ── */
+.trigger-pills{display:flex;gap:8px;margin-bottom:14px;}
+.trigger-pill{
+  padding:7px 18px;border-radius:999px;
+  font-size:13px;font-weight:500;cursor:pointer;
+  border:1.5px solid #D9E3E6;background:#fff;color:#707070;
+  transition:all .15s;
+}
+.trigger-pill.selected{background:#23A9F6;border-color:#23A9F6;color:#fff;}
+.trigger-pill:hover:not(.selected){border-color:#23A9F6;color:#23A9F6;}
+
+/* ── Trigger option descriptions ── */
+.trigger-opts{display:flex;flex-direction:column;gap:8px;}
+.trigger-opt{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:12px 14px;border-radius:8px;border:1.5px solid #E8EEF0;
+  transition:border-color .15s;
+}
+.trigger-opt.selected{border-color:#23A9F6;background:#F0F9FF;}
+.to-label{font-size:13px;font-weight:600;color:#102532;margin-bottom:2px;}
+.to-desc{font-size:12px;color:#828282;}
+.to-check{
+  width:18px;height:18px;border-radius:50%;
+  border:2px solid #D9E3E6;flex-shrink:0;margin-top:1px;
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color .15s;
+}
+.trigger-opt.selected .to-check{border-color:#23A9F6;background:#23A9F6;}
+.to-check-dot{width:7px;height:7px;border-radius:50%;background:#fff;display:none;}
+.trigger-opt.selected .to-check-dot{display:block;}
+
+/* ── Refill amount display ── */
+.refill-amount-box{
+  display:inline-flex;align-items:center;gap:12px;
+  background:#F7F7F7;border:1px solid #E8EEF0;border-radius:8px;
+  padding:12px 16px;margin-bottom:10px;
+}
+.ra-badge{
+  background:#102532;color:#fff;font-size:11px;font-weight:600;
+  padding:3px 10px;border-radius:20px;letter-spacing:0.2px;
+}
+
+/* ── Monthly cap options ── */
+.cap-options{display:flex;gap:10px;margin-bottom:12px;}
+.cap-option{
+  flex:1;border:1.5px solid #D9E3E6;border-radius:10px;
+  padding:14px 16px;cursor:pointer;transition:all .15s;
+  background:#fff;
+}
+.cap-option:hover:not(.selected){border-color:#23A9F6;}
+.cap-option.selected{border-color:#23A9F6;background:#F0F9FF;}
+.co-price{font-size:15px;font-weight:600;color:#102532;margin-bottom:3px;}
+.co-detail{font-size:12px;color:#828282;line-height:1.5;}
+
 /* ── Quota & Usage view ── */
 .quota-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
 .quota-card{
@@ -641,7 +701,8 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
       </div>
 
       <div class="ar-desc">
-        Automatically purchase 1 Token Pack ($250) when your balance drops below the threshold. Helps prevent unexpected service interruptions.
+        Automatically purchase 1 Token Pack ($250) when your token balance drops below the selected threshold.<br>
+        You can change or turn off Auto Refill at any time.
       </div>
 
       <!-- Post Turn-Off Banner -->
@@ -675,80 +736,93 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
 
       <!-- Settings Panel -->
       <div id="ar-settings" style="display:none;">
-        <div class="divider"></div>
         <div id="settings-form-inner">
 
-          <!-- Minimum balance -->
-          <div style="margin-bottom:20px;">
-            <div style="font-size:14px;font-weight:500;color:#102532;margin-bottom:4px;">Minimum balance</div>
-            <div style="font-size:13px;color:#828282;margin-bottom:10px;">Auto reload triggers when your credit balance goes below this amount.</div>
-            <div style="display:flex;align-items:center;border:1px solid #D9E3E6;border-radius:8px;overflow:hidden;width:200px;">
-              <input id="min-balance-input" type="number" value="5" min="1" max="50"
-                style="flex:1;height:40px;border:none;padding:0 12px;font-family:'Poppins',sans-serif;font-size:14px;color:#102532;outline:none;"
-                oninput="updateSummary()">
-              <span style="height:40px;padding:0 14px;background:#F7F7F7;border-left:1px solid #D9E3E6;display:flex;align-items:center;font-size:13px;color:#707070;font-weight:500;">%</span>
+          <!-- ① Refill trigger -->
+          <div class="setting-section">
+            <div class="ss-title">Refill trigger</div>
+            <div class="ss-desc">Choose when Auto Refill should be triggered.</div>
+            <div class="trigger-pills">
+              <div class="trigger-pill selected" id="pill-5" onclick="selectTrigger('5')">5% of quota</div>
+              <div class="trigger-pill" id="pill-10" onclick="selectTrigger('10')">10% of quota</div>
+            </div>
+            <div class="trigger-opts">
+              <div class="trigger-opt selected" id="opt-5" onclick="selectTrigger('5')">
+                <div class="to-check"><div class="to-check-dot"></div></div>
+                <div>
+                  <div class="to-label">5% of quota</div>
+                  <div class="to-desc">Triggers when your balance drops below 25,000 tokens.</div>
+                </div>
+              </div>
+              <div class="trigger-opt" id="opt-10" onclick="selectTrigger('10')">
+                <div class="to-check"><div class="to-check-dot"></div></div>
+                <div>
+                  <div class="to-label">10% of quota</div>
+                  <div class="to-desc">Triggers when your balance drops below 50,000 tokens. Recommended for uninterrupted AI analysis.</div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Target balance -->
-          <div style="margin-bottom:20px;">
-            <div style="font-size:14px;font-weight:500;color:#102532;margin-bottom:4px;">Target balance</div>
-            <div style="font-size:13px;color:#828282;margin-bottom:10px;">Auto reload brings your credit balance back up to this amount.</div>
-            <div style="display:flex;align-items:center;border:1px solid #D9E3E6;border-radius:8px;overflow:hidden;width:200px;">
-              <input id="target-balance-input" type="number" value="1000000" min="0"
-                style="flex:1;height:40px;border:none;padding:0 12px;font-family:'Poppins',sans-serif;font-size:14px;color:#102532;outline:none;"
-                oninput="updateSummary()">
-              <span style="height:40px;padding:0 14px;background:#F7F7F7;border-left:1px solid #D9E3E6;display:flex;align-items:center;font-size:13px;color:#707070;font-weight:500;">credits</span>
+          <!-- ② Refill amount -->
+          <div class="setting-section">
+            <div class="ss-title">Refill amount</div>
+            <div class="ss-desc">This is the fixed amount purchased each time Auto Refill is triggered.</div>
+            <div class="refill-amount-box">
+              <span class="ra-badge">1 Token Pack</span>
+              <span style="font-size:14px;font-weight:600;color:#102532;">$250</span>
+            </div>
+            <div style="font-size:12px;color:#828282;line-height:1.6;">
+              Adds 1,000,000 tokens per refill.<br>
+              The refill amount is fixed for now.
             </div>
           </div>
 
-          <!-- Monthly Cap -->
-          <div style="margin-bottom:20px;">
-            <div style="font-size:14px;font-weight:500;color:#102532;margin-bottom:4px;">Monthly cap</div>
-            <div style="font-size:13px;color:#828282;margin-bottom:10px;">Maximum Auto Refill spend per calendar month. Resets on the 1st of every month. Manual purchases are not counted toward this cap.</div>
-            <div style="display:flex;align-items:center;border:1px solid #D9E3E6;border-radius:8px;overflow:hidden;width:200px;">
-              <input id="monthly-cap-input" type="number" value="500" min="250" step="250"
-                style="flex:1;height:40px;border:none;padding:0 12px;font-family:'Poppins',sans-serif;font-size:14px;color:#102532;outline:none;">
-              <span style="height:40px;padding:0 14px;background:#F7F7F7;border-left:1px solid #D9E3E6;display:flex;align-items:center;font-size:13px;color:#707070;font-weight:500;">USD</span>
+          <!-- ③ Monthly cap -->
+          <div class="setting-section">
+            <div class="ss-title">Monthly Auto Refill cap</div>
+            <div class="ss-desc">Maximum Auto Refill spend per month.</div>
+            <div class="cap-options">
+              <div class="cap-option selected" id="cap-250" onclick="selectCap(250)">
+                <div class="co-price">$250 / month</div>
+                <div class="co-detail">Max 1 refill<br>1,000,000 tokens</div>
+              </div>
+              <div class="cap-option" id="cap-500" onclick="selectCap(500)">
+                <div class="co-price">$500 / month</div>
+                <div class="co-detail">Max 2 refills<br>2,000,000 tokens</div>
+              </div>
+              <div class="cap-option" id="cap-750" onclick="selectCap(750)">
+                <div class="co-price">$750 / month</div>
+                <div class="co-detail">Max 3 refills<br>3,000,000 tokens</div>
+              </div>
             </div>
-            <div style="font-size:11px;color:#AEAEAE;margin-top:6px;">Cap resets Jul 1, 2026 &nbsp;·&nbsp; Max 1 refill per day</div>
-          </div>
-
-          <!-- Calculated summary -->
-          <div id="ar-summary" style="font-size:13px;color:#102532;margin-bottom:6px;">
-            Minimum <strong>25,000 tokens (5%)</strong> will be purchased, equivalent to <strong>$250.00</strong>
-          </div>
-
-          <!-- Info line -->
-          <div style="font-size:13px;color:#828282;margin-bottom:16px;line-height:1.6;">
-            MediaLens will charge your payment method automatically when you reach your minimum balance.
-          </div>
-
-          <!-- Warning box: first-time trigger -->
-          <div id="ar-firstrun-box" style="background:#F7F7F7;border-radius:8px;padding:12px 14px;font-size:13px;color:#707070;line-height:1.6;margin-bottom:20px;">
-            Enabling Auto Refill will trigger a one-time purchase to reach your target balance. Estimated cost: <strong style="color:#102532;">$250.00</strong>.
-          </div>
-
-          <!-- Monthly usage -->
-          <div style="padding:14px 16px;background:#F7F7F7;border-radius:8px;margin-bottom:20px;">
-            <div style="font-size:11px;font-weight:600;color:#AEAEAE;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:10px;">June 2026 Usage</div>
-            <div class="usage-row">
-              <span class="usage-label">Charged this month</span>
-              <span class="usage-value" id="usage-amount">$250 of $500 cap</span>
+            <div style="font-size:12px;color:#828282;line-height:1.7;">
+              Manual purchases do not count toward this cap.<br>
+              Auto Refill will pause once this monthly cap is reached and resume next month.
             </div>
-            <div class="usage-bar-wrap">
+          </div>
+
+          <!-- ④ This month -->
+          <div class="setting-section">
+            <div class="ss-title">This month</div>
+            <div style="margin-bottom:10px;">
+              <div style="font-size:22px;font-weight:600;color:#102532;line-height:1.2;" id="usage-amount">$250 used of $500 monthly cap</div>
+            </div>
+            <div class="usage-bar-wrap" style="margin-bottom:10px;">
               <div class="usage-bar-fill" id="usage-bar" style="width:50%"></div>
             </div>
-            <div class="usage-note" id="usage-note">
-              Last refill: Jun 2, 2026 — 1 pack added &nbsp;·&nbsp;
-              <strong style="color:#52C41A;">1 more refill available this month</strong>
+            <div style="font-size:13px;color:#828282;line-height:1.8;" id="usage-note">
+              1 refill used · 1 refill remaining<br>
+              1,000,000 tokens added by Auto Refill this month<br>
+              <span style="color:#707070;">Last refill: Jun 2, 2026 · 1 Token Pack added</span><br>
+              <span style="color:#AEAEAE;">Cap resets on Jul 1, 2026</span>
             </div>
           </div>
 
-          <!-- Payment Method -->
-          <div style="border-top:1px solid #E8EEF0;padding-top:16px;">
-            <div style="font-size:14px;font-weight:500;color:#102532;margin-bottom:4px;">Payment method</div>
-            <div style="font-size:13px;color:#828282;margin-bottom:10px;">Charges will be applied to this card each time Auto Refill triggers.</div>
+          <!-- ⑤ Payment method -->
+          <div class="setting-section">
+            <div class="ss-title">Payment method</div>
+            <div class="ss-desc">Charges will be applied to this card each time Auto Refill triggers.</div>
             <div style="display:flex;align-items:center;gap:10px;">
               <div class="payment-card-display">
                 <div class="card-brand">VISA</div>
@@ -1009,18 +1083,17 @@ function setDemoState(state, btn) {
     } else if (state === 'cap-reached') {
       setBadge('cap','Cap Reached');
       inner.classList.remove('settings-disabled');
-      // Update usage bar to 100%
-      document.getElementById('usage-amount').textContent = '$500 of $500 cap';
+      document.getElementById('usage-amount').textContent = '$500 used of $500 monthly cap';
       document.getElementById('usage-bar').style.width = '100%';
       document.getElementById('usage-bar').style.background = '#FFC960';
-      document.getElementById('usage-note').innerHTML = 'Last recharge: Jun 10, 2026 &nbsp;·&nbsp; <strong style="color:#E6A817;">Monthly cap reached — resumes Jul 1</strong>';
+      document.getElementById('usage-note').innerHTML = '2 refills used · 0 refills remaining<br>2,000,000 tokens added by Auto Refill this month<br><span style="color:#707070;">Last refill: Jun 10, 2026 · 1 Token Pack added</span><br><span style="color:#E6A817;font-weight:600;">Monthly cap reached — Auto Refill resumes Jul 1, 2026</span>';
     } else {
       setBadge('active','Active');
       inner.classList.remove('settings-disabled');
-      document.getElementById('usage-amount').textContent = '$250 of $500 cap';
+      document.getElementById('usage-amount').textContent = '$250 used of $500 monthly cap';
       document.getElementById('usage-bar').style.width = '50%';
       document.getElementById('usage-bar').style.background = '#23A9F6';
-      document.getElementById('usage-note').innerHTML = 'Last recharge: Jun 2, 2026 — 1 pack added &nbsp;·&nbsp; <strong style="color:#52C41A;">1 more recharge available this month</strong>';
+      document.getElementById('usage-note').innerHTML = '1 refill used · 1 refill remaining<br>1,000,000 tokens added by Auto Refill this month<br><span style="color:#707070;">Last refill: Jun 2, 2026 · 1 Token Pack added</span><br><span style="color:#AEAEAE;">Cap resets on Jul 1, 2026</span>';
     }
   }
 }
@@ -1096,16 +1169,20 @@ function toggleAR() {
   }
 }
 
-function updateSummary() {
-  var minInput = document.getElementById('min-balance-input');
-  if (!minInput) return;
-  var pct = parseInt(minInput.value) || 5;
-  var minTokens = (500000 * pct / 100).toLocaleString();
-  var summary = document.getElementById('ar-summary');
-  if (summary) {
-    summary.innerHTML = 'Minimum <strong>' + minTokens + ' tokens (' + pct + '%)</strong> will be purchased, equivalent to <strong>$250.00</strong>';
-  }
+function selectTrigger(val) {
+  ['5','10'].forEach(function(v) {
+    document.getElementById('pill-'+v).classList.toggle('selected', v===val);
+    document.getElementById('opt-'+v).classList.toggle('selected', v===val);
+  });
 }
+
+function selectCap(val) {
+  [250,500,750].forEach(function(v) {
+    document.getElementById('cap-'+v).classList.toggle('selected', v===val);
+  });
+}
+
+function updateSummary() {} // no-op, kept for compat
 
 function reactivate() {
   currentState = 'active';
@@ -1115,7 +1192,7 @@ function reactivate() {
 }
 
 function increaseCap() {
-  document.getElementById('monthly-cap').value = '750';
+  selectCap(750);
   reactivate();
 }
 
