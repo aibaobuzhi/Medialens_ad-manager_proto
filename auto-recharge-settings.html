@@ -702,9 +702,21 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
             </div>
           </div>
 
+          <!-- Monthly Cap -->
+          <div style="margin-bottom:20px;">
+            <div style="font-size:14px;font-weight:500;color:#102532;margin-bottom:4px;">Monthly cap</div>
+            <div style="font-size:13px;color:#828282;margin-bottom:10px;">Maximum Auto Refill spend per calendar month. Resets on the 1st of every month. Manual purchases are not counted toward this cap.</div>
+            <div style="display:flex;align-items:center;border:1px solid #D9E3E6;border-radius:8px;overflow:hidden;width:200px;">
+              <input id="monthly-cap-input" type="number" value="500" min="250" step="250"
+                style="flex:1;height:40px;border:none;padding:0 12px;font-family:'Poppins',sans-serif;font-size:14px;color:#102532;outline:none;">
+              <span style="height:40px;padding:0 14px;background:#F7F7F7;border-left:1px solid #D9E3E6;display:flex;align-items:center;font-size:13px;color:#707070;font-weight:500;">USD</span>
+            </div>
+            <div style="font-size:11px;color:#AEAEAE;margin-top:6px;">Cap resets Jul 1, 2026 &nbsp;·&nbsp; Max 1 refill per day</div>
+          </div>
+
           <!-- Calculated summary -->
           <div id="ar-summary" style="font-size:13px;color:#102532;margin-bottom:6px;">
-            Minimum <strong>50,000 tokens (5%)</strong> will be purchased, equivalent to <strong>$250.00</strong>
+            Minimum <strong>25,000 tokens (5%)</strong> will be purchased, equivalent to <strong>$250.00</strong>
           </div>
 
           <!-- Info line -->
@@ -713,39 +725,12 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
           </div>
 
           <!-- Warning box: first-time trigger -->
-          <div id="ar-firstrun-box" style="background:#F7F7F7;border-radius:8px;padding:12px 14px;font-size:13px;color:#707070;line-height:1.6;margin-bottom:16px;">
+          <div id="ar-firstrun-box" style="background:#F7F7F7;border-radius:8px;padding:12px 14px;font-size:13px;color:#707070;line-height:1.6;margin-bottom:20px;">
             Enabling Auto Refill will trigger a one-time purchase to reach your target balance. Estimated cost: <strong style="color:#102532;">$250.00</strong>.
           </div>
 
-          <!-- Monthly Cap + Payment Method (secondary settings) -->
-          <div style="border-top:1px solid #E8EEF0;padding-top:16px;display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;">
-            <div style="flex:1;min-width:180px;">
-              <div style="font-size:12px;font-weight:500;color:#707070;margin-bottom:6px;">Monthly Cap</div>
-              <select class="select-input" id="monthly-cap" style="width:100%;height:36px;font-size:13px;" onchange="updateSummary()">
-                <option value="250">$250 / month — 1 pack</option>
-                <option value="500" selected>$500 / month — 2 packs</option>
-                <option value="750">$750 / month — 3 packs</option>
-                <option value="1000">$1,000 / month — 4 packs</option>
-              </select>
-              <div style="font-size:11px;color:#AEAEAE;margin-top:4px;">Resets Jul 1, 2026</div>
-            </div>
-            <div style="flex:1;min-width:180px;">
-              <div style="font-size:12px;font-weight:500;color:#707070;margin-bottom:6px;">Payment Method</div>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <div class="payment-card-display" style="padding:6px 10px;">
-                  <div class="card-brand">VISA</div>
-                  <div>
-                    <div class="card-number">**** **** **** 4242</div>
-                    <div class="card-exp">Exp 08/27</div>
-                  </div>
-                </div>
-                <button class="btn btn-secondary btn-sm" onclick="openModal()">Change</button>
-              </div>
-            </div>
-          </div>
-
           <!-- Monthly usage -->
-          <div style="margin-top:16px;padding:14px 16px;background:#F7F7F7;border-radius:8px;">
+          <div style="padding:14px 16px;background:#F7F7F7;border-radius:8px;margin-bottom:20px;">
             <div style="font-size:11px;font-weight:600;color:#AEAEAE;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:10px;">June 2026 Usage</div>
             <div class="usage-row">
               <span class="usage-label">Charged this month</span>
@@ -757,6 +742,22 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
             <div class="usage-note" id="usage-note">
               Last refill: Jun 2, 2026 — 1 pack added &nbsp;·&nbsp;
               <strong style="color:#52C41A;">1 more refill available this month</strong>
+            </div>
+          </div>
+
+          <!-- Payment Method -->
+          <div style="border-top:1px solid #E8EEF0;padding-top:16px;">
+            <div style="font-size:14px;font-weight:500;color:#102532;margin-bottom:4px;">Payment method</div>
+            <div style="font-size:13px;color:#828282;margin-bottom:10px;">Charges will be applied to this card each time Auto Refill triggers.</div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="payment-card-display">
+                <div class="card-brand">VISA</div>
+                <div>
+                  <div class="card-number">**** **** **** 4242</div>
+                  <div class="card-exp">Exp 08/27</div>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="openModal()">Change</button>
             </div>
           </div>
 
