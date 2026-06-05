@@ -537,9 +537,9 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
             </div>
             <!-- Auto Refill toggle — stop click propagation -->
             <div onclick="event.stopPropagation()" style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;margin-left:20px;">
-              <div style="font-size:11px;font-weight:600;color:#707070;">Auto Refill</div>
+              <div style="font-size:11px;font-weight:600;color:#707070;" id="quota-ar-label">Enable Auto-refill</div>
               <div style="display:flex;align-items:center;gap:8px;">
-                <div class="status-badge sb-disabled" id="quota-status-badge">Disabled</div>
+                <div class="status-badge sb-active" id="quota-status-badge" style="display:none;">Active</div>
                 <div class="toggle" id="quota-ar-toggle" onclick="toggleARFromQuota()" style="flex-shrink:0;"></div>
               </div>
             </div>
@@ -660,7 +660,7 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
       <div class="ar-header">
         <div class="ar-title-row">
           <div class="ar-title">Auto Refill</div>
-          <div class="status-badge sb-disabled" id="status-badge">Disabled</div>
+          <div class="status-badge sb-active" id="status-badge" style="display:none;">Active</div>
         </div>
         <div class="toggle-row">
           <div class="toggle" id="ar-toggle" onclick="toggleAR()"></div>
@@ -668,9 +668,15 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
         </div>
       </div>
 
-      <div class="ar-desc">
-        Automatically purchase 1 Token Pack ($250) when your token balance drops below the selected threshold.<br>
-        You can change or turn off Auto Refill at any time.
+      <!-- OFF state: compact info row (OpenAI pattern) -->
+      <div id="ar-off-state" style="margin-top:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#F7F7F7;border-radius:8px;">
+          <div>
+            <div style="font-size:14px;font-weight:600;color:#102532;margin-bottom:3px;">Auto Refill Credits</div>
+            <div style="font-size:13px;color:#828282;">Automatically add Credits when your balance drops below the selected threshold.</div>
+          </div>
+          <button class="btn btn-outline btn-sm" style="flex-shrink:0;margin-left:16px;" onclick="toggleAR()">Set up</button>
+        </div>
       </div>
 
       <!-- Post Turn-Off Banner -->
@@ -1036,7 +1042,9 @@ function setDemoState(state, btn) {
     document.getElementById('ar-settings').style.display = 'none';
     document.getElementById('no-payment-prompt').style.display = 'none';
     setBadge('disabled','Disabled');
+    setOffState(true);
   } else {
+    setOffState(false);
     arOn = true;
     refreshToggleUI();
     document.getElementById('ar-settings').style.display = 'block';
@@ -1069,6 +1077,13 @@ function setBadge(cls, label) {
   var b = document.getElementById('status-badge');
   b.className = 'status-badge sb-' + cls;
   b.textContent = label;
+  // Only show badge when not disabled
+  b.style.display = cls === 'disabled' ? 'none' : '';
+}
+
+function setOffState(isOff) {
+  var offState = document.getElementById('ar-off-state');
+  if (offState) offState.style.display = isOff ? 'block' : 'none';
 }
 
 function refreshToggleUI() {
@@ -1097,6 +1112,7 @@ function confirmTurnOff() {
   document.getElementById('ar-settings').style.display = 'none';
   document.getElementById('no-payment-prompt').style.display = 'none';
   setBadge('disabled','Disabled');
+  setOffState(false); // post-turnoff banner replaces off-state
   // Show post-turn-off guidance
   document.getElementById('post-turnoff-banner').style.display = 'block';
 }
@@ -1123,6 +1139,7 @@ function toggleAR() {
     // Turn on
     arOn = true;
     refreshToggleUI();
+    setOffState(false);
     if (!hasCard) {
       document.getElementById('no-payment-prompt').style.display = 'flex';
       setBadge('disabled','Disabled');
@@ -1215,8 +1232,11 @@ function switchView(view) {
 function syncQuotaBadge() {
   var qtog = document.getElementById('quota-ar-toggle');
   var qbdg = document.getElementById('quota-status-badge');
+  var qlbl = document.getElementById('quota-ar-label');
   if (arOn) {
     qtog.classList.add('on');
+    qbdg.style.display = '';
+    if (qlbl) qlbl.textContent = 'Auto-refill';
     if (currentState === 'suspended') {
       qbdg.className = 'status-badge sb-suspended'; qbdg.textContent = 'Suspended';
     } else if (currentState === 'cap-reached') {
@@ -1226,7 +1246,8 @@ function syncQuotaBadge() {
     }
   } else {
     qtog.classList.remove('on');
-    qbdg.className = 'status-badge sb-disabled'; qbdg.textContent = 'Disabled';
+    qbdg.style.display = 'none';
+    if (qlbl) qlbl.textContent = 'Enable Auto-refill';
   }
 }
 
