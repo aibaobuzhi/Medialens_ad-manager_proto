@@ -542,74 +542,74 @@
           <tr>
             <td>2</td>
             <td><strong>Country: HK + MO</strong></td>
-            <td><span class="gap">⚠ 需補充</span></td>
-            <td>現有服務無 country 過濾。需在 $match 加 <code>countries: { $in: ['HK', 'MO'] }</code></td>
+            <td><span class="ok">✅ 已實作</span></td>
+            <td><code>countries: { $in: ['HK', 'MO'] }</code> 已加入 $match。MO 幣別視同 HKD（adsCurrencyExpr 現有邏輯）</td>
           </tr>
           <tr>
             <td>3</td>
             <td><strong>Ad type: paid + branded</strong></td>
-            <td><span class="gap">⚠ 需補充</span></td>
-            <td>現有服務無 adType 過濾。需加 <code>adType: { $in: ['paid_post', 'branded_content'] }</code></td>
+            <td><span class="ok">✅ 已實作</span></td>
+            <td><code>adType: { $in: ['paid_post', 'branded_content'] }</code> 已加入 $match，排除 official_post</td>
           </tr>
           <tr>
             <td>4</td>
-            <td><strong>By advertiser category (content)</strong><br><small>（原 product category，已更改）</small></td>
-            <td><span class="ask">❓待確認</span></td>
-            <td>廣告主 model 無直接 category 欄位。暫定方案：聚合 <code>fbPost.category</code> 取最高頻內容分類。<strong>請確認定義。</strong></td>
+            <td><strong>By advertiser category (content)</strong></td>
+            <td><span class="ok">✅ 已確認</span></td>
+            <td>使用 <code>advertisers.productCategory.name</code>（與 Ad Intelligence Categories 頁同源，<code>categories.js</code> line 42 確認）。人工標記的固定類別，非 AI 逐貼文分類。<code>.populate('productCategory', 'name')</code></td>
           </tr>
           <tr>
             <td>5</td>
             <td><strong>Ad spending &gt; 0 advertiser list</strong></td>
             <td><span class="ok">✅ 已實作</span></td>
-            <td><code>spending: { $gt: 0 }</code> 已在 $match 中，加上 MIN_SPENDING_THRESHOLD 二次過濾</td>
+            <td><code>spending: { $gt: 0 }</code> 已在 $match 中，加上 <code>MIN_SPENDING_THRESHOLD = 50000</code> 二次過濾</td>
           </tr>
           <tr>
             <td>6</td>
             <td><strong>月環比增長 ≥ 30%</strong></td>
             <td><span class="ok">✅ 已實作</span></td>
-            <td><code>GROWTH_THRESHOLD = 0.30</code>，prevSpend = 0 者排除</td>
+            <td><code>GROWTH_THRESHOLD = 0.30</code>，prevSpend = 0 者排除（新廣告主無基準）</td>
           </tr>
           <tr>
             <td>7.1</td>
-            <td><strong>Advertiser name [link to advertiser page]</strong></td>
-            <td><span class="ask">❓待確認</span></td>
-            <td>代碼中有 FB page link (<code>fb.com/{pageId}</code>) 及 website (<code>advertisers.websites[0]</code>) 兩個候選。<strong>請確認。</strong></td>
+            <td><strong>External link — 已移除</strong></td>
+            <td><span class="removed">已移除</span></td>
+            <td>確認不需要官方帳號連結（Facebook 頁或網站），從 Email 和 Excel 均移除</td>
           </tr>
           <tr>
             <td>7.2</td>
-            <td><strong>Advertiser content category</strong></td>
-            <td><span class="ask">❓待確認</span></td>
-            <td>同第 4 項，等待確認 category 定義</td>
+            <td><strong>Advertiser category (content)</strong></td>
+            <td><span class="ok">✅ 已確認</span></td>
+            <td>同第 4 項。Email 顯示為藍色 tag，Excel D 欄 <code>advertisers.productCategory.name</code></td>
           </tr>
           <tr>
             <td>7.3</td>
             <td><strong>Advertiser name [link to MediaLens page]</strong></td>
             <td><span class="ok">✅ 已實作</span></td>
-            <td>Email + Excel B 欄均已超連結至 <code>app.medialens.io/organization/{orgId}/advertiser/{id}</code></td>
+            <td>Email + Excel B 欄均超連結至 <code>app.medialens.io/organization/{orgId}/advertiser/{id}</code>。廣告主名稱取 <code>advertisers.name</code>（優先 <code>regionalInfo.HK.name</code>），與 Advertisers 頁同源</td>
           </tr>
           <tr>
             <td>7.4</td>
             <td><strong>Advertiser group</strong></td>
-            <td><span class="gap">⚠ 需補充</span></td>
-            <td>現有服務不含 group 欄位。需 <code>.populate('group','name')</code></td>
+            <td><span class="ok">✅ 已實作</span></td>
+            <td><code>.populate('group', 'name')</code> 已加入，回傳 <code>groupName</code>。Excel C 欄顯示，Email 不顯示（避免過於擁擠）</td>
           </tr>
           <tr>
             <td>7.5/7.6</td>
             <td><strong>Ad values this/last month</strong></td>
             <td><span class="ok">✅ 已實作</span></td>
-            <td><code>lastMonthSpending / prevMonthSpending</code> 均已計算並回傳</td>
+            <td><code>lastMonthSpending / prevMonthSpending</code> 均已計算並回傳，FB + IG 合計</td>
           </tr>
           <tr>
             <td>7.7</td>
             <td><strong>Growth rate</strong></td>
             <td><span class="ok">✅ 已實作</span></td>
-            <td><code>growthRate</code> 已計算</td>
+            <td><code>growthRate = (lastSpend - prevSpend) / prevSpend</code>，Email 顯示 badge，Excel K 欄格式 <code>0.0"%"</code></td>
           </tr>
           <tr>
             <td>7.8</td>
             <td><strong>Campaign [link] — 已移除</strong></td>
             <td><span class="removed">已移除</span></td>
-            <td>依最新指示，Campaign 字段及連結從報告中完全移除</td>
+            <td>Campaign 字段及連結從報告中完全移除（campaigns 以 modal 形式開啟，無獨立 URL）</td>
           </tr>
           <tr>
             <td>排序</td>
@@ -626,70 +626,55 @@
         </tbody>
       </table>
 
-      <div class="lh">需補充的查詢邏輯</div>
+      <div class="lh">已實作的完整查詢邏輯</div>
       <div class="code-block">
-        <pre><span style="color:#C678DD;">// monthlySpendingGrowthReport.js — $match 需更新</span>
-<span style="color:#61AFEF;">const</span> matchQuery = {
-  [dateField]: { <span style="color:#E06C75;">$gte</span>: start, <span style="color:#E06C75;">$lte</span>: end },
-  advertisers:  { <span style="color:#E06C75;">$exists</span>: <span style="color:#D19A66;">true</span>, <span style="color:#E06C75;">$not</span>: { <span style="color:#E06C75;">$size</span>: <span style="color:#D19A66;">0</span> } },
-  spending:     { <span style="color:#E06C75;">$exists</span>: <span style="color:#D19A66;">true</span>, <span style="color:#E06C75;">$gt</span>: <span style="color:#D19A66;">0</span> },
-  countries:    { <span style="color:#E06C75;">$in</span>: [<span style="color:#98C379;">'HK'</span>, <span style="color:#98C379;">'MO'</span>] },              <span style="color:#C678DD;">// ⚠ 新增</span>
-  adType:       { <span style="color:#E06C75;">$in</span>: [<span style="color:#98C379;">'paid_post'</span>, <span style="color:#98C379;">'branded_content'</span>] }, <span style="color:#C678DD;">// ⚠ 新增</span>
-};
-
-<span style="color:#C678DD;">// getSpendingGrowthAdvertisers() — Advertisers.find() 需更新</span>
-<span style="color:#61AFEF;">const</span> advertiserDocs = <span style="color:#61AFEF;">await</span> Advertisers
-  .<span style="color:#E5C07B;">find</span>({ _id: { <span style="color:#E06C75;">$in</span>: advIds } })
-  .<span style="color:#E5C07B;">select</span>(<span style="color:#98C379;">'name fullname logo group facebooks websites'</span>)
-  .<span style="color:#E5C07B;">populate</span>(<span style="color:#98C379;">'group'</span>, <span style="color:#98C379;">'name'</span>)   <span style="color:#C678DD;">// ⚠ 新增：集團名稱</span>
-  .<span style="color:#E5C07B;">lean</span>();
-
-<span style="color:#C678DD;">// 回傳物件補充 groupName + fbPageUrl（其中一個待確認）</span>
-<span style="color:#61AFEF;">return</span> growthList.<span style="color:#E5C07B;">map</span>(item => {
-  <span style="color:#61AFEF;">const</span> meta = advMetaMap[item.advertiserId];
-  <span style="color:#61AFEF;">const</span> fbPageId = meta?.facebooks?.[<span style="color:#D19A66;">0</span>]?.id;
-  <span style="color:#61AFEF;">return</span> {
-    ...item,
-    name:       meta?.fullname || meta?.name || <span style="color:#98C379;">'Unknown'</span>,
-    logo:       meta?.logo || <span style="color:#D19A66;">null</span>,
-    groupName:  meta?.group?.name || <span style="color:#98C379;">''</span>,             <span style="color:#C678DD;">// ⚠ 新增</span>
-    fbPageUrl:  fbPageId ? <span style="color:#98C379;">`https://www.facebook.com/${fbPageId}`</span> : <span style="color:#98C379;">''</span>, <span style="color:#C678DD;">// ⚠ 待確認</span>
-    websiteUrl: meta?.websites?.[<span style="color:#D19A66;">0</span>] || <span style="color:#98C379;">''</span>,          <span style="color:#C678DD;">// ⚠ 待確認</span>
-  };
-}).<span style="color:#E5C07B;">sort</span>((a, b) => b.growthRate - a.growthRate); <span style="color:#C678DD;">// 按增長率排序</span></pre>
-      </div>
-
-      <div class="lh">Advertiser Category (Content) 補充查詢方案</div>
-      <div class="ibox">
-        <h4>暫定實作方案（待你確認定義後執行）</h4>
-        <p>
-          廣告主 model 上沒有直接 category 欄位。最可行的方案是：<br>
-          在 <code>getSpendingGrowthAdvertisers()</code> 中，額外對上月的 paid + branded 貼文按廣告主聚合 <code>category</code> 欄位，取各廣告主出現最多次的 category 值。
-        </p>
-      </div>
-      <div class="code-block">
-        <pre><span style="color:#C678DD;">// 新增輔助查詢：按廣告主取 top 1 content category</span>
-<span style="color:#61AFEF;">const</span> getTopCategoryPerAdvertiser = <span style="color:#61AFEF;">async</span> (start, end) => {
-  <span style="color:#61AFEF;">const</span> baseMatch = {
-    createdAt: { <span style="color:#E06C75;">$gte</span>: start, <span style="color:#E06C75;">$lte</span>: end },
-    countries:  { <span style="color:#E06C75;">$in</span>: [<span style="color:#98C379;">'HK'</span>, <span style="color:#98C379;">'MO'</span>] },
-    adType:     { <span style="color:#E06C75;">$in</span>: [<span style="color:#98C379;">'paid_post'</span>, <span style="color:#98C379;">'branded_content'</span>] },
-    category:   { <span style="color:#E06C75;">$exists</span>: <span style="color:#D19A66;">true</span>, <span style="color:#E06C75;">$ne</span>: <span style="color:#D19A66;">null</span> },
-    advertisers: { <span style="color:#E06C75;">$exists</span>: <span style="color:#D19A66;">true</span>, <span style="color:#E06C75;">$not</span>: { <span style="color:#E06C75;">$size</span>: <span style="color:#D19A66;">0</span> } },
-  };
-  <span style="color:#61AFEF;">const</span> rows = <span style="color:#61AFEF;">await</span> FbPost.<span style="color:#E5C07B;">aggregate</span>([
-    { <span style="color:#E06C75;">$match</span>: baseMatch },
+        <pre><span style="color:#C678DD;">// services/monthlySpendingGrowthReport.js — 最終 $match（已實作）</span>
+<span style="color:#61AFEF;">const</span> aggregateSpending = (Model, dateField, start, end) =>
+  Model.<span style="color:#E5C07B;">aggregate</span>([
+    { <span style="color:#E06C75;">$match</span>: {
+        [dateField]: { <span style="color:#E06C75;">$gte</span>: start, <span style="color:#E06C75;">$lte</span>: end },
+        advertisers: { <span style="color:#E06C75;">$exists</span>: <span style="color:#D19A66;">true</span>, <span style="color:#E06C75;">$not</span>: { <span style="color:#E06C75;">$size</span>: <span style="color:#D19A66;">0</span> } },
+        spending:    { <span style="color:#E06C75;">$exists</span>: <span style="color:#D19A66;">true</span>, <span style="color:#E06C75;">$gt</span>: <span style="color:#D19A66;">0</span> },
+        countries:   { <span style="color:#E06C75;">$in</span>: [<span style="color:#98C379;">'HK'</span>, <span style="color:#98C379;">'MO'</span>] },
+        adType:      { <span style="color:#E06C75;">$in</span>: [<span style="color:#98C379;">'paid_post'</span>, <span style="color:#98C379;">'branded_content'</span>] },
+    }},
     { <span style="color:#E06C75;">$unwind</span>: <span style="color:#98C379;">'$advertisers'</span> },
-    { <span style="color:#E06C75;">$unwind</span>: <span style="color:#98C379;">'$category'</span> },
-    { <span style="color:#E06C75;">$group</span>: { _id: { adv: <span style="color:#98C379;">'$advertisers'</span>, cat: <span style="color:#98C379;">'$category'</span> }, count: { <span style="color:#E06C75;">$sum</span>: <span style="color:#D19A66;">1</span> } } },
-    { <span style="color:#E06C75;">$sort</span>: { count: <span style="color:#D19A66;">-1</span> } },
-    { <span style="color:#E06C75;">$group</span>: { _id: <span style="color:#98C379;">'$_id.adv'</span>, topCategory: { <span style="color:#E06C75;">$first</span>: <span style="color:#98C379;">'$_id.cat'</span> } } },
+    { <span style="color:#E06C75;">$group</span>: { _id: <span style="color:#98C379;">'$advertisers'</span>, spending: { <span style="color:#E06C75;">$sum</span>: <span style="color:#98C379;">'$spending'</span> } } },
   ]).<span style="color:#E5C07B;">allowDiskUse</span>(<span style="color:#D19A66;">true</span>);
 
-  <span style="color:#61AFEF;">const</span> map = {};
-  rows.<span style="color:#E5C07B;">forEach</span>(r => { map[r._id.<span style="color:#E5C07B;">toString</span>()] = r.topCategory; });
-  <span style="color:#61AFEF;">return</span> map; <span style="color:#C678DD;">// { advertiserId: 'Beauty', ... }</span>
-};</pre>
+<span style="color:#C678DD;">// Advertisers.find() — 最終版（已實作）</span>
+<span style="color:#61AFEF;">const</span> advertiserDocs = <span style="color:#61AFEF;">await</span> Advertisers
+  .<span style="color:#E5C07B;">find</span>({ _id: { <span style="color:#E06C75;">$in</span>: advIds } })
+  .<span style="color:#E5C07B;">select</span>(<span style="color:#98C379;">'name fullname logo group productCategory regionalInfo'</span>)
+  .<span style="color:#E5C07B;">populate</span>(<span style="color:#98C379;">'group'</span>, <span style="color:#98C379;">'name'</span>)
+  .<span style="color:#E5C07B;">populate</span>(<span style="color:#98C379;">'productCategory'</span>, <span style="color:#98C379;">'name'</span>)
+  .<span style="color:#E5C07B;">lean</span>();
+
+<span style="color:#C678DD;">// 回傳物件（已實作）</span>
+<span style="color:#61AFEF;">return</span> growthList.<span style="color:#E5C07B;">map</span>(item => {
+  <span style="color:#61AFEF;">const</span> meta = advMetaMap[item.advertiserId] || {};
+  <span style="color:#C678DD;">// HK regional override — matches buildAdvertiserObjects() in adsAdvertiserAggregate.js</span>
+  <span style="color:#61AFEF;">const</span> regional = meta.regionalInfo?.HK || {};
+  <span style="color:#61AFEF;">return</span> {
+    ...item,
+    name:         regional.name || meta.name || meta.fullname || <span style="color:#98C379;">'Unknown'</span>,
+    logo:         regional.logo || meta.logo || <span style="color:#D19A66;">null</span>,
+    groupName:    meta.group?.name || <span style="color:#D19A66;">null</span>,
+    categoryName: meta.productCategory?.name || <span style="color:#D19A66;">null</span>,
+    lastMonthLabel,
+    prevMonthLabel,
+  };
+});</pre>
+      </div>
+
+      <div class="lh">Email 輸出格式（已更新）</div>
+      <div class="ibox">
+        <h4>Subject: <code>[MediaLens] Sales Signal — Ad Spend Growth Alert | May 2025 (15 advertisers)</code></h4>
+        <p style="margin-top:8px;">
+          Email 語言：<strong>全英文</strong>（Sales Signal 定位）<br>
+          Email 每行顯示：廣告主名稱（超連結）+ Category tag，不顯示 Group（Group 在 Excel C 欄）<br>
+          Email 上限：Top 20 · Excel 導出全部達標廣告主（12 欄 A–L）
+        </p>
       </div>
 
     </div>
