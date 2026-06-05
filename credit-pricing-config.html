@@ -166,12 +166,12 @@
         <div class="credit-val-row">
           1 Credit =
           <span style="color:#0A1F2C; font-weight:600; font-size:11px;">$</span>
-          <input type="text" id="creditValueInput" class="credit-val-input" value="0.000001" onchange="updateCreditValue()" onblur="updateCreditValue()">
+          <input type="text" id="creditValueInput" class="credit-val-input" value="0.01" onchange="updateCreditValue()" onblur="updateCreditValue()">
           <span style="color:#CACACA; font-size:11px;">USD</span>
         </div>
       </div>
       <div class="formula-expr">
-        credits = adj_cost × (1 + <span class="hi" id="markupFormula">0.50</span>) ÷ <span class="cv" id="formulaCreditVal">$0.000001</span>
+        credits = adj_cost × (1 + <span class="hi" id="markupFormula">0.50</span>) ÷ <span class="cv" id="formulaCreditVal">$0.01</span>
       </div>
       <div class="formula-note" id="formulaNote">token rows: per 1M tokens &nbsp;·&nbsp; tool_use: per call &nbsp;·&nbsp; all prices via b.ai docs</div>
     </div>
@@ -226,9 +226,9 @@
       </div>
       <div class="stat">
         <div class="lbl">1 Credit =</div>
-        <div class="val" id="statCreditVal">$0.000001</div>
+        <div class="val" id="statCreditVal">$0.01</div>
         <div class="sub">configurable above</div>
-        <div class="sub" id="statUsdToCredit">1 USD = 1,000,000 Credits</div>
+        <div class="sub" id="statUsdToCredit">1 USD = 100 Credits</div>
       </div>
       <div class="stat">
         <div class="lbl">Total Row Count</div>
@@ -523,7 +523,7 @@ let savedRate    = 50;
 let currentRate  = 50;
 let currentIdx   = 0;
 let editingRowIdx = null;
-let creditValue  = 0.000001;   // USD per credit — configurable
+let creditValue  = 0.01;   // USD per credit — 1 credit = $0.01
 
 // ═══════════════════════════════════════════════════════════════
 // CREDIT VALUE
