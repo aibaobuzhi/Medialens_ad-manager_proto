@@ -254,7 +254,6 @@
         <select class="form-input" id="inputDirection">
           <option value="input">Input</option>
           <option value="output">Output</option>
-          <option value="tool">Tool</option>
         </select>
       </div>
       <div class="form-group">
@@ -262,7 +261,6 @@
         <select class="form-input" id="inputTokenType" onchange="syncDirFromType()">
           <option value="input_tokens">input_tokens</option>
           <option value="output_tokens">output_tokens</option>
-          <option value="tool_use">tool_use (search)</option>
         </select>
       </div>
     </div>
@@ -627,39 +625,44 @@ function renderOverview() {
   const body = document.getElementById('paramsBody');
 
   head.innerHTML = `<tr>
-    <th style="width:150px">Model</th>
-    <th style="width:90px">Direction</th>
-    <th style="width:150px">Token Type</th>
-    <th class="right" style="width:180px">Vendor Cost /1M Tokens <span style="font-weight:400;text-transform:none;color:#CACACA">(internal)</span></th>
-    <th class="right col-adj-header" style="width:180px">Adjusted Vendor Cost /1M Tokens<span class="internal-tag">markup 计算基准</span></th>
-    <th class="right" style="width:120px">Credits</th>
-    <th class="right" style="width:110px">Credit/Token</th>
-    <th class="right" style="width:110px">Token/Credit</th>
+    <th style="width:140px">Model</th>
+    <th style="width:80px">Direction</th>
+    <th style="width:130px">Token Type</th>
+    <th class="right" style="width:160px">Vendor Cost /1M Tokens <span style="font-weight:400;text-transform:none;color:#CACACA">(internal)</span></th>
+    <th class="right col-adj-header" style="width:160px">Adjusted Cost /1M Tokens<span class="internal-tag">markup 计算基准</span></th>
+    <th class="right" style="width:100px">Credits /1M</th>
+    <th class="right" style="width:130px">Micro-Credits /1M</th>
+    <th class="right" style="width:120px">Micro-Credit/Token</th>
+    <th class="right" style="width:120px">Token/Micro-Credit</th>
   </tr>`;
 
   let html = '';
   let totalRows = 0;
   models.forEach(m => {
     const vs = VENDOR_STYLE[m.vendor] || { bg:'#F7F7F7', color:'#707070', border:'#D9E3E6' };
-    m.rows.forEach((r, ri) => {
-      const c        = calcCredits(r.adjCost, currentRate);
-      const ctVal    = r.isPerCall ? null : fmtCT(c / 1e6);
-      const tcVal    = r.isPerCall ? null : fmtCT(1e6 / c);
+    let firstVisible = true;
+    m.rows.forEach((r) => {
+      if (r.isPerCall) return; // skip tool/per-call rows
+      const c     = calcCredits(r.adjCost, currentRate);
+      const micro = calcMicro(c);
+      const mct   = c;                  // micro-credits per token = credits per 1M (numerically equal)
+      const tmc   = fmtTMC(1e6 / micro); // tokens per micro-credit
       const srcBadge = r.src ? `<span class="src-badge">${r.src}</span>` : '';
-      const perCallBadge = r.isPerCall ? `<span class="per-call-badge">per call</span>` : '';
-      const topBorder = ri === 0 ? 'border-top:2px solid #E8EEF0;' : '';
-      const modelCell = ri === 0
+      const topBorder = firstVisible ? 'border-top:2px solid #E8EEF0;' : '';
+      const modelCell = firstVisible
         ? `<span style="background:${vs.bg};color:${vs.color};border:1px solid ${vs.border};padding:2px 10px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap">${m.name}</span>`
         : '';
+      firstVisible = false;
       html += `<tr style="${topBorder}">
         <td style="font-size:12px">${modelCell}</td>
         <td><span class="dir-badge ${r.dir}">${r.dir.toUpperCase()}</span></td>
-        <td><strong>${r.type}</strong>${perCallBadge}</td>
+        <td><strong>${r.type}</strong></td>
         <td class="col-vendor">$${r.vendorCost.toFixed(4)}${srcBadge}</td>
         <td class="col-adj">$${r.adjCost.toFixed(4)}</td>
-        <td class="col-credits">${fmtC(c)}${r.isPerCall ? '<small>/ call</small>' : ''}</td>
-        <td class="col-credit-token">${ctVal ? ctVal : '<span style="color:#CACACA">—</span>'}</td>
-        <td class="col-credit-token">${tcVal ? tcVal : '<span style="color:#CACACA">—</span>'}</td>
+        <td class="col-credits">${fmtC(c)}</td>
+        <td class="col-credit-token" style="color:#7B5EF8">${fmtC(micro)}</td>
+        <td class="col-credit-token" style="color:#7B5EF8">${mct.toLocaleString()}</td>
+        <td class="col-credit-token" style="color:#7B5EF8">${tmc}</td>
       </tr>`;
       totalRows++;
     });
@@ -675,14 +678,21 @@ function renderOverview() {
 function calcCredits(adjCost, rate) {
   return Math.round(adjCost * (1 + rate / 100) / creditValue);
 }
+// micro-credits per 1M tokens = credits × 1,000,000
+function calcMicro(credits) { return credits * 1_000_000; }
 function fmtC(n) {
   if (n >= 1e6) return (n / 1e6).toFixed(2).replace(/\.?0+$/, '') + 'M';
   if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
   return n.toLocaleString();
 }
 function fmtCT(n) {
-  // credits per single token = credits/1M ÷ 1,000,000
   if (n >= 1)    return n.toFixed(3).replace(/\.?0+$/, '');
+  if (n >= 0.01) return n.toFixed(4).replace(/\.?0+$/, '');
+  return n.toExponential(2);
+}
+// micro-credit/token = micro-credits per 1M ÷ 1M = credits/1M (integer)
+// token/micro-credit = 1M ÷ micro-credits per 1M = 1/credits (small decimal)
+function fmtTMC(n) {
   if (n >= 0.01) return n.toFixed(4).replace(/\.?0+$/, '');
   return n.toExponential(2);
 }
@@ -697,51 +707,57 @@ function renderTable() {
 
   const vs = VENDOR_STYLE[m.vendor] || { bg:'#F7F7F7', color:'#707070', border:'#D9E3E6' };
   head.innerHTML = `<tr>
-    <th style="width:150px">Model</th>
-    <th style="width:90px">Direction</th>
-    <th style="width:150px">Token Type</th>
-    <th class="right" style="width:190px">Vendor Cost /1M Tokens <span style="font-weight:400;text-transform:none;color:#CACACA">(internal)</span></th>
-    <th class="right col-adj-header" style="width:190px">Adjusted Vendor Cost /1M Tokens<span class="internal-tag">markup 计算基准</span></th>
-    <th class="right" style="width:120px">Credits</th>
-    <th class="right" style="width:110px">Credit/Token</th>
-    <th class="right" style="width:110px">Token/Credit</th>
+    <th style="width:140px">Model</th>
+    <th style="width:80px">Direction</th>
+    <th style="width:130px">Token Type</th>
+    <th class="right" style="width:160px">Vendor Cost /1M Tokens <span style="font-weight:400;text-transform:none;color:#CACACA">(internal)</span></th>
+    <th class="right col-adj-header" style="width:160px">Adjusted Cost /1M Tokens<span class="internal-tag">markup 计算基准</span></th>
+    <th class="right" style="width:100px">Credits /1M</th>
+    <th class="right" style="width:130px">Micro-Credits /1M</th>
+    <th class="right" style="width:120px">Micro-Credit/Token</th>
+    <th class="right" style="width:120px">Token/Micro-Credit</th>
     <th class="right" style="width:72px">Actions</th>
   </tr>`;
 
   const modelBadge = `<span style="background:${vs.bg};color:${vs.color};border:1px solid ${vs.border};padding:2px 10px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap">${m.name}</span>`;
 
   let html = '';
+  let firstVisible = true;
   m.rows.forEach((r, i) => {
-    const c  = calcCredits(r.adjCost, currentRate);
-    const sc = calcCredits(r.adjCost, savedRate);
+    if (r.isPerCall) return; // skip tool/per-call rows
+    const c     = calcCredits(r.adjCost, currentRate);
+    const sc    = calcCredits(r.adjCost, savedRate);
+    const micro = calcMicro(c);
     const changed  = c !== sc;
     const adjusted = r.adjCost !== r.vendorCost;
     const adjNote  = adjusted ? `<span class="adj-note">↑ floor</span>` : `<span class="adj-same">= vendor</span>`;
     const srcBadge = r.src ? `<span class="src-badge">${r.src}</span>` : '';
-    const perCallBadge = r.isPerCall ? `<span class="per-call-badge">per call</span>` : '';
-    const unit = r.isPerCall ? '/ call' : '/ 1M tokens';
-    const ctVal  = r.isPerCall ? '-' : fmtCT(c / 1e6);
-    const tcVal  = r.isPerCall ? '-' : fmtCT(1e6 / c);
+    const mct   = c;                    // micro-credits per token
+    const tmc   = fmtTMC(1e6 / micro); // tokens per micro-credit
     html += `<tr>
-      <td style="font-size:12px">${i === 0 ? modelBadge : ''}</td>
+      <td style="font-size:12px">${firstVisible ? modelBadge : ''}</td>
       <td><span class="dir-badge ${r.dir}">${r.dir.toUpperCase()}</span></td>
-      <td><strong>${r.type}</strong>${perCallBadge}</td>
+      <td><strong>${r.type}</strong></td>
       <td class="col-vendor">$${r.vendorCost.toFixed(4)}${srcBadge}</td>
       <td class="col-adj">$${r.adjCost.toFixed(4)} ${adjNote}</td>
       <td class="col-credits ${changed ? 'preview-changed' : ''}" title="${changed ? 'saved: ' + fmtC(sc) : ''}">
-        ${fmtC(c)}${r.isPerCall ? `<small>${unit}</small>` : ''}
+        ${fmtC(c)}
       </td>
-      <td class="col-credit-token ${changed ? 'preview-changed' : ''}">
-        ${ctVal === '-' ? '<span style="color:#CACACA">—</span>' : ctVal}
+      <td class="col-credit-token ${changed ? 'preview-changed' : ''}" style="color:#7B5EF8">
+        ${fmtC(micro)}
       </td>
-      <td class="col-credit-token ${changed ? 'preview-changed' : ''}">
-        ${tcVal === '-' ? '<span style="color:#CACACA">—</span>' : tcVal}
+      <td class="col-credit-token ${changed ? 'preview-changed' : ''}" style="color:#7B5EF8">
+        ${mct.toLocaleString()}
+      </td>
+      <td class="col-credit-token ${changed ? 'preview-changed' : ''}" style="color:#7B5EF8">
+        ${tmc}
       </td>
       <td class="col-actions">
         <button class="icon-btn" onclick="openEditModal(${i})">✎</button>
         <button class="icon-btn danger" onclick="deleteRow(${i})">⌫</button>
       </td>
     </tr>`;
+    firstVisible = false;
   });
   body.innerHTML = html;
   document.getElementById('paramCount').textContent = `${m.rows.length} pricing row(s) configured`;
@@ -760,12 +776,10 @@ function updateStats() {
 function syncDirFromType() {
   const t = document.getElementById('inputTokenType').value;
   const dir = document.getElementById('inputDirection');
-  if (t === 'input_tokens')  { dir.value = 'input'; }
+  if (t === 'input_tokens')       { dir.value = 'input'; }
   else if (t === 'output_tokens') { dir.value = 'output'; }
-  else if (t === 'tool_use') { dir.value = 'tool'; }
-  const isCall = t === 'tool_use';
-  document.getElementById('unitHint').textContent = isCall ? 'USD per call' : 'USD per 1M tokens';
-  document.getElementById('creditLabel').textContent = isCall ? 'Computed Credits / call' : 'Computed Credits / 1M tokens';
+  document.getElementById('unitHint').textContent = 'USD per 1M tokens';
+  document.getElementById('creditLabel').textContent = 'Computed Credits / 1M tokens';
   updatePreviewCredit();
 }
 
