@@ -23,7 +23,7 @@
   .card { background: #fff; border-radius: 12px; border: 1px solid #D9E3E6; padding: 28px; margin-bottom: 16px; }
 
   /* ── MARKUP ── */
-  .markup-card { display: grid; grid-template-columns: 160px 1fr 280px; gap: 28px; align-items: center; }
+  .markup-card { display: grid; grid-template-columns: 160px 1fr 340px; gap: 28px; align-items: center; }
   .markup-label { font-size: 11px; font-weight: 600; letter-spacing: 1px; color: #707070; text-transform: uppercase; margin-bottom: 6px; }
   .markup-number { display: flex; align-items: baseline; gap: 5px; }
   .markup-number .big { font-size: 52px; font-weight: 700; color: #0A1F2C; line-height: 1; }
@@ -32,9 +32,14 @@
   input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 2px; background: #D9E3E6; outline: none; cursor: pointer; }
   input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #0A1F2C; border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.22); cursor: pointer; }
   .formula-block { background: #F7F7F7; border-radius: 10px; padding: 16px 20px; }
+  .formula-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .credit-val-row { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #707070; }
+  .credit-val-input { width: 88px; height: 26px; padding: 0 8px; border: 1.5px solid #D9E3E6; border-radius: 6px; font-size: 12px; font-family: 'Poppins', sans-serif; text-align: right; color: #102532; outline: none; }
+  .credit-val-input:focus { border-color: #23A9F6; }
   .formula-expr { font-size: 13px; color: #102532; line-height: 1.8; }
   .formula-expr .hi { font-size: 20px; font-weight: 700; color: #0A1F2C; }
-  .formula-note { font-size: 11px; color: #707070; margin-top: 4px; }
+  .formula-expr .cv { font-size: 14px; font-weight: 600; color: #23A9F6; }
+  .formula-note { font-size: 11px; color: #707070; margin-top: 6px; }
 
   /* ── BANNER ── */
   .preview-banner { background: #FFF8EB; border: 1px solid #FFC960; border-radius: 10px; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
@@ -49,38 +54,14 @@
   .btn-primary { background: #0A1F2C; color: #fff; }
   .btn-primary:hover { background: #1a3548; }
   .btn-sm { height: 32px; padding: 0 14px; font-size: 12px; }
-  .btn-ghost { background: none; border: 1.5px dashed #D9E3E6; color: #707070; }
-  .btn-ghost:hover { border-color: #23A9F6; color: #23A9F6; background: #F1FCFF; }
   .icon-btn { background: none; border: none; cursor: pointer; color: #CACACA; font-size: 15px; padding: 4px 5px; border-radius: 6px; transition: all 0.15s; }
   .icon-btn:hover { color: #102532; background: #F7F7F7; }
   .icon-btn.danger:hover { color: #FF3F41; background: #FFECEC; }
 
-  /* ── PRODUCT FILTER ── */
-  .product-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .product-pill {
-    display: inline-flex; align-items: center; gap: 6px;
-    height: 36px; padding: 0 14px;
-    border-radius: 20px;
-    font-size: 13px; font-weight: 600;
-    cursor: pointer;
-    border: 1.5px solid #D9E3E6;
-    background: #fff; color: #707070;
-    transition: all 0.15s;
-    position: relative;
-  }
-  .product-pill:hover { border-color: #23A9F6; color: #23A9F6; }
-  .product-pill.active { background: #0A1F2C; border-color: #0A1F2C; color: #fff; }
-  .product-pill .pill-actions { display: none; align-items: center; gap: 2px; margin-left: 4px; }
-  .product-pill.active .pill-actions { display: flex; }
-  .pill-icon { background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.6); font-size: 13px; padding: 2px 3px; border-radius: 4px; line-height: 1; transition: all 0.12s; }
-  .pill-icon:hover { color: #fff; background: rgba(255,255,255,0.2); }
-  .pill-icon.danger:hover { color: #FF3F41; background: rgba(255,63,65,0.2); }
-  .product-section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #707070; margin-bottom: 12px; }
-
   /* ── MODEL SELECTOR ── */
   .model-selector-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-  .select-model { height: 44px; padding: 0 14px; border-radius: 10px; border: 1.5px solid #D9E3E6; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; color: #102532; background: #fff; cursor: pointer; min-width: 220px; }
-  .vendor-badge { display: inline-flex; align-items: center; height: 28px; padding: 0 14px; border-radius: 20px; font-size: 12px; font-weight: 600; background: #EEF6FF; color: #23A9F6; border: 1px solid #73DFFF; }
+  .select-model { height: 44px; padding: 0 14px; border-radius: 10px; border: 1.5px solid #D9E3E6; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; color: #102532; background: #fff; cursor: pointer; min-width: 240px; }
+  .vendor-badge { display: inline-flex; align-items: center; height: 28px; padding: 0 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
   .type-badge { display: inline-flex; align-items: center; height: 28px; padding: 0 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
   .type-badge.token { background: #E6FBEB; color: #52C41A; border: 1px solid #52C41A; }
   .doc-link { font-size: 12px; color: #707070; text-decoration: none; }
@@ -96,74 +77,34 @@
   tbody tr { border-bottom: 1px solid #E8EEF0; }
   tbody tr:last-child { border-bottom: none; }
   tbody td { padding: 13px 0; font-size: 14px; vertical-align: middle; }
+
+  /* direction badges */
   .dir-badge { display: inline-flex; align-items: center; height: 26px; padding: 0 12px; border-radius: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
-  .dir-badge.input { background: #EEF6FF; color: #23A9F6; }
+  .dir-badge.input  { background: #EEF6FF; color: #23A9F6; }
   .dir-badge.output { background: #FFF8EB; color: #FFC960; }
+  .dir-badge.tool   { background: #F5EEFF; color: #7B2FF7; }
+
   .col-vendor { text-align: right; color: #CACACA; font-size: 13px; }
   .col-adj { text-align: right; font-size: 14px; color: #102532; font-weight: 500; }
   .col-adj-header { text-align: right; }
   .internal-tag { display: block; font-size: 10px; color: #FF3F41; font-weight: 600; margin-top: 2px; }
-  .col-credits { text-align: right; font-size: 18px; font-weight: 700; color: #0A1F2C; }
+  .col-credits { text-align: right; font-size: 16px; font-weight: 700; color: #0A1F2C; }
   .col-credits.preview-changed { color: #23A9F6; }
   .col-credits small { font-size: 10px; font-weight: 500; color: #707070; display: block; }
+  .col-credit-token { text-align: right; font-size: 14px; font-weight: 600; color: #23A9F6; }
+  .col-credit-token.preview-changed { color: #FFC960; }
   .col-actions { text-align: right; width: 72px; }
   .adj-note { font-size: 10px; color: #52C41A; font-weight: 600; margin-left: 4px; }
   .adj-same { font-size: 10px; color: #CACACA; margin-left: 4px; }
+
+  .src-badge { display: inline-block; font-size: 9px; font-weight: 600; padding: 1px 5px; border-radius: 4px; background: #F7F7F7; color: #CACACA; border: 1px solid #E8EEF0; vertical-align: middle; margin-left: 5px; letter-spacing: 0.3px; }
+  .per-call-badge { display: inline-block; font-size: 9px; font-weight: 600; padding: 1px 5px; border-radius: 4px; background: #F5EEFF; color: #7B2FF7; border: 1px solid #C4A0FF; vertical-align: middle; margin-left: 4px; }
+
   .stat-bar { background: #F6F8FD; border-radius: 10px; padding: 16px 20px; display: flex; gap: 40px; align-items: center; margin-top: 20px; border: 1px solid #D9E3E6; flex-wrap: wrap; }
   .stat .lbl { font-size: 10px; color: #707070; font-weight: 600; text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 3px; }
   .stat .val { font-size: 18px; font-weight: 700; color: #0A1F2C; }
   .stat .val.blue { color: #23A9F6; }
   .stat .sub { font-size: 10px; color: #707070; margin-top: 2px; }
-
-  /* ── SECTION DIVIDER ── */
-  .section-header { display: flex; align-items: center; justify-content: space-between; margin: 32px 0 16px; }
-  .section-title { font-size: 18px; font-weight: 700; color: #0A1F2C; }
-  .section-title span { font-size: 13px; font-weight: 400; color: #707070; margin-left: 8px; }
-
-  /* ── SCENARIO CARD ── */
-  .scenario-card { background: #fff; border-radius: 12px; border: 1px solid #D9E3E6; margin-bottom: 16px; overflow: hidden; }
-  .scenario-head {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 24px;
-    border-bottom: 1px solid #E8EEF0;
-    background: #F7F7F7;
-  }
-  .scenario-name-wrap { display: flex; align-items: center; gap: 10px; }
-  .scenario-name { font-size: 15px; font-weight: 700; color: #0A1F2C; }
-  .scenario-name-input {
-    font-size: 15px; font-weight: 700; color: #0A1F2C;
-    border: 1.5px solid #23A9F6; border-radius: 8px;
-    padding: 4px 10px; font-family: 'Poppins', sans-serif;
-    outline: none; background: #fff;
-    display: none;
-  }
-  .scenario-actions { display: flex; gap: 4px; align-items: center; }
-
-  /* scenario table */
-  .scenario-body { padding: 0 24px 20px; }
-  .scenario-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-  .scenario-table thead th {
-    font-size: 10px; font-weight: 600; letter-spacing: 0.7px; text-transform: uppercase;
-    color: #707070; padding: 0 8px 10px 0; border-bottom: 1px solid #E8EEF0; text-align: left;
-  }
-  .scenario-table thead th.right { text-align: right; }
-  .scenario-table tbody tr { border-bottom: 1px solid #E8EEF0; }
-  .scenario-table tbody tr:last-child { border-bottom: none; }
-  .scenario-table tbody td { padding: 11px 8px 11px 0; font-size: 13px; vertical-align: middle; }
-  .scenario-table tbody td.right { text-align: right; }
-  .scenario-table .total-row td {
-    font-weight: 700; font-size: 13px; color: #0A1F2C;
-    padding-top: 14px; border-top: 2px solid #D9E3E6; border-bottom: none;
-  }
-  .scenario-table .total-row td.right { text-align: right; }
-  .model-chip {
-    display: inline-block; font-size: 10px; font-weight: 600;
-    padding: 2px 8px; border-radius: 6px;
-    background: #EEF6FF; color: #23A9F6;
-    white-space: nowrap;
-  }
-  .num-cell { text-align: right; font-variant-numeric: tabular-nums; }
-  .scenario-footer { padding: 0 24px 20px; }
 
   /* ── MODAL ── */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(10,31,44,0.4); z-index: 100; align-items: center; justify-content: center; }
@@ -220,11 +161,19 @@
       <input type="range" id="markupSlider" min="0" max="99" value="50" step="1">
     </div>
     <div class="formula-block">
-      <div class="markup-label">Formula · 公式</div>
-      <div class="formula-expr">
-        credits = adj_cost × (1 + <span class="hi" id="markupFormula">0.50</span>) × 100
+      <div class="formula-top">
+        <div class="markup-label">Formula · 公式</div>
+        <div class="credit-val-row">
+          1 Credit =
+          <span style="color:#0A1F2C; font-weight:600; font-size:11px;">$</span>
+          <input type="text" id="creditValueInput" class="credit-val-input" value="0.000001" onchange="updateCreditValue()" onblur="updateCreditValue()">
+          <span style="color:#CACACA; font-size:11px;">USD</span>
+        </div>
       </div>
-      <div class="formula-note">1 credit = $0.01 &nbsp;·&nbsp; Token models: per 1M tokens</div>
+      <div class="formula-expr">
+        credits = adj_cost × (1 + <span class="hi" id="markupFormula">0.50</span>) ÷ <span class="cv" id="formulaCreditVal">$0.000001</span>
+      </div>
+      <div class="formula-note" id="formulaNote">token rows: per 1M tokens &nbsp;·&nbsp; tool_use: per call &nbsp;·&nbsp; all prices via b.ai docs</div>
     </div>
   </div>
 
@@ -242,24 +191,13 @@
     </div>
   </div>
 
-  <!-- ── PRODUCT FILTER ── -->
-  <div class="card" style="padding: 20px 28px;">
-    <div class="product-section-label">Product Selection · 产品选择</div>
-    <div class="product-bar" id="productBar">
-      <!-- rendered by JS -->
-    </div>
-  </div>
-
   <!-- ── MODEL SELECTOR ── -->
   <div class="card" style="padding: 18px 28px;">
     <div class="model-selector-row">
-      <select class="select-model" id="modelSelect" onchange="switchModel()">
-        <option value="0">Gemini 2.5 Flash</option>
-        <option value="1">gemini-3.5-flash</option>
-      </select>
-      <span class="vendor-badge" id="vendorBadge">google</span>
+      <select class="select-model" id="modelSelect" onchange="switchModel()"></select>
+      <span class="vendor-badge" id="vendorBadge"></span>
       <span class="type-badge token" id="typeBadge">token-based</span>
-      <a href="https://ai.google.dev/gemini-api/docs/pricing?hl=zh-cn#gemini-2.5-flash" target="_blank" class="doc-link" id="docLink">ai.google.dev/gemini-api/docs/pricing ↗</a>
+      <a href="#" target="_blank" class="doc-link" id="docLink"></a>
     </div>
   </div>
 
@@ -284,22 +222,20 @@
       <div class="stat">
         <div class="lbl">Theoretical Gross Margin</div>
         <div class="val" id="statMargin">33.3%</div>
-        <div class="sub">based on adjusted cost · rate ÷ (1 + rate)</div>
+        <div class="sub">rate ÷ (1 + rate)</div>
       </div>
       <div class="stat">
-        <div class="lbl">1 Credit</div>
-        <div class="val">$0.01</div>
+        <div class="lbl">1 Credit =</div>
+        <div class="val" id="statCreditVal">$0.000001</div>
+        <div class="sub">configurable above</div>
+        <div class="sub" id="statUsdToCredit">1 USD = 1,000,000 Credits</div>
+      </div>
+      <div class="stat">
+        <div class="lbl">Total Row Count</div>
+        <div class="val" id="statRowCount">—</div>
+        <div class="sub">this model</div>
       </div>
     </div>
-  </div>
-
-  <!-- ── SCENARIOS SECTION ── -->
-  <div id="scenariosSection">
-    <div class="section-header">
-      <div class="section-title">Scenarios · 场景模拟 <span id="scenarioProductLabel"></span></div>
-      <button class="btn btn-primary" onclick="openNewScenarioModal()">+ Add Scenario · 新增场景</button>
-    </div>
-    <div id="scenariosList"></div>
   </div>
 
 </div><!-- /page -->
@@ -308,37 +244,26 @@
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal modal-md">
     <h3 id="modalTitle">Add Pricing Row</h3>
-    <div id="tokenFields">
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Direction · 方向</label>
-          <select class="form-input" id="inputDirection">
-            <option value="input">Input</option>
-            <option value="output">Output</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Token Type · 类型</label>
-          <select class="form-input" id="inputTokenType">
-            <option>text</option><option>image</option><option>video</option><option>audio</option><option>others</option>
-          </select>
-        </div>
-      </div>
+    <div class="form-group" style="margin-bottom:16px">
+      <label class="form-label">Model Name</label>
+      <div id="modalModelName" style="font-size:14px;font-weight:600;color:#102532;padding:6px 0;"></div>
     </div>
-    <div id="callFields" style="display:none">
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Group · 分组</label>
-          <input class="form-input" id="inputGroup" placeholder="Aspect Ratio">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Name · 名称</label>
-          <input class="form-input" id="inputName" placeholder="1:1">
-        </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Direction · 方向</label>
+        <select class="form-input" id="inputDirection">
+          <option value="input">Input</option>
+          <option value="output">Output</option>
+          <option value="tool">Tool</option>
+        </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Value · 取值（展示用）</label>
-        <input class="form-input" id="inputValue" placeholder="2048×2048">
+        <label class="form-label">Token Type · 类型</label>
+        <select class="form-input" id="inputTokenType" onchange="syncDirFromType()">
+          <option value="input_tokens">input_tokens</option>
+          <option value="output_tokens">output_tokens</option>
+          <option value="tool_use">tool_use (search)</option>
+        </select>
       </div>
     </div>
     <div class="form-row">
@@ -353,6 +278,10 @@
         <div class="form-hint warn" id="adjHint"></div>
       </div>
     </div>
+    <div class="form-group">
+      <label class="form-label">Source Note · 价格来源备注</label>
+      <input class="form-input" id="inputSrc" type="text" placeholder="bai" value="bai">
+    </div>
     <div class="computed-block">
       <span class="cl" id="creditLabel">Computed Credits / 1M tokens</span>
       <span class="cr" id="previewCredit">—</span>
@@ -365,157 +294,227 @@
   </div>
 </div>
 
-<!-- ── PRODUCT MODAL ── -->
-<div class="modal-overlay" id="productModal">
-  <div class="modal modal-sm">
-    <h3 id="productModalTitle">New Product</h3>
-    <div class="form-group">
-      <label class="form-label">Product Name · 产品名称</label>
-      <input class="form-input" id="inputProductName" placeholder="e.g. Ad Manager">
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal('productModal')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveProduct()">Save</button>
-    </div>
-  </div>
-</div>
-
-<!-- ── SCENARIO NAME MODAL ── -->
-<div class="modal-overlay" id="scenarioModal">
-  <div class="modal modal-sm">
-    <h3 id="scenarioModalTitle">New Scenario</h3>
-    <div class="form-group">
-      <label class="form-label">Scenario Name · 场景名称</label>
-      <input class="form-input" id="inputScenarioName" placeholder="e.g. Initial cost">
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal('scenarioModal')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveScenario()">Save</button>
-    </div>
-  </div>
-</div>
-
-<!-- ── SCENARIO ROW MODAL ── -->
-<div class="modal-overlay" id="scenarioRowModal">
-  <div class="modal modal-md">
-    <h3>Add Row · 新增行</h3>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Model · 模型</label>
-        <select class="form-input" id="srModel" onchange="onSrModelChange()">
-          <option value="0">Gemini 2.5 Flash</option>
-          <option value="1">gemini-3.5-flash</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Direction · 方向</label>
-        <select class="form-input" id="srDir">
-          <option value="input">Input</option>
-          <option value="output">Output</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Token Type · 类型</label>
-      <select class="form-input" id="srType">
-        <option>text</option><option>image</option><option>video</option><option>audio</option><option>others</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Simulated Tokens · 模拟 Token 数</label>
-      <input class="form-input" id="srTokens" type="number" placeholder="1000000" oninput="updateSrPreview()">
-    </div>
-    <div class="computed-block" style="flex-direction:column; align-items:flex-start; gap:8px;">
-      <div style="display:flex; justify-content:space-between; width:100%;">
-        <span style="font-size:12px;color:#707070">Vendor Adj Cost</span>
-        <span style="font-weight:600" id="srVendorAdjCost">—</span>
-      </div>
-      <div style="display:flex; justify-content:space-between; width:100%;">
-        <span style="font-size:12px;color:#707070">Markup Credits</span>
-        <span style="font-weight:600" id="srMarkupCredit">—</span>
-      </div>
-      <div style="display:flex; justify-content:space-between; width:100%;">
-        <span style="font-size:12px;color:#707070">Markup Price (USD)</span>
-        <span style="font-weight:700;font-size:18px" id="srMarkupPrice">—</span>
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal('scenarioRowModal')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveSrRow()">Add Row</button>
-    </div>
-  </div>
-</div>
-
 <script>
 // ═══════════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════════
+const BAI_DOC = "https://docs.b.ai/zh-Hans/llmservice/pricing-and-usage/";
+
+const VENDOR_STYLE = {
+  'OpenAI':    { bg:'#E6FBF1', color:'#00875A', border:'#5CE8B8' },
+  'Anthropic': { bg:'#FFF3ED', color:'#C44D00', border:'#FFAA7A' },
+  'Google':    { bg:'#EEF6FF', color:'#23A9F6', border:'#73DFFF' },
+  'DeepSeek':  { bg:'#EEF5FF', color:'#1A6FCC', border:'#88BEFF' },
+  'Kimi':      { bg:'#FFF0F8', color:'#B8007A', border:'#F8A0D8' },
+  'Zhipu':     { bg:'#F5EEFF', color:'#7B2FF7', border:'#C4A0FF' },
+  'MiniMax':   { bg:'#FFF7E0', color:'#9A6000', border:'#FFD06A' },
+};
+
+// ═══════════════════════════════════════════════════════════════
 // DATA
+//   Vendor Cost = official vendor price (max tier where tiered).
+//   Fallback to b.ai doc price when official unavailable — marked src:"bai".
+//   src:"official" = verified from vendor's own pricing page.
+//   tool_use vendorCost = USD / call (not per 1M tokens).
+//
+//   Official sources used:
+//     OpenAI    → developers.openai.com/api/docs/pricing
+//     Anthropic → platform.claude.com/docs/en/docs/about-claude/models
+//     Google    → ai.google.dev/gemini-api/docs/pricing
+//     DeepSeek  → api-docs.deepseek.com/quick_start/pricing
+//     Kimi      → tokenmix.ai / artificialanalysis.ai (official site 404)
+//     Zhipu/GLM → ofox.ai / vibecoding.app (official site blocked)
+//     MiniMax   → pricepertoken.com (official site blocked)
 // ═══════════════════════════════════════════════════════════════
 
+const OAI_DOC   = "https://developers.openai.com/api/docs/pricing";
+const ANT_DOC   = "https://platform.claude.com/docs/en/docs/about-claude/models";
+const GGL_DOC   = "https://ai.google.dev/gemini-api/docs/pricing";
+const DSK_DOC   = "https://api-docs.deepseek.com/quick_start/pricing";
+
 const models = [
-  {
-    name: "Gemini 2.5 Flash", vendor: "google",
-    doc: "https://ai.google.dev/gemini-api/docs/pricing?hl=zh-cn#gemini-2.5-flash",
-    type: "token",
-    rows: [
-      { dir: "input",  type: "text",   vendorCost: 0.30, adjCost: 1.00 },
-      { dir: "input",  type: "image",  vendorCost: 0.30, adjCost: 1.00 },
-      { dir: "input",  type: "video",  vendorCost: 0.30, adjCost: 1.00 },
-      { dir: "input",  type: "audio",  vendorCost: 1.00, adjCost: 1.00 },
-      { dir: "input",  type: "others", vendorCost: 1.00, adjCost: 1.00 },
-      { dir: "output", type: "text",   vendorCost: 2.50, adjCost: 2.50 },
-    ]
-  },
-  {
-    name: "gemini-3.5-flash", vendor: "google",
-    doc: "https://ai.google.dev/gemini-api/docs/pricing?hl=zh-cn#gemini-3.5-flash",
-    type: "token",
-    rows: [
-      { dir: "input",  type: "text",   vendorCost: 1.50, adjCost: 1.50 },
-      { dir: "input",  type: "image",  vendorCost: 1.50, adjCost: 1.50 },
-      { dir: "input",  type: "video",  vendorCost: 1.50, adjCost: 1.50 },
-      { dir: "input",  type: "audio",  vendorCost: 1.50, adjCost: 1.50 },
-      { dir: "input",  type: "others", vendorCost: 1.50, adjCost: 1.50 },
-      { dir: "output", type: "text",   vendorCost: 9.00, adjCost: 9.00 },
-    ]
-  }
-];
 
-let products = [
-  { id: 1, name: "Ad Manager" }
-];
-let nextProductId = 2;
+  // ── Google ───────────────────────────────────────────────────
+  // Token prices verified from ai.google.dev/gemini-api/docs/pricing
+  // "Take max" rule covers three dimensions: context-length tier × serving tier × input modality.
+  //   2.5 Flash-Lite: audio Priority $0.54; output Priority $0.72
+  //   2.5 Flash:      audio Priority $1.80; output Priority $4.50
+  //   2.5 Pro:        text >200K Priority $4.50; output >200K Priority $27.00; audio not listed
+  //   3.1 Flash-Lite: audio Priority $0.90; output Priority $2.70
+  //   3.5 Flash:      text Priority $2.70; output Priority $16.20; audio not listed
+  //   3.1 Pro:        text >200K Priority $7.20; output >200K Priority $32.40; audio not listed
+  // Search Grounding: $14/1k queries = $0.014/call (Gemini 3.x confirmed; 2.x to be verified)
+  { name:"Gemini 2.5 Flash-Lite", vendor:"Google", doc:GGL_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:0.54,  adjCost:0.54,  src:"official" }, // audio Priority max
+    { dir:"output", type:"output_tokens", vendorCost:0.72,  adjCost:0.72,  src:"official" }, // Priority max
+  ]},
+  { name:"Gemini 2.5 Flash", vendor:"Google", doc:GGL_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:1.80,  adjCost:1.80,  src:"official" }, // audio Priority max
+    { dir:"output", type:"output_tokens", vendorCost:4.50,  adjCost:4.50,  src:"official" }, // Priority max
+    { dir:"tool",   type:"tool_use",      vendorCost:0.014, adjCost:0.014, src:"official", isPerCall:true },
+  ]},
+  { name:"Gemini 2.5 Pro", vendor:"Google", doc:GGL_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:4.50,  adjCost:4.50,  src:"official" }, // >200K Priority max
+    { dir:"output", type:"output_tokens", vendorCost:27.00, adjCost:27.00, src:"official" }, // >200K Priority max
+  ]},
+  { name:"Gemini 3.1 Flash-Lite", vendor:"Google", doc:GGL_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:0.90,  adjCost:0.90,  src:"official" }, // audio Priority max
+    { dir:"output", type:"output_tokens", vendorCost:2.70,  adjCost:2.70,  src:"official" }, // Priority max
+    { dir:"tool",   type:"tool_use",      vendorCost:0.014, adjCost:0.014, src:"official", isPerCall:true },
+  ]},
+  { name:"Gemini 3.5 Flash", vendor:"Google", doc:GGL_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:2.70,  adjCost:2.70,  src:"official" }, // Priority max
+    { dir:"output", type:"output_tokens", vendorCost:16.20, adjCost:16.20, src:"official" }, // Priority max
+    { dir:"tool",   type:"tool_use",      vendorCost:0.014, adjCost:0.014, src:"official", isPerCall:true },
+  ]},
+  { name:"Gemini 3.1 Pro", vendor:"Google", doc:GGL_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:7.20,  adjCost:7.20,  src:"official" }, // Priority >200K max
+    { dir:"output", type:"output_tokens", vendorCost:32.40, adjCost:32.40, src:"official" }, // Priority >200K max
+    { dir:"tool",   type:"tool_use",      vendorCost:0.014, adjCost:0.014, src:"official", isPerCall:true },
+  ]},
 
-let scenarios = [
-  {
-    id: 1, productId: 1, name: "Initial cost",
-    rows: [
-      { modelIdx: 0, dir: "input",  type: "text",   tokens: 2487249 },
-      { modelIdx: 0, dir: "input",  type: "image",  tokens: 4338225 },
-      { modelIdx: 0, dir: "output", type: "text",   tokens: 501306  },
-      { modelIdx: 0, dir: "input",  type: "text",   tokens: 1525449 },
-      { modelIdx: 0, dir: "input",  type: "image",  tokens: 984696  },
-      { modelIdx: 0, dir: "input",  type: "video",  tokens: 29822246},
-      { modelIdx: 0, dir: "input",  type: "audio",  tokens: 2837916 },
-      { modelIdx: 0, dir: "output", type: "text",   tokens: 377559  },
-    ]
-  },
-  {
-    id: 2, productId: 1, name: "AI agent",
-    rows: [
-      { modelIdx: 0, dir: "input",  type: "text",   tokens: 182000 },
-      { modelIdx: 0, dir: "output", type: "text",   tokens: 78000  },
-    ]
-  },
-  {
-    id: 3, productId: 1, name: "Image ad AI analysis (1000 ads)",
-    rows: [
-      { modelIdx: 0, dir: "input",  type: "text",   tokens: 387000 },
-      { modelIdx: 0, dir: "input",  type: "image",  tokens: 675000 },
-      { modelIdx: 0, dir: "output", type: "text",   tokens: 78000  },
-    ]
-  }
+  // ── DeepSeek ─────────────────────────────────────────────────
+  // Verified from api-docs.deepseek.com/quick_start/pricing
+  // Prices shown are cache-miss (max) input prices per "take max" rule.
+  // DeepSeek V3.2: not found on official page (b.ai alias); kept from b.ai.
+  { name:"DeepSeek V4 Flash", vendor:"DeepSeek", doc:DSK_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:0.14,  adjCost:0.14,  src:"official" }, // cache-miss max
+    { dir:"output", type:"output_tokens", vendorCost:0.28,  adjCost:0.28,  src:"official" },
+  ]},
+  { name:"DeepSeek V4 Pro", vendor:"DeepSeek", doc:DSK_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:0.435, adjCost:0.435, src:"official" }, // cache-miss max
+    { dir:"output", type:"output_tokens", vendorCost:0.87,  adjCost:0.87,  src:"official" },
+  ]},
+  { name:"DeepSeek V3.2", vendor:"DeepSeek", doc:BAI_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:0.29,  adjCost:0.29,  src:"bai" },
+    { dir:"output", type:"output_tokens", vendorCost:0.44,  adjCost:0.44,  src:"bai" },
+  ]},
+
+  // ── OpenAI ──────────────────────────────────────────────────
+  // Token prices: verified from developers.openai.com/api/docs/pricing
+  // tool_use (web search): official $10.00/1k calls = $0.01/call
+  // GPT-5 Nano / Mini / 5.2 / 5.5 Instant: model names only found on b.ai
+  { name:"GPT-5 Nano", vendor:"OpenAI", doc:BAI_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:0.05,   adjCost:0.05,   src:"bai" },
+    { dir:"output", type:"output_tokens", vendorCost:0.40,   adjCost:0.40,   src:"bai" },
+  ]},
+  { name:"GPT-5.4 Nano", vendor:"OpenAI", doc:OAI_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:0.20,   adjCost:0.20,   src:"official" },
+    { dir:"output", type:"output_tokens", vendorCost:1.25,   adjCost:1.25,   src:"official" },
+    { dir:"tool",   type:"tool_use",      vendorCost:0.01,   adjCost:0.01,   src:"official", isPerCall:true },
+  ]},
+  { name:"GPT-5 Mini", vendor:"OpenAI", doc:BAI_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:0.25,   adjCost:0.25,   src:"bai" },
+    { dir:"output", type:"output_tokens", vendorCost:2.00,   adjCost:2.00,   src:"bai" },
+    { dir:"tool",   type:"tool_use",      vendorCost:0.01,   adjCost:0.01,   src:"official", isPerCall:true },
+  ]},
+  { name:"GPT-5.4 Mini", vendor:"OpenAI", doc:OAI_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:0.75,   adjCost:0.75,   src:"official" },
+    { dir:"output", type:"output_tokens", vendorCost:4.50,   adjCost:4.50,   src:"official" },
+    { dir:"tool",   type:"tool_use",      vendorCost:0.01,   adjCost:0.01,   src:"official", isPerCall:true },
+  ]},
+  { name:"GPT-5.2", vendor:"OpenAI", doc:BAI_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:1.75,   adjCost:1.75,   src:"bai" },
+    { dir:"output", type:"output_tokens", vendorCost:14.00,  adjCost:14.00,  src:"bai" },
+    { dir:"tool",   type:"tool_use",      vendorCost:0.01,   adjCost:0.01,   src:"official", isPerCall:true },
+  ]},
+  { name:"GPT-5.4", vendor:"OpenAI", doc:OAI_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:2.50,   adjCost:2.50,   src:"official" },
+    { dir:"output", type:"output_tokens", vendorCost:15.00,  adjCost:15.00,  src:"official" },
+    { dir:"tool",   type:"tool_use",      vendorCost:0.01,   adjCost:0.01,   src:"official", isPerCall:true },
+  ]},
+  { name:"GPT-5.5", vendor:"OpenAI", doc:OAI_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:5.00,   adjCost:5.00,   src:"official" },
+    { dir:"output", type:"output_tokens", vendorCost:30.00,  adjCost:30.00,  src:"official" },
+    { dir:"tool",   type:"tool_use",      vendorCost:0.01,   adjCost:0.01,   src:"official", isPerCall:true },
+  ]},
+  { name:"GPT-Realtime-2", vendor:"OpenAI", doc:OAI_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:32.00,  adjCost:32.00,  src:"official" }, // audio max
+    { dir:"output", type:"output_tokens", vendorCost:64.00,  adjCost:64.00,  src:"official" }, // audio max
+  ]},
+  { name:"GPT-5.5 Instant", vendor:"OpenAI", doc:BAI_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:5.00,   adjCost:5.00,   src:"bai" },
+    { dir:"output", type:"output_tokens", vendorCost:30.00,  adjCost:30.00,  src:"bai" },
+    { dir:"tool",   type:"tool_use",      vendorCost:0.01,   adjCost:0.01,   src:"official", isPerCall:true },
+  ]},
+  { name:"GPT-5.4 Pro", vendor:"OpenAI", doc:BAI_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:30.00,  adjCost:30.00,  src:"bai" }, // ⚠️ not on official page
+    { dir:"output", type:"output_tokens", vendorCost:180.00, adjCost:180.00, src:"bai" },
+  ]},
+
+  // ── Anthropic ────────────────────────────────────────────────
+  // Token prices: platform.claude.com/docs/en/about-claude/pricing
+  // tool_use (web search, server-side): $10/1k searches = $0.01/call
+  // Claude Opus 4.8 Fast mode: input $10/MTok, output $50/MTok — used as max
+  { name:"Claude Haiku 4.5", vendor:"Anthropic", doc:ANT_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:1.00,  adjCost:1.00,  src:"official" },
+    { dir:"output", type:"output_tokens", vendorCost:5.00,  adjCost:5.00,  src:"official" },
+    { dir:"tool",   type:"tool_use",      vendorCost:0.01,  adjCost:0.01,  src:"official", isPerCall:true },
+  ]},
+  { name:"Claude Sonnet 4.5", vendor:"Anthropic", doc:ANT_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:3.00,  adjCost:3.00,  src:"official" },
+    { dir:"output", type:"output_tokens", vendorCost:15.00, adjCost:15.00, src:"official" },
+    { dir:"tool",   type:"tool_use",      vendorCost:0.01,  adjCost:0.01,  src:"official", isPerCall:true },
+  ]},
+  { name:"Claude Sonnet 4.6", vendor:"Anthropic", doc:ANT_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:3.00,  adjCost:3.00,  src:"official" },
+    { dir:"output", type:"output_tokens", vendorCost:15.00, adjCost:15.00, src:"official" },
+    { dir:"tool",   type:"tool_use",      vendorCost:0.01,  adjCost:0.01,  src:"official", isPerCall:true },
+  ]},
+  { name:"Claude Opus 4.5", vendor:"Anthropic", doc:ANT_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:5.00,  adjCost:5.00,  src:"official" },
+    { dir:"output", type:"output_tokens", vendorCost:25.00, adjCost:25.00, src:"official" },
+    { dir:"tool",   type:"tool_use",      vendorCost:0.01,  adjCost:0.01,  src:"official", isPerCall:true },
+  ]},
+  { name:"Claude Opus 4.6", vendor:"Anthropic", doc:ANT_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:5.00,  adjCost:5.00,  src:"official" },
+    { dir:"output", type:"output_tokens", vendorCost:25.00, adjCost:25.00, src:"official" },
+    { dir:"tool",   type:"tool_use",      vendorCost:0.01,  adjCost:0.01,  src:"official", isPerCall:true },
+  ]},
+  { name:"Claude Opus 4.7", vendor:"Anthropic", doc:ANT_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:5.00,  adjCost:5.00,  src:"official" },
+    { dir:"output", type:"output_tokens", vendorCost:25.00, adjCost:25.00, src:"official" },
+    { dir:"tool",   type:"tool_use",      vendorCost:0.01,  adjCost:0.01,  src:"official", isPerCall:true },
+  ]},
+  { name:"Claude Opus 4.8", vendor:"Anthropic", doc:ANT_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:10.00, adjCost:10.00, src:"official" }, // Fast mode max
+    { dir:"output", type:"output_tokens", vendorCost:50.00, adjCost:50.00, src:"official" }, // Fast mode max
+    { dir:"tool",   type:"tool_use",      vendorCost:0.01,  adjCost:0.01,  src:"official", isPerCall:true },
+  ]},
+
+  // ── Kimi (Moonshot AI) ───────────────────────────────────────
+  // Official pricing page returned 404; prices from tokenmix.ai / artificialanalysis.ai
+  { name:"Kimi K2.5", vendor:"Kimi", doc:BAI_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:0.60,  adjCost:0.60,  src:"3rd-party" },
+    { dir:"output", type:"output_tokens", vendorCost:2.50,  adjCost:2.50,  src:"3rd-party" },
+  ]},
+  { name:"Kimi K2.6", vendor:"Kimi", doc:BAI_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:0.95,  adjCost:0.95,  src:"3rd-party" },
+    { dir:"output", type:"output_tokens", vendorCost:4.00,  adjCost:4.00,  src:"3rd-party" },
+  ]},
+
+  // ── Zhipu AI (GLM) ───────────────────────────────────────────
+  // Official site blocked; GLM-5 input confirmed by multiple sources
+  { name:"GLM-5", vendor:"Zhipu", doc:BAI_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:1.00,  adjCost:1.00,  src:"3rd-party" },
+    { dir:"output", type:"output_tokens", vendorCost:3.20,  adjCost:3.20,  src:"bai" },
+  ]},
+  { name:"GLM-5.1", vendor:"Zhipu", doc:BAI_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:1.40,  adjCost:1.40,  src:"bai" },
+    { dir:"output", type:"output_tokens", vendorCost:4.40,  adjCost:4.40,  src:"bai" },
+  ]},
+
+  // ── MiniMax ──────────────────────────────────────────────────
+  // Official site blocked; M2.7 / M3 from b.ai only
+  { name:"MiniMax M2.7", vendor:"MiniMax", doc:BAI_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:0.30,  adjCost:0.30,  src:"bai" },
+    { dir:"output", type:"output_tokens", vendorCost:1.20,  adjCost:1.20,  src:"bai" },
+  ]},
+  { name:"MiniMax M3", vendor:"MiniMax", doc:BAI_DOC, rows:[
+    { dir:"input",  type:"input_tokens",  vendorCost:0.30,  adjCost:0.30,  src:"bai" },
+    { dir:"output", type:"output_tokens", vendorCost:1.20,  adjCost:1.20,  src:"bai" },
+  ]},
 ];
-let nextScenarioId = 4;
 
 // ═══════════════════════════════════════════════════════════════
 // STATE
@@ -524,14 +523,30 @@ let savedRate    = 50;
 let currentRate  = 50;
 let currentIdx   = 0;
 let editingRowIdx = null;
-let currentProductId = 1;
-let editingProductId = null;
-let editingScenarioId = null;
-let targetScenarioId = null; // for adding rows to a scenario
+let creditValue  = 0.000001;   // USD per credit — configurable
+
+// ═══════════════════════════════════════════════════════════════
+// CREDIT VALUE
+// ═══════════════════════════════════════════════════════════════
+function updateCreditValue() {
+  const v = parseFloat(document.getElementById('creditValueInput').value);
+  if (!isNaN(v) && v > 0) {
+    creditValue = v;
+    document.getElementById('formulaCreditVal').textContent = '$' + v;
+    document.getElementById('statCreditVal').textContent = '$' + v;
+    const usdToCredit = Math.round(1 / v);
+    document.getElementById('statUsdToCredit').textContent = '1 USD = ' + usdToCredit.toLocaleString() + ' Credits';
+    renderCurrent(); updateStats();
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════
 // MARKUP SLIDER
 // ═══════════════════════════════════════════════════════════════
+function renderCurrent() {
+  document.getElementById('modelSelect').value === 'overview' ? renderOverview() : renderTable();
+}
+
 const slider = document.getElementById('markupSlider');
 slider.addEventListener('input', () => {
   currentRate = parseInt(slider.value);
@@ -541,7 +556,7 @@ slider.addEventListener('input', () => {
   document.getElementById('prevTo').textContent = currentRate + '%';
   const banner = document.getElementById('previewBanner');
   currentRate !== savedRate ? banner.classList.remove('hidden') : banner.classList.add('hidden');
-  renderTable(); updateStats(); renderScenarios();
+  renderCurrent(); updateStats();
 });
 function resetMarkup() {
   currentRate = savedRate;
@@ -549,48 +564,127 @@ function resetMarkup() {
   document.getElementById('markupDisplay').textContent = savedRate;
   document.getElementById('markupFormula').textContent = (savedRate/100).toFixed(2);
   document.getElementById('previewBanner').classList.add('hidden');
-  renderTable(); updateStats(); renderScenarios();
+  renderCurrent(); updateStats();
 }
 function saveMarkup() {
   savedRate = currentRate;
   document.getElementById('previewBanner').classList.add('hidden');
-  renderTable();
+  renderCurrent();
 }
 
 // ═══════════════════════════════════════════════════════════════
-// MODEL SWITCH
+// MODEL SELECT — build grouped dropdown
 // ═══════════════════════════════════════════════════════════════
+function buildModelSelect() {
+  const sel = document.getElementById('modelSelect');
+  const groups = {};
+  models.forEach((m, i) => {
+    if (!groups[m.vendor]) groups[m.vendor] = [];
+    groups[m.vendor].push({ name: m.name, idx: i });
+  });
+  let html = '<option value="overview">Overview · All Models</option>';
+  Object.entries(groups).forEach(([vendor, list]) => {
+    html += `<optgroup label="${vendor}">`;
+    list.forEach(item => { html += `<option value="${item.idx}">${item.name}</option>`; });
+    html += '</optgroup>';
+  });
+  sel.innerHTML = html;
+}
+
+const DOC_LABELS = {
+  [OAI_DOC]: 'OpenAI · pricing ↗',
+  [ANT_DOC]: 'Anthropic · pricing ↗',
+  [GGL_DOC]: 'Google AI · pricing ↗',
+  [DSK_DOC]: 'DeepSeek · pricing ↗',
+  [BAI_DOC]: 'b.ai · pricing ↗',
+};
+
 function switchModel() {
-  currentIdx = parseInt(document.getElementById('modelSelect').value);
-  const m = models[currentIdx];
-  document.getElementById('vendorBadge').textContent = m.vendor;
+  const val = document.getElementById('modelSelect').value;
+  const badge = document.getElementById('vendorBadge');
   const docEl = document.getElementById('docLink');
+
+  if (val === 'overview') {
+    badge.textContent = 'All Vendors';
+    badge.style.cssText = 'background:#F7F7F7; color:#707070; border:1px solid #D9E3E6;';
+    docEl.href = '#'; docEl.textContent = '';
+    renderOverview(); updateStats();
+    return;
+  }
+
+  currentIdx = parseInt(val);
+  const m = models[currentIdx];
+  const vs = VENDOR_STYLE[m.vendor] || { bg:'#F7F7F7', color:'#707070', border:'#D9E3E6' };
+  badge.textContent = m.vendor;
+  badge.style.cssText = `background:${vs.bg}; color:${vs.color}; border:1px solid ${vs.border};`;
   docEl.href = m.doc;
-  docEl.textContent = m.doc.replace('https://', '') + ' ↗';
-  const tb = document.getElementById('typeBadge');
-  tb.textContent = 'token-based';
-  tb.className = 'type-badge token';
+  docEl.textContent = DOC_LABELS[m.doc] || m.doc;
   renderTable(); updateStats();
+}
+
+function renderOverview() {
+  const head = document.getElementById('tableHead');
+  const body = document.getElementById('paramsBody');
+
+  head.innerHTML = `<tr>
+    <th style="width:150px">Model</th>
+    <th style="width:90px">Direction</th>
+    <th style="width:150px">Token Type</th>
+    <th class="right" style="width:180px">Vendor Cost /1M Tokens <span style="font-weight:400;text-transform:none;color:#CACACA">(internal)</span></th>
+    <th class="right col-adj-header" style="width:180px">Adjusted Vendor Cost /1M Tokens<span class="internal-tag">markup 计算基准</span></th>
+    <th class="right" style="width:120px">Credits</th>
+    <th class="right" style="width:110px">Credit/Token</th>
+    <th class="right" style="width:110px">Token/Credit</th>
+  </tr>`;
+
+  let html = '';
+  let totalRows = 0;
+  models.forEach(m => {
+    const vs = VENDOR_STYLE[m.vendor] || { bg:'#F7F7F7', color:'#707070', border:'#D9E3E6' };
+    m.rows.forEach((r, ri) => {
+      const c        = calcCredits(r.adjCost, currentRate);
+      const ctVal    = r.isPerCall ? null : fmtCT(c / 1e6);
+      const tcVal    = r.isPerCall ? null : fmtCT(1e6 / c);
+      const srcBadge = r.src ? `<span class="src-badge">${r.src}</span>` : '';
+      const perCallBadge = r.isPerCall ? `<span class="per-call-badge">per call</span>` : '';
+      const topBorder = ri === 0 ? 'border-top:2px solid #E8EEF0;' : '';
+      const modelCell = ri === 0
+        ? `<span style="background:${vs.bg};color:${vs.color};border:1px solid ${vs.border};padding:2px 10px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap">${m.name}</span>`
+        : '';
+      html += `<tr style="${topBorder}">
+        <td style="font-size:12px">${modelCell}</td>
+        <td><span class="dir-badge ${r.dir}">${r.dir.toUpperCase()}</span></td>
+        <td><strong>${r.type}</strong>${perCallBadge}</td>
+        <td class="col-vendor">$${r.vendorCost.toFixed(4)}${srcBadge}</td>
+        <td class="col-adj">$${r.adjCost.toFixed(4)}</td>
+        <td class="col-credits">${fmtC(c)}${r.isPerCall ? '<small>/ call</small>' : ''}</td>
+        <td class="col-credit-token">${ctVal ? ctVal : '<span style="color:#CACACA">—</span>'}</td>
+        <td class="col-credit-token">${tcVal ? tcVal : '<span style="color:#CACACA">—</span>'}</td>
+      </tr>`;
+      totalRows++;
+    });
+  });
+  body.innerHTML = html;
+  document.getElementById('paramCount').textContent = `${totalRows} rows · ${models.length} models`;
+  document.getElementById('statRowCount').textContent = totalRows;
 }
 
 // ═══════════════════════════════════════════════════════════════
 // CREDIT CALC
 // ═══════════════════════════════════════════════════════════════
-function calcCredits(adjCost, type) {
-  const raw = adjCost * (1 + currentRate/100) * 100;
-  return type === 'token' ? Math.round(raw * 10000) / 10000 : Math.ceil(raw);
+function calcCredits(adjCost, rate) {
+  return Math.round(adjCost * (1 + rate / 100) / creditValue);
 }
-function savedCredits(adjCost, type) {
-  const raw = adjCost * (1 + savedRate/100) * 100;
-  return type === 'token' ? Math.round(raw * 10000) / 10000 : Math.ceil(raw);
+function fmtC(n) {
+  if (n >= 1e6) return (n / 1e6).toFixed(2).replace(/\.?0+$/, '') + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+  return n.toLocaleString();
 }
-function getAdjCost(modelIdx, dir, type) {
-  const row = models[modelIdx].rows.find(r => r.dir === dir && r.type === type);
-  return row ? row.adjCost : 0;
-}
-function getVendorCost(modelIdx, dir, type) {
-  const row = models[modelIdx].rows.find(r => r.dir === dir && r.type === type);
-  return row ? row.vendorCost : 0;
+function fmtCT(n) {
+  // credits per single token = credits/1M ÷ 1,000,000
+  if (n >= 1)    return n.toFixed(3).replace(/\.?0+$/, '');
+  if (n >= 0.01) return n.toFixed(4).replace(/\.?0+$/, '');
+  return n.toExponential(2);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -601,29 +695,47 @@ function renderTable() {
   const head = document.getElementById('tableHead');
   const body = document.getElementById('paramsBody');
 
+  const vs = VENDOR_STYLE[m.vendor] || { bg:'#F7F7F7', color:'#707070', border:'#D9E3E6' };
   head.innerHTML = `<tr>
-    <th style="width:100px">Direction</th>
-    <th style="width:120px">Token Type</th>
-    <th class="right" style="width:200px">Vendor Cost /1M <span style="font-weight:400;text-transform:none;color:#CACACA">(internal)</span></th>
-    <th class="right col-adj-header" style="width:200px">Adjusted Cost /1M<span class="internal-tag">markup 计算基准</span></th>
-    <th class="right" style="width:150px">Credits /1M tokens</th>
+    <th style="width:150px">Model</th>
+    <th style="width:90px">Direction</th>
+    <th style="width:150px">Token Type</th>
+    <th class="right" style="width:190px">Vendor Cost /1M Tokens <span style="font-weight:400;text-transform:none;color:#CACACA">(internal)</span></th>
+    <th class="right col-adj-header" style="width:190px">Adjusted Vendor Cost /1M Tokens<span class="internal-tag">markup 计算基准</span></th>
+    <th class="right" style="width:120px">Credits</th>
+    <th class="right" style="width:110px">Credit/Token</th>
+    <th class="right" style="width:110px">Token/Credit</th>
     <th class="right" style="width:72px">Actions</th>
   </tr>`;
 
+  const modelBadge = `<span style="background:${vs.bg};color:${vs.color};border:1px solid ${vs.border};padding:2px 10px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap">${m.name}</span>`;
+
   let html = '';
   m.rows.forEach((r, i) => {
-    const c  = calcCredits(r.adjCost, 'token');
-    const sc = savedCredits(r.adjCost, 'token');
+    const c  = calcCredits(r.adjCost, currentRate);
+    const sc = calcCredits(r.adjCost, savedRate);
     const changed  = c !== sc;
     const adjusted = r.adjCost !== r.vendorCost;
     const adjNote  = adjusted ? `<span class="adj-note">↑ floor</span>` : `<span class="adj-same">= vendor</span>`;
+    const srcBadge = r.src ? `<span class="src-badge">${r.src}</span>` : '';
+    const perCallBadge = r.isPerCall ? `<span class="per-call-badge">per call</span>` : '';
+    const unit = r.isPerCall ? '/ call' : '/ 1M tokens';
+    const ctVal  = r.isPerCall ? '-' : fmtCT(c / 1e6);
+    const tcVal  = r.isPerCall ? '-' : fmtCT(1e6 / c);
     html += `<tr>
+      <td style="font-size:12px">${i === 0 ? modelBadge : ''}</td>
       <td><span class="dir-badge ${r.dir}">${r.dir.toUpperCase()}</span></td>
-      <td><strong>${r.type}</strong></td>
-      <td class="col-vendor">$${r.vendorCost.toFixed(4)}</td>
+      <td><strong>${r.type}</strong>${perCallBadge}</td>
+      <td class="col-vendor">$${r.vendorCost.toFixed(4)}${srcBadge}</td>
       <td class="col-adj">$${r.adjCost.toFixed(4)} ${adjNote}</td>
-      <td class="col-credits ${changed?'preview-changed':''}" title="${changed?'saved: '+sc:''}">
-        ${c}<small>/1M</small>
+      <td class="col-credits ${changed ? 'preview-changed' : ''}" title="${changed ? 'saved: ' + fmtC(sc) : ''}">
+        ${fmtC(c)}${r.isPerCall ? `<small>${unit}</small>` : ''}
+      </td>
+      <td class="col-credit-token ${changed ? 'preview-changed' : ''}">
+        ${ctVal === '-' ? '<span style="color:#CACACA">—</span>' : ctVal}
+      </td>
+      <td class="col-credit-token ${changed ? 'preview-changed' : ''}">
+        ${tcVal === '-' ? '<span style="color:#CACACA">—</span>' : tcVal}
       </td>
       <td class="col-actions">
         <button class="icon-btn" onclick="openEditModal(${i})">✎</button>
@@ -632,317 +744,61 @@ function renderTable() {
     </tr>`;
   });
   body.innerHTML = html;
-  document.getElementById('paramCount').textContent = `${m.rows.length} token type(s) configured`;
+  document.getElementById('paramCount').textContent = `${m.rows.length} pricing row(s) configured`;
+  document.getElementById('statRowCount').textContent = m.rows.length;
 }
 
 function updateStats() {
   const r = currentRate / 100;
   document.getElementById('statRate').textContent = currentRate + '%';
-  document.getElementById('statMargin').textContent = ((r/(1+r))*100).toFixed(1) + '%';
+  document.getElementById('statMargin').textContent = ((r / (1 + r)) * 100).toFixed(1) + '%';
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PRODUCT FILTER
+// MODAL helpers
 // ═══════════════════════════════════════════════════════════════
-function renderProducts() {
-  const bar = document.getElementById('productBar');
-  let html = '';
-  products.forEach(p => {
-    const active = p.id === currentProductId;
-    html += `
-      <div class="product-pill ${active?'active':''}" onclick="selectProduct(${p.id})">
-        <span>${p.name}</span>
-        <span class="pill-actions">
-          <button class="pill-icon" onclick="event.stopPropagation(); openEditProductModal(${p.id})" title="Rename">✎</button>
-          <button class="pill-icon danger" onclick="event.stopPropagation(); deleteProduct(${p.id})" title="Delete">✕</button>
-        </span>
-      </div>`;
-  });
-  html += `<button class="btn btn-ghost btn-sm" onclick="openNewProductModal()">+ New Product</button>`;
-  bar.innerHTML = html;
-
-  // update scenario section label
-  const prod = products.find(p => p.id === currentProductId);
-  document.getElementById('scenarioProductLabel').textContent = prod ? `— ${prod.name}` : '';
+function syncDirFromType() {
+  const t = document.getElementById('inputTokenType').value;
+  const dir = document.getElementById('inputDirection');
+  if (t === 'input_tokens')  { dir.value = 'input'; }
+  else if (t === 'output_tokens') { dir.value = 'output'; }
+  else if (t === 'tool_use') { dir.value = 'tool'; }
+  const isCall = t === 'tool_use';
+  document.getElementById('unitHint').textContent = isCall ? 'USD per call' : 'USD per 1M tokens';
+  document.getElementById('creditLabel').textContent = isCall ? 'Computed Credits / call' : 'Computed Credits / 1M tokens';
+  updatePreviewCredit();
 }
 
-function selectProduct(id) {
-  currentProductId = id;
-  renderProducts();
-  renderScenarios();
-}
-
-function openNewProductModal() {
-  editingProductId = null;
-  document.getElementById('productModalTitle').textContent = 'New Product · 新建产品';
-  document.getElementById('inputProductName').value = '';
-  document.getElementById('productModal').classList.add('open');
-}
-
-function openEditProductModal(id) {
-  editingProductId = id;
-  const p = products.find(x => x.id === id);
-  document.getElementById('productModalTitle').textContent = 'Rename Product · 编辑产品名称';
-  document.getElementById('inputProductName').value = p.name;
-  document.getElementById('productModal').classList.add('open');
-}
-
-function saveProduct() {
-  const name = document.getElementById('inputProductName').value.trim();
-  if (!name) return;
-  if (editingProductId !== null) {
-    products.find(p => p.id === editingProductId).name = name;
-  } else {
-    const id = nextProductId++;
-    products.push({ id, name });
-    currentProductId = id;
-  }
-  closeModal('productModal');
-  renderProducts();
-  renderScenarios();
-}
-
-function deleteProduct(id) {
-  if (!confirm('Delete this product and all its scenarios?')) return;
-  products = products.filter(p => p.id !== id);
-  scenarios = scenarios.filter(s => s.productId !== id);
-  if (currentProductId === id) {
-    currentProductId = products.length ? products[0].id : null;
-  }
-  renderProducts();
-  renderScenarios();
-}
-
-// ═══════════════════════════════════════════════════════════════
-// SCENARIOS
-// ═══════════════════════════════════════════════════════════════
-function fmtNum(n) { return n.toLocaleString('en-US', { maximumFractionDigits: 6 }); }
-function fmtUSD(n) { return '$' + n.toFixed(6); }
-function fmtCredits(n) { return n.toFixed(4); }
-
-function calcScenarioRow(row) {
-  const adjCost        = getAdjCost(row.modelIdx, row.dir, row.type);
-  const vendorCost     = getVendorCost(row.modelIdx, row.dir, row.type);
-  const rawVendorCost  = (row.tokens / 1_000_000) * vendorCost;
-  const vendorAdjCost  = (row.tokens / 1_000_000) * adjCost;
-  const markupCredit   = vendorAdjCost * (1 + currentRate / 100) * 100;
-  const markupPriceUSD = markupCredit * 0.01;
-  return { rawVendorCost, vendorAdjCost, markupCredit, markupPriceUSD };
-}
-
-function renderScenarios() {
-  const list = document.getElementById('scenariosList');
-  const productScenarios = scenarios.filter(s => s.productId === currentProductId);
-
-  if (!productScenarios.length) {
-    list.innerHTML = `<div style="text-align:center; padding:40px; color:#CACACA; font-size:14px;">
-      No scenarios yet — click "Add Scenario" to create one.
-    </div>`;
-    return;
-  }
-
-  list.innerHTML = productScenarios.map(sc => {
-    let totalRawVendor = 0, totalVendorAdj = 0, totalCredits = 0, totalUSD = 0;
-
-    const rowsHtml = sc.rows.map((r, ri) => {
-      const { rawVendorCost, vendorAdjCost, markupCredit, markupPriceUSD } = calcScenarioRow(r);
-      totalRawVendor += rawVendorCost;
-      totalVendorAdj += vendorAdjCost;
-      totalCredits   += markupCredit;
-      totalUSD       += markupPriceUSD;
-
-      const mName = models[r.modelIdx] ? models[r.modelIdx].name : '—';
-      return `<tr>
-        <td><span class="model-chip">${mName}</span></td>
-        <td><span class="dir-badge ${r.dir}" style="font-size:10px;height:22px;padding:0 8px">${r.dir.toUpperCase()}</span></td>
-        <td><strong>${r.type}</strong></td>
-        <td class="num-cell right">${fmtNum(r.tokens)}</td>
-        <td class="num-cell right">${fmtUSD(rawVendorCost)}</td>
-        <td class="num-cell right">${fmtUSD(vendorAdjCost)}</td>
-        <td class="num-cell right">${fmtCredits(markupCredit)}</td>
-        <td class="num-cell right">$${markupPriceUSD.toFixed(6)}</td>
-        <td style="text-align:right;width:60px">
-          <button class="icon-btn danger" onclick="deleteScenarioRow(${sc.id}, ${ri})">⌫</button>
-        </td>
-      </tr>`;
-    }).join('');
-
-    return `
-    <div class="scenario-card" id="sc-${sc.id}">
-      <div class="scenario-head">
-        <div class="scenario-name-wrap">
-          <span class="scenario-name" id="scname-${sc.id}">${sc.name}</span>
-          <input class="scenario-name-input" id="scname-input-${sc.id}"
-            value="${sc.name}"
-            onblur="saveScenarioNameInline(${sc.id})"
-            onkeydown="if(event.key==='Enter')this.blur()">
-        </div>
-        <div class="scenario-actions">
-          <button class="icon-btn" onclick="startRenameScenario(${sc.id})" title="Rename">✎</button>
-          <button class="icon-btn danger" onclick="deleteScenario(${sc.id})" title="Delete">⌫</button>
-        </div>
-      </div>
-      <div class="scenario-body">
-        <table class="scenario-table">
-          <thead>
-            <tr>
-              <th style="width:140px">Model</th>
-              <th style="width:80px">Direction</th>
-              <th style="width:90px">Type</th>
-              <th class="right" style="width:130px">Simulated Tokens</th>
-              <th class="right" style="width:130px">Vendor Cost</th>
-              <th class="right" style="width:140px">Vendor Adj Cost</th>
-              <th class="right" style="width:120px">Markup Credits</th>
-              <th class="right" style="width:130px">Markup Price (USD)</th>
-              <th style="width:60px"></th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rowsHtml}
-            <tr class="total-row">
-              <td colspan="4" style="color:#707070;font-size:12px">Total · 合计</td>
-              <td class="right">$${totalRawVendor.toFixed(6)}</td>
-              <td class="right">$${totalVendorAdj.toFixed(6)}</td>
-              <td class="right">${fmtCredits(totalCredits)}</td>
-              <td class="right">$${totalUSD.toFixed(6)}</td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="scenario-footer">
-        <button class="btn btn-ghost btn-sm" onclick="openScenarioRowModal(${sc.id})">+ Add Row · 新增行</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function openNewScenarioModal() {
-  editingScenarioId = null;
-  document.getElementById('scenarioModalTitle').textContent = 'New Scenario · 新建场景';
-  document.getElementById('inputScenarioName').value = '';
-  document.getElementById('scenarioModal').classList.add('open');
-}
-
-function saveScenario() {
-  const name = document.getElementById('inputScenarioName').value.trim();
-  if (!name) return;
-  if (editingScenarioId !== null) {
-    scenarios.find(s => s.id === editingScenarioId).name = name;
-  } else {
-    scenarios.push({ id: nextScenarioId++, productId: currentProductId, name, rows: [] });
-  }
-  closeModal('scenarioModal');
-  renderScenarios();
-}
-
-function startRenameScenario(id) {
-  document.getElementById('scname-' + id).style.display = 'none';
-  const inp = document.getElementById('scname-input-' + id);
-  inp.style.display = 'block';
-  inp.focus();
-  inp.select();
-}
-
-function saveScenarioNameInline(id) {
-  const inp = document.getElementById('scname-input-' + id);
-  const name = inp.value.trim();
-  if (name) {
-    scenarios.find(s => s.id === id).name = name;
-  }
-  renderScenarios();
-}
-
-function deleteScenario(id) {
-  if (!confirm('Delete this scenario?')) return;
-  scenarios = scenarios.filter(s => s.id !== id);
-  renderScenarios();
-}
-
-function deleteScenarioRow(scenarioId, rowIdx) {
-  const sc = scenarios.find(s => s.id === scenarioId);
-  sc.rows.splice(rowIdx, 1);
-  renderScenarios();
-}
-
-// ─── SCENARIO ROW MODAL ───────────────────────────────────────
-function openScenarioRowModal(scenarioId) {
-  targetScenarioId = scenarioId;
-  document.getElementById('srTokens').value = '';
-  document.getElementById('srModel').value = '0';
-  document.getElementById('srDir').value = 'input';
-  document.getElementById('srType').value = 'text';
-  updateSrPreview();
-  document.getElementById('scenarioRowModal').classList.add('open');
-}
-
-function onSrModelChange() { updateSrPreview(); }
-
-function updateSrPreview() {
-  const modelIdx = parseInt(document.getElementById('srModel').value);
-  const dir      = document.getElementById('srDir').value;
-  const type     = document.getElementById('srType').value;
-  const tokens   = parseFloat(document.getElementById('srTokens').value);
-
-  if (isNaN(tokens) || tokens <= 0) {
-    document.getElementById('srVendorAdjCost').textContent = '—';
-    document.getElementById('srMarkupCredit').textContent  = '—';
-    document.getElementById('srMarkupPrice').textContent   = '—';
-    return;
-  }
-  const adjCost        = getAdjCost(modelIdx, dir, type);
-  const vendorAdjCost  = (tokens / 1_000_000) * adjCost;
-  const markupCredit   = vendorAdjCost * (1 + currentRate / 100) * 100;
-  const markupPriceUSD = markupCredit * 0.01;
-  document.getElementById('srVendorAdjCost').textContent = fmtUSD(vendorAdjCost);
-  document.getElementById('srMarkupCredit').textContent  = fmtCredits(markupCredit);
-  document.getElementById('srMarkupPrice').textContent   = '$' + markupPriceUSD.toFixed(6);
-}
-
-function saveSrRow() {
-  const tokens = parseFloat(document.getElementById('srTokens').value);
-  if (isNaN(tokens) || tokens <= 0) { alert('Enter a valid token count.'); return; }
-  const sc = scenarios.find(s => s.id === targetScenarioId);
-  sc.rows.push({
-    modelIdx: parseInt(document.getElementById('srModel').value),
-    dir:      document.getElementById('srDir').value,
-    type:     document.getElementById('srType').value,
-    tokens
-  });
-  closeModal('scenarioRowModal');
-  renderScenarios();
-}
-
-// ═══════════════════════════════════════════════════════════════
-// PRICING PARAM MODAL
-// ═══════════════════════════════════════════════════════════════
 function openAddModal() {
   editingRowIdx = null;
-  const m = models[currentIdx];
-  document.getElementById('modalTitle').textContent = 'Add Token Pricing Row';
-  document.getElementById('tokenFields').style.display = '';
-  document.getElementById('callFields').style.display = 'none';
-  document.getElementById('unitHint').textContent = 'USD per 1M tokens';
-  document.getElementById('creditLabel').textContent = 'Credits / 1M tokens';
+  document.getElementById('modalTitle').textContent = 'Add Pricing Row';
+  document.getElementById('modalModelName').textContent = models[currentIdx].name;
+  document.getElementById('inputDirection').value = 'input';
+  document.getElementById('inputTokenType').value = 'input_tokens';
   document.getElementById('inputVendorCost').value = '';
   document.getElementById('inputAdjCost').value = '';
+  document.getElementById('inputSrc').value = 'bai';
   document.getElementById('previewCredit').textContent = '—';
   document.getElementById('adjHint').textContent = '';
+  document.getElementById('unitHint').textContent = 'USD per 1M tokens';
+  document.getElementById('creditLabel').textContent = 'Computed Credits / 1M tokens';
+  document.getElementById('modalFormula').textContent = '—';
   document.getElementById('modalOverlay').classList.add('open');
 }
 
 function openEditModal(idx) {
   editingRowIdx = idx;
   const r = models[currentIdx].rows[idx];
-  document.getElementById('modalTitle').textContent = 'Edit Token Pricing';
-  document.getElementById('tokenFields').style.display = '';
-  document.getElementById('callFields').style.display = 'none';
-  document.getElementById('unitHint').textContent = 'USD per 1M tokens';
-  document.getElementById('creditLabel').textContent = 'Credits / 1M tokens';
+  document.getElementById('modalTitle').textContent = 'Edit Pricing Row';
+  document.getElementById('modalModelName').textContent = models[currentIdx].name;
   document.getElementById('inputDirection').value = r.dir;
   document.getElementById('inputTokenType').value = r.type;
   document.getElementById('inputVendorCost').value = r.vendorCost;
   document.getElementById('inputAdjCost').value = r.adjCost;
+  document.getElementById('inputSrc').value = r.src || '';
+  const isCall = r.isPerCall;
+  document.getElementById('unitHint').textContent = isCall ? 'USD per call' : 'USD per 1M tokens';
+  document.getElementById('creditLabel').textContent = isCall ? 'Computed Credits / call' : 'Computed Credits / 1M tokens';
   updatePreviewCredit();
   document.getElementById('modalOverlay').classList.add('open');
 }
@@ -958,11 +814,13 @@ function onCostInput() {
 
 function updatePreviewCredit() {
   const adj = parseFloat(document.getElementById('inputAdjCost').value);
+  const isCall = document.getElementById('inputTokenType').value === 'tool_use';
+  const unit = isCall ? '/ call' : '/ 1M tokens';
   if (!isNaN(adj) && adj > 0) {
-    const c = calcCredits(adj, 'token');
-    document.getElementById('previewCredit').textContent = c;
+    const c = calcCredits(adj, currentRate);
+    document.getElementById('previewCredit').textContent = fmtC(c);
     document.getElementById('modalFormula').textContent =
-      `$${adj.toFixed(4)} × (1 + ${currentRate}%) × 100 = ${c} credits / 1M tokens`;
+      `$${adj.toFixed(4)} × (1 + ${currentRate}%) ÷ $${creditValue} = ${fmtC(c)} credits ${unit}`;
   } else {
     document.getElementById('previewCredit').textContent = '—';
     document.getElementById('modalFormula').textContent = '—';
@@ -973,10 +831,13 @@ function saveParam() {
   const vendorCost = parseFloat(document.getElementById('inputVendorCost').value);
   const adjCost    = parseFloat(document.getElementById('inputAdjCost').value);
   if (isNaN(vendorCost) || isNaN(adjCost)) { alert('Fill in both cost fields.'); return; }
+  const tokenType = document.getElementById('inputTokenType').value;
   const row = {
-    dir:  document.getElementById('inputDirection').value,
-    type: document.getElementById('inputTokenType').value,
-    vendorCost, adjCost
+    dir:       document.getElementById('inputDirection').value,
+    type:      tokenType,
+    vendorCost, adjCost,
+    src:       document.getElementById('inputSrc').value || 'bai',
+    isPerCall: tokenType === 'tool_use',
   };
   const m = models[currentIdx];
   if (editingRowIdx !== null) m.rows[editingRowIdx] = row;
@@ -991,20 +852,16 @@ function deleteRow(idx) {
   renderTable(); updateStats();
 }
 
-// close modals on backdrop click
-['modalOverlay','productModal','scenarioModal','scenarioRowModal'].forEach(id => {
-  document.getElementById(id).addEventListener('click', e => {
-    if (e.target.id === id) closeModal(id);
-  });
+document.getElementById('modalOverlay').addEventListener('click', e => {
+  if (e.target.id === 'modalOverlay') closeModal('modalOverlay');
 });
 
 // ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
-renderTable();
-updateStats();
-renderProducts();
-renderScenarios();
+buildModelSelect();
+document.getElementById('modelSelect').value = 'overview';
+switchModel();
 </script>
 </body>
 </html>
