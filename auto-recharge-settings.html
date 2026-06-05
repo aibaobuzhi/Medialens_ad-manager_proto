@@ -676,72 +676,44 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
       <!-- Settings Panel -->
       <div id="ar-settings" style="display:none;">
         <div class="divider"></div>
-        <div class="settings-form" id="settings-form-inner">
+        <div id="settings-form-inner">
 
-          <!-- Refill Threshold -->
-          <div class="form-row">
-            <div class="form-label">
-              Refill Threshold
-              <div class="tooltip-wrap">
-                <span class="tip-icon">?</span>
-                <div class="tip-popup">Auto Refill triggers when Total Balance (Subscription + Pack combined) drops below this percentage of Total Quota.</div>
-              </div>
+          <!-- Row: Threshold + Monthly Cap side by side -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #E8EEF0;border-radius:10px;overflow:hidden;margin-bottom:16px;">
+
+            <!-- Refill Threshold -->
+            <div style="padding:18px 20px;border-right:1px solid #E8EEF0;">
+              <div style="font-size:14px;font-weight:600;color:#102532;margin-bottom:4px;">Refill Threshold</div>
+              <div style="font-size:12px;color:#828282;margin-bottom:12px;line-height:1.5;">Auto Refill triggers when your Total Balance drops below this level.</div>
+              <select class="select-input" id="threshold-select" style="width:100%;" onchange="updateSummary()">
+                <option value="5">5% of Total Quota — 25,000 tokens</option>
+                <option value="10" selected>10% of Total Quota — 50,000 tokens</option>
+                <option value="15">15% of Total Quota — 75,000 tokens</option>
+                <option value="20">20% of Total Quota — 100,000 tokens</option>
+              </select>
             </div>
-            <div class="radio-group">
-              <label class="radio-option" id="radio-5" onclick="selectThreshold('5')">
-                <div class="radio-dot"><div class="radio-dot-inner"></div></div>
-                <div>
-                  <div class="radio-text">5% of Total Quota</div>
-                  <div class="radio-sub">Trigger when balance drops below 25,000 tokens — more aggressive refill</div>
-                </div>
-              </label>
-              <label class="radio-option selected" id="radio-10" onclick="selectThreshold('10')">
-                <div class="radio-dot"><div class="radio-dot-inner"></div></div>
-                <div>
-                  <div class="radio-text">10% of Total Quota</div>
-                  <div class="radio-sub">Trigger when balance drops below 50,000 tokens — currently below this threshold</div>
-                </div>
-              </label>
+
+            <!-- Monthly Cap -->
+            <div style="padding:18px 20px;">
+              <div style="font-size:14px;font-weight:600;color:#102532;margin-bottom:4px;">Monthly Cap</div>
+              <div style="font-size:12px;color:#828282;margin-bottom:12px;line-height:1.5;">Maximum Auto Refill spend per calendar month. Resets Jul 1, 2026.</div>
+              <select class="select-input" id="monthly-cap" style="width:100%;" onchange="updateSummary()">
+                <option value="250">$250 / month — 1 pack</option>
+                <option value="500" selected>$500 / month — 2 packs</option>
+                <option value="750">$750 / month — 3 packs</option>
+                <option value="1000">$1,000 / month — 4 packs</option>
+              </select>
             </div>
+
           </div>
 
-          <!-- Refill Amount -->
-          <div class="form-row">
-            <div class="form-label">
-              Refill Amount
-              <div class="tooltip-wrap">
-                <span class="tip-icon">?</span>
-                <div class="tip-popup">Fixed at 1 pack per recharge to prevent unexpected large charges. You can always purchase additional packs manually.</div>
-              </div>
+          <!-- Payment Method row -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border:1px solid #E8EEF0;border-radius:10px;margin-bottom:16px;">
+            <div>
+              <div style="font-size:14px;font-weight:600;color:#102532;margin-bottom:2px;">Payment Method</div>
+              <div style="font-size:12px;color:#828282;">Charges applied to this card when Auto Refill triggers.</div>
             </div>
             <div style="display:flex;align-items:center;gap:10px;">
-              <div style="background:#F5F5F5;border:1px solid #D9E3E6;border-radius:8px;padding:9px 14px;font-size:14px;color:#828282;cursor:not-allowed;width:260px;">1 Token Pack &mdash; $250.00 USD</div>
-              <span style="font-size:12px;color:#828282;">Fixed per recharge</span>
-            </div>
-          </div>
-
-          <!-- Monthly Cap -->
-          <div class="form-row">
-            <div class="form-label">
-              Monthly Cap
-              <div class="tooltip-wrap">
-                <span class="tip-icon">?</span>
-                <div class="tip-popup">Maximum Auto Refill spend per calendar month. Resets on the 1st of every month. Manual purchases are not affected by this cap.</div>
-              </div>
-            </div>
-            <select class="select-input" id="monthly-cap">
-              <option value="250">$250 / month &nbsp;·&nbsp; 1 pack</option>
-              <option value="500" selected>$500 / month &nbsp;·&nbsp; 2 packs</option>
-              <option value="750">$750 / month &nbsp;·&nbsp; 3 packs</option>
-              <option value="1000">$1,000 / month &nbsp;·&nbsp; 4 packs</option>
-            </select>
-            <div class="form-helper">Cap resets on Jul 1, 2026 &nbsp;·&nbsp; Daily cooldown: max 1 recharge per day</div>
-          </div>
-
-          <!-- Payment Method -->
-          <div class="form-row">
-            <div class="form-label">Payment Method</div>
-            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
               <div class="payment-card-display">
                 <div class="card-brand">VISA</div>
                 <div>
@@ -749,26 +721,28 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
                   <div class="card-exp">Exp 08/27</div>
                 </div>
               </div>
-              <button class="btn btn-secondary btn-sm" onclick="openModal()">Change Payment Method</button>
+              <button class="btn btn-secondary btn-sm" onclick="openModal()">Change</button>
             </div>
           </div>
 
-          <!-- Monthly Usage Summary -->
-          <div class="divider" style="margin:4px 0;"></div>
-          <div class="form-row">
-            <div class="form-label">June 2026 Auto Refill</div>
-            <div class="usage-box">
-              <div class="usage-row">
-                <span class="usage-label">Amount charged this month</span>
-                <span class="usage-value" id="usage-amount">$250 of $500 cap</span>
-              </div>
-              <div class="usage-bar-wrap">
-                <div class="usage-bar-fill" id="usage-bar" style="width:50%"></div>
-              </div>
-              <div class="usage-note" id="usage-note">
-                Last recharge: Jun 2, 2026 — 1 pack added &nbsp;·&nbsp;
-                <strong style="color:#52C41A;">1 more recharge available this month</strong>
-              </div>
+          <!-- Summary line -->
+          <div id="ar-summary" style="background:#F0F9FF;border:1px solid #C8E8FA;border-radius:8px;padding:12px 16px;font-size:13px;color:#0A6FAD;line-height:1.6;margin-bottom:16px;">
+            Auto Refill will trigger when balance drops below <strong>50,000 tokens (10%)</strong> — adding 1 pack ($250) each time, up to <strong>$500/month</strong>, charged to Visa ****4242.
+          </div>
+
+          <!-- Monthly usage -->
+          <div style="padding:14px 16px;border:1px solid #E8EEF0;border-radius:10px;">
+            <div style="font-size:12px;font-weight:600;color:#707070;letter-spacing:0.3px;text-transform:uppercase;margin-bottom:10px;">June 2026 Usage</div>
+            <div class="usage-row">
+              <span class="usage-label">Charged this month</span>
+              <span class="usage-value" id="usage-amount">$250 of $500 cap</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar-fill" id="usage-bar" style="width:50%"></div>
+            </div>
+            <div class="usage-note" id="usage-note">
+              Last refill: Jun 2, 2026 — 1 pack added &nbsp;·&nbsp;
+              <strong style="color:#52C41A;">1 more refill available this month</strong>
             </div>
           </div>
 
@@ -873,61 +847,48 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
     <div class="modal-title">Enable Auto Refill</div>
     <div class="modal-subtitle">Auto-purchase 1 Token Pack ($250) when your balance drops below the threshold. You can adjust these settings in Plans &amp; Billing at any time.</div>
 
-    <div style="display:flex;flex-direction:column;gap:18px;">
+    <div style="display:flex;flex-direction:column;gap:14px;">
 
       <!-- Threshold -->
-      <div class="form-row">
-        <div class="form-label">Refill Threshold</div>
-        <div class="radio-group">
-          <label class="radio-option" id="qs-radio-5" onclick="qsSelectThreshold('5')">
-            <div class="radio-dot"><div class="radio-dot-inner"></div></div>
-            <div>
-              <div class="radio-text">5% of Total Quota</div>
-              <div class="radio-sub">Trigger below 25,000 tokens — more aggressive</div>
-            </div>
-          </label>
-          <label class="radio-option selected" id="qs-radio-10" onclick="qsSelectThreshold('10')">
-            <div class="radio-dot"><div class="radio-dot-inner"></div></div>
-            <div>
-              <div class="radio-text">10% of Total Quota</div>
-              <div class="radio-sub">Trigger below 50,000 tokens — recommended</div>
-            </div>
-          </label>
-        </div>
+      <div>
+        <div style="font-size:14px;font-weight:600;color:#102532;margin-bottom:3px;">Refill Threshold</div>
+        <div style="font-size:12px;color:#828282;margin-bottom:8px;">Auto Refill triggers when your Total Balance drops below this level.</div>
+        <select class="select-input" id="qs-threshold" style="width:100%;" onchange="updateQsSummary()">
+          <option value="5">5% of Total Quota — 25,000 tokens</option>
+          <option value="10" selected>10% of Total Quota — 50,000 tokens</option>
+          <option value="15">15% of Total Quota — 75,000 tokens</option>
+          <option value="20">20% of Total Quota — 100,000 tokens</option>
+        </select>
       </div>
 
       <!-- Monthly Cap -->
-      <div class="form-row">
-        <div class="form-label">Monthly Cap
-          <div class="tooltip-wrap">
-            <span class="tip-icon">?</span>
-            <div class="tip-popup">Max Auto Refill spend per calendar month. Resets on the 1st of every month.</div>
-          </div>
-        </div>
-        <select class="select-input" style="width:100%;">
-          <option value="250">$250 / month &nbsp;·&nbsp; 1 pack</option>
-          <option value="500" selected>$500 / month &nbsp;·&nbsp; 2 packs</option>
-          <option value="750">$750 / month &nbsp;·&nbsp; 3 packs</option>
-          <option value="1000">$1,000 / month &nbsp;·&nbsp; 4 packs</option>
+      <div>
+        <div style="font-size:14px;font-weight:600;color:#102532;margin-bottom:3px;">Monthly Cap</div>
+        <div style="font-size:12px;color:#828282;margin-bottom:8px;">Maximum Auto Refill spend per calendar month. Resets Jul 1, 2026.</div>
+        <select class="select-input" id="qs-cap" style="width:100%;" onchange="updateQsSummary()">
+          <option value="250">$250 / month — 1 pack</option>
+          <option value="500" selected>$500 / month — 2 packs</option>
+          <option value="750">$750 / month — 3 packs</option>
+          <option value="1000">$1,000 / month — 4 packs</option>
         </select>
       </div>
 
       <!-- Payment method -->
-      <div class="form-row">
-        <div class="form-label">Payment Method</div>
-        <div class="payment-card-display">
-          <div class="card-brand">VISA</div>
-          <div>
-            <div class="card-number">**** **** **** 4242</div>
-            <div class="card-exp">Exp 08/27</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#F7F7F7;border-radius:8px;">
+        <div style="font-size:13px;color:#707070;">Payment method</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="payment-card-display" style="padding:6px 10px;">
+            <div class="card-brand" style="width:28px;height:18px;font-size:7px;">VISA</div>
+            <div class="card-number" style="font-size:13px;">****4242</div>
           </div>
+          <span style="font-size:12px;color:#23A9F6;cursor:pointer;" onclick="closeQuickSetup();openModal()">Change</span>
         </div>
-        <div style="font-size:11px;color:#828282;margin-top:4px;">Charges applied to this card. <span style="color:#23A9F6;cursor:pointer;" onclick="closeQuickSetup();openModal()">Change</span></div>
       </div>
 
-      <!-- Note -->
-      <div style="background:#F0F9FF;border-radius:8px;padding:12px 14px;font-size:12px;color:#707070;line-height:1.6;">
-        First refill will trigger immediately if your current balance (48,200 tokens · 9.6%) is below the selected threshold.
+      <!-- Summary -->
+      <div id="qs-summary" style="background:#F0F9FF;border:1px solid #C8E8FA;border-radius:8px;padding:12px 14px;font-size:13px;color:#0A6FAD;line-height:1.6;">
+        Auto Refill will trigger below <strong>50,000 tokens (10%)</strong> — $250/refill, up to <strong>$500/month</strong>.
+        Your current balance (48,200 · 9.6%) is already below this threshold — a refill will trigger immediately.
       </div>
 
     </div>
@@ -1123,9 +1084,17 @@ function toggleAR() {
   }
 }
 
-function selectThreshold(val) {
-  document.getElementById('radio-5').classList.toggle('selected', val === '5');
-  document.getElementById('radio-10').classList.toggle('selected', val === '10');
+function updateSummary() {
+  var tsel = document.getElementById('threshold-select');
+  var capsel = document.getElementById('monthly-cap');
+  if (!tsel || !capsel) return;
+  var tval = tsel.value;
+  var tTokens = (500000 * parseInt(tval) / 100).toLocaleString();
+  var capOpt = capsel.options[capsel.selectedIndex].text.split('—')[0].trim();
+  var summary = document.getElementById('ar-summary');
+  if (summary) {
+    summary.innerHTML = 'Auto Refill will trigger when balance drops below <strong>' + tTokens + ' tokens (' + tval + '%)</strong> — adding 1 pack ($250) each time, up to <strong>' + capOpt + '</strong>, charged to Visa ****4242.';
+  }
 }
 
 function reactivate() {
@@ -1240,9 +1209,14 @@ function confirmQuickSetup() {
   showToast('Auto Refill enabled successfully.');
 }
 
-function qsSelectThreshold(val) {
-  document.getElementById('qs-radio-5').classList.toggle('selected', val === '5');
-  document.getElementById('qs-radio-10').classList.toggle('selected', val === '10');
+function updateQsSummary() {
+  var tval = document.getElementById('qs-threshold').value;
+  var tTokens = (500000 * parseInt(tval) / 100).toLocaleString();
+  var capOpt = document.getElementById('qs-cap').options[document.getElementById('qs-cap').selectedIndex].text.split('—')[0].trim();
+  var below = parseInt(tval) >= 10;
+  var s = document.getElementById('qs-summary');
+  s.innerHTML = 'Auto Refill will trigger below <strong>' + tTokens + ' tokens (' + tval + '%)</strong> — $250/refill, up to <strong>' + capOpt + '</strong>.'
+    + (below ? ' Your current balance (48,200 · 9.6%) is already below this threshold — a refill will trigger immediately.' : '');
 }
 
 // ── Override confirmTurnOff to also sync quota badge ──
