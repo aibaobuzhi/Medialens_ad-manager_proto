@@ -365,6 +365,42 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
 
 /* ── Disabled overlay for settings ── */
 .settings-disabled{opacity:0.45;pointer-events:none;}
+
+/* ── Quota & Usage view ── */
+.quota-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+.quota-card{
+  background:#fff;border:1px solid #D9E3E6;border-radius:12px;
+  padding:20px 22px;cursor:pointer;transition:border-color .15s,box-shadow .15s;
+}
+.quota-card:hover{border-color:#23A9F6;box-shadow:0 2px 12px rgba(35,169,246,0.10);}
+.quota-card.highlight{border-color:#23A9F6;background:#F8FCFF;}
+.qc-label{font-size:11px;font-weight:600;color:#AEAEAE;letter-spacing:0.6px;text-transform:uppercase;margin-bottom:6px;}
+.qc-value{font-size:22px;font-weight:600;color:#102532;line-height:1.2;margin-bottom:2px;}
+.qc-sub{font-size:12px;color:#828282;}
+.qc-bar-wrap{background:#E8EEF0;border-radius:999px;height:4px;margin-top:10px;}
+.qc-bar-fill{height:100%;border-radius:999px;background:#23A9F6;}
+
+/* AI Tokens quota card — special layout */
+.ai-token-card{
+  grid-column:1/-1;
+  display:flex;align-items:stretch;gap:0;
+  background:#fff;border:1.5px solid #23A9F6;border-radius:12px;
+  overflow:hidden;cursor:default;
+}
+.ai-token-card .ai-left{
+  flex:1;padding:20px 24px;cursor:pointer;
+  transition:background .15s;
+}
+.ai-token-card .ai-left:hover{background:#F0F9FF;}
+.ai-token-card .ai-right{
+  width:1px;background:#E8EEF0;flex-shrink:0;
+}
+.ai-token-card .ai-actions{
+  width:280px;padding:20px 22px;display:flex;flex-direction:column;justify-content:center;gap:10px;
+}
+
+/* Quick-setup modal */
+.qs-modal{width:440px;}
 </style>
 </head>
 <body>
@@ -397,7 +433,11 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
       <svg viewBox="0 0 20 20" fill="currentColor"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM2 8a2 2 0 114 0A2 2 0 012 8zm14 8a6 6 0 00-11.8-1.4 7 7 0 0011.8 1.4zM2 16a6 6 0 0111.8-1.4A7 7 0 002 16z"/></svg>
       Team Members
     </div>
-    <div class="sidebar-item active">
+    <div class="sidebar-item" id="nav-quota" onclick="switchView('quota')">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
+      Quota and Usage
+    </div>
+    <div class="sidebar-item active" id="nav-billing" onclick="switchView('billing')">
       <svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM2 9v7a2 2 0 002 2h12a2 2 0 002-2V9H2zm5 3a1 1 0 011-1h4a1 1 0 110 2H8a1 1 0 01-1-1z"/></svg>
       Plans &amp; Billing
     </div>
@@ -417,6 +457,102 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
 
   <!-- Main Content -->
   <main class="main">
+
+    <!-- ══ Quota and Usage View ══ -->
+    <div id="view-quota" style="display:none;">
+      <div class="breadcrumb"><a onclick="switchView('billing')">Account Settings</a> &nbsp;/&nbsp; Quota and Usage</div>
+      <div class="page-title">Quota and Usage</div>
+
+      <!-- Quota cards grid -->
+      <div class="quota-grid">
+
+        <!-- User Seats -->
+        <div class="quota-card">
+          <div class="qc-label">User Seats</div>
+          <div class="qc-value">3 <span style="font-size:14px;font-weight:400;color:#828282;">/ 5</span></div>
+          <div class="qc-sub">2 seats available</div>
+          <div class="qc-bar-wrap"><div class="qc-bar-fill" style="width:60%;"></div></div>
+        </div>
+
+        <!-- Competitor Pages -->
+        <div class="quota-card">
+          <div class="qc-label">Competitor Pages</div>
+          <div class="qc-value">8 <span style="font-size:14px;font-weight:400;color:#828282;">/ 10</span></div>
+          <div class="qc-sub">2 pages remaining</div>
+          <div class="qc-bar-wrap"><div class="qc-bar-fill" style="width:80%;background:#FFC960;"></div></div>
+        </div>
+
+        <!-- Competitor Page Views -->
+        <div class="quota-card">
+          <div class="qc-label">Competitor Page Views</div>
+          <div class="qc-value">18,420 <span style="font-size:14px;font-weight:400;color:#828282;">/ 25,000</span></div>
+          <div class="qc-sub">6,580 views remaining</div>
+          <div class="qc-bar-wrap"><div class="qc-bar-fill" style="width:73.7%;"></div></div>
+        </div>
+
+        <!-- Buzz -->
+        <div class="quota-card">
+          <div class="qc-label">Buzz Monitoring</div>
+          <div class="qc-value">Active</div>
+          <div class="qc-sub">Unlimited mentions</div>
+          <div class="qc-bar-wrap"><div class="qc-bar-fill" style="width:100%;background:#52C41A;"></div></div>
+        </div>
+
+        <!-- AI Tokens — full-width special card -->
+        <div class="ai-token-card" style="grid-column:1/-1;">
+          <!-- Left: clickable area → go to billing AI tokens -->
+          <div class="ai-left" onclick="switchView('billing')" title="Click to manage in Plans &amp; Billing">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <div>
+                <div class="qc-label" style="color:#23A9F6;">AI Tokens</div>
+                <div style="font-size:11px;color:#828282;">Plans &amp; Billing → AI Tokens &nbsp;→</div>
+              </div>
+              <span style="font-size:11px;color:#23A9F6;font-weight:500;padding:3px 10px;background:#EEF6FF;border-radius:20px;">Manage ›</span>
+            </div>
+            <!-- Balance display -->
+            <div style="display:flex;align-items:flex-end;gap:8px;margin-bottom:6px;">
+              <span style="font-size:32px;font-weight:600;color:#23A9F6;line-height:1;">48,200</span>
+              <span style="font-size:13px;color:#828282;margin-bottom:4px;">tokens remaining</span>
+            </div>
+            <!-- Usage bar -->
+            <div style="background:#E8EEF0;border-radius:999px;height:5px;margin-bottom:5px;">
+              <div style="height:100%;border-radius:999px;background:#FF3F41;width:90.4%;"></div>
+            </div>
+            <div style="font-size:11px;color:#707070;">90.4% used &nbsp;·&nbsp; 9.6% remaining &nbsp;·&nbsp; Subscription resets Jul 4, 2026</div>
+            <!-- Breakdown -->
+            <div style="display:flex;gap:24px;margin-top:14px;">
+              <div>
+                <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#23A9F6;margin-right:4px;"></span>
+                <span style="font-size:11px;color:#707070;">Subscription: <strong style="color:#102532;">48,200</strong> remaining</span>
+              </div>
+              <div>
+                <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#BDBDBD;margin-right:4px;"></span>
+                <span style="font-size:11px;color:#BDBDBD;">Pack: 0 remaining</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="ai-right"></div>
+
+          <!-- Right: Auto Refill toggle + status -->
+          <div class="ai-actions">
+            <div style="font-size:12px;font-weight:600;color:#102532;margin-bottom:2px;">Auto Refill</div>
+            <div style="font-size:12px;color:#828282;margin-bottom:14px;line-height:1.5;">Auto-purchase 1 pack ($250) when balance drops below threshold.</div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+              <div class="toggle" id="quota-ar-toggle" onclick="toggleARFromQuota()" style="flex-shrink:0;"></div>
+              <span id="quota-toggle-label" style="font-size:13px;color:#707070;">Off</span>
+              <div class="status-badge sb-disabled" id="quota-status-badge">Disabled</div>
+            </div>
+            <button class="btn btn-outline btn-sm" style="width:100%;justify-content:center;" onclick="switchView('billing')">Full Settings ›</button>
+          </div>
+        </div>
+
+      </div><!-- /quota-grid -->
+    </div><!-- /view-quota -->
+
+    <!-- ══ Plans & Billing View ══ -->
+    <div id="view-billing">
     <div class="breadcrumb">
       <a>Account Settings</a> &nbsp;/&nbsp; Plans &amp; Billing
     </div>
@@ -744,6 +880,8 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
       </div>
     </div>
 
+    </div><!-- /view-billing -->
+
   </main>
 </div>
 
@@ -755,6 +893,79 @@ body{font-family:'Poppins',system-ui,sans-serif;background:#F7F7F7;color:#102532
     <button class="demo-btn" data-state="active" onclick="setDemoState('active',this)">Active</button>
     <button class="demo-btn" data-state="suspended" onclick="setDemoState('suspended',this)">Suspended</button>
     <button class="demo-btn" data-state="cap-reached" onclick="setDemoState('cap-reached',this)">Cap Reached</button>
+  </div>
+</div>
+
+<!-- ── Quick Setup Modal (from Quota & Usage toggle) ── -->
+<div class="modal-overlay" id="quicksetup-modal" onclick="if(event.target===this)closeQuickSetup()">
+  <div class="modal qs-modal">
+    <button class="modal-close" onclick="closeQuickSetup()">&#x2715;</button>
+    <div class="modal-title">Enable Auto Refill</div>
+    <div class="modal-subtitle">Auto-purchase 1 Token Pack ($250) when your balance drops below the threshold. You can adjust these settings in Plans &amp; Billing at any time.</div>
+
+    <div style="display:flex;flex-direction:column;gap:18px;">
+
+      <!-- Threshold -->
+      <div class="form-row">
+        <div class="form-label">Refill Threshold</div>
+        <div class="radio-group">
+          <label class="radio-option" id="qs-radio-5" onclick="qsSelectThreshold('5')">
+            <div class="radio-dot"><div class="radio-dot-inner"></div></div>
+            <div>
+              <div class="radio-text">5% of Total Quota</div>
+              <div class="radio-sub">Trigger below 25,000 tokens — more aggressive</div>
+            </div>
+          </label>
+          <label class="radio-option selected" id="qs-radio-10" onclick="qsSelectThreshold('10')">
+            <div class="radio-dot"><div class="radio-dot-inner"></div></div>
+            <div>
+              <div class="radio-text">10% of Total Quota</div>
+              <div class="radio-sub">Trigger below 50,000 tokens — recommended</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Monthly Cap -->
+      <div class="form-row">
+        <div class="form-label">Monthly Cap
+          <div class="tooltip-wrap">
+            <span class="tip-icon">?</span>
+            <div class="tip-popup">Max Auto Refill spend per calendar month. Resets on the 1st of every month.</div>
+          </div>
+        </div>
+        <select class="select-input" style="width:100%;">
+          <option value="250">$250 / month &nbsp;·&nbsp; 1 pack</option>
+          <option value="500" selected>$500 / month &nbsp;·&nbsp; 2 packs</option>
+          <option value="750">$750 / month &nbsp;·&nbsp; 3 packs</option>
+          <option value="1000">$1,000 / month &nbsp;·&nbsp; 4 packs</option>
+        </select>
+      </div>
+
+      <!-- Payment method -->
+      <div class="form-row">
+        <div class="form-label">Payment Method</div>
+        <div class="payment-card-display">
+          <div class="card-brand">VISA</div>
+          <div>
+            <div class="card-number">**** **** **** 4242</div>
+            <div class="card-exp">Exp 08/27</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#828282;margin-top:4px;">Charges applied to this card. <span style="color:#23A9F6;cursor:pointer;" onclick="closeQuickSetup();openModal()">Change</span></div>
+      </div>
+
+      <!-- Note -->
+      <div style="background:#F0F9FF;border-radius:8px;padding:12px 14px;font-size:12px;color:#707070;line-height:1.6;">
+        First refill will trigger immediately if your current balance (48,200 tokens · 9.6%) is below the selected threshold.
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeQuickSetup()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmQuickSetup()">Enable Auto Refill</button>
+    </div>
   </div>
 </div>
 
@@ -997,6 +1208,82 @@ function showToast(msg) {
   document.body.appendChild(t);
   setTimeout(function(){ t.remove(); }, 3000);
 }
+
+// ── View switching ──
+function switchView(view) {
+  var isQuota = view === 'quota';
+  document.getElementById('view-quota').style.display = isQuota ? 'block' : 'none';
+  document.getElementById('view-billing').style.display = isQuota ? 'none' : 'block';
+  document.getElementById('nav-quota').classList.toggle('active', isQuota);
+  document.getElementById('nav-billing').classList.toggle('active', !isQuota);
+  // Sync quota badge with billing state
+  syncQuotaBadge();
+}
+
+function syncQuotaBadge() {
+  var qtog = document.getElementById('quota-ar-toggle');
+  var qlbl = document.getElementById('quota-toggle-label');
+  var qbdg = document.getElementById('quota-status-badge');
+  if (arOn) {
+    qtog.classList.add('on');
+    qlbl.textContent = 'On';
+    if (currentState === 'suspended') {
+      qbdg.className = 'status-badge sb-suspended'; qbdg.textContent = 'Suspended';
+    } else if (currentState === 'cap-reached') {
+      qbdg.className = 'status-badge sb-cap'; qbdg.textContent = 'Cap Reached';
+    } else {
+      qbdg.className = 'status-badge sb-active'; qbdg.textContent = 'Active';
+    }
+  } else {
+    qtog.classList.remove('on');
+    qlbl.textContent = 'Off';
+    qbdg.className = 'status-badge sb-disabled'; qbdg.textContent = 'Disabled';
+  }
+}
+
+function toggleARFromQuota() {
+  if (arOn) {
+    // Show turn-off confirmation
+    openTurnOffModal();
+  } else {
+    // Open quick setup
+    openQuickSetup();
+  }
+}
+
+function openQuickSetup() {
+  document.getElementById('quicksetup-modal').classList.add('open');
+}
+
+function closeQuickSetup() {
+  document.getElementById('quicksetup-modal').classList.remove('open');
+}
+
+function confirmQuickSetup() {
+  closeQuickSetup();
+  // Enable in billing view state too
+  arOn = true;
+  currentState = 'active';
+  document.querySelectorAll('.demo-btn').forEach(function(b,i){ b.classList.toggle('active', i===1); });
+  refreshToggleUI();
+  document.getElementById('ar-settings').style.display = 'block';
+  document.getElementById('settings-form-inner').classList.remove('settings-disabled');
+  setBadge('active','Active');
+  syncQuotaBadge();
+  showToast('Auto Refill enabled successfully.');
+}
+
+function qsSelectThreshold(val) {
+  document.getElementById('qs-radio-5').classList.toggle('selected', val === '5');
+  document.getElementById('qs-radio-10').classList.toggle('selected', val === '10');
+}
+
+// ── Override confirmTurnOff to also sync quota badge ──
+var _origConfirmTurnOff = confirmTurnOff;
+confirmTurnOff = function() {
+  _origConfirmTurnOff();
+  syncQuotaBadge();
+};
 
 // Init
 setDemoState('disabled', document.querySelectorAll('.demo-btn')[0]);
