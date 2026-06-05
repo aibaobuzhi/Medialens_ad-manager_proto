@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales Signal — Industry Engagement Drop Alert</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Poppins', sans-serif; background: #F7F7F7; color: #102532; min-height: 100vh; }
+
+/* ── Nav ── */
+.nav { height: 64px; background: #23A9F6; display: flex; align-items: center; padding: 0 40px; }
+.nav-logo { font-size: 18px; font-weight: 700; color: #fff; }
+.nav-logo span { font-weight: 400; opacity: 0.75; }
+
+/* ── Tabs ── */
+.tabs-bar { background: #fff; border-bottom: 1.5px solid #E8EAEC; padding: 0 40px; display: flex; gap: 0; }
+.tab-btn {
+  padding: 14px 24px;
+  font-size: 13px; font-weight: 500; color: #707070;
+  border: none; border-bottom: 2.5px solid transparent;
+  background: none; cursor: pointer; transition: all 0.15s;
+  margin-bottom: -1.5px;
+}
+.tab-btn.active { color: #23A9F6; border-bottom-color: #23A9F6; font-weight: 600; }
+.tab-btn:hover:not(.active) { color: #102532; }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── Tab 1: Email Preview ── */
+.email-stage { background: #E8EAED; padding: 32px 24px; min-height: calc(100vh - 128px); }
+.email-meta { max-width: 680px; margin: 0 auto 16px; font-size: 12px; color: #555; line-height: 1.7; background: #fff; border-radius: 8px; padding: 12px 18px; border: 1px solid #ddd; }
+.email-meta strong { color: #102532; }
+.email-wrap { max-width: 680px; margin: 0 auto; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,.10); }
+
+/* ── Tab 2: Excel Spec ── */
+.doc-page { max-width: 860px; margin: 0 auto; padding: 40px 32px; }
+.doc-page h2 { font-size: 18px; font-weight: 700; color: #0A1F2C; margin-bottom: 6px; }
+.doc-page .doc-sub { font-size: 12px; color: #707070; margin-bottom: 28px; }
+.section-title { font-size: 13px; font-weight: 600; color: #102532; margin: 28px 0 10px; padding-bottom: 6px; border-bottom: 1.5px solid #E8EAEC; }
+.spec-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px; }
+.spec-table th { background: #23A9F6; color: #fff; font-weight: 600; font-size: 11px; padding: 9px 12px; text-align: left; }
+.spec-table td { padding: 9px 12px; border-bottom: 1px solid #F0F0F0; vertical-align: top; line-height: 1.5; }
+.spec-table tr:nth-child(even) td { background: #F7F9FC; }
+.spec-table td:first-child { font-weight: 600; color: #23A9F6; white-space: nowrap; }
+.tag { display: inline-block; font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 10px; }
+.tag-db { background: #EFF8FF; color: #1D4ED8; }
+.tag-ai { background: #F3E8FF; color: #9333EA; }
+.tag-calc { background: #F0FBF0; color: #2E7D32; }
+.confirmed-box { background: #F0FBF0; border: 1px solid #C8E6C9; border-radius: 8px; padding: 12px 16px; font-size: 12px; color: #2E7D32; margin: 20px 0; }
+.confirmed-box strong { color: #1B5E20; }
+.question-box { background: #FFFDE7; border: 1px solid #FFF176; border-radius: 8px; padding: 12px 16px; font-size: 12px; color: #795548; margin: 20px 0; }
+.question-box strong { color: #4E342E; }
+
+/* ── Tab 3: Backend Logic ── */
+.logic-page { max-width: 860px; margin: 0 auto; padding: 40px 32px; }
+.logic-page h2 { font-size: 18px; font-weight: 700; color: #0A1F2C; margin-bottom: 6px; }
+.logic-page .doc-sub { font-size: 12px; color: #707070; margin-bottom: 28px; }
+.prd-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 24px; }
+.prd-table th { background: #F0F0F0; color: #102532; font-weight: 600; font-size: 11px; padding: 9px 12px; text-align: left; }
+.prd-table td { padding: 9px 12px; border-bottom: 1px solid #F0F0F0; vertical-align: top; line-height: 1.5; }
+.prd-table tr:nth-child(even) td { background: #FAFAFA; }
+.status-ok { color: #2E7D32; font-weight: 600; }
+.status-q  { color: #D4860A; font-weight: 600; }
+pre.code-block {
+  background: #0D1117; color: #E6EDF3; font-size: 11px; line-height: 1.65;
+  border-radius: 8px; padding: 20px 24px; overflow-x: auto;
+  font-family: 'SF Mono', 'Consolas', 'Menlo', monospace;
+  margin: 12px 0 24px;
+  white-space: pre;
+}
+.kw  { color: #FF7B72; }
+.cm  { color: #8B949E; font-style: italic; }
+.str { color: #A5D6FF; }
+.fn  { color: #D2A8FF; }
+.num { color: #79C0FF; }
+.op  { color: #FF7B72; }
+</style>
+</head>
+<body>
+
+<nav class="nav"><div class="nav-logo">Media<span>Lens</span></div></nav>
+
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="switchTab(0)">Email Preview</button>
+  <button class="tab-btn" onclick="switchTab(1)">Excel Field Spec</button>
+  <button class="tab-btn" onclick="switchTab(2)">Backend Logic</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TAB 1 — EMAIL PREVIEW
+═══════════════════════════════════════════════════════════════ -->
+<div class="tab-panel active" id="panel-0">
+<div class="email-stage">
+
+  <div class="email-meta" style="max-width:680px;">
+    <strong>From:</strong> "MediaLens" &lt;noreply@medialens.io&gt;<br>
+    <strong>To:</strong> sales@medialens.io, bd@medialens.io<br>
+    <strong>Subject:</strong> [MediaLens] Sales Signal — Industry Engagement Drop Alert | Jun 2025 (6 industries · 11 advertisers)<br>
+    <strong>Schedule:</strong> 1st of each month · 09:00 HKT · Auto-generated
+  </div>
+
+  <div class="email-wrap">
+
+    <!-- Header -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td style="background:#23A9F6;padding:28px 40px 24px;">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td style="font-size:20px;font-weight:700;color:#fff;">MediaLens <span style="font-size:13px;font-weight:400;opacity:.8;">Sales Signal</span></td>
+              <td align="right" style="font-size:11px;color:rgba(255,255,255,.8);background:rgba(255,255,255,.18);padding:4px 12px;border-radius:20px;white-space:nowrap;">Jun 2025 Monthly</td>
+            </tr>
+          </table>
+          <div style="margin-top:16px;font-size:20px;font-weight:700;color:#fff;">Industry Engagement Drop Alert</div>
+          <div style="margin-top:6px;font-size:13px;color:rgba(255,255,255,.8);">Advertisers whose within-industry engagement share dropped &gt;20% MoM in Jun 2025 · HK + MO · Paid + Branded · Sorted by drop magnitude</div>
+        </td>
+      </tr>
+    </table>
+
+    <!-- Body -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td style="padding:32px 40px;">
+
+          <!-- Intro -->
+          <div style="background:#F6F8FD;border-left:3px solid #23A9F6;border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:24px;font-size:13px;color:#102532;line-height:1.7;">
+            <strong style="color:#23A9F6;">6 industries</strong> with advertisers losing engagement share this month — <strong>11 advertisers</strong> dropped &gt;20% within their industry. These advertisers may be underperforming in competitive engagement and looking for new media solutions.
+          </div>
+
+          <!-- Summary stats -->
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+            <tr>
+              <td style="background:#F6F8FD;border-radius:10px;padding:14px 16px;text-align:center;width:33%;">
+                <div style="font-size:24px;font-weight:700;color:#23A9F6;">6</div>
+                <div style="font-size:11px;color:#707070;margin-top:2px;">Industries Affected</div>
+              </td>
+              <td width="8"></td>
+              <td style="background:#FFF2F2;border-radius:10px;padding:14px 16px;text-align:center;width:33%;">
+                <div style="font-size:24px;font-weight:700;color:#FF3F41;">11</div>
+                <div style="font-size:11px;color:#707070;margin-top:2px;">Advertisers Declining</div>
+              </td>
+              <td width="8"></td>
+              <td style="background:#F7F7F7;border-radius:10px;padding:14px 16px;text-align:center;width:33%;">
+                <div style="font-size:20px;font-weight:700;color:#102532;">&#9660; 46.3%</div>
+                <div style="font-size:11px;color:#707070;margin-top:2px;">Deepest Share Drop</div>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Industry blocks -->
+          <div id="industry-blocks"></div>
+
+          <!-- CTA -->
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:24px;background:linear-gradient(135deg,#EFF8FF 0%,#F6F8FD 100%);border-radius:10px;">
+            <tr>
+              <td style="padding:20px 24px;">
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td>
+                      <div style="font-size:14px;font-weight:600;color:#102532;margin-bottom:4px;">View Full Category Intelligence</div>
+                      <div style="font-size:12px;color:#707070;line-height:1.5;">Open MediaLens Ad Intelligence to explore engagement trends, creative share, and competitive benchmarks across all industries.</div>
+                    </td>
+                    <td align="right" style="padding-left:16px;white-space:nowrap;">
+                      <a href="https://app.medialens.io/organization/jkay0l8p/ad-intelligence/categories" style="display:inline-block;background:#23A9F6;color:#fff;font-size:13px;font-weight:600;padding:10px 20px;border-radius:10px;text-decoration:none;">View Categories</a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+
+        </td>
+      </tr>
+    </table>
+
+    <!-- Footer -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td style="padding:20px 40px 24px;border-top:1px solid #F0F0F0;text-align:center;font-size:11px;color:#AAAAAA;line-height:1.6;">
+          This email is sent automatically by MediaLens on the 1st of each month.<br>
+          Data source: MediaLens Ad Intelligence · Period: May 2025 → Jun 2025<br>
+          &copy; 2025 MediaLens. All rights reserved.
+        </td>
+      </tr>
+    </table>
+
+  </div><!-- /email-wrap -->
+
+  <!-- Download button below email -->
+  <div style="max-width:680px;margin:20px auto 0;text-align:right;">
+    <button onclick="downloadExcel()" style="display:inline-flex;align-items:center;gap:6px;background:#2E7D32;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;">
+      &#8595; Download Excel (all advertisers)
+    </button>
+  </div>
+
+</div>
+</div><!-- /panel-0 -->
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TAB 2 — EXCEL FIELD SPEC
+═══════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-1">
+<div class="doc-page">
+  <h2>Excel Field Specification</h2>
+  <p class="doc-sub">industry-engagement-drop-alert · Excel export · Download triggered from email or API</p>
+
+  <div class="confirmed-box">
+    <strong>✅ Confirmed:</strong> Metric = <code>advertiser.engagements / industry.totalEngagements</code> (within-industry share). No minimum threshold. Sort advertisers by drop% descending within each industry. Industry sort by engagement share drop descending.
+  </div>
+
+  <div class="section-title">Worksheet 1 — 廣告主行業 Engagement 下降清單</div>
+  <table class="spec-table">
+    <thead>
+      <tr>
+        <th>Col</th>
+        <th>Header</th>
+        <th>Data Type</th>
+        <th>Source</th>
+        <th>Example</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>A</td>
+        <td>#</td>
+        <td>Integer</td>
+        <td><span class="tag tag-calc">Computed</span></td>
+        <td>1</td>
+        <td>Global rank across all advertisers, sorted by drop% desc</td>
+      </tr>
+      <tr>
+        <td>B</td>
+        <td>行業 / Industry</td>
+        <td>String</td>
+        <td><span class="tag tag-db">DB: productCategory.name</span></td>
+        <td>Finance</td>
+        <td>Groups all rows for the same industry; repeated per advertiser</td>
+      </tr>
+      <tr>
+        <td>C</td>
+        <td>廣告主名稱</td>
+        <td>Hyperlink</td>
+        <td><span class="tag tag-db">DB: advertisers.name (regional override)</span></td>
+        <td>HSBC HK</td>
+        <td>Hyperlinked to MediaLens advertiser page; name with HK regional override</td>
+      </tr>
+      <tr>
+        <td>D</td>
+        <td>上月 Engagement Share (%)</td>
+        <td>Decimal %</td>
+        <td><span class="tag tag-calc">Computed: advEngagements / industryEngagements</span></td>
+        <td>42.3%</td>
+        <td>Prev month (M-2) within-industry engagement share</td>
+      </tr>
+      <tr>
+        <td>E</td>
+        <td>本月 Engagement Share (%)</td>
+        <td>Decimal %</td>
+        <td><span class="tag tag-calc">Computed: advEngagements / industryEngagements</span></td>
+        <td>28.1%</td>
+        <td>Last month (M-1) within-industry engagement share</td>
+      </tr>
+      <tr>
+        <td>F</td>
+        <td>Engagement Share 跌幅 (%)</td>
+        <td>Decimal % (negative)</td>
+        <td><span class="tag tag-calc">Computed: (E - D) / D</span></td>
+        <td>-33.6%</td>
+        <td>MoM change; displayed as negative; sorted desc by abs value</td>
+      </tr>
+      <tr>
+        <td>G</td>
+        <td>廣告主 Engagements (上月)</td>
+        <td>Integer</td>
+        <td><span class="tag tag-db">DB: aggregated from fbPost + igMedia</span></td>
+        <td>284,600</td>
+        <td>Prev month raw engagement count for this advertiser</td>
+      </tr>
+      <tr>
+        <td>H</td>
+        <td>廣告主 Engagements (本月)</td>
+        <td>Integer</td>
+        <td><span class="tag tag-db">DB: aggregated from fbPost + igMedia</span></td>
+        <td>189,200</td>
+        <td>Last month raw engagement count for this advertiser</td>
+      </tr>
+      <tr>
+        <td>I</td>
+        <td>行業 Engagements (本月)</td>
+        <td>Integer</td>
+        <td><span class="tag tag-db">DB: aggregated from fbPost + igMedia (category level)</span></td>
+        <td>673,200</td>
+        <td>Total engagements across all advertisers in this industry, last month</td>
+      </tr>
+      <tr>
+        <td>J</td>
+        <td>MediaLens 廣告主頁</td>
+        <td>Hyperlink URL</td>
+        <td><span class="tag tag-calc">Computed: APP_BASE_URL + /advertiser/:id</span></td>
+        <td>https://app.medialens.io/…</td>
+        <td>Direct link; duplicates hyperlink on col C for easy copy-paste</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">Worksheet 2 — 說明 (Metadata)</div>
+  <table class="spec-table">
+    <thead>
+      <tr><th>Row</th><th>Label (A)</th><th>Value (B)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>報告名稱</td><td>MediaLens 廣告主行業 Engagement 下降預警</td></tr>
+      <tr><td>2</td><td>統計月份</td><td>{year}年{month}月</td></tr>
+      <tr><td>3</td><td>指標定義</td><td>廣告主 engagements / 所屬行業 total engagements</td></tr>
+      <tr><td>4</td><td>預警門檻</td><td>Engagement Share MoM 跌幅 &gt; 20%</td></tr>
+      <tr><td>5</td><td>廣告主數</td><td>{advertisers.length}</td></tr>
+      <tr><td>6</td><td>行業數</td><td>{industries.length}</td></tr>
+      <tr><td>7</td><td>生成時間</td><td>{new Date().toLocaleString('zh-HK', { timeZone: 'Asia/Hong_Kong' })}</td></tr>
+      <tr><td>8</td><td>資料來源</td><td>MediaLens Ad Intelligence (fb + ig) · HK + MO · Paid + Branded</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">Sort &amp; Filter Logic</div>
+  <table class="spec-table">
+    <thead>
+      <tr><th>Step</th><th>Rule</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>Calculate <code>prevShare = advPrevEngagements / industryPrevTotalEngagements</code></td></tr>
+      <tr><td>2</td><td>Calculate <code>lastShare = advLastEngagements / industryLastTotalEngagements</code></td></tr>
+      <tr><td>3</td><td>Calculate <code>dropRate = (lastShare - prevShare) / prevShare</code> — include if dropRate &lt; -0.20</td></tr>
+      <tr><td>4</td><td>No minimum engagement threshold</td></tr>
+      <tr><td>5</td><td>Within each industry: sort advertisers by dropRate ascending (largest drop first)</td></tr>
+      <tr><td>6</td><td>Industry sort: by industry-level engagement share drop descending ❓ (see Tab 3)</td></tr>
+    </tbody>
+  </table>
+
+</div>
+</div><!-- /panel-1 -->
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TAB 3 — BACKEND LOGIC
+═══════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-2">
+<div class="logic-page">
+  <h2>Backend Logic — PRD Review</h2>
+  <p class="doc-sub">industryEngagementDropAlert.js · New cron job · monthlyEngagementShareReport.js · New service</p>
+
+  <div class="section-title">PRD Requirement Review</div>
+  <table class="prd-table">
+    <thead>
+      <tr><th>Item</th><th>Requirement</th><th>Status</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Data sources</td>
+        <td>fb + ig engagements, HK + MO, paid_post + branded_content</td>
+        <td class="status-ok">✅</td>
+        <td>Same $match filters as monthlySpendingGrowthReport.js</td>
+      </tr>
+      <tr>
+        <td>Engagement metric</td>
+        <td>advertiser.engagements / industry.totalEngagements (within-industry share)</td>
+        <td class="status-ok">✅ Confirmed</td>
+        <td>Aggregate fbPost + igMedia engagements per advertiser; group by productCategory</td>
+      </tr>
+      <tr>
+        <td>Alert threshold</td>
+        <td>Within-industry share drop &gt; 20% MoM</td>
+        <td class="status-ok">✅ Confirmed</td>
+        <td>dropRate = (lastShare - prevShare) / prevShare; include if &lt; -0.20</td>
+      </tr>
+      <tr>
+        <td>Minimum threshold</td>
+        <td>None</td>
+        <td class="status-ok">✅ Confirmed</td>
+        <td>No MIN_SPENDING_THRESHOLD or MIN_ENGAGEMENT_THRESHOLD applied</td>
+      </tr>
+      <tr>
+        <td>Advertiser sort</td>
+        <td>By drop% descending within each industry</td>
+        <td class="status-ok">✅ Confirmed</td>
+        <td>Sort growthList by dropRate ascending (most negative first) within each industry group</td>
+      </tr>
+      <tr>
+        <td>Industry sort</td>
+        <td>By industry-level engagement share drop descending</td>
+        <td class="status-q">❓ Method TBD</td>
+        <td>How to compute industry-level drop — see question below</td>
+      </tr>
+      <tr>
+        <td>Grouping</td>
+        <td>Email grouped by industry; each industry shows its advertisers</td>
+        <td class="status-ok">✅</td>
+        <td>Group result set by productCategory.name before building email HTML</td>
+      </tr>
+      <tr>
+        <td>Advertiser metadata</td>
+        <td>name (HK regional override), logo, productCategory</td>
+        <td class="status-ok">✅</td>
+        <td>Same populate pattern as monthlySpendingGrowthReport.js</td>
+      </tr>
+      <tr>
+        <td>Cron schedule</td>
+        <td>1st of each month, 09:00 HKT</td>
+        <td class="status-ok">✅</td>
+        <td>0 1 1 * * (UTC) — same as spending alert</td>
+      </tr>
+      <tr>
+        <td>Email top N cap</td>
+        <td>TBD — email shows all or top N per industry</td>
+        <td class="status-q">❓ Confirm</td>
+        <td>Suggest: cap at 5 advertisers per industry in email; full list in Excel</td>
+      </tr>
+      <tr>
+        <td>Excel export</td>
+        <td>All qualifying advertisers with industry column + engagement share data</td>
+        <td class="status-ok">✅</td>
+        <td>New controller: /api/v1/ads/engagement-drop-export</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="question-box">
+    <strong>❓ Open: Industry-level sort metric</strong><br><br>
+    Two options for sorting industries:<br><br>
+    <strong>Option A — Industry's own share of platform engagements:</strong> Calculate each industry's <code>totalEngagements / platformTotalEngagements</code> for prevMonth and lastMonth. Sort by how much the industry's platform share dropped. This requires an additional aggregation step across all industries.<br><br>
+    <strong>Option B — Average advertiser drop within industry:</strong> Sort industries by the average (or maximum) within-industry drop% of the qualifying advertisers in that industry. Simpler — no extra query needed.<br><br>
+    <strong>Awaiting confirmation from PM on which approach to implement.</strong>
+  </div>
+
+  <div class="section-title">Proposed Service: services/monthlyEngagementShareReport.js</div>
+
+<pre class="code-block"><span class="cm">/**
+ * services/monthlyEngagementShareReport.js
+ *
+ * Identifies advertisers whose within-industry engagement share
+ * dropped >= 20% MoM (lastMonth vs prevMonth).
+ *
+ * Returns results grouped by industry, sorted by drop% desc.
+ */</span>
+
+<span class="kw">const</span> moment = <span class="fn">require</span>(<span class="str">'moment'</span>);
+<span class="kw">const</span> FbPost = <span class="fn">require</span>(<span class="str">'models/fbPost.js'</span>);
+<span class="kw">const</span> IgMedia = <span class="fn">require</span>(<span class="str">'models/igMedia.js'</span>);
+<span class="kw">const</span> Advertisers = <span class="fn">require</span>(<span class="str">'models/advertisers.js'</span>);
+
+<span class="kw">const</span> DROP_THRESHOLD = <span class="num">-0.20</span>; <span class="cm">// -20% MoM share drop</span>
+
+<span class="cm">// Aggregate engagements per advertiser within a date range</span>
+<span class="kw">const</span> <span class="fn">aggregateEngagements</span> = (Model, dateField, start, end) =>
+  Model.<span class="fn">aggregate</span>([
+    { $match: {
+        [dateField]: { $gte: start, $lte: end },
+        advertisers: { $exists: <span class="kw">true</span>, $not: { $size: <span class="num">0</span> } },
+        engagements: { $exists: <span class="kw">true</span>, $gt: <span class="num">0</span> },
+        countries:   { $in: [<span class="str">'HK'</span>, <span class="str">'MO'</span>] },
+        adType:      { $in: [<span class="str">'paid_post'</span>, <span class="str">'branded_content'</span>] },
+    }},
+    { $unwind: <span class="str">'$advertisers'</span> },
+    { $group: { _id: <span class="str">'$advertisers'</span>, engagements: { $sum: <span class="str">'$engagements'</span> } } },
+  ]).<span class="fn">allowDiskUse</span>(<span class="kw">true</span>);
+
+<span class="cm">// Returns map: advId -> total engagements</span>
+<span class="kw">const</span> <span class="fn">getMonthlyEngagementsMap</span> = <span class="kw">async</span> (start, end) => {
+  <span class="kw">const</span> [fbRows, igRows] = <span class="kw">await</span> Promise.<span class="fn">all</span>([
+    <span class="fn">aggregateEngagements</span>(FbPost,   <span class="str">'createdAt'</span>,     start, end),
+    <span class="fn">aggregateEngagements</span>(IgMedia, <span class="str">'created_time'</span>, start, end),
+  ]);
+  <span class="kw">const</span> map = {};
+  <span class="kw">for</span> (<span class="kw">const</span> row <span class="kw">of</span> [...fbRows, ...igRows]) {
+    <span class="kw">const</span> id = row._id.<span class="fn">toString</span>();
+    map[id] = (map[id] || <span class="num">0</span>) + row.engagements;
+  }
+  <span class="kw">return</span> map;
+};
+
+<span class="kw">const</span> <span class="fn">getEngagementDropAdvertisers</span> = <span class="kw">async</span> () => {
+  <span class="kw">const</span> now = moment.<span class="fn">utc</span>();
+  <span class="kw">const</span> lastMonthStart = now.<span class="fn">clone</span>().<span class="fn">subtract</span>(<span class="num">1</span>, <span class="str">'month'</span>).<span class="fn">startOf</span>(<span class="str">'month'</span>).<span class="fn">toDate</span>();
+  <span class="kw">const</span> lastMonthEnd   = now.<span class="fn">clone</span>().<span class="fn">subtract</span>(<span class="num">1</span>, <span class="str">'month'</span>).<span class="fn">endOf</span>(<span class="str">'month'</span>).<span class="fn">toDate</span>();
+  <span class="kw">const</span> prevMonthStart = now.<span class="fn">clone</span>().<span class="fn">subtract</span>(<span class="num">2</span>, <span class="str">'months'</span>).<span class="fn">startOf</span>(<span class="str">'month'</span>).<span class="fn">toDate</span>();
+  <span class="kw">const</span> prevMonthEnd   = now.<span class="fn">clone</span>().<span class="fn">subtract</span>(<span class="num">2</span>, <span class="str">'months'</span>).<span class="fn">endOf</span>(<span class="str">'month'</span>).<span class="fn">toDate</span>();
+
+  <span class="kw">const</span> [lastEngMap, prevEngMap] = <span class="kw">await</span> Promise.<span class="fn">all</span>([
+    <span class="fn">getMonthlyEngagementsMap</span>(lastMonthStart, lastMonthEnd),
+    <span class="fn">getMonthlyEngagementsMap</span>(prevMonthStart, prevMonthEnd),
+  ]);
+
+  <span class="cm">// Enrich with advertiser metadata (productCategory for industry grouping)</span>
+  <span class="kw">const</span> advIds = Object.<span class="fn">keys</span>(lastEngMap);
+  <span class="kw">const</span> advDocs = <span class="kw">await</span> Advertisers.<span class="fn">find</span>({ _id: { $in: advIds } })
+    .<span class="fn">select</span>(<span class="str">'name fullname logo productCategory regionalInfo'</span>)
+    .<span class="fn">populate</span>(<span class="str">'productCategory'</span>, <span class="str">'name'</span>)
+    .<span class="fn">lean</span>();
+
+  <span class="kw">const</span> advMetaMap = {};
+  <span class="kw">for</span> (<span class="kw">const</span> doc <span class="kw">of</span> advDocs) advMetaMap[doc._id.<span class="fn">toString</span>()] = doc;
+
+  <span class="cm">// Group engagements by industry to compute per-industry totals</span>
+  <span class="kw">const</span> industryLastTotals = {}, industryPrevTotals = {};
+  <span class="kw">for</span> (<span class="kw">const</span> [advId, lastEng] <span class="kw">of</span> Object.<span class="fn">entries</span>(lastEngMap)) {
+    <span class="kw">const</span> cat = advMetaMap[advId]?.productCategory?.name;
+    <span class="kw">if</span> (!cat) <span class="kw">continue</span>;
+    industryLastTotals[cat] = (industryLastTotals[cat] || <span class="num">0</span>) + lastEng;
+    industryPrevTotals[cat] = (industryPrevTotals[cat] || <span class="num">0</span>) + (prevEngMap[advId] || <span class="num">0</span>);
+  }
+
+  <span class="cm">// Compute per-advertiser share and filter by drop threshold</span>
+  <span class="kw">const</span> dropList = [];
+  <span class="kw">for</span> (<span class="kw">const</span> [advId, lastEng] <span class="kw">of</span> Object.<span class="fn">entries</span>(lastEngMap)) {
+    <span class="kw">const</span> meta = advMetaMap[advId] || {};
+    <span class="kw">const</span> cat = meta.productCategory?.name;
+    <span class="kw">if</span> (!cat) <span class="kw">continue</span>;
+
+    <span class="kw">const</span> prevEng    = prevEngMap[advId] || <span class="num">0</span>;
+    <span class="kw">if</span> (prevEng === <span class="num">0</span>) <span class="kw">continue</span>; <span class="cm">// No baseline</span>
+
+    <span class="kw">const</span> lastShare = lastEng / industryLastTotals[cat];
+    <span class="kw">const</span> prevShare = prevEng / (industryPrevTotals[cat] || <span class="num">1</span>);
+    <span class="kw">const</span> dropRate  = (lastShare - prevShare) / prevShare;
+
+    <span class="kw">if</span> (dropRate >= DROP_THRESHOLD) <span class="kw">continue</span>; <span class="cm">// Not enough drop</span>
+
+    <span class="kw">const</span> regional = meta.regionalInfo?.HK || {};
+    dropList.<span class="fn">push</span>({
+      advertiserId: advId,
+      industryName: cat,
+      name:         regional.name || meta.name || meta.fullname || <span class="str">'Unknown'</span>,
+      logo:         regional.logo || meta.logo || <span class="kw">null</span>,
+      prevShare,
+      lastShare,
+      dropRate,
+      prevEngagements: prevEng,
+      lastEngagements: lastEng,
+      industryLastEngagements: industryLastTotals[cat],
+    });
+  }
+
+  <span class="cm">// Group by industry, sort advertisers within each group by dropRate asc</span>
+  <span class="kw">const</span> industryMap = {};
+  <span class="kw">for</span> (<span class="kw">const</span> item <span class="kw">of</span> dropList) {
+    <span class="kw">if</span> (!industryMap[item.industryName]) industryMap[item.industryName] = [];
+    industryMap[item.industryName].<span class="fn">push</span>(item);
+  }
+  <span class="kw">for</span> (<span class="kw">const</span> cat <span class="kw">of</span> Object.<span class="fn">keys</span>(industryMap)) {
+    industryMap[cat].<span class="fn">sort</span>((a, b) => a.dropRate - b.dropRate); <span class="cm">// most negative first</span>
+  }
+
+  <span class="cm">// Sort industries — ❓ Option A or B: see open question above</span>
+  <span class="cm">// Currently using Option B: avg drop of qualifying advertisers in industry</span>
+  <span class="kw">const</span> industries = Object.<span class="fn">entries</span>(industryMap).<span class="fn">map</span>(([name, advertisers]) => ({
+    name,
+    advertisers,
+    avgDrop: advertisers.<span class="fn">reduce</span>((s, a) => s + a.dropRate, <span class="num">0</span>) / advertisers.length,
+  })).<span class="fn">sort</span>((a, b) => a.avgDrop - b.avgDrop); <span class="cm">// most negative first</span>
+
+  <span class="kw">return</span> industries;
+};
+
+module.exports = { <span class="fn">getEngagementDropAdvertisers</span> };</pre>
+
+  <div class="section-title">Email Format — Industry Block Structure</div>
+  <table class="prd-table">
+    <thead>
+      <tr><th>Element</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Industry header</td><td>Industry name + # advertisers affected + industry avg drop badge</td></tr>
+      <tr><td>Advertiser rows</td><td>Logo / initials · Name (hyperlink) · Prev share% · Last share% · Drop% pill (red)</td></tr>
+      <tr><td>Per-industry cap</td><td>❓ TBD: suggest top 5 advertisers per industry in email; full list in Excel</td></tr>
+      <tr><td>Industry sort</td><td>By industry-level drop metric (❓ see open question); most impacted industry first</td></tr>
+      <tr><td>Excel download</td><td>Flat table: all advertisers, all industries; col B = industry name</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">New Files Required</div>
+  <table class="prd-table">
+    <thead>
+      <tr><th>File</th><th>Role</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>services/monthlyEngagementShareReport.js</td><td>Core service — aggregation, share calculation, filtering, grouping</td></tr>
+      <tr><td>jobs/industryEngagementDropAlert.js</td><td>Cron job — calls service, builds email HTML, sends via nodemailer</td></tr>
+      <tr><td>controllers/v1/ads/engagementDropExport.js</td><td>GET /api/v1/ads/engagement-drop-export — streams Excel via ExcelJS</td></tr>
+    </tbody>
+  </table>
+
+</div>
+</div><!-- /panel-2 -->
+
+
+<script>
+// ── Tab switching ──────────────────────────────────────────────
+function switchTab(idx) {
+  document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+  document.querySelectorAll('.tab-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
+}
+
+// ── Mock data ─────────────────────────────────────────────────
+const PREV_LABEL = 'May 2025';
+const LAST_LABEL = 'Jun 2025';
+const APP_BASE   = 'https://app.medialens.io';
+const ORG_ID     = 'jkay0l8p';
+
+const INDUSTRIES = [
+  {
+    name: 'Finance',
+    avgDrop: -0.305,
+    advertisers: [
+      { id:'ab11', name:'HSBC HK',        initials:'HS', bg:'#FFF3E0', fc:'#E65100',
+        prevShare:42.3, lastShare:28.1, drop:-0.336, prevEng:284600, lastEng:189200, indEng:673200 },
+      { id:'ab15', name:'Hang Seng Bank', initials:'HG', bg:'#FFF8E1', fc:'#F57F17',
+        prevShare:31.5, lastShare:22.8, drop:-0.276, prevEng:212000, lastEng:153500, indEng:673200 },
+      { id:'ab12', name:'Manulife HK',    initials:'MF', bg:'#E8F5E9', fc:'#388E3C',
+        prevShare:18.2, lastShare:14.5, drop:-0.203, prevEng:122400, lastEng:97600,  indEng:673200 },
+    ]
+  },
+  {
+    name: 'Sports',
+    avgDrop: -0.305,
+    advertisers: [
+      { id:'ab09', name:'Adidas HK',      initials:'AD', bg:'#F0F0F0', fc:'#333',
+        prevShare:44.8, lastShare:34.3, drop:-0.234, prevEng:196800, lastEng:150500, indEng:438600 },
+      { id:'ab01', name:'Nike HK',        initials:'NK', bg:'#E8F4FD', fc:'#23A9F6',
+        prevShare:55.2, lastShare:38.4, drop:-0.304, prevEng:242400, lastEng:168500, indEng:438600 },
+    ]
+  },
+  {
+    name: 'Travel',
+    avgDrop: -0.296,
+    advertisers: [
+      { id:'ab07', name:'Cathay Pacific',  initials:'CP', bg:'#EFF6FF', fc:'#1D4ED8',
+        prevShare:78.4, lastShare:55.2, drop:-0.296, prevEng:412300, lastEng:290400, indEng:526300 },
+    ]
+  },
+  {
+    name: 'Fashion',
+    avgDrop: -0.292,
+    advertisers: [
+      { id:'ab08', name:'Zara HK',         initials:'ZR', bg:'#F5F5F5', fc:'#333',
+        prevShare:28.1, lastShare:19.8, drop:-0.295, prevEng:118400, lastEng:83500,  indEng:421800 },
+      { id:'ab03', name:'H&M Hong Kong',   initials:'HM', bg:'#FFF0E6', fc:'#FF6B35',
+        prevShare:41.6, lastShare:29.8, drop:-0.284, prevEng:175300, lastEng:125600, indEng:421800 },
+    ]
+  },
+  {
+    name: 'Food & Beverage',
+    avgDrop: -0.248,
+    advertisers: [
+      { id:'ab04', name:"McDonald's HK",  initials:'MD', bg:'#FFF8E1', fc:'#FFA000',
+        prevShare:58.9, lastShare:44.3, drop:-0.248, prevEng:296700, lastEng:223100, indEng:503700 },
+    ]
+  },
+  {
+    name: 'Beauty',
+    avgDrop: -0.240,
+    advertisers: [
+      { id:'ab05', name:'SK-II',           initials:'SK', bg:'#F3E8FF', fc:'#9333EA',
+        prevShare:45.6, lastShare:34.2, drop:-0.250, prevEng:214300, lastEng:160800, indEng:470200 },
+      { id:'ab10', name:"L'Oréal HK",      initials:'LO', bg:'#FFF0F6', fc:'#DB2777',
+        prevShare:38.2, lastShare:29.4, drop:-0.230, prevEng:179500, lastEng:138100, indEng:470200 },
+    ]
+  },
+];
+
+// ── Render email industry blocks ───────────────────────────────
+function dropColor(rate) {
+  const abs = Math.abs(rate);
+  if (abs >= 0.40) return { bg:'#FFF2F2', text:'#FF3F41' };
+  if (abs >= 0.25) return { bg:'#FFF8EC', text:'#D4860A' };
+  return { bg:'#FFF8EC', text:'#D4860A' };
+}
+
+function fmtPct(v) { return (v * 100).toFixed(1) + '%'; }
+function fmtNum(n) { return Math.round(n).toLocaleString('en-HK'); }
+
+function buildIndustryBlocks() {
+  const container = document.getElementById('industry-blocks');
+  let html = '';
+
+  INDUSTRIES.forEach(industry => {
+    const avgDropAbs = Math.abs(industry.avgDrop * 100).toFixed(1);
+
+    html += `
+    <div style="margin-bottom:24px;">
+      <!-- Industry header -->
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;">
+        <tr>
+          <td style="font-size:13px;font-weight:600;color:#102532;">
+            <span style="display:inline-block;width:8px;height:8px;background:#FF3F41;border-radius:50%;margin-right:7px;vertical-align:middle;"></span>
+            ${industry.name}
+            <span style="font-size:11px;font-weight:500;color:#707070;background:#F0F0F0;padding:2px 8px;border-radius:10px;margin-left:6px;">${industry.advertisers.length} advertiser${industry.advertisers.length > 1 ? 's' : ''}</span>
+          </td>
+          <td align="right">
+            <span style="font-size:11px;font-weight:700;background:#FFF2F2;color:#FF3F41;padding:3px 10px;border-radius:20px;">&#9660; avg ${avgDropAbs}% share drop</span>
+          </td>
+        </tr>
+      </table>
+
+      <!-- Advertiser table -->
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #F0F0F0;border-radius:8px;overflow:hidden;">
+        <thead>
+          <tr style="background:#FAFAFA;border-bottom:1px solid #F0F0F0;">
+            <th style="font-size:10px;font-weight:600;color:#707070;text-align:left;padding:7px 12px;">Advertiser</th>
+            <th style="font-size:10px;font-weight:600;color:#707070;text-align:right;padding:7px 12px;">${PREV_LABEL} Share</th>
+            <th style="font-size:10px;font-weight:600;color:#707070;text-align:right;padding:7px 12px;">${LAST_LABEL} Share</th>
+            <th style="font-size:10px;font-weight:600;color:#707070;text-align:right;padding:7px 12px;">MoM Change</th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+    industry.advertisers.forEach(adv => {
+      const { bg, text } = dropColor(adv.drop);
+      const advUrl = `${APP_BASE}/organization/${ORG_ID}/advertiser/${adv.id}`;
+      const logo = `<div style="width:30px;height:30px;background:${adv.bg};border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:${adv.fc};flex-shrink:0;">${adv.initials}</div>`;
+
+      html += `
+          <tr style="border-bottom:1px solid #F7F7F7;">
+            <td style="padding:11px 12px;">
+              <div style="display:flex;align-items:center;gap:9px;">
+                ${logo}
+                <a href="${advUrl}" style="font-weight:600;font-size:12px;color:#102532;text-decoration:none;">${adv.name}</a>
+              </div>
+            </td>
+            <td style="padding:11px 12px;font-size:12px;color:#707070;text-align:right;">${fmtPct(adv.prevShare / 100)}</td>
+            <td style="padding:11px 12px;font-size:12px;color:#707070;text-align:right;">${fmtPct(adv.lastShare / 100)}</td>
+            <td style="padding:11px 12px;text-align:right;">
+              <span style="display:inline-block;background:${bg};color:${text};font-weight:700;font-size:11px;padding:3px 9px;border-radius:20px;">&#9660; ${fmtPct(Math.abs(adv.drop))}</span>
+            </td>
+          </tr>`;
+    });
+
+    html += `
+        </tbody>
+      </table>
+    </div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+// ── Excel download (SheetJS) ───────────────────────────────────
+function downloadExcel() {
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  script.onload = generateExcel;
+  document.head.appendChild(script);
+}
+
+function generateExcel() {
+  const wb = XLSX.utils.book_new();
+  const prevH = PREV_LABEL + ' Share (%)';
+  const lastH = LAST_LABEL + ' Share (%)';
+  const monthStr = '2025-06';
+
+  const headers = [
+    '#', '行業 / Industry', '廣告主名稱',
+    prevH, lastH, 'Engagement Share 跌幅 (%)',
+    '廣告主 Engagements (上月)', '廣告主 Engagements (本月)',
+    '行業 Engagements (本月)', 'MediaLens 廣告主頁'
+  ];
+  const rows = [headers];
+  let rank = 1;
+
+  INDUSTRIES.forEach(industry => {
+    industry.advertisers.forEach(adv => {
+      const advUrl = `${APP_BASE}/organization/${ORG_ID}/advertiser/${adv.id}`;
+      rows.push([
+        rank++,
+        industry.name,
+        adv.name,
+        parseFloat((adv.prevShare).toFixed(1)),
+        parseFloat((adv.lastShare).toFixed(1)),
+        parseFloat((adv.drop * 100).toFixed(1)),
+        adv.prevEng,
+        adv.lastEng,
+        adv.indEng,
+        advUrl,
+      ]);
+    });
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [
+    {wch:5}, {wch:18}, {wch:26},
+    {wch:20}, {wch:20}, {wch:24},
+    {wch:26}, {wch:26}, {wch:26}, {wch:72}
+  ];
+
+  // Hyperlinks on advertiser name column (C = index 2)
+  let rowIdx = 2;
+  INDUSTRIES.forEach(industry => {
+    industry.advertisers.forEach(adv => {
+      const advUrl = `${APP_BASE}/organization/${ORG_ID}/advertiser/${adv.id}`;
+      const cellRef = XLSX.utils.encode_cell({ r: rowIdx - 1, c: 2 });
+      if (ws[cellRef]) {
+        ws[cellRef].l = { Target: advUrl };
+      }
+      const urlCellRef = XLSX.utils.encode_cell({ r: rowIdx - 1, c: 9 });
+      if (ws[urlCellRef]) {
+        ws[urlCellRef].l = { Target: advUrl };
+      }
+      rowIdx++;
+    });
+  });
+
+  XLSX.utils.book_append_sheet(wb, ws, '廣告主行業Engagement下降清單');
+
+  // Metadata sheet
+  const metaData = [
+    ['報告名稱', 'MediaLens 廣告主行業 Engagement 下降預警'],
+    ['統計月份', '2025年6月'],
+    ['指標定義', '廣告主 engagements / 所屬行業 total engagements'],
+    ['預警門檻', 'Engagement Share MoM 跌幅 > 20%'],
+    ['廣告主數', INDUSTRIES.reduce((s, i) => s + i.advertisers.length, 0)],
+    ['行業數',   INDUSTRIES.length],
+    ['生成時間', new Date().toLocaleString('zh-HK', { timeZone: 'Asia/Hong_Kong' })],
+    ['資料來源', 'MediaLens Ad Intelligence (fb + ig) · HK + MO · Paid + Branded'],
+  ];
+  const metaWs = XLSX.utils.aoa_to_sheet(metaData);
+  metaWs['!cols'] = [{wch:16}, {wch:60}];
+  XLSX.utils.book_append_sheet(wb, metaWs, '說明');
+
+  XLSX.writeFile(wb, `MediaLens_行業Engagement下降預警_${monthStr}.xlsx`);
+}
+
+// ── Init ──────────────────────────────────────────────────────
+buildIndustryBlocks();
+</script>
+</body>
+</html>
