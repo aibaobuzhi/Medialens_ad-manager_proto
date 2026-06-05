@@ -156,9 +156,16 @@
     </div>
     <div>
       <div class="slider-ticks">
-        <span>0%</span><span>20%</span><span>40%</span><span>60%</span><span>80%</span><span>99%</span>
+        <span>0%</span><span>200%</span><span>400%</span><span>600%</span><span>800%</span><span>1000%</span>
       </div>
-      <input type="range" id="markupSlider" min="0" max="99" value="50" step="1">
+      <input type="range" id="markupSlider" min="0" max="1000" value="50" step="1">
+      <div style="display:flex;align-items:center;gap:6px;margin-top:8px;">
+        <span style="font-size:11px;color:#707070;">Direct input · 直接输入：</span>
+        <input type="number" id="markupInput" min="0" max="1000" value="50" step="1"
+          style="width:72px;padding:4px 8px;border:1px solid #D9E3E6;border-radius:6px;font-size:13px;font-weight:600;color:#0A1F2C;text-align:center;"
+          oninput="onMarkupInput()">
+        <span style="font-size:12px;color:#707070;">%</span>
+      </div>
     </div>
     <div class="formula-block">
       <div class="formula-top">
@@ -173,7 +180,7 @@
       <div class="formula-expr">
         credits = adj_cost × (1 + <span class="hi" id="markupFormula">0.50</span>) ÷ <span class="cv" id="formulaCreditVal">$0.01</span>
       </div>
-      <div class="formula-note" id="formulaNote">token rows: per 1M tokens &nbsp;·&nbsp; tool_use: per call &nbsp;·&nbsp; all prices via b.ai docs</div>
+      <div class="formula-note" id="formulaNote">all rows: per 1M tokens &nbsp;·&nbsp; prices via official vendor docs or b.ai</div>
     </div>
   </div>
 
@@ -548,6 +555,17 @@ function renderCurrent() {
 const slider = document.getElementById('markupSlider');
 slider.addEventListener('input', () => {
   currentRate = parseInt(slider.value);
+  document.getElementById('markupInput').value = currentRate;
+  applyMarkupChange();
+});
+function onMarkupInput() {
+  const val = parseInt(document.getElementById('markupInput').value);
+  if (isNaN(val) || val < 0) return;
+  currentRate = Math.min(val, 1000);
+  slider.value = currentRate;
+  applyMarkupChange();
+}
+function applyMarkupChange() {
   document.getElementById('markupDisplay').textContent = currentRate;
   document.getElementById('markupFormula').textContent = (currentRate/100).toFixed(2);
   document.getElementById('prevFrom').textContent = savedRate + '%';
@@ -555,10 +573,11 @@ slider.addEventListener('input', () => {
   const banner = document.getElementById('previewBanner');
   currentRate !== savedRate ? banner.classList.remove('hidden') : banner.classList.add('hidden');
   renderCurrent(); updateStats();
-});
+}
 function resetMarkup() {
   currentRate = savedRate;
   slider.value = savedRate;
+  document.getElementById('markupInput').value = savedRate;
   document.getElementById('markupDisplay').textContent = savedRate;
   document.getElementById('markupFormula').textContent = (savedRate/100).toFixed(2);
   document.getElementById('previewBanner').classList.add('hidden');
@@ -626,14 +645,13 @@ function renderOverview() {
 
   head.innerHTML = `<tr>
     <th style="width:140px">Model</th>
-    <th style="width:80px">Direction</th>
     <th style="width:130px">Token Type</th>
-    <th class="right" style="width:160px">Vendor Cost /1M Tokens <span style="font-weight:400;text-transform:none;color:#CACACA">(internal)</span></th>
-    <th class="right col-adj-header" style="width:160px">Adjusted Cost /1M Tokens<span class="internal-tag">markup 计算基准</span></th>
-    <th class="right" style="width:100px">Credits /1M</th>
-    <th class="right" style="width:130px">Micro-Credits /1M</th>
-    <th class="right" style="width:120px">Micro-Credit/Token</th>
-    <th class="right" style="width:120px">Token/Micro-Credit</th>
+    <th class="right" style="width:150px">Vendor Cost /1M <span style="font-weight:400;text-transform:none;color:#CACACA">(internal)</span></th>
+    <th class="right col-adj-header" style="width:150px">Adjusted Cost /1M<span class="internal-tag">计算基准</span></th>
+    <th class="right" style="width:155px"><span class="markup-price-hdr" title="= adj_cost × (1 + markup rate)">Mark-up Price /1M <span style="font-size:10px;opacity:.6;">ⓘ</span></span></th>
+    <th class="right" style="width:100px">Credits</th>
+    <th class="right" style="width:130px">Micro-Credits</th>
+    <th class="right" style="width:130px">Micro-Credit/Token</th>
   </tr>`;
 
   let html = '';
@@ -642,11 +660,11 @@ function renderOverview() {
     const vs = VENDOR_STYLE[m.vendor] || { bg:'#F7F7F7', color:'#707070', border:'#D9E3E6' };
     let firstVisible = true;
     m.rows.forEach((r) => {
-      if (r.isPerCall) return; // skip tool/per-call rows
-      const c     = calcCredits(r.adjCost, currentRate);
-      const micro = calcMicro(c);
-      const mct   = c;                  // micro-credits per token = credits per 1M (numerically equal)
-      const tmc   = fmtTMC(1e6 / micro); // tokens per micro-credit
+      if (r.isPerCall) return;
+      const c       = calcCredits(r.adjCost, currentRate);
+      const micro   = calcMicro(c);
+      const mct     = c;
+      const markupP = (r.adjCost * (1 + currentRate / 100)).toFixed(4);
       const srcBadge = r.src ? `<span class="src-badge">${r.src}</span>` : '';
       const topBorder = firstVisible ? 'border-top:2px solid #E8EEF0;' : '';
       const modelCell = firstVisible
@@ -655,14 +673,13 @@ function renderOverview() {
       firstVisible = false;
       html += `<tr style="${topBorder}">
         <td style="font-size:12px">${modelCell}</td>
-        <td><span class="dir-badge ${r.dir}">${r.dir.toUpperCase()}</span></td>
         <td><strong>${r.type}</strong></td>
         <td class="col-vendor">$${r.vendorCost.toFixed(4)}${srcBadge}</td>
         <td class="col-adj">$${r.adjCost.toFixed(4)}</td>
+        <td class="col-adj" style="color:#E67700" title="= $${r.adjCost.toFixed(4)} × (1 + ${currentRate}%) = $${markupP}">$${markupP}</td>
         <td class="col-credits">${fmtC(c)}</td>
         <td class="col-credit-token" style="color:#7B5EF8">${fmtC(micro)}</td>
         <td class="col-credit-token" style="color:#7B5EF8">${mct.toLocaleString()}</td>
-        <td class="col-credit-token" style="color:#7B5EF8">${tmc}</td>
       </tr>`;
       totalRows++;
     });
@@ -708,14 +725,13 @@ function renderTable() {
   const vs = VENDOR_STYLE[m.vendor] || { bg:'#F7F7F7', color:'#707070', border:'#D9E3E6' };
   head.innerHTML = `<tr>
     <th style="width:140px">Model</th>
-    <th style="width:80px">Direction</th>
     <th style="width:130px">Token Type</th>
-    <th class="right" style="width:160px">Vendor Cost /1M Tokens <span style="font-weight:400;text-transform:none;color:#CACACA">(internal)</span></th>
-    <th class="right col-adj-header" style="width:160px">Adjusted Cost /1M Tokens<span class="internal-tag">markup 计算基准</span></th>
-    <th class="right" style="width:100px">Credits /1M</th>
-    <th class="right" style="width:130px">Micro-Credits /1M</th>
-    <th class="right" style="width:120px">Micro-Credit/Token</th>
-    <th class="right" style="width:120px">Token/Micro-Credit</th>
+    <th class="right" style="width:150px">Vendor Cost /1M <span style="font-weight:400;text-transform:none;color:#CACACA">(internal)</span></th>
+    <th class="right col-adj-header" style="width:150px">Adjusted Cost /1M<span class="internal-tag">计算基准</span></th>
+    <th class="right" style="width:155px"><span class="markup-price-hdr" title="= adj_cost × (1 + markup rate)">Mark-up Price /1M <span style="font-size:10px;opacity:.6;">ⓘ</span></span></th>
+    <th class="right" style="width:100px">Credits</th>
+    <th class="right" style="width:130px">Micro-Credits</th>
+    <th class="right" style="width:130px">Micro-Credit/Token</th>
     <th class="right" style="width:72px">Actions</th>
   </tr>`;
 
@@ -724,22 +740,26 @@ function renderTable() {
   let html = '';
   let firstVisible = true;
   m.rows.forEach((r, i) => {
-    if (r.isPerCall) return; // skip tool/per-call rows
-    const c     = calcCredits(r.adjCost, currentRate);
-    const sc    = calcCredits(r.adjCost, savedRate);
-    const micro = calcMicro(c);
+    if (r.isPerCall) return;
+    const c       = calcCredits(r.adjCost, currentRate);
+    const sc      = calcCredits(r.adjCost, savedRate);
+    const micro   = calcMicro(c);
     const changed  = c !== sc;
     const adjusted = r.adjCost !== r.vendorCost;
     const adjNote  = adjusted ? `<span class="adj-note">↑ floor</span>` : `<span class="adj-same">= vendor</span>`;
     const srcBadge = r.src ? `<span class="src-badge">${r.src}</span>` : '';
-    const mct   = c;                    // micro-credits per token
-    const tmc   = fmtTMC(1e6 / micro); // tokens per micro-credit
+    const mct      = c;
+    const markupP  = (r.adjCost * (1 + currentRate / 100)).toFixed(4);
+    const markupPS = (r.adjCost * (1 + savedRate / 100)).toFixed(4);
     html += `<tr>
       <td style="font-size:12px">${firstVisible ? modelBadge : ''}</td>
-      <td><span class="dir-badge ${r.dir}">${r.dir.toUpperCase()}</span></td>
       <td><strong>${r.type}</strong></td>
       <td class="col-vendor">$${r.vendorCost.toFixed(4)}${srcBadge}</td>
       <td class="col-adj">$${r.adjCost.toFixed(4)} ${adjNote}</td>
+      <td class="col-adj ${changed ? 'preview-changed' : ''}" style="color:#E67700"
+          title="= $${r.adjCost.toFixed(4)} × (1 + ${currentRate}%) = $${markupP}${changed ? ' · saved: $'+markupPS : ''}">
+        $${markupP}
+      </td>
       <td class="col-credits ${changed ? 'preview-changed' : ''}" title="${changed ? 'saved: ' + fmtC(sc) : ''}">
         ${fmtC(c)}
       </td>
@@ -748,9 +768,6 @@ function renderTable() {
       </td>
       <td class="col-credit-token ${changed ? 'preview-changed' : ''}" style="color:#7B5EF8">
         ${mct.toLocaleString()}
-      </td>
-      <td class="col-credit-token ${changed ? 'preview-changed' : ''}" style="color:#7B5EF8">
-        ${tmc}
       </td>
       <td class="col-actions">
         <button class="icon-btn" onclick="openEditModal(${i})">✎</button>
