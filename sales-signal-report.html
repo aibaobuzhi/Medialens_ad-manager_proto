@@ -93,11 +93,12 @@
   .btn-primary:hover { opacity: 0.85; }
 
   .btn-sales-signal {
-    background: #fff; color: #102532; border: 2px solid #FF3F41; border-radius: 8px;
+    background: #fff; color: #23A9F6; border: 2px solid #23A9F6; border-radius: 8px;
     padding: 7px 14px; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600;
     cursor: pointer; white-space: nowrap; transition: background 0.15s;
+    display: inline-flex; align-items: center; gap: 6px;
   }
-  .btn-sales-signal:hover { background: #FFECEC; }
+  .btn-sales-signal:hover { background: #EEF6FF; }
 
   .btn-back {
     background: #fff; color: #23A9F6; border: 1.5px solid #23A9F6; border-radius: 8px;
@@ -468,6 +469,7 @@
             Schedule New Report
           </button>
           <button class="btn-sales-signal" onclick="showPage('page-sales-signal')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
             Sales signal report
           </button>
         </div>
