@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediaLens Credit System Architecture Prototype</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    /* 滚动条及特定输入控件的自定义样式 */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #11141d;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #272e3f;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3b4760;
+    }
+  </style>
+</head>
+<body class="bg-[#0f1115] text-slate-100 min-h-screen flex flex-col antialiased">
+
+  <!-- 顶部原型控制器（用于演示及模拟消费调试） -->
+  <header class="bg-[#181d28] border-b border-slate-700/80 px-4 py-3 sticky top-0 z-40 shadow-lg">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
+      <div class="flex items-center gap-3">
+        <div class="bg-blue-600 p-1.5 rounded-lg text-white">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+        </div>
+        <div>
+          <h1 class="text-sm font-bold tracking-wide flex items-center gap-2">
+            MediaLens Credit Migration Interactive Prototype
+            <span class="bg-blue-500/20 text-blue-400 text-[9px] uppercase px-1.5 py-0.5 rounded font-mono font-bold">Active</span>
+          </h1>
+          <p class="text-[10px] text-slate-400">Conversion Rule: 1 USD = 100 Credits = 100M Microcredits (BE calculation unit)</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="text-[11px] text-slate-400">Simulate Pages:</span>
+        <div class="bg-slate-900 p-0.5 rounded-lg border border-slate-700 flex text-xs">
+          <button onclick="switchPage('dashboard')" id="btn-page-dashboard" class="px-3 py-1 rounded font-medium transition bg-blue-600 text-white">
+            1. MediaLens Dashboard
+          </button>
+          <button onclick="switchPage('credit')" id="btn-page-credit" class="px-3 py-1 rounded font-medium transition text-slate-400 hover:text-slate-200">
+            2. Credit Analytics
+          </button>
+        </div>
+        <button onclick="resetPrototype()" class="p-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-300 transition" title="Reset State">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 19.191M20 20h-5v-5"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 工作区 -->
+  <div class="flex-1 max-w-full mx-auto w-full flex flex-col lg:flex-row overflow-x-hidden">
+    
+    <!-- 左侧: 交互式页面模拟器 -->
+    <main class="flex-1 bg-slate-950 p-3 sm:p-6 border-r border-slate-800/80">
+      
+      <!-- ==================== 页面 1: MEDIALENS DASHBOARD (LIGHT MODE) ==================== -->
+      <section id="page-dashboard" class="bg-slate-50 text-slate-800 rounded-2xl shadow-2xl border border-slate-200 overflow-hidden min-h-[620px] flex flex-col">
+        <!-- 头部 -->
+        <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shrink-0">
+          <div class="flex items-center gap-8">
+            <div class="flex items-center gap-2 font-black text-sky-600 text-lg tracking-wider">
+              <span class="bg-sky-600 text-white p-1 rounded-md text-xs">M</span>
+              MEDIA <span class="text-slate-900 font-light">LENS</span>
+            </div>
+            <nav class="hidden md:flex gap-6 text-xs font-semibold text-slate-500">
+              <span class="text-sky-600 border-b-2 border-sky-600 pb-3 pt-1">Dashboard</span>
+              <span class="hover:text-slate-900 cursor-pointer pt-1 transition">Settings</span>
+              <span class="hover:text-slate-900 cursor-pointer pt-1 transition">Billing</span>
+            </nav>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 bg-slate-100 py-1 px-3 rounded-full">
+              <div class="w-6 h-6 rounded-full bg-sky-100 text-sky-700 text-xs flex items-center justify-center font-bold">J</div>
+              <span class="text-xs font-semibold text-slate-700">Julie li</span>
+            </div>
+          </div>
+        </header>
+
+        <!-- 主体布局 -->
+        <div class="flex flex-col md:flex-row flex-1">
+          <!-- 侧边栏 -->
+          <aside class="w-full md:w-60 bg-white border-r border-slate-200 p-4 shrink-0 flex flex-col justify-between">
+            <div class="space-y-6">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2.5 px-3 py-2 bg-slate-50 text-slate-800 text-xs font-semibold rounded-lg cursor-pointer">
+                  <span class="text-slate-400">🏠</span> Dashboard
+                </div>
+                <div class="flex items-center gap-2.5 px-3 py-2 text-slate-600 hover:bg-slate-50 text-xs font-medium rounded-lg cursor-pointer transition">
+                  <span class="text-slate-400">📈</span> My Pages
+                </div>
+                <div class="flex items-center gap-2.5 px-3 py-2 text-slate-600 hover:bg-slate-50 text-xs font-medium rounded-lg cursor-pointer transition">
+                  <span class="text-slate-400">👥</span> Competitor Analysis
+                </div>
+                <div class="flex items-center gap-2.5 px-3 py-2 text-slate-600 hover:bg-slate-50 text-xs font-medium rounded-lg cursor-pointer transition">
+                  <span class="text-slate-400">🔔</span> Buzz (Market Insights)
+                </div>
+                <div class="flex items-center gap-2.5 px-3 py-2 text-slate-600 hover:bg-slate-50 text-xs font-medium rounded-lg cursor-pointer transition">
+                  <span class="text-slate-400">🏆</span> Leader Board
+                </div>
+                <div class="flex items-center gap-2.5 px-3 py-2 text-slate-600 hover:bg-slate-50 text-xs font-medium rounded-lg cursor-pointer transition">
+                  <span class="text-slate-400">🔍</span> Social Listening
+                </div>
+                <div class="flex items-center gap-2.5 px-3 py-2 text-slate-600 hover:bg-slate-50 text-xs font-medium rounded-lg cursor-pointer transition">
+                  <span class="text-slate-400">🎙️</span> Social Pulses
+                </div>
+              </div>
+
+              <!-- 个人账号状态 -->
+              <div class="pt-4 border-t border-slate-100">
+                <div class="flex items-center gap-2 px-3 mb-3">
+                  <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0">J</div>
+                  <div class="overflow-hidden">
+                    <div class="text-xs font-bold text-slate-900 truncate">Julie li</div>
+                    <div class="text-[10px] text-slate-400 truncate">julie.li@presslogic.com</div>
+                  </div>
+                </div>
+                <div class="space-y-1">
+                  <div class="px-3 py-1 text-[9px] font-bold text-slate-400 uppercase tracking-wider">Account</div>
+                  <div class="px-3 py-1.5 text-[11px] text-slate-600 hover:bg-slate-50 rounded-md cursor-pointer transition">My Account</div>
+                  <div class="px-3 py-1.5 text-[11px] text-slate-600 hover:bg-slate-50 rounded-md cursor-pointer transition">Ad Intelligence</div>
+                  <div class="px-3 py-1.5 text-[11px] text-slate-600 hover:bg-slate-50 rounded-md cursor-pointer transition">Article</div>
+                  <div class="px-3 py-1.5 text-[11px] text-slate-600 hover:bg-slate-50 rounded-md cursor-pointer transition">Verified Browsers</div>
+                </div>
+              </div>
+
+              <!-- 企业/组织状态 -->
+              <div class="pt-4 border-t border-slate-100">
+                <div class="flex items-center gap-2 px-3 mb-2.5">
+                  <div class="w-8 h-8 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center font-bold text-xs shrink-0">P</div>
+                  <div>
+                    <div class="text-xs font-bold text-slate-900">PL - Hong Kong</div>
+                    <div class="text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-bold inline-block">Enterprise 135 member</div>
+                  </div>
+                </div>
+                <div class="space-y-0.5">
+                  <div class="px-3 py-1.5 text-[11px] text-slate-600 hover:bg-slate-50 rounded-md cursor-pointer transition">Team Details</div>
+                  <div class="px-3 py-1.5 text-[11px] text-slate-600 hover:bg-slate-50 rounded-md cursor-pointer transition">Manage Team Users</div>
+                  <div onclick="switchPage('credit')" class="px-3 py-1.5 text-[11px] bg-sky-50 text-sky-700 font-bold rounded-md cursor-pointer flex justify-between items-center transition">
+                    Quota and Usage 
+                    <span class="w-1.5 h-1.5 bg-sky-600 rounded-full animate-pulse"></span>
+                  </div>
+                  <div class="px-3 py-1.5 text-[11px] text-slate-600 hover:bg-slate-50 rounded-md cursor-pointer transition">Plans and billing</div>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <!-- 主内容区域 -->
+          <main class="flex-1 p-6 md:p-8 bg-slate-50">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
+              <div>
+                <h2 class="text-lg font-bold text-slate-900">Quota and Usage</h2>
+              </div>
+              <div class="text-right">
+                <span class="text-xs bg-slate-200/80 text-slate-600 px-3 py-1 rounded font-medium">
+                  Reset Quota Date: 08 Jun 2026
+                </span>
+              </div>
+            </div>
+
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Quota Details</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <!-- Seats Card -->
+              <div class="bg-white p-4 rounded-xl border border-slate-200/60 shadow-sm">
+                <div class="text-xs font-semibold text-slate-500 mb-1">User Seats</div>
+                <div class="text-base font-bold text-slate-900">0 / 0 <span class="text-xs font-normal text-slate-400">user seats</span></div>
+                <div class="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
+                  <div class="bg-sky-500 h-full rounded-full" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <!-- Competitor Page Card -->
+              <div class="bg-white p-4 rounded-xl border border-slate-200/60 shadow-sm animate-fade-in">
+                <div class="text-xs font-semibold text-slate-500 mb-1 flex items-center gap-1">
+                  Competitor Page
+                  <svg class="w-3.5 h-3.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div class="text-base font-bold text-slate-900">0 / 0 <span class="text-xs font-normal text-slate-400">pages</span></div>
+                <div class="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
+                  <div class="bg-sky-500 h-full rounded-full" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <!-- Competitor Page Views Card -->
+              <div class="bg-white p-4 rounded-xl border border-slate-200/60 shadow-sm">
+                <div class="text-xs font-semibold text-slate-500 mb-1 flex items-center gap-1">
+                  Competitor Page Views
+                  <svg class="w-3.5 h-3.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div class="text-base font-bold text-slate-900">0 / 0 <span class="text-xs font-normal text-slate-400">pages</span></div>
+                <div class="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
+                  <div class="bg-sky-500 h-full rounded-full" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <!-- Buzz Card -->
+              <div class="bg-white p-4 rounded-xl border border-slate-200/60 shadow-sm">
+                <div class="text-xs font-semibold text-slate-500 mb-1">Buzz</div>
+                <div class="text-base font-bold text-slate-900">0 / 0 <span class="text-xs font-normal text-slate-400">searches</span></div>
+                <div class="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
+                  <div class="bg-sky-500 h-full rounded-full" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <!-- AI CREDITS 卡片 -->
+              <div onclick="switchPage('credit')" class="bg-white p-5 rounded-2xl border-2 border-dashed border-sky-300 hover:border-sky-500 hover:shadow-md cursor-pointer transition duration-200 md:col-span-2 group relative">
+                <div class="absolute top-4 right-4 bg-sky-50 text-sky-600 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 group-hover:bg-sky-600 group-hover:text-white transition duration-200">
+                  Manage Balance & Settings <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </div>
+                
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="p-1.5 bg-sky-50 text-sky-600 rounded-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  </span>
+                  <span class="text-xs font-bold text-slate-800 uppercase tracking-wide">AI Credits</span>
+                </div>
+
+                <div class="mt-2.5 flex items-baseline gap-2">
+                  <span id="dash-total-credits" class="text-3xl font-extrabold text-slate-900 tracking-tight">4,950 Credits</span>
+                  <span id="dash-total-usd" class="text-xs text-slate-500 font-semibold">($49.50 USD)</span>
+                </div>
+
+                <!-- 进度条保持原样 -->
+                <div class="w-full bg-slate-100 h-2 rounded-full mt-4 overflow-hidden">
+                  <div id="dash-progress" class="bg-gradient-to-r from-sky-500 to-blue-600 h-full rounded-full transition-all duration-300" style="width: 99%"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Subscribed Modules -->
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Subscribed Modules</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div class="bg-white p-3 rounded-lg border border-slate-200/60 text-xs font-semibold text-slate-700 flex items-center gap-2">
+                <span class="text-sky-500">📈</span> My Pages
+              </div>
+              <div class="bg-white p-3 rounded-lg border border-slate-200/60 text-xs font-semibold text-slate-700 flex items-center gap-2">
+                <span class="text-sky-500">👥</span> Competitor Analysis
+              </div>
+              <div class="bg-white p-3 rounded-lg border border-slate-200/60 text-xs font-semibold text-slate-700 flex items-center gap-2">
+                <span class="text-sky-500">🔔</span> Buzz (Market Insights)
+              </div>
+              <div class="bg-white p-3 rounded-lg border border-slate-200/60 text-xs font-semibold text-slate-700 flex items-center gap-2">
+                <span class="text-sky-500">🏆</span> Leader Board
+              </div>
+            </div>
+          </main>
+        </div>
+      </section>
+
+      <!-- ==================== 页面 2: CREDITS ANALYTICS / BALANCE (DARK MODE) ==================== -->
+      <section id="page-credit" class="bg-[#0a0c10] text-slate-100 rounded-2xl shadow-2xl border border-slate-800/80 overflow-hidden min-h-[620px] p-6 sm:p-8 hidden flex-col">
+        
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 shrink-0">
+          <div>
+            <h2 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+              MediaLens Analytics
+              <span class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded font-mono font-medium">Credit System</span>
+            </h2>
+            <div class="flex gap-4 text-xs mt-4 text-slate-400 border-b border-slate-800/80 pb-2.5">
+              <button class="text-white border-b-2 border-white pb-2.5 font-semibold">Usage</button>
+              <button class="hover:text-white transition pb-2.5">Code review</button>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2 self-stretch md:self-auto justify-end">
+            <div class="bg-[#151922] p-1 rounded-lg border border-slate-800/80 flex text-xs">
+              <button class="px-3 py-1.5 rounded bg-[#1e2530] text-white font-semibold">7D</button>
+              <button class="px-3 py-1.5 rounded text-slate-400 hover:text-white transition">1M</button>
+              <button class="px-3 py-1.5 rounded text-slate-400 hover:text-white transition">Custom</button>
+            </div>
+            <select class="bg-[#151922] border border-slate-800/80 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold focus:outline-none">
+              <option>Group by: Day</option>
+              <option>Group by: Hour</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-6 shrink-0">
+          <h3 class="text-base font-bold text-white tracking-wide">Balance</h3>
+        </div>
+
+        <!-- Card 3: Credits remaining (已移动至 Subscription 细分卡片上方，全宽展示) -->
+        <div class="bg-[#12161f] p-6 rounded-2xl border border-slate-800/60 shadow-lg mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="text-xs text-slate-400 font-medium">Credits remaining</div>
+            
+            <div class="mt-3 flex items-baseline gap-2">
+              <span id="detail-total-credits" class="text-4xl font-extrabold text-white tracking-tight">4,950 Credits</span>
+              <span id="detail-total-usd" class="text-sm text-slate-400 font-medium">($49.50)</span>
+            </div>
+          </div>
+
+          <!-- Manual Top-up Trigger Action -->
+          <div class="relative shrink-0 flex items-center justify-end sm:justify-center">
+            <button onclick="toggleTopupMenu()" class="w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white flex items-center justify-center font-semibold text-2xl shadow-lg border border-blue-400 transition transform hover:scale-105" title="Top-up Credits">
+              +
+            </button>
+            
+            <div id="topup-menu" class="hidden absolute right-0 bottom-14 bg-[#181d28] border border-slate-700 rounded-xl shadow-xl p-3 w-44 z-20 space-y-2">
+              <div class="text-[10px] uppercase text-slate-400 font-bold tracking-wider text-center pb-1 border-b border-slate-800">Choose Top-up</div>
+              <button onclick="addonRecharge(10)" class="w-full py-1.5 px-3 rounded bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition text-left flex justify-between">
+                <span>+ $10.00</span>
+                <span class="text-sky-400">1k Cr</span>
+              </button>
+              <button onclick="addonRecharge(25)" class="w-full py-1.5 px-3 rounded bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition text-left flex justify-between">
+                <span>+ $25.00</span>
+                <span class="text-sky-400">2.5k Cr</span>
+              </button>
+              <button onclick="addonRecharge(100)" class="w-full py-1.5 px-3 rounded bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition text-left flex justify-between">
+                <span>+ $100.00</span>
+                <span class="text-sky-400">10k Cr</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 详细额度分配卡片组 (左右布局细分 Usage) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          
+          <!-- Card 1: Subscription Credit Usage -->
+          <div class="bg-[#12161f] p-5 rounded-2xl border border-slate-800/60 shadow-lg relative overflow-hidden flex flex-col justify-between min-h-[145px]">
+            <div class="absolute top-0 left-0 w-1.5 h-full bg-[#24b47e]"></div>
+            <div>
+              <div class="text-xs text-slate-400 font-medium flex justify-between items-center">
+                <span>Subscription Credit Usage</span>
+                <span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded text-[9px] font-bold">Deduct Priority</span>
+              </div>
+
+              <div class="text-xl font-bold text-white mt-3 flex items-baseline justify-between">
+                <div>
+                  <span id="detail-sub-percent">99%</span>
+                  <span class="text-xs font-normal text-slate-400 ml-1">remaining</span>
+                </div>
+                <span id="detail-sub-credits" class="text-sm font-semibold text-emerald-400 font-mono">4,950 Cr</span>
+              </div>
+            </div>
+
+            <!-- Progress -->
+            <div class="w-full bg-[#1e2533] h-2.5 rounded-full mt-3 overflow-hidden">
+              <div id="detail-sub-progress" class="bg-[#24b47e] h-full rounded-full transition-all duration-300" style="width: 99%"></div>
+            </div>
+
+            <div class="text-[10px] text-slate-500 mt-2 flex justify-between">
+              <span>Resets 9:13 PM</span>
+              <span>Total: 5,000 Credits ($50.00)</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Add on Usage -->
+          <div class="bg-[#12161f] p-5 rounded-2xl border border-slate-800/60 shadow-lg relative overflow-hidden flex flex-col justify-between min-h-[145px]">
+            <div class="absolute top-0 left-0 w-1.5 h-full bg-sky-500"></div>
+            <div>
+              <div class="text-xs text-slate-400 font-medium">Add on Usage</div>
+              
+              <div class="text-xl font-bold text-white mt-3 flex items-baseline justify-between">
+                <div>
+                  <span id="detail-addon-percent">100%</span>
+                  <span class="text-xs font-normal text-slate-400 ml-1">remaining</span>
+                </div>
+                <span id="detail-addon-credits-bar" class="text-sm font-semibold text-sky-400 font-mono">0 Cr</span>
+              </div>
+            </div>
+
+            <!-- Progress -->
+            <div class="w-full bg-[#1e2533] h-2.5 rounded-full mt-3 overflow-hidden">
+              <div id="detail-addon-progress" class="bg-sky-500 h-full rounded-full transition-all duration-300" style="width: 100%"></div>
+            </div>
+
+            <div class="text-[10px] text-slate-500 mt-2">
+              Resets Jun 10, 2026 1:23 AM
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4: Auto-refill section -->
+        <div class="mt-6 shrink-0">
+          <h3 class="text-base font-bold text-white mb-4">Auto-refill</h3>
+          
+          <div class="bg-[#12161f] p-5 rounded-2xl border border-slate-800/60 shadow-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <h4 class="text-sm font-bold text-white">Auto-refill credit</h4>
+                <span id="autofill-status-badge" class="text-[9px] px-2 py-0.5 rounded font-bold uppercase bg-slate-800 text-slate-400">Disabled</span>
+              </div>
+              <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">
+                Automatically add credit when you reach your minimum balance. 
+                <span id="autofill-active-summary" class="hidden text-emerald-400 font-medium block mt-1.5"></span>
+              </p>
+            </div>
+
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+              <button onclick="openAutoRefillModal()" id="btn-autofill-action" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-md transition whitespace-nowrap">
+                Enable Auto-refill
+              </button>
+            </div>
+          </div>
+
+          <!-- Email notification setting -->
+          <div class="mt-4 bg-[#12161f]/40 p-4 rounded-xl border border-slate-800/40 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+              <div class="p-2 bg-[#1b2130] rounded-lg text-blue-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              </div>
+              <div>
+                <h5 class="text-xs font-bold text-white">Email notifications</h5>
+                <p class="text-[10px] text-slate-500">Receive alert when auto-refill triggers or balance runs low.</p>
+              </div>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="email-notif-toggle" onchange="toggleEmailNotif()" checked class="sr-only peer">
+              <div class="w-8 h-4 bg-slate-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-600 peer-checked:after:bg-white relative"></div>
+            </label>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- 右侧: BE 微信用成本 Live Console（控制台） -->
+    <aside class="w-full lg:w-96 bg-[#11141d] p-6 flex flex-col shrink-0 border-t lg:border-t-0 lg:border-l border-slate-800">
+      <div class="flex items-center gap-2 pb-3 border-b border-slate-800 mb-4 shrink-0">
+        <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+        <div>
+          <h3 class="text-xs font-bold text-white uppercase tracking-wider">BE Microcredit Live Console</h3>
+          <p class="text-[10px] text-slate-400">Simulation tools for backend cost deduction</p>
+        </div>
+      </div>
+
+      <!-- BE 变量监控 -->
+      <div class="bg-[#181d28] p-4 rounded-xl border border-slate-800 space-y-3 mb-5 shrink-0">
+        <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Backend Storage Variables (Microcredit)</h4>
+        
+        <div class="bg-slate-950 p-2.5 rounded font-mono text-[10px] text-slate-300 space-y-1">
+          <div class="flex justify-between">
+            <span>sub_balance:</span>
+            <span id="be-sub-micro" class="text-emerald-400 font-bold">4,950,000,000</span>
+          </div>
+          <div class="flex justify-between">
+            <span>addon_balance:</span>
+            <span id="be-addon-micro" class="text-sky-400 font-bold">0</span>
+          </div>
+          <div class="flex justify-between">
+            <span>auto_refill:</span>
+            <span id="be-autofill-enabled" class="text-amber-400 font-bold">false</span>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-800/80 pt-2.5 space-y-1 text-xs">
+          <div class="flex justify-between text-slate-400">
+            <span>Total Credits (FE):</span>
+            <span id="be-fe-credits" class="font-bold text-white">4,950 Cr</span>
+          </div>
+          <div class="flex justify-between text-slate-400">
+            <span>Total USD Equivalent:</span>
+            <span id="be-fe-usd" class="font-bold text-slate-200">$49.50</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 模拟请求按钮 -->
+      <div class="mb-5 shrink-0">
+        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+          ⚡ Trigger Call Cost (Simulate Usage)
+        </label>
+        <div class="grid grid-cols-3 gap-2">
+          <button onclick="consumeCredits(2.5)" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg p-2 text-xs font-medium text-slate-200 transition">
+            Use 2.5 Cr
+            <span class="block text-[9px] text-slate-500 mt-0.5">($0.025)</span>
+          </button>
+          <button onclick="consumeCredits(150)" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg p-2 text-xs font-medium text-slate-200 transition">
+            Use 150 Cr
+            <span class="block text-[9px] text-slate-500 mt-0.5">($1.50)</span>
+          </button>
+          <button onclick="consumeCredits(5000)" class="bg-red-950/40 hover:bg-red-950/60 border border-red-900/60 rounded-lg p-2 text-xs font-semibold text-red-200 transition">
+            Use 5,000 Cr
+            <span class="block text-[9px] text-red-400 mt-0.5">($50.00)</span>
+          </button>
+        </div>
+        <p class="text-[10px] text-slate-500 mt-2 italic leading-relaxed">
+          * Notice: Deduct Priority uses Subscription balance first. If Auto-refill is active, dropping below trigger threshold immediately executes top-up calculation.
+        </p>
+      </div>
+
+      <!-- 日志模块 -->
+      <div class="flex-1 flex flex-col min-h-[200px]">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">
+            ⚙️ Live System Logs
+          </label>
+          <button onclick="clearLogs()" class="text-[10px] text-slate-500 hover:text-slate-300">
+            Clear Logs
+          </button>
+        </div>
+
+        <div id="live-logs" class="flex-1 bg-slate-950 rounded-xl p-3 border border-slate-800 font-mono text-[10px] overflow-y-auto space-y-2 max-h-[300px] lg:max-h-[380px]">
+          <!-- 日志流在 JS 中动态产生 -->
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- ==================== 弹窗 1: AUTO-REFILL CONFIGURATION MODAL (USD Priority) ==================== -->
+  <div id="auto-refill-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden overflow-y-auto">
+    <div class="relative w-full max-w-[480px] bg-white text-slate-800 rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden my-8">
+      
+      <!-- 弹窗 Header -->
+      <div class="p-6 pb-4 flex justify-between items-start border-b border-slate-100">
+        <div>
+          <h3 class="text-base font-extrabold text-slate-900">Credit Auto-refill</h3>
+          <div class="flex items-center gap-1.5 mt-1">
+            <span class="text-xs text-slate-500">
+              Current balance: <strong id="modal-curr-balance">4,950 Credits ($49.50)</strong>
+            </span>
+          </div>
+        </div>
+        <button onclick="closeAutoRefillModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+      </div>
+
+      <!-- 测试余额滑动条 -->
+      <div class="px-6 py-4 bg-slate-50 border-b border-slate-100">
+        <div class="flex justify-between items-center text-[11px] font-semibold text-slate-500 mb-1">
+          <span class="flex items-center gap-1">
+            🧪 Test Balance Slider (Simulate Active Balance)
+          </span>
+          <span id="test-slider-val" class="font-mono text-sky-600 bg-sky-50 px-2 py-0.5 rounded">
+            $0.25 (25 Credits)
+          </span>
+        </div>
+        
+        <input type="range" min="0" max="50" step="0.25" value="0.25" id="test-balance-slider" oninput="handleTestSliderChange(this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600 mt-2">
+        
+        <div class="flex justify-between text-[9px] text-slate-400 mt-1 font-mono">
+          <span>$0.00 (0 Cr)</span>
+          <span>$25.00 (2.5k Cr)</span>
+          <span>$50.00 (5k Cr)</span>
+        </div>
+      </div>
+
+      <div class="p-6 space-y-5">
+        
+        <!-- 实时计算 immediate top-up 卡片 -->
+        <div class="bg-blue-50/75 p-3.5 rounded-xl border border-blue-100 flex justify-between items-center">
+          <div>
+            <div class="text-xs font-bold text-blue-800">Immediate top-up</div>
+            <div class="text-[10px] text-blue-600/80 mt-0.5">Charged now to reach target balance.</div>
+          </div>
+          <div class="text-right">
+            <div id="modal-immediate-usd" class="text-lg font-black text-blue-800">$49.75</div>
+            <div id="modal-immediate-credits" class="text-[10px] text-blue-500 font-medium">4,975 credits</div>
+          </div>
+        </div>
+
+        <!-- 步骤 1: Minimum Balance (Trigger) - USD 优先 -->
+        <div class="space-y-1.5">
+          <div class="flex justify-between items-center">
+            <label class="text-xs font-bold text-slate-800">1. Minimum balance <span class="font-normal text-slate-500">(trigger)</span></label>
+            <span id="lbl-trigger-credits" class="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">1,000 CREDITS</span>
+          </div>
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-extrabold text-sm">$</span>
+            <input type="number" id="input-trigger-usd" oninput="updateTriggerFromInput(this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-4 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500">
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="setTriggerUsd(5)" class="btn-trigger-opt py-1.5 rounded-lg text-xs font-semibold border transition" data-val="5">$5</button>
+            <button onclick="setTriggerUsd(10)" class="btn-trigger-opt py-1.5 rounded-lg text-xs font-semibold border transition" data-val="10">$10</button>
+            <button onclick="setTriggerUsd(25)" class="btn-trigger-opt py-1.5 rounded-lg text-xs font-semibold border transition" data-val="25">$25</button>
+          </div>
+        </div>
+
+        <!-- 步骤 2: Target Balance (Refill to) - USD 优先 -->
+        <div class="space-y-1.5">
+          <div class="flex justify-between items-center">
+            <label class="text-xs font-bold text-slate-800">2. Target balance <span class="font-normal text-slate-500">(refill to)</span></label>
+            <span id="lbl-target-credits" class="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">5,000 CREDITS</span>
+          </div>
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-extrabold text-sm">$</span>
+            <input type="number" id="input-target-usd" oninput="updateTargetFromInput(this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-4 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500">
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="setTargetUsd(50)" class="btn-target-opt py-1.5 rounded-lg text-xs font-semibold border transition" data-val="50">$50</button>
+            <button onclick="setTargetUsd(100)" class="btn-target-opt py-1.5 rounded-lg text-xs font-semibold border transition" data-val="100">$100</button>
+            <button onclick="setTargetUsd(250)" class="btn-target-opt py-1.5 rounded-lg text-xs font-semibold border transition" data-val="250">$250</button>
+          </div>
+        </div>
+
+        <!-- 步骤 3: Monthly Cap - USD 优先 -->
+        <div class="space-y-1.5">
+          <div class="flex justify-between items-center">
+            <label class="text-xs font-bold text-slate-800">3. Monthly cap <span class="font-normal text-slate-500">(budget guard)</span></label>
+            <span id="lbl-cap-credits" class="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">20,000 CREDITS</span>
+          </div>
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-extrabold text-sm">$</span>
+            <input type="number" id="input-cap-usd" oninput="updateCapFromInput(this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-4 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500">
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="setCapUsd(100)" class="btn-cap-opt py-1.5 rounded-lg text-xs font-semibold border transition" data-val="100">$100</button>
+            <button onclick="setCapUsd(200)" class="btn-cap-opt py-1.5 rounded-lg text-xs font-semibold border transition" data-val="200">$200</button>
+            <button onclick="setCapUsd(500)" class="btn-cap-opt py-1.5 rounded-lg text-xs font-semibold border transition" data-val="500">$500</button>
+          </div>
+        </div>
+
+        <!-- 规则计算总结信息 -->
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 grid grid-cols-2 gap-4">
+          <div class="border-r border-slate-200 pr-2">
+            <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Each refill</div>
+            <div id="summary-each-refill-usd" class="text-base font-extrabold text-slate-950 mt-1">$40.00</div>
+            <div id="summary-each-refill-credits" class="text-[10px] text-slate-500 font-medium">4,000 credits</div>
+          </div>
+          <div class="pl-2">
+            <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Monthly cap</div>
+            <div id="summary-cap-usd" class="text-base font-extrabold text-slate-950 mt-1">$200.00</div>
+            <div id="summary-cap-credits" class="text-[10px] text-slate-500 font-medium">20,000 credits</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 弹窗底部 -->
+      <div class="p-6 bg-slate-50 border-t border-slate-100 flex flex-col gap-3">
+        <div class="flex gap-3">
+          <button onclick="closeAutoRefillModal()" class="flex-1 bg-white hover:bg-slate-100 text-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold border border-slate-200 transition">
+            Cancel
+          </button>
+          <button onclick="enableAutoRefill()" id="btn-modal-submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md transition">
+            Enable Auto-refill
+          </button>
+        </div>
+
+        <!-- TURN OFF 按钮（只有在开启后在此点击触发二次确认） -->
+        <button id="btn-modal-turnoff" onclick="triggerTurnOff()" class="hidden w-full text-center text-red-600 hover:text-red-700 hover:bg-red-50 py-2 rounded-lg text-xs font-bold transition">
+          Turn off Auto-refill
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== 弹窗 2: 二次确认弹窗 ==================== -->
+  <div id="double-confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-xs hidden">
+    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl max-w-sm w-full shadow-2xl space-y-4">
+      <div class="flex items-start gap-3 text-rose-500">
+        <div class="bg-rose-500/10 p-2 rounded-xl text-rose-500">
+          <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        </div>
+        <div>
+          <h4 class="text-sm font-bold text-white">Disable Auto-refill?</h4>
+          <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+            Once disabled, service calls will fail with a "402 Insufficient Balance" error as soon as your active credits run out.
+          </p>
+        </div>
+      </div>
+
+      <div class="bg-slate-950 p-3 rounded-xl text-xs space-y-2 text-slate-400 font-mono">
+        <div class="flex justify-between">
+          <span>Deduction Trigger:</span>
+          <span id="confirm-trigger-val" class="text-slate-200 font-bold">$10.00</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Target Recharge:</span>
+          <span id="confirm-target-val" class="text-slate-200 font-bold">$50.00</span>
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-1">
+        <button onclick="closeDoubleConfirm()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 rounded-xl text-xs font-bold transition">
+          Keep Enabled
+        </button>
+        <button onclick="confirmTurnOff()" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white py-2.5 rounded-xl text-xs font-bold shadow-md transition">
+          Confirm Disable
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 轻量悬浮消息通知 -->
+  <div id="toast" class="fixed bottom-4 right-4 bg-slate-900 border border-slate-800 text-white px-4 py-3 rounded-xl shadow-2xl z-50 transform translate-y-20 opacity-0 transition duration-300 max-w-sm flex items-center gap-2.5">
+    <div class="p-1 bg-emerald-500/20 text-emerald-400 rounded-lg shrink-0">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    </div>
+    <span id="toast-text" class="text-xs font-semibold text-slate-200">System updated successfully</span>
+  </div>
+
+  <!-- ==================== 系统核心运行状态脚本 ==================== -->
+  <script>
+    // 比例常量
+    const CREDITS_PER_USD = 100;
+    const MICROCREDITS_PER_CREDIT = 1000000;
+    const MICROCREDITS_PER_USD = 100000000;
+
+    // 订阅默认 5000 Credits 上限，初始值设为 4950 Credits
+    const MAX_SUB_MICRO = 5000000000;
+    
+    let state = {
+      currentPage: 'dashboard',
+      subMicrocredits: 4950000000, 
+      addonMicrocredits: 0,
+      autoRefillEnabled: false,
+      refillTriggerUsd: 10,
+      refillTargetUsd: 50,
+      refillCapUsd: 200,
+      emailNotifications: true,
+      testBalanceUsd: 0.25
+    };
+
+    // 系统装载初始化
+    window.onload = function() {
+      addLog("Credit system migrated successfully. 1 Credit = 1M Microcredits.", "system");
+      addLog("All frontend pages rendered under Credit-First priorities.", "system");
+      updateUI();
+    };
+
+    // 重置模拟状态
+    function resetPrototype() {
+      state.subMicrocredits = 4950000000;
+      state.addonMicrocredits = 0;
+      state.autoRefillEnabled = false;
+      state.refillTriggerUsd = 10;
+      state.refillTargetUsd = 50;
+      state.refillCapUsd = 200;
+      state.testBalanceUsd = 0.25;
+      
+      addLog("System variables initialized to defaults.", "system");
+      showToast("Simulation state reset.", "info");
+      updateUI();
+    }
+
+    // 页面页签切换
+    function switchPage(pageId) {
+      state.currentPage = pageId;
+      document.getElementById('page-dashboard').style.display = pageId === 'dashboard' ? 'flex' : 'none';
+      document.getElementById('page-credit').style.display = pageId === 'credit' ? 'flex' : 'none';
+      
+      const btnDash = document.getElementById('btn-page-dashboard');
+      const btnCredit = document.getElementById('btn-page-credit');
+      
+      if (pageId === 'dashboard') {
+        btnDash.className = "px-3 py-1 rounded font-medium transition bg-blue-600 text-white";
+        btnCredit.className = "px-3 py-1 rounded font-medium transition text-slate-400 hover:text-slate-200";
+      } else {
+        btnDash.className = "px-3 py-1 rounded font-medium transition text-slate-400 hover:text-slate-200";
+        btnCredit.className = "px-3 py-1 rounded font-medium transition bg-blue-600 text-white";
+      }
+    }
+
+    // 切换加购包气泡菜单
+    function toggleTopupMenu() {
+      const menu = document.getElementById('topup-menu');
+      menu.classList.toggle('hidden');
+    }
+
+    // 执行手动加购充值
+    function addonRecharge(usdAmount) {
+      const micro = usdAmount * MICROCREDITS_PER_USD;
+      state.addonMicrocredits += micro;
+      
+      addLog(`💰 Manual Recharge Success: Deposited $${usdAmount.toFixed(2)} (${(usdAmount * CREDITS_PER_USD).toLocaleString()} Credits) to Add-on.`, "success");
+      showToast(`Deposited $${usdAmount.toFixed(2)} (${(usdAmount * CREDITS_PER_USD).toLocaleString()} Credits)`);
+      toggleTopupMenu();
+      updateUI();
+    }
+
+    // 切换电邮开关状态
+    function toggleEmailNotif() {
+      state.emailNotifications = document.getElementById('email-notif-toggle').checked;
+      addLog(`✉️ Email notification setting changed to: ${state.emailNotifications ? 'Enabled' : 'Disabled'}`, "info");
+      showToast(`Email notifications: ${state.emailNotifications ? 'Enabled' : 'Disabled'}`);
+    }
+
+    // 弹窗管理
+    function openAutoRefillModal() {
+      document.getElementById('auto-refill-modal').classList.remove('hidden');
+      
+      document.getElementById('input-trigger-usd').value = state.refillTriggerUsd;
+      document.getElementById('input-target-usd').value = state.refillTargetUsd;
+      document.getElementById('input-cap-usd').value = state.refillCapUsd;
+      
+      updateModalCalculations();
+    }
+
+    function closeAutoRefillModal() {
+      document.getElementById('auto-refill-modal').classList.add('hidden');
+    }
+
+    function handleTestSliderChange(val) {
+      state.testBalanceUsd = parseFloat(val);
+      document.getElementById('test-slider-val').innerText = `$${state.testBalanceUsd.toFixed(2)} (${Math.round(state.testBalanceUsd * CREDITS_PER_USD)} Credits)`;
+      updateModalCalculations();
+    }
+
+    // 快速配置阈值按钮
+    function setTriggerUsd(val) {
+      state.refillTriggerUsd = val;
+      document.getElementById('input-trigger-usd').value = val;
+      updateModalCalculations();
+    }
+
+    // 设置目标上限值
+    function setTargetUsd(val) {
+      state.refillTargetUsd = val;
+      document.getElementById('input-target-usd').value = val;
+      updateModalCalculations();
+    }
+
+    function setCapUsd(val) {
+      state.refillCapUsd = val;
+      document.getElementById('input-cap-usd').value = val;
+      updateModalCalculations();
+    }
+
+    // 输入框响应
+    function updateTriggerFromInput(val) {
+      state.refillTriggerUsd = parseFloat(val) || 0;
+      updateModalCalculations();
+    }
+    function updateTargetFromInput(val) {
+      state.refillTargetUsd = parseFloat(val) || 0;
+      updateModalCalculations();
+    }
+    function updateCapFromInput(val) {
+      state.refillCapUsd = parseFloat(val) || 0;
+      updateModalCalculations();
+    }
+
+    // 充值设置弹窗中的数学逻辑更新
+    function updateModalCalculations() {
+      const trigCredits = state.refillTriggerUsd * CREDITS_PER_USD;
+      const targCredits = state.refillTargetUsd * CREDITS_PER_USD;
+      const bgCapCredits = state.refillCapUsd * CREDITS_PER_USD;
+
+      document.getElementById('lbl-trigger-credits').innerText = `${trigCredits.toLocaleString()} CREDITS`;
+      document.getElementById('lbl-target-credits').innerText = `${targCredits.toLocaleString()} CREDITS`;
+      document.getElementById('lbl-cap-credits').innerText = `${bgCapCredits.toLocaleString()} CREDITS`;
+
+      // 同步高亮选中状态的按钮
+      updateButtonSelection('btn-trigger-opt', state.refillTriggerUsd);
+      updateButtonSelection('btn-target-opt', state.refillTargetUsd);
+      updateButtonSelection('btn-cap-opt', state.refillCapUsd);
+
+      // 计算 Immediate top-up 的动态差距
+      const immediateUsd = Math.max(0, state.refillTargetUsd - state.testBalanceUsd);
+      document.getElementById('modal-immediate-usd').innerText = `$${immediateUsd.toFixed(2)}`;
+      document.getElementById('modal-immediate-credits').innerText = `${(immediateUsd * CREDITS_PER_USD).toLocaleString()} credits`;
+
+      // 每次充值总结
+      const eachRefillUsd = Math.max(0, state.refillTargetUsd - state.refillTriggerUsd);
+      document.getElementById('summary-each-refill-usd').innerText = `$${eachRefillUsd.toFixed(2)}`;
+      document.getElementById('summary-each-refill-credits').innerText = `${(eachRefillUsd * CREDITS_PER_USD).toLocaleString()} credits`;
+
+      document.getElementById('summary-cap-usd').innerText = `$${state.refillCapUsd.toFixed(2)}`;
+      document.getElementById('summary-cap-credits').innerText = `${bgCapCredits.toLocaleString()} credits`;
+
+      // 按钮提交文案更新
+      const btnSubmit = document.getElementById('btn-modal-submit');
+      if (state.autoRefillEnabled) {
+        btnSubmit.innerText = "Save Settings";
+        document.getElementById('btn-modal-turnoff').classList.remove('hidden');
+      } else {
+        btnSubmit.innerText = "Enable Auto-refill";
+        document.getElementById('btn-modal-turnoff').classList.add('hidden');
+      }
+    }
+
+    function updateButtonSelection(className, activeVal) {
+      const btns = document.querySelectorAll(`.${className}`);
+      btns.forEach(btn => {
+        const val = parseFloat(btn.getAttribute('data-val'));
+        if (val === activeVal) {
+          btn.className = `${className} py-1.5 rounded-lg text-xs font-bold bg-blue-50 border-blue-600 text-blue-600 transition`;
+        } else {
+          btn.className = `${className} py-1.5 rounded-lg text-xs font-semibold bg-white border-slate-200 text-slate-600 hover:bg-slate-50 transition`;
+        }
+      });
+    }
+
+    // 保存/启用 Auto-refill 规则
+    function enableAutoRefill() {
+      state.autoRefillEnabled = true;
+      closeAutoRefillModal();
+      
+      const trigCredits = state.refillTriggerUsd * CREDITS_PER_USD;
+      const targCredits = state.refillTargetUsd * CREDITS_PER_USD;
+
+      addLog(`⚙️ Auto-refill active! Trigger Threshold: $${state.refillTriggerUsd.toFixed(2)} (${trigCredits.toLocaleString()} Cr), Refill up to: $${state.refillTargetUsd.toFixed(2)} (${targCredits.toLocaleString()} Cr).`, "success");
+      showToast("Auto-refill enabled successfully.");
+      updateUI();
+    }
+
+    // 触发关闭二次确认流程
+    function triggerTurnOff() {
+      closeAutoRefillModal();
+      document.getElementById('confirm-trigger-val').innerText = `$${state.refillTriggerUsd.toFixed(2)}`;
+      document.getElementById('confirm-target-val').innerText = `$${state.refillTargetUsd.toFixed(2)}`;
+      document.getElementById('double-confirm-modal').classList.remove('hidden');
+    }
+
+    function closeDoubleConfirm() {
+      document.getElementById('double-confirm-modal').classList.add('hidden');
+    }
+
+    function confirmTurnOff() {
+      state.autoRefillEnabled = false;
+      closeDoubleConfirm();
+      addLog(`🛑 Auto-refill deactivated by user request.`, "warning");
+      showToast("Auto-refill disabled", "warning");
+      updateUI();
+    }
+
+    // 扣减仿真
+    function consumeCredits(amount) {
+      const neededMicro = amount * MICROCREDITS_PER_CREDIT;
+      addLog(`🚀 [Usage] API requested call costing ${amount.toLocaleString()} Credits (${(neededMicro/1000000).toFixed(1)}M Microcredits)`, "api");
+
+      let currentSub = state.subMicrocredits;
+      let currentAddon = state.addonMicrocredits;
+      let usedSub = 0;
+      let usedAddon = 0;
+
+      if (currentSub >= neededMicro) {
+        currentSub -= neededMicro;
+        usedSub = neededMicro;
+      } else {
+        usedSub = currentSub;
+        const remaining = neededMicro - currentSub;
+        currentSub = 0;
+        
+        if (currentAddon >= remaining) {
+          currentAddon -= remaining;
+          usedAddon = remaining;
+        } else {
+          usedAddon = currentAddon;
+          currentAddon = 0;
+          addLog("⚠️ Insufficient credits on both balances. Call interrupted.", "error");
+          showToast("Insufficient credits remaining!", "error");
+        }
+      }
+
+      state.subMicrocredits = currentSub;
+      state.addonMicrocredits = currentAddon;
+
+      if (usedSub > 0) addLog(`   └─ [BE cost] Deducted ${(usedSub/MICROCREDITS_PER_CREDIT).toLocaleString()} Credits (${(usedSub/1000000).toFixed(1)}M Micro) from Subscription balance.`, "be");
+      if (usedAddon > 0) addLog(`   └─ [BE cost] Deducted ${(usedAddon/MICROCREDITS_PER_CREDIT).toLocaleString()} Credits (${(usedAddon/1000000).toFixed(1)}M Micro) from Add-on balance.`, "be");
+
+      // 判断自动充值阈值
+      const totalAvailableCr = (currentSub + currentAddon) / MICROCREDITS_PER_CREDIT;
+      const triggerLimitCr = state.refillTriggerUsd * CREDITS_PER_USD;
+
+      if (state.autoRefillEnabled && totalAvailableCr < triggerLimitCr) {
+        const refillNeededUsd = state.refillTargetUsd - (totalAvailableCr / CREDITS_PER_USD);
+        if (refillNeededUsd > 0) {
+          const addedMicro = refillNeededUsd * MICROCREDITS_PER_USD;
+          state.addonMicrocredits += addedMicro;
+          
+          addLog(`⚡ [Auto-refill Triggered] Balance (${totalAvailableCr.toFixed(0)} Credits) fell below trigger ($${state.refillTriggerUsd.toFixed(2)} / ${triggerLimitCr.toLocaleString()} Cr).`, "refill");
+          addLog(`   └─ Automated payment processed: Added $${refillNeededUsd.toFixed(2)} (${(addedMicro/MICROCREDITS_PER_CREDIT).toLocaleString()} Credits) to Add-on balance.`, "refill");
+          showToast(`Auto-refilled +$${refillNeededUsd.toFixed(2)}`, "success");
+        }
+      }
+
+      updateUI();
+    }
+
+    // 同步视图与运行状态数据
+    function updateUI() {
+      const subCr = state.subMicrocredits / MICROCREDITS_PER_CREDIT;
+      const subUsd = subCr / CREDITS_PER_USD;
+      const subPct = (state.subMicrocredits / MAX_SUB_MICRO) * 100;
+
+      const addonCr = state.addonMicrocredits / MICROCREDITS_PER_CREDIT;
+      const addonUsd = addonCr / CREDITS_PER_USD;
+
+      const totalCr = subCr + addonCr;
+      const totalUsd = totalCr / CREDITS_PER_USD;
+
+      // --- PAGE 1 UI ELEMENTS (Light Dashboard) ---
+      document.getElementById('dash-total-credits').innerText = `${totalCr.toLocaleString(undefined, {maximumFractionDigits:0})} Credits`;
+      document.getElementById('dash-total-usd').innerText = `($${totalUsd.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} USD)`;
+      
+      const dashSubCrNode = document.getElementById('dash-sub-credits');
+      if (dashSubCrNode) dashSubCrNode.innerText = `${subCr.toLocaleString()} Cr`;
+      const dashAddonCrNode = document.getElementById('dash-addon-credits');
+      if (dashAddonCrNode) dashAddonCrNode.innerText = `${addonCr.toLocaleString()} Cr`;
+      const badge = document.getElementById('dash-autofill-badge');
+      if (badge) {
+        if (state.autoRefillEnabled) {
+          badge.innerText = `Auto-refill: Trigger at $${state.refillTriggerUsd.toFixed(0)}`;
+          badge.className = "bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold text-[9px] uppercase";
+        } else {
+          badge.innerText = "Auto-refill: Disabled";
+          badge.className = "bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-bold text-[9px] uppercase";
+        }
+      }
+      
+      // 首页卡片进度条同步
+      document.getElementById('dash-progress').style.width = `${Math.min(100, (totalCr / 5000) * 100)}%`;
+
+
+      // --- PAGE 2 UI ELEMENTS (Dark Analytics) ---
+      // 订阅卡片信息
+      document.getElementById('detail-sub-percent').innerText = `${Math.round(subPct)}%`;
+      document.getElementById('detail-sub-credits').innerText = `${subCr.toLocaleString()} Cr ($${subUsd.toFixed(2)})`;
+      document.getElementById('detail-sub-progress').style.width = `${subPct}%`;
+
+      // 加购进度信息
+      document.getElementById('detail-addon-percent').innerText = addonCr > 0 ? "Active" : "No Balance";
+      document.getElementById('detail-addon-credits-bar').innerText = `${addonCr.toLocaleString()} Cr ($${addonUsd.toFixed(2)})`;
+      document.getElementById('detail-addon-progress').style.width = addonCr > 0 ? "100%" : "0%";
+
+      // 可用总余额
+      document.getElementById('detail-total-credits').innerText = `${totalCr.toLocaleString(undefined, {maximumFractionDigits:0})} Credits`;
+      document.getElementById('detail-total-usd').innerText = `($${totalUsd.toFixed(2)})`;
+
+      // 充值卡片中的摘要标签及设置
+      const autofillBadge = document.getElementById('autofill-status-badge');
+      const actionBtn = document.getElementById('btn-autofill-action');
+      const summaryText = document.getElementById('autofill-active-summary');
+
+      if (state.autoRefillEnabled) {
+        autofillBadge.innerText = "Active";
+        autofillBadge.className = "text-[9px] px-2 py-0.5 rounded font-bold uppercase bg-emerald-500/10 text-emerald-400";
+        actionBtn.innerText = "Settings";
+        actionBtn.className = "bg-[#1f2530] hover:bg-[#272e3a] text-slate-200 px-5 py-2.5 rounded-xl text-xs font-bold border border-slate-700 transition whitespace-nowrap";
+        
+        summaryText.innerHTML = `Trigger at: <strong class="text-white">$${state.refillTriggerUsd.toFixed(2)}</strong> (${(state.refillTriggerUsd * CREDITS_PER_USD).toLocaleString()} Credits), auto-refills up to: <strong class="text-white">$${state.refillTargetUsd.toFixed(2)}</strong> (${(state.refillTargetUsd * CREDITS_PER_USD).toLocaleString()} Credits).`;
+        summaryText.classList.remove('hidden');
+      } else {
+        autofillBadge.innerText = "Disabled";
+        autofillBadge.className = "text-[9px] px-2 py-0.5 rounded font-bold uppercase bg-slate-800 text-slate-400";
+        actionBtn.innerText = "Enable Auto-refill";
+        actionBtn.className = "bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-md transition whitespace-nowrap";
+        
+        summaryText.classList.add('hidden');
+      }
+
+
+      // --- BE 控制台状态同步 ---
+      document.getElementById('be-sub-micro').innerText = state.subMicrocredits.toLocaleString();
+      document.getElementById('be-addon-micro').innerText = state.addonMicrocredits.toLocaleString();
+      document.getElementById('be-autofill-enabled').innerText = state.autoRefillEnabled ? "true" : "false";
+      document.getElementById('be-fe-credits').innerText = `${totalCr.toLocaleString()} Cr`;
+      document.getElementById('be-fe-usd').innerText = `$${totalUsd.toFixed(2)}`;
+
+      // 弹窗内部当前状态同步
+      document.getElementById('modal-curr-balance').innerHTML = `${totalCr.toLocaleString()} Credits ($${totalUsd.toFixed(2)})`;
+    }
+
+    // 打印实时调试日志
+    function addLog(text, type = "info") {
+      const logsContainer = document.getElementById('live-logs');
+      const timeStr = new Date().toTimeString().split(' ')[0];
+      
+      let colorClass = "text-slate-300";
+      if (type === "be") colorClass = "text-teal-400";
+      if (type === "api") colorClass = "text-indigo-400";
+      if (type === "refill") colorClass = "text-amber-400 font-bold";
+      if (type === "success") colorClass = "text-emerald-400 font-semibold";
+      if (type === "warning") colorClass = "text-yellow-400";
+      if (type === "error") colorClass = "text-rose-400 font-bold";
+      if (type === "system") colorClass = "text-slate-400 italic";
+
+      const logNode = document.createElement('div');
+      logNode.className = "border-b border-slate-900/50 pb-1.5 leading-relaxed";
+      logNode.innerHTML = `<span class="text-slate-600 mr-1.5">[${timeStr}]</span><span class="${colorClass}">${text}</span>`;
+      
+      logsContainer.insertBefore(logNode, logsContainer.firstChild);
+    }
+
+    function clearLogs() {
+      document.getElementById('live-logs').innerHTML = "";
+    }
+
+    // 气泡 Toast 消息提示
+    function showToast(text, type = "success") {
+      const toast = document.getElementById('toast');
+      const toastText = document.getElementById('toast-text');
+      
+      toastText.innerText = text;
+      
+      toast.className = "fixed bottom-4 right-4 bg-slate-900 border border-slate-800 text-white px-4 py-3 rounded-xl shadow-2xl z-50 transform translate-y-0 opacity-100 transition duration-300 max-w-sm flex items-center gap-2.5";
+      
+      setTimeout(() => {
+        toast.className = "fixed bottom-4 right-4 bg-slate-900 border border-slate-800 text-white px-4 py-3 rounded-xl shadow-2xl z-50 transform translate-y-20 opacity-0 transition duration-300 max-w-sm flex items-center gap-2.5";
+      }, 3500);
+    }
+  </script>
+</body>
+</html>
