@@ -717,7 +717,7 @@
               <td>
                 <div class="type-label">
                   <div class="type-dot type-dot-spend"></div>
-                  <span>Brands whose ad value spend grew MoM</span>
+                  <span>Brands with Rising Ad Investment</span>
                 </div>
               </td>
               <td>
@@ -740,11 +740,11 @@
               <td class="action-cell">
                 <button class="dots-btn" onclick="toggleDropdown('ss-dd1')">⋮</button>
                 <div class="dropdown-menu" id="ss-dd1">
-                  <div class="dropdown-item" onclick="openEditModal('Brands whose ad value spend grew MoM', 'julie@medialens.com, mark@agency.com'); closeDropdown('ss-dd1')">
+                  <div class="dropdown-item" onclick="openEditModal('Brands with Rising Ad Investment', 'julie@medialens.com, mark@agency.com'); closeDropdown('ss-dd1')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                     Edit Recipient
                   </div>
-                  <div class="dropdown-item" onclick="showHistoryPage('Brands whose ad value spend grew MoM'); closeDropdown('ss-dd1')">
+                  <div class="dropdown-item" onclick="showHistoryPage('Brands with Rising Ad Investment'); closeDropdown('ss-dd1')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     View Report History
                   </div>
@@ -775,7 +775,7 @@
               <td>
                 <div class="type-label">
                   <div class="type-dot type-dot-sov"></div>
-                  <span>Brands whose Share of Voice Dropped MoM</span>
+                  <span>Brands Losing Market SOV (Share of Voice Dropped)</span>
                 </div>
               </td>
               <td>
@@ -798,11 +798,11 @@
               <td class="action-cell">
                 <button class="dots-btn" onclick="toggleDropdown('ss-dd2')">⋮</button>
                 <div class="dropdown-menu" id="ss-dd2">
-                  <div class="dropdown-item" onclick="openEditModal('Brands whose Share of Voice Dropped MoM', 'julie@medialens.com'); closeDropdown('ss-dd2')">
+                  <div class="dropdown-item" onclick="openEditModal('Brands Losing Market SOV (Share of Voice Dropped)', 'julie@medialens.com'); closeDropdown('ss-dd2')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                     Edit Recipient
                   </div>
-                  <div class="dropdown-item" onclick="showHistoryPage('Brands whose Share of Voice Dropped MoM'); closeDropdown('ss-dd2')">
+                  <div class="dropdown-item" onclick="showHistoryPage('Brands Losing Market SOV (Share of Voice Dropped)'); closeDropdown('ss-dd2')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     View Report History
                   </div>
@@ -1067,7 +1067,7 @@
   let currentHistoryType = '';
 
   const historyData = {
-    'Brands whose ad value spend grew MoM': [
+    'Brands with Rising Ad Investment': [
       { subject: 'Sales Signal Report — Ad Spend Growth · June 2026', date: '2026/06/07', to: 'julie@medialens.com, mark@agency.com',
         brands: [
           { name: 'Nestlé HK', prev: 'HK$120K', curr: 'HK$198K', change: '+65%', signal: 'High Growth' },
@@ -1093,7 +1093,7 @@
         ]
       },
     ],
-    'Brands whose Share of Voice Dropped MoM': [
+    'Brands Losing Market SOV (Share of Voice Dropped)': [
       { subject: 'Sales Signal Report — SoV Drop · June 2026', date: '2026/06/07', to: 'julie@medialens.com',
         brands: [
           { name: 'Coca-Cola HK', prev: '18.4%', curr: '11.2%', change: '-7.2pp', signal: 'Significant Drop' },
