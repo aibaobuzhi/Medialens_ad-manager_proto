@@ -790,7 +790,7 @@ function downloadExcel() {
   const lastH = '2025年5月 (05-01 ~ 05-31)';
 
   // 12 columns: A-L (no 官方帳號連結)
-  const headers = ['#','Advertiser Name','Brand Group','Advertiser Category','Market','Ad Type',
+  const headers = ['#','Advertiser Name','Brand Group','Advertiser Category',
                    prevH,'Prev Month Ad Value (HKD)',lastH,'Last Month Ad Value (HKD)','MoM Growth (%)','MediaLens Advertiser Page'];
   const rows = [headers];
 
@@ -798,17 +798,16 @@ function downloadExcel() {
     const advUrl = `${BASE_URL}/organization/${ORG_ID}/advertiser/${adv.id}`;
     rows.push([
       i+1, adv.name, adv.group, adv.category,
-      'HK + MO', 'Paid + Branded',
       '2025年4月', Math.round(adv.prev),
       '2025年5月', Math.round(adv.last),
-      parseFloat((adv.growth*100).toFixed(1)),
+      (adv.growth*100).toFixed(1) + '%',
       advUrl
     ]);
   });
 
   const ws = XLSX.utils.aoa_to_sheet(rows);
-  // col widths: A # | B name | C group | D category | E region | F adType | G prevH | H prev | I lastH | J last | K growth | L url
-  ws['!cols'] = [{wch:5},{wch:28},{wch:22},{wch:14},{wch:10},{wch:16},
+  // col widths: A # | B name | C group | D category | E prevH | F prev | G lastH | H last | I growth | J url
+  ws['!cols'] = [{wch:5},{wch:28},{wch:22},{wch:14},
                  {wch:32},{wch:22},{wch:32},{wch:22},{wch:18},{wch:72}];
 
   ADVERTISERS.forEach((adv,i) => {
