@@ -213,7 +213,7 @@ pre.code-block {
               </svg>
             </div>
             <div style="flex:1;min-width:0;">
-              <div style="font-size:12px;font-weight:600;color:#102532;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">medialens-engagement-drop-alert-2025-06.csv</div>
+              <div style="font-size:12px;font-weight:600;color:#102532;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">MediaLens-Sales-Signal-Brands-Losing-SOV-2025-06.csv</div>
               <div style="font-size:11px;color:#9AA3AD;margin-top:2px;">CSV · 3 KB</div>
             </div>
             <div style="flex-shrink:0;width:28px;height:28px;border-radius:6px;background:#F0F0F0;display:flex;align-items:center;justify-content:center;">
@@ -711,7 +711,7 @@ function downloadCSV() {
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
-  a.href = url; a.download = 'medialens-engagement-drop-alert-2025-06.csv';
+  a.href = url; a.download = 'MediaLens-Sales-Signal-Brands-Losing-SOV-2025-06.csv';
   a.click();
   URL.revokeObjectURL(url);
 }

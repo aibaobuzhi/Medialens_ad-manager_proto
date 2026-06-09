@@ -265,7 +265,7 @@
             </svg>
           </div>
           <div style="flex:1;min-width:0;">
-            <div style="font-size:12px;font-weight:600;color:#102532;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">MediaLens_廣告主增長預警_2025-05.xlsx</div>
+            <div style="font-size:12px;font-weight:600;color:#102532;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">MediaLens-Sales-Signal-Brands-Increasing-Ad-Spend-2026-06.xlsx</div>
             <div style="font-size:11px;color:#9AA3AD;margin-top:2px;">Excel · 18 KB</div>
           </div>
           <div style="flex-shrink:0;width:28px;height:28px;border-radius:6px;background:#F0F0F0;display:flex;align-items:center;justify-content:center;">
@@ -820,7 +820,7 @@ function downloadExcel() {
     if (ws[urlRef])  ws[urlRef].l  = { Target: advUrl };
   });
 
-  XLSX.utils.book_append_sheet(wb, ws, '廣告主增長清單');
+  XLSX.utils.book_append_sheet(wb, ws, 'Advertiser Growth List');
 
   const meta = [
     ['報告名稱','MediaLens 廣告主月環比投放增長預警'],
@@ -835,9 +835,9 @@ function downloadExcel() {
   ];
   const ws2 = XLSX.utils.aoa_to_sheet(meta);
   ws2['!cols'] = [{wch:18},{wch:55}];
-  XLSX.utils.book_append_sheet(wb, ws2, '說明');
+  XLSX.utils.book_append_sheet(wb, ws2, 'Metadata');
 
-  XLSX.writeFile(wb, 'MediaLens_廣告主增長預警_2025-05.xlsx');
+  XLSX.writeFile(wb, 'MediaLens-Sales-Signal-Brands-Increasing-Ad-Spend-2026-06.xlsx');
 }
 
 function setView(v) {
