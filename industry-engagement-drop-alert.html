@@ -166,7 +166,7 @@ pre.code-block {
             <thead>
               <tr style="border-bottom:1px solid #E8E8E8;">
                 <th style="font-size:11px;font-weight:600;color:#707070;text-align:left;padding:8px 12px;">#</th>
-                <th style="font-size:11px;font-weight:600;color:#707070;text-align:left;padding:8px 12px;">Advertiser / Industry</th>
+                <th style="font-size:11px;font-weight:600;color:#707070;text-align:left;padding:8px 12px;">Advertiser / Category</th>
                 <th style="font-size:11px;font-weight:600;color:#707070;text-align:right;padding:8px 12px;">May 2025 Share</th>
                 <th style="font-size:11px;font-weight:600;color:#707070;text-align:right;padding:8px 12px;">Jun 2025 Share</th>
                 <th style="font-size:11px;font-weight:600;color:#707070;text-align:right;padding:8px 12px;">MoM Drop</th>
@@ -253,7 +253,7 @@ pre.code-block {
     <strong>✅ Confirmed:</strong> Flat advertiser list sorted by within-industry engagement share drop (largest drop first). Each row notes the advertiser's industry (category). No industry-level grouping or industry-level drop calculation needed.
   </div>
 
-  <div class="section-title">Worksheet 1 — 廣告主行業 Engagement 下降清單</div>
+  <div class="section-title">Worksheet 1 — Advertiser SOV Drop List (A–K)</div>
   <table class="spec-table">
     <thead>
       <tr>
@@ -272,11 +272,11 @@ pre.code-block {
         <td>Integer</td>
         <td><span class="tag tag-calc">Computed</span></td>
         <td>1</td>
-        <td>Global rank, sorted by share drop% descending (largest drop = rank 1)</td>
+        <td>Global rank, sorted by SOV drop% descending (largest drop = rank 1)</td>
       </tr>
       <tr>
         <td>B</td>
-        <td>廣告主名稱</td>
+        <td>Advertiser Name</td>
         <td>Hyperlink</td>
         <td><span class="tag tag-db">DB: advertisers.name (HK regional override)</span></td>
         <td>HSBC HK</td>
@@ -284,7 +284,7 @@ pre.code-block {
       </tr>
       <tr>
         <td>C</td>
-        <td>行業 / Industry</td>
+        <td>Category</td>
         <td>String</td>
         <td><span class="tag tag-db">DB: advertisers.productCategory.name</span></td>
         <td>Finance</td>
@@ -292,31 +292,31 @@ pre.code-block {
       </tr>
       <tr>
         <td>D</td>
-        <td>上月 Engagement Share (%)</td>
-        <td>Decimal %</td>
-        <td><span class="tag tag-calc">Computed: advPrevEng / industryPrevTotalEng</span></td>
+        <td>Prev Month SOV (%)</td>
+        <td>String %</td>
+        <td><span class="tag tag-calc">Computed: advPrevEng / categoryPrevTotalEng</span></td>
         <td>42.3%</td>
-        <td>Prev month (M-2) within-industry share</td>
+        <td>M-2 within-category share</td>
       </tr>
       <tr>
         <td>E</td>
-        <td>本月 Engagement Share (%)</td>
-        <td>Decimal %</td>
-        <td><span class="tag tag-calc">Computed: advLastEng / industryLastTotalEng</span></td>
+        <td>Last Month SOV (%)</td>
+        <td>String %</td>
+        <td><span class="tag tag-calc">Computed: advLastEng / categoryLastTotalEng</span></td>
         <td>28.1%</td>
-        <td>Last month (M-1) within-industry share</td>
+        <td>M-1 within-category share</td>
       </tr>
       <tr>
         <td>F</td>
-        <td>Engagement Share 跌幅 (%)</td>
-        <td>Decimal % (negative)</td>
+        <td>SOV Drop (%)</td>
+        <td>String % (negative)</td>
         <td><span class="tag tag-calc">Computed: (E − D) / D</span></td>
         <td>-33.6%</td>
-        <td>MoM share change; sort column (most negative = rank 1)</td>
+        <td>MoM SOV change; sort column (most negative = rank 1)</td>
       </tr>
       <tr>
         <td>G</td>
-        <td>廣告主 Engagements (上月)</td>
+        <td>Advertiser Engagements (Prev Month)</td>
         <td>Integer</td>
         <td><span class="tag tag-db">DB: aggregated fbPost + igMedia</span></td>
         <td>284,600</td>
@@ -324,7 +324,7 @@ pre.code-block {
       </tr>
       <tr>
         <td>H</td>
-        <td>廣告主 Engagements (本月)</td>
+        <td>Advertiser Engagements (Last Month)</td>
         <td>Integer</td>
         <td><span class="tag tag-db">DB: aggregated fbPost + igMedia</span></td>
         <td>189,200</td>
@@ -332,7 +332,23 @@ pre.code-block {
       </tr>
       <tr>
         <td>I</td>
-        <td>MediaLens 廣告主頁</td>
+        <td>Category Engagements (Prev Month)</td>
+        <td>Integer</td>
+        <td><span class="tag tag-calc">Computed: SUM of all advPrevEng in same productCategory</span></td>
+        <td>673,000</td>
+        <td>M-2 category total; denominator for Prev Month SOV</td>
+      </tr>
+      <tr>
+        <td>J</td>
+        <td>Category Engagements (Last Month)</td>
+        <td>Integer</td>
+        <td><span class="tag tag-calc">Computed: SUM of all advLastEng in same productCategory</span></td>
+        <td>673,200</td>
+        <td>M-1 category total; denominator for Last Month SOV</td>
+      </tr>
+      <tr>
+        <td>K</td>
+        <td>MediaLens Advertiser Page</td>
         <td>Hyperlink URL</td>
         <td><span class="tag tag-calc">Computed: APP_BASE_URL + /advertiser/:id</span></td>
         <td>https://app.medialens.io/…</td>
@@ -677,14 +693,14 @@ function downloadCSV() {
   const headers = [
     '#',
     'Advertiser Name',
-    'Industry',
+    'Category',
     `${PREV_LABEL} SOV (%)`,
     `${LAST_LABEL} SOV (%)`,
     'SOV Drop (%)',
     `Advertiser Engagements (${PREV_LABEL})`,
     `Advertiser Engagements (${LAST_LABEL})`,
-    `Industry Engagements (${PREV_LABEL})`,
-    `Industry Engagements (${LAST_LABEL})`,
+    `Category Engagements (${PREV_LABEL})`,
+    `Category Engagements (${LAST_LABEL})`,
     'MediaLens Advertiser Page',
   ];
 

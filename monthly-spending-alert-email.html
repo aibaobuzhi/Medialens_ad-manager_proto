@@ -297,7 +297,7 @@
     <div class="spec-card">
       <div class="spec-card-header">
         <h3>Excel 導出欄位規格</h3>
-        <p>檔名：<code>MediaLens_廣告主增長預警_YYYY-MM.xlsx</code> &nbsp;·&nbsp; 共 2 個工作表 &nbsp;·&nbsp; 12 欄（A–L）&nbsp;·&nbsp; 包含超連結</p>
+        <p>檔名：<code>MediaLens-Sales-Signal-Brands-Increasing-Ad-Spend-YYYY-MM.xlsx</code> &nbsp;·&nbsp; 共 2 個工作表 &nbsp;·&nbsp; 10 欄（A–J）&nbsp;·&nbsp; 包含超連結</p>
       </div>
       <div class="spec-meta">
         <div class="spec-meta-item"><div class="k">地區篩選</div><div class="v">HK + MO（澳門）</div></div>
@@ -386,24 +386,8 @@
             </td>
           </tr>
 
-          <tr>
-            <td><span class="col-chip c-dark">E</span></td>
-            <td><strong>Market</strong></td>
-            <td><span class="type-pill t-txt">文字</span></td>
-            <td><code>fixed: "HK + MO"</code></td>
-            <td>本報告固定值，說明篩選範圍</td>
-          </tr>
-
-          <tr>
-            <td><span class="col-chip c-dark">F</span></td>
-            <td><strong>Ad Type</strong></td>
-            <td><span class="type-pill t-txt">文字</span></td>
-            <td><code>fixed: "Paid + Branded"</code></td>
-            <td>本報告固定值，說明 adType 篩選</td>
-          </tr>
-
           <tr style="background:#FFFBF0 !important;">
-            <td><span class="col-chip c-orange">G</span></td>
+            <td><span class="col-chip c-orange">E</span></td>
             <td>
               <strong>Prev Month Period</strong><br>
               <span style="font-size:10px;color:#92400E;">(Dynamic header)</span>
@@ -417,7 +401,7 @@
           </tr>
 
           <tr style="background:#FFFBF0 !important;">
-            <td><span class="col-chip c-orange">H</span></td>
+            <td><span class="col-chip c-orange">F</span></td>
             <td><strong>Prev Month Ad Value (HKD)</strong></td>
             <td><span class="type-pill t-num">數字</span></td>
             <td>
@@ -435,7 +419,7 @@
           </tr>
 
           <tr style="background:#F0FBF0 !important;">
-            <td><span class="col-chip c-green">I</span></td>
+            <td><span class="col-chip c-green">G</span></td>
             <td>
               <strong>Last Month Period</strong><br>
               <span style="font-size:10px;color:#166534;">(Dynamic header)</span>
@@ -446,7 +430,7 @@
           </tr>
 
           <tr style="background:#F0FBF0 !important;">
-            <td><span class="col-chip c-green">J</span></td>
+            <td><span class="col-chip c-green">H</span></td>
             <td><strong>Last Month Ad Value (HKD)</strong></td>
             <td><span class="type-pill t-num">數字</span></td>
             <td>
@@ -459,10 +443,10 @@
           </tr>
 
           <tr>
-            <td><span class="col-chip c-blue">K</span></td>
+            <td><span class="col-chip c-blue">I</span></td>
             <td><strong>MoM Growth (%)</strong></td>
             <td><span class="type-pill t-pct">百分比</span></td>
-            <td><code>(J - H) / H × 100</code></td>
+            <td><code>(H - F) / F × 100</code></td>
             <td>
               Excel numFmt: <code>0.0"%"</code><br>
               如 <strong>67.2%</strong>（H=250,000, J=418,000）<br>
@@ -472,7 +456,7 @@
           </tr>
 
           <tr>
-            <td><span class="col-chip c-blue">L</span></td>
+            <td><span class="col-chip c-blue">J</span></td>
             <td><strong>MediaLens Advertiser Page</strong></td>
             <td><span class="type-pill t-link">超連結</span></td>
             <td><code>computed</code></td>
@@ -494,22 +478,18 @@
             <th style="background:#23A9F6;">B</th>
             <th style="background:#374151;">C</th>
             <th style="background:#374151;">D</th>
-            <th style="background:#374151;">E</th>
-            <th style="background:#374151;">F</th>
-            <th style="background:#F59E0B;">G</th>
-            <th style="background:#D97706;">H</th>
-            <th style="background:#52C41A;">I</th>
-            <th style="background:#3A9A2F;">J</th>
-            <th style="background:#23A9F6;">K</th>
-            <th style="background:#23A9F6;">L</th>
+            <th style="background:#F59E0B;">E</th>
+            <th style="background:#D97706;">F</th>
+            <th style="background:#52C41A;">G</th>
+            <th style="background:#3A9A2F;">H</th>
+            <th style="background:#23A9F6;">I</th>
+            <th style="background:#23A9F6;">J</th>
           </tr>
           <tr>
             <td style="color:#707070;">1</td>
             <td style="color:#1565C0;text-decoration:underline;">Nike Hong Kong ↗</td>
             <td>Nike Inc.</td>
-            <td>運動</td>
-            <td>HK + MO</td>
-            <td>Paid + Branded</td>
+            <td>Sports</td>
             <td style="background:#FFFBF0;">2025年4月</td>
             <td style="background:#FFFBF0;font-weight:600;">250,000</td>
             <td style="background:#F0FBF0;">2025年5月</td>
