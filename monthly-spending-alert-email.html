@@ -226,14 +226,6 @@
           <div class="summary-card"><div class="num">HKD 6.8M</div><div class="lbl">Avg Value Growing</div></div>
         </div>
 
-        <div class="export-note">
-          <p>Full list · <strong>15 advertisers</strong> qualified this month · includes all fields &amp; MediaLens links</p>
-          <button class="export-note-btn" onclick="downloadExcel()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="margin-right:3px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" style="display:none"/><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-            Open In Google Drive
-          </button>
-        </div>
-
         <div class="sh-row">
           <div class="sh">High-Growth Advertisers (sorted by growth rate)</div>
         </div>
@@ -243,6 +235,7 @@
             <tr>
               <th>#</th>
               <th>Advertiser / Category</th>
+              <th class="r">April Ad Value</th>
               <th class="r">May Ad Value</th>
               <th class="r">MoM Growth</th>
             </tr>
@@ -259,6 +252,28 @@
         </div>
       </div>
 
+      <!-- Attachment area -->
+      <div style="padding:16px 40px 20px;border-top:1px solid #F0F0F0;">
+        <div style="font-size:10px;font-weight:600;color:#9AA3AD;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">1 Attachment</div>
+        <p style="font-size:12px;color:#707070;line-height:1.6;margin:0 0 10px;">The full advertiser list (<strong style="color:#102532;">15 brands</strong>) is attached to this email as an Excel file, including all fields and direct MediaLens links.</p>
+        <div onclick="downloadExcel()" style="display:inline-flex;align-items:center;gap:12px;padding:10px 14px;background:#FFFFFF;border:1px solid #E0E0E0;border-radius:10px;cursor:pointer;max-width:340px;width:100%;box-sizing:border-box;" onmouseover="this.style.background='#F7F9FC'" onmouseout="this.style.background='#FFFFFF'">
+          <div style="width:36px;height:36px;background:#E8F5E9;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="#2E7D32" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M14 2V8H20" stroke="#2E7D32" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 13H16M8 17H13" stroke="#2E7D32" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:12px;font-weight:600;color:#102532;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">MediaLens_廣告主增長預警_2025-05.xlsx</div>
+            <div style="font-size:11px;color:#9AA3AD;margin-top:2px;">Excel · 18 KB</div>
+          </div>
+          <div style="flex-shrink:0;width:28px;height:28px;border-radius:6px;background:#F0F0F0;display:flex;align-items:center;justify-content:center;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#707070"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          </div>
+        </div>
+      </div>
+
       <div class="email-footer">
         This email is sent automatically by MediaLens on the 1st of each month.<br>
         Filters: Region HK + MO · Ad Type Paid + Branded · Period May 1 – May 31, 2025<br>
@@ -266,7 +281,7 @@
       </div>
     </div>
     <div style="text-align:center;margin-top:12px;font-size:11px;color:#AAA;">
-      Advertiser names are clickable → MediaLens advertiser page · "Download Excel" is functional
+      Advertiser names are clickable → MediaLens advertiser page · Attachment card is functional (click to download Excel)
     </div>
   </div>
 </div>
@@ -323,7 +338,7 @@
           <tr>
             <td><span class="col-chip c-blue">B</span></td>
             <td>
-              <strong>廣告主名稱</strong><br>
+              <strong>Advertiser Name</strong><br>
               <span style="font-size:10px;color:#FF3F41;font-weight:600;">超連結 → MediaLens 廣告主頁</span>
             </td>
             <td><span class="type-pill t-link">超連結</span></td>
@@ -341,7 +356,7 @@
 
           <tr>
             <td><span class="col-chip c-dark">C</span></td>
-            <td><strong>品牌集團</strong></td>
+            <td><strong>Brand Group</strong></td>
             <td><span class="type-pill t-txt">文字</span></td>
             <td>
               <code>advertisers.group</code><br>
@@ -356,7 +371,7 @@
 
           <tr>
             <td><span class="col-chip c-dark">D</span></td>
-            <td><strong>廣告主類別</strong></td>
+            <td><strong>Advertiser Category</strong></td>
             <td><span class="type-pill t-txt">文字</span></td>
             <td>
               <code>advertisers.productCategory</code><br>
@@ -373,7 +388,7 @@
 
           <tr>
             <td><span class="col-chip c-dark">E</span></td>
-            <td><strong>地區</strong></td>
+            <td><strong>Market</strong></td>
             <td><span class="type-pill t-txt">文字</span></td>
             <td><code>fixed: "HK + MO"</code></td>
             <td>本報告固定值，說明篩選範圍</td>
@@ -381,7 +396,7 @@
 
           <tr>
             <td><span class="col-chip c-dark">F</span></td>
-            <td><strong>廣告類型</strong></td>
+            <td><strong>Ad Type</strong></td>
             <td><span class="type-pill t-txt">文字</span></td>
             <td><code>fixed: "Paid + Branded"</code></td>
             <td>本報告固定值，說明 adType 篩選</td>
@@ -390,8 +405,8 @@
           <tr style="background:#FFFBF0 !important;">
             <td><span class="col-chip c-orange">G</span></td>
             <td>
-              <strong>上上月期間</strong><br>
-              <span style="font-size:10px;color:#92400E;">(動態表頭)</span>
+              <strong>Prev Month Period</strong><br>
+              <span style="font-size:10px;color:#92400E;">(Dynamic header)</span>
             </td>
             <td><span class="type-pill t-date">動態表頭</span></td>
             <td><code>moment().subtract(2,'months')</code></td>
@@ -403,7 +418,7 @@
 
           <tr style="background:#FFFBF0 !important;">
             <td><span class="col-chip c-orange">H</span></td>
-            <td><strong>上上月 Ad Value (HKD)</strong></td>
+            <td><strong>Prev Month Ad Value (HKD)</strong></td>
             <td><span class="type-pill t-num">數字</span></td>
             <td>
               <code>fbPost.spending + igMedia.spending</code><br>
@@ -422,8 +437,8 @@
           <tr style="background:#F0FBF0 !important;">
             <td><span class="col-chip c-green">I</span></td>
             <td>
-              <strong>上月期間</strong><br>
-              <span style="font-size:10px;color:#166534;">(動態表頭)</span>
+              <strong>Last Month Period</strong><br>
+              <span style="font-size:10px;color:#166534;">(Dynamic header)</span>
             </td>
             <td><span class="type-pill t-date">動態表頭</span></td>
             <td><code>moment().subtract(1,'month')</code></td>
@@ -432,7 +447,7 @@
 
           <tr style="background:#F0FBF0 !important;">
             <td><span class="col-chip c-green">J</span></td>
-            <td><strong>上月 Ad Value (HKD)</strong></td>
+            <td><strong>Last Month Ad Value (HKD)</strong></td>
             <td><span class="type-pill t-num">數字</span></td>
             <td>
               同 H 欄，時間範圍改為上月
@@ -445,7 +460,7 @@
 
           <tr>
             <td><span class="col-chip c-blue">K</span></td>
-            <td><strong>月環比增長 (%)</strong></td>
+            <td><strong>MoM Growth (%)</strong></td>
             <td><span class="type-pill t-pct">百分比</span></td>
             <td><code>(J - H) / H × 100</code></td>
             <td>
@@ -458,7 +473,7 @@
 
           <tr>
             <td><span class="col-chip c-blue">L</span></td>
-            <td><strong>MediaLens 廣告主頁連結</strong></td>
+            <td><strong>MediaLens Advertiser Page</strong></td>
             <td><span class="type-pill t-link">超連結</span></td>
             <td><code>computed</code></td>
             <td>
@@ -701,7 +716,7 @@
 
       <div class="lh">Email 輸出格式（已更新）</div>
       <div class="ibox">
-        <h4>Subject: <code>[MediaLens] Sales Signal — Ad Spend Growth Alert | May 2025 (15 advertisers)</code></h4>
+        <h4>Subject: <code>Sales Signal Report — Brands Increasing Ad Spend · June 2026</code></h4>
         <p style="margin-top:8px;">
           Email 語言：<strong>全英文</strong>（Sales Signal 定位）<br>
           Email 每行顯示：廣告主名稱（超連結）+ Category tag，不顯示 Group（Group 在 Excel C 欄）<br>
@@ -762,6 +777,7 @@ ADVERTISERS.slice(0,20).forEach((adv,i) => {
           </div>
         </div>
       </td>
+      <td class="r" style="color:#9AA3AD;">${fhkd(adv.prev)}</td>
       <td class="r">${fhkd(adv.last)}</td>
       <td class="r"><span class="gb ${gt(adv.growth)}">▲ ${(adv.growth*100).toFixed(1)}%</span></td>
     </tr>`;
@@ -774,8 +790,8 @@ function downloadExcel() {
   const lastH = '2025年5月 (05-01 ~ 05-31)';
 
   // 12 columns: A-L (no 官方帳號連結)
-  const headers = ['#','廣告主名稱','品牌集團','廣告主類別','地區','廣告類型',
-                   prevH,'上上月 Ad Value (HKD)',lastH,'上月 Ad Value (HKD)','月環比增長 (%)','MediaLens 廣告主頁'];
+  const headers = ['#','Advertiser Name','Brand Group','Advertiser Category','Market','Ad Type',
+                   prevH,'Prev Month Ad Value (HKD)',lastH,'Last Month Ad Value (HKD)','MoM Growth (%)','MediaLens Advertiser Page'];
   const rows = [headers];
 
   ADVERTISERS.forEach((adv,i) => {
