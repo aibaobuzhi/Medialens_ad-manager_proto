@@ -3,189 +3,364 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MediaLens – Create Account</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>MediaLens – Create Your Account</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── CSS Variables & Design Tokens ── */
+:root {
+  --primary: #23A9F6;
+  --primary-hover: #0b96e0;
+  --primary-light: rgba(35, 169, 246, 0.08);
+  --primary-glow: rgba(35, 169, 246, 0.25);
+  --dark-bg: #0A1F2C;
+  --text-main: #1C2D3A;
+  --text-muted: #6C7A84;
+  --border-color: #E2E8F0;
+  --facebook-color: #1877F2;
+  --card-bg: #FFFFFF;
+  --body-bg: radial-gradient(circle at 10% 20%, rgba(243, 248, 255, 1) 0%, rgba(250, 252, 255, 1) 100%);
+  --shadow-sm: 0 4px 12px rgba(35, 169, 246, 0.04);
+  --shadow-md: 0 12px 36px rgba(10, 31, 44, 0.06);
+  --shadow-lg: 0 20px 48px rgba(35, 169, 246, 0.12);
+}
+
+*, *::before, *::after { 
+  box-sizing: border-box; 
+  margin: 0; 
+  padding: 0; 
+}
 
 body {
-  font-family: 'Poppins', sans-serif;
-  background: #F7F7F7;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--body-bg);
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
-  color: #102532;
+  color: var(--text-main);
+  overflow-x: hidden;
+  position: relative;
 }
 
-/* ── Card wrapper ── */
+/* Background Soft Glow Accents */
+body::before {
+  content: '';
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(35, 169, 246, 0.08) 0%, transparent 70%);
+  top: -200px;
+  left: -200px;
+  z-index: 0;
+  pointer-events: none;
+}
+body::after {
+  content: '';
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(155, 89, 182, 0.05) 0%, transparent 70%);
+  bottom: -150px;
+  right: -100px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── Container Card ── */
 .card {
-  background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 8px 40px rgba(35, 169, 246, 0.10), 0 2px 12px rgba(0,0,0,0.06);
+  background: var(--card-bg);
+  border-radius: 24px;
+  box-shadow: var(--shadow-md), 0 1px 3px rgba(0,0,0,0.02);
   display: flex;
-  width: 920px;
-  min-height: 560px;
+  width: 1000px;
+  min-height: 640px;
   overflow: hidden;
+  position: relative;
+  z-index: 10;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* ── Left panel ── */
+/* ── Left Visual Panel ── */
 .left-panel {
-  flex: 0 0 42%;
-  background: linear-gradient(160deg, #EEF6FF 0%, #F1FCFF 60%, #D8F5FF 100%);
+  flex: 0 0 45%;
+  background: linear-gradient(145deg, #EEF6FF 0%, #F5F7FF 40%, #E3F5FF 100%);
   display: flex;
   flex-direction: column;
-  padding: 40px 44px;
+  padding: 48px;
   position: relative;
   overflow: hidden;
+  border-right: 1px solid rgba(35, 169, 246, 0.08);
 }
 
 .left-panel::before {
   content: '';
   position: absolute;
-  bottom: -60px; right: -60px;
-  width: 260px; height: 260px;
-  background: radial-gradient(circle, rgba(35,169,246,0.12) 0%, transparent 70%);
+  bottom: -80px; 
+  right: -80px;
+  width: 320px; 
+  height: 320px;
+  background: radial-gradient(circle, rgba(35, 169, 246, 0.15) 0%, transparent 70%);
   border-radius: 50%;
+  pointer-events: none;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 48px;
+  gap: 12px;
+  margin-bottom: 40px;
+  text-decoration: none;
 }
 
 .logo-icon {
-  width: 34px; height: 34px;
+  width: 38px;
+  height: 38px;
+  filter: drop-shadow(0 4px 8px rgba(35, 169, 246, 0.2));
+  transition: transform 0.5s ease;
+}
+
+.logo:hover .logo-icon {
+  transform: rotate(180deg);
 }
 
 .logo-text {
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 800;
   letter-spacing: 2px;
-  color: #0A1F2C;
+  color: var(--dark-bg);
 }
 
 .logo-text span {
-  color: #23A9F6;
+  color: var(--primary);
 }
 
 .left-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
+  z-index: 2;
 }
 
 .left-headline {
-  font-size: 26px;
-  font-weight: 700;
-  line-height: 1.3;
-  color: #0A1F2C;
-  margin-bottom: 24px;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: var(--dark-bg);
+  margin-bottom: 16px;
 }
 
-.left-headline .accent { color: #23A9F6; }
+.left-headline .accent {
+  color: var(--primary);
+  background: linear-gradient(120deg, var(--primary) 0%, #1583D4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
+/* ── Live Analytics Mockup (Pure CSS Animation) ── */
+.dashboard-mockup {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 30px rgba(35, 169, 246, 0.08);
+  border-radius: 16px;
+  padding: 18px;
+  margin: 24px 0;
+  backdrop-filter: blur(10px);
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.dashboard-mockup:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.mockup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.mockup-header .status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #2ECC71;
+}
+
+.mockup-header .status-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #2ECC71;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+
+.mockup-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 60px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 4px;
+}
+
+.chart-bar {
+  flex: 1;
+  background: linear-gradient(to top, rgba(35, 169, 246, 0.2), var(--primary));
+  border-radius: 3px 3px 0 0;
+  height: 20%;
+  animation: growBar 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.chart-bar:nth-child(2) { height: 40%; animation-delay: 0.1s; }
+.chart-bar:nth-child(3) { height: 35%; animation-delay: 0.2s; }
+.chart-bar:nth-child(4) { height: 75%; animation-delay: 0.3s; }
+.chart-bar:nth-child(5) { height: 50%; animation-delay: 0.4s; }
+.chart-bar:nth-child(6) { height: 90%; animation-delay: 0.5s; }
+
+@keyframes growBar {
+  from { height: 0; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.6; }
+}
+
+/* Feature Bullet Points */
 .feature-list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .feature-list li {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 12px;
   font-size: 13.5px;
-  font-weight: 400;
-  color: #102532;
+  font-weight: 500;
+  color: var(--text-main);
   line-height: 1.5;
 }
 
 .feature-list li .icon {
   flex-shrink: 0;
-  width: 20px; height: 20px;
-  background: #23A9F6;
+  width: 20px;
+  height: 20px;
+  background: var(--primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 1px;
+  margin-top: 2px;
+  box-shadow: 0 4px 8px rgba(35,169,246,0.2);
 }
 
 .feature-list li .icon svg {
-  width: 10px; height: 10px;
+  width: 10px;
+  height: 10px;
 }
 
 .badge-row {
   display: flex;
   gap: 8px;
-  margin-top: 36px;
   flex-wrap: wrap;
 }
 
 .badge {
-  background: rgba(35,169,246,0.10);
-  color: #23A9F6;
-  font-size: 11.5px;
+  background: rgba(35, 169, 246, 0.08);
+  color: var(--primary);
+  font-size: 11px;
   font-weight: 600;
-  padding: 4px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
+  border: 1px solid rgba(35, 169, 246, 0.1);
+  transition: all 0.3s ease;
 }
 
-/* ── Right panel ── */
+.badge:hover {
+  background: var(--primary);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* ── Right Form Panel ── */
 .right-panel {
   flex: 1;
-  padding: 48px 52px;
+  padding: 48px 60px;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .form-header {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .form-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: #0A1F2C;
-  margin-bottom: 6px;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--dark-bg);
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
 }
 
 .form-subtitle {
-  font-size: 13.5px;
-  color: #707070;
+  font-size: 14px;
+  color: var(--text-muted);
 }
 
-/* ── Google button (primary) ── */
-.btn-google {
+/* ── Social Login Buttons ── */
+.social-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.btn-social {
   width: 100%;
   height: 48px;
-  border: 1.5px solid #D9E3E6;
-  border-radius: 8px;
-  background: #fff;
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  background: #FFF;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  font-family: 'Poppins', sans-serif;
+  gap: 12px;
+  font-family: inherit;
   font-size: 14px;
   font-weight: 600;
-  color: #102532;
+  color: var(--text-main);
   cursor: pointer;
-  transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  overflow: hidden;
 }
 
+.btn-social svg {
+  transition: transform 0.2s ease;
+}
+
+.btn-social:hover svg {
+  transform: scale(1.1);
+}
+
+/* Google Sign-In */
 .btn-google:hover {
-  border-color: #23A9F6;
-  box-shadow: 0 2px 12px rgba(35,169,246,0.15);
+  border-color: var(--primary);
+  box-shadow: 0 4px 15px rgba(35, 169, 246, 0.12);
   background: #FAFEFF;
 }
 
@@ -193,28 +368,26 @@ body {
   background: #EEF6FF;
 }
 
-.google-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: #23A9F6;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 20px;
-  margin-left: 6px;
-  letter-spacing: 0.3px;
+/* Facebook Sign-In */
+.btn-facebook:hover {
+  border-color: var(--facebook-color);
+  box-shadow: 0 4px 15px rgba(24, 119, 242, 0.1);
+  background: #F4F8FF;
 }
 
-/* ── Divider ── */
+.btn-facebook:active {
+  background: #E1ECFF;
+}
+
+/* Divider Line */
 .divider {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 20px 0;
-  color: #CACACA;
+  gap: 16px;
+  margin-bottom: 24px;
+  color: #A0AEC0;
   font-size: 12px;
+  font-weight: 500;
 }
 
 .divider::before,
@@ -222,232 +395,252 @@ body {
   content: '';
   flex: 1;
   height: 1px;
-  background: #E8EEF0;
+  background: var(--border-color);
 }
 
-/* ── Secondary section label ── */
-.section-label {
-  font-size: 12px;
-  color: #707070;
-  margin-bottom: 10px;
-}
-
-/* ── Input ── */
-.input-wrap {
-  position: relative;
-  margin-bottom: 14px;
+/* ── Form Inputs & Validation ── */
+.form-group {
+  margin-bottom: 20px;
 }
 
 .input-label {
   display: block;
-  font-size: 12px;
-  font-weight: 500;
-  color: #707070;
-  margin-bottom: 5px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 8px;
+  transition: color 0.2s;
 }
 
-input[type="email"],
-input[type="text"] {
-  width: 100%;
-  height: 44px;
-  border: 1.5px solid #D9E3E6;
-  border-radius: 8px;
-  padding: 0 14px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 14px;
-  color: #102532;
-  outline: none;
-  transition: border-color 0.18s, box-shadow 0.18s;
-  background: #fff;
-}
-
-input[type="email"]:focus,
-input[type="text"]:focus {
-  border-color: #23A9F6;
-  box-shadow: 0 0 0 3px rgba(35,169,246,0.12);
-}
-
-input[type="email"]::placeholder {
-  color: #CACACA;
-}
-
-/* ── Checkbox ── */
-.remember-row {
+.input-container {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
 }
 
-.remember-row input[type="checkbox"] {
-  width: 16px; height: 16px;
-  accent-color: #23A9F6;
-  cursor: pointer;
+.input-container input {
+  width: 100%;
+  height: 48px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  padding: 0 16px 0 44px; /* Space for the envelope icon */
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-main);
+  outline: none;
+  background: #FFF;
+  transition: all 0.2s ease;
 }
 
-.remember-row label {
-  font-size: 13px;
-  color: #707070;
-  cursor: pointer;
+.input-container input::placeholder {
+  color: #A0AEC0;
 }
 
-/* ── Primary CTA ── */
+.input-container .input-icon {
+  position: absolute;
+  left: 16px;
+  color: #A0AEC0;
+  pointer-events: none;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+/* Focus Glow States */
+.input-container input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--primary-glow);
+}
+
+.input-container input:focus + .input-icon {
+  color: var(--primary);
+}
+
+/* Error Jitter and Border States */
+.input-container input.error-input {
+  border-color: #FF4D4F;
+  box-shadow: 0 0 0 4px rgba(255, 77, 79, 0.1);
+  animation: shake 0.4s ease-in-out;
+}
+
+.input-container input.error-input + .input-icon {
+  color: #FF4D4F;
+}
+
+.error-tip {
+  color: #FF4D4F;
+  font-size: 11px;
+  font-weight: 500;
+  margin-top: 6px;
+  display: none;
+  align-items: center;
+  gap: 4px;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+/* ── Primary Submit Button ── */
 .btn-primary {
   width: 100%;
-  height: 46px;
-  background: #23A9F6;
+  height: 48px;
+  background: linear-gradient(135deg, var(--primary) 0%, #1583D4 100%);
   color: #fff;
   border: none;
-  border-radius: 8px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 14px;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 14.5px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.18s, box-shadow 0.18s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(35, 169, 246, 0.2);
 }
 
 .btn-primary:hover {
-  background: #0B9AE7;
-  box-shadow: 0 4px 16px rgba(35,169,246,0.30);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(35, 169, 246, 0.35);
 }
 
-/* ── Facebook button ── */
-.btn-facebook {
-  width: 100%;
-  height: 44px;
-  border: 1.5px solid #D9E3E6;
-  border-radius: 8px;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 13.5px;
-  font-weight: 500;
-  color: #102532;
-  cursor: pointer;
-  transition: border-color 0.18s, box-shadow 0.18s;
-  margin-top: 10px;
+.btn-primary:active {
+  transform: translateY(0);
 }
 
-.btn-facebook:hover {
-  border-color: #1877F2;
-  box-shadow: 0 2px 10px rgba(24,119,242,0.12);
-}
-
-/* ── Footer links ── */
+/* Footer & Switch Page Links */
 .form-footer {
-  margin-top: 20px;
+  margin-top: 24px;
   text-align: center;
-  font-size: 12px;
-  color: #707070;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.6;
 }
 
 .form-footer a {
-  color: #23A9F6;
+  color: var(--primary);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
+  transition: color 0.15s;
 }
 
-.form-footer a:hover { text-decoration: underline; }
+.form-footer a:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
 
 .signin-row {
   text-align: center;
-  margin-top: 14px;
-  font-size: 13px;
-  color: #707070;
+  margin-top: 16px;
+  font-size: 13.5px;
+  color: var(--text-muted);
 }
 
 .signin-row a {
-  color: #23A9F6;
-  font-weight: 600;
+  color: var(--primary);
+  font-weight: 700;
   text-decoration: none;
+  transition: color 0.15s;
 }
 
-/* ── Google OAuth modal ── */
-.oauth-overlay {
+.signin-row a:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+/* ── Modal Overlays ── */
+.modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(16,37,50,0.45);
-  backdrop-filter: blur(2px);
+  background: rgba(10, 31, 44, 0.5);
+  backdrop-filter: blur(4px);
   display: none;
   align-items: center;
   justify-content: center;
   z-index: 200;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.oauth-overlay.visible { display: flex; }
+.modal-overlay.visible {
+  display: flex;
+  opacity: 1;
+}
 
+/* ── Google OAuth Sandbox Panel ── */
 .oauth-modal {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
-  width: 400px;
-  padding: 36px 40px;
+  background: #FFF;
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  width: 420px;
+  padding: 40px;
   text-align: center;
-  animation: popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: scale(0.9);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-@keyframes popIn {
-  from { transform: scale(0.88); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
+.modal-overlay.visible .oauth-modal {
+  transform: scale(1);
 }
 
 .oauth-google-logo {
-  margin: 0 auto 18px;
-  width: 48px; height: 48px;
+  margin: 0 auto 20px;
+  width: 48px;
+  height: 48px;
 }
 
 .oauth-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
-  color: #0A1F2C;
+  color: var(--dark-bg);
   margin-bottom: 6px;
 }
 
 .oauth-subtitle {
-  font-size: 13px;
-  color: #707070;
+  font-size: 13.5px;
+  color: var(--text-muted);
   margin-bottom: 24px;
 }
 
 .account-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 24px;
 }
 
 .account-item {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 12px 16px;
-  border: 1.5px solid #E8EEF0;
-  border-radius: 10px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
   cursor: pointer;
-  transition: border-color 0.18s, background 0.18s;
+  transition: all 0.2s ease;
   text-align: left;
+  position: relative;
 }
 
 .account-item:hover {
-  border-color: #23A9F6;
-  background: #EEF6FF;
+  border-color: var(--primary);
+  background: var(--primary-light);
 }
 
 .account-item.selected {
-  border-color: #23A9F6;
-  background: #EEF6FF;
+  border-color: var(--primary);
+  background: var(--primary-light);
+  box-shadow: inset 0 0 0 1px var(--primary);
 }
 
 .avatar {
-  width: 38px; height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   color: #fff;
   flex-shrink: 0;
@@ -456,120 +649,205 @@ input[type="email"]::placeholder {
 .avatar-jl { background: linear-gradient(135deg, #23A9F6, #0B9AE7); }
 .avatar-pm { background: linear-gradient(135deg, #9B59B6, #7D3C98); }
 
-.account-info .name { font-size: 14px; font-weight: 600; color: #102532; }
-.account-info .email-text { font-size: 12px; color: #707070; }
+.account-info {
+  flex-grow: 1;
+}
+
+.account-info .name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.account-info .email-text {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Checked Checklist Item */
+.check-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--primary);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.account-item.selected .check-icon {
+  opacity: 1;
+}
 
 .btn-oauth-continue {
   width: 100%;
   height: 46px;
-  background: #23A9F6;
+  background: var(--primary);
   color: #fff;
   border: none;
-  border-radius: 8px;
-  font-family: 'Poppins', sans-serif;
+  border-radius: 10px;
+  font-family: inherit;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.18s, box-shadow 0.18s;
-  margin-bottom: 10px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(35,169,246,0.2);
+  margin-bottom: 12px;
 }
 
 .btn-oauth-continue:hover {
-  background: #0B9AE7;
-  box-shadow: 0 4px 16px rgba(35,169,246,0.30);
+  background: var(--primary-hover);
+  box-shadow: 0 6px 16px rgba(35,169,246,0.3);
 }
 
 .btn-oauth-cancel {
   background: none;
   border: none;
-  font-family: 'Poppins', sans-serif;
+  font-family: inherit;
   font-size: 13px;
-  color: #707070;
+  color: var(--text-muted);
   cursor: pointer;
-  padding: 6px;
+  transition: color 0.2s;
 }
 
-.btn-oauth-cancel:hover { color: #102532; }
+.btn-oauth-cancel:hover {
+  color: var(--dark-bg);
+}
 
-/* ── Success overlay ── */
+/* ── 2. Processing Success State Overlay ── */
 .success-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(16,37,50,0.45);
-  backdrop-filter: blur(2px);
+  background: rgba(10, 31, 44, 0.7);
+  backdrop-filter: blur(8px);
   display: none;
   align-items: center;
   justify-content: center;
   z-index: 300;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.success-overlay.visible { display: flex; }
+.success-overlay.visible {
+  display: flex;
+  opacity: 1;
+}
 
 .success-modal {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
-  width: 380px;
-  padding: 44px 40px;
+  background: #FFF;
+  border-radius: 24px;
+  box-shadow: var(--shadow-lg);
+  width: 400px;
+  padding: 48px 40px;
   text-align: center;
-  animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: scale(0.9);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.success-icon {
-  width: 64px; height: 64px;
-  background: #E6FBEB;
+.success-overlay.visible .success-modal {
+  transform: scale(1);
+}
+
+.success-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  background: #E8F8F5;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 20px;
+  margin: 0 auto 24px;
+  color: #2ECC71;
+  box-shadow: 0 8px 24px rgba(46, 204, 113, 0.2);
 }
 
 .success-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
-  color: #0A1F2C;
-  margin-bottom: 8px;
+  color: var(--dark-bg);
+  margin-bottom: 12px;
 }
 
 .success-msg {
-  font-size: 13.5px;
-  color: #707070;
+  font-size: 14px;
+  color: var(--text-muted);
   line-height: 1.6;
-  margin-bottom: 28px;
+  margin-bottom: 30px;
 }
 
-.progress-ring {
-  width: 36px; height: 36px;
-  margin: 0 auto;
+/* Loading Spinners */
+.progress-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
-.progress-ring-circle {
-  fill: none;
-  stroke: #23A9F6;
-  stroke-width: 3;
-  stroke-dasharray: 88;
-  stroke-dashoffset: 88;
-  stroke-linecap: round;
-  transform: rotate(-90deg);
-  transform-origin: 50% 50%;
-  animation: fillRing 1.5s ease forwards;
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--border-color);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s infinite linear;
 }
 
-@keyframes fillRing {
-  to { stroke-dashoffset: 0; }
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Adaptive Breakpoints ── */
+@media (max-width: 900px) {
+  .card {
+    width: 100%;
+    max-width: 520px;
+    flex-direction: column;
+    min-height: auto;
+  }
+  
+  .left-panel {
+    flex: none;
+    padding: 36px;
+    border-right: none;
+    border-bottom: 1px solid rgba(35, 169, 246, 0.08);
+  }
+
+  .left-headline {
+    font-size: 24px;
+  }
+
+  .dashboard-mockup {
+    display: none; /* Auto-hide heavy elements on small screens */
+  }
+
+  .right-panel {
+    padding: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 12px;
+  }
+  .left-panel {
+    padding: 24px;
+  }
+  .right-panel {
+    padding: 24px;
+  }
+  .form-title {
+    font-size: 20px;
+  }
 }
 </style>
 </head>
 <body>
 
-<!-- ── Main registration card ── -->
+<!-- ── Main Registration Card ── -->
 <div class="card">
 
-  <!-- Left panel -->
+  <!-- Left Side: Interactive Branding Visual -->
   <div class="left-panel">
-    <div class="logo">
-      <!-- MediaLens SVG logo mark -->
+    <a href="#" class="logo">
+      <!-- MediaLens Branding SVG Logo Mark -->
       <svg class="logo-icon" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="17" cy="17" r="17" fill="#23A9F6" fill-opacity="0.12"/>
         <circle cx="17" cy="17" r="11" stroke="#23A9F6" stroke-width="2.5" fill="none"/>
@@ -577,92 +855,123 @@ input[type="email"]::placeholder {
         <path d="M17 6 Q21 11 17 17 Q13 11 17 6Z" fill="#23A9F6" fill-opacity="0.5"/>
       </svg>
       <span class="logo-text">MEDIA <span>LENS</span></span>
-    </div>
+    </a>
 
     <div class="left-content">
-      <h2 class="left-headline">
-        Start Growing Your<br>
-        <span class="accent">Business for Free</span>
-      </h2>
+      <div>
+        <h2 class="left-headline">
+          Start Growing Your<br>
+          <span class="accent">Business for Free</span>
+        </h2>
 
-      <ul class="feature-list">
-        <li>
-          <span class="icon">
-            <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </span>
-          Analyze your performance and your competitors
-        </li>
-        <li>
-          <span class="icon">
-            <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </span>
-          Discover top-ranking influencers and brands
-        </li>
-        <li>
-          <span class="icon">
-            <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </span>
-          Leverage AI for content creation and real-time insights
-        </li>
-      </ul>
+        <!-- Interactive Interactive Dashboard Widget -->
+        <div class="dashboard-mockup">
+          <div class="mockup-header">
+            <span>LIVE AUDIENCE DISCOVERY</span>
+            <div class="status">
+              <span class="status-dot"></span>
+              <span>AI Optimizing</span>
+            </div>
+          </div>
+          <div class="mockup-chart">
+            <div class="chart-bar"></div>
+            <div class="chart-bar"></div>
+            <div class="chart-bar"></div>
+            <div class="chart-bar"></div>
+            <div class="chart-bar"></div>
+            <div class="chart-bar"></div>
+          </div>
+        </div>
+
+        <ul class="feature-list">
+          <li>
+            <span class="icon">
+              <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            Analyze your performance and your competitors' metrics
+          </li>
+          <li>
+            <span class="icon">
+              <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            Discover top-ranking influencers and brand matches in one click
+          </li>
+          <li>
+            <span class="icon">
+              <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            Leverage AI models for premium content creation and data mining
+          </li>
+        </ul>
+      </div>
 
       <div class="badge-row">
-        <span class="badge">7-day free trial</span>
-        <span class="badge">No credit card</span>
-        <span class="badge">Cancel anytime</span>
+        <span class="badge">7-Day Free Trial</span>
+        <span class="badge">No Credit Card Required</span>
+        <span class="badge">Cancel Anytime</span>
       </div>
     </div>
   </div>
 
-  <!-- Right panel -->
+  <!-- Right Side: Interaction Workspace -->
   <div class="right-panel">
     <div class="form-header">
       <h1 class="form-title">Create Your Account</h1>
-      <p class="form-subtitle">Start your 7-day free trial. No credit card required.</p>
+      <p class="form-subtitle">Set up your credentials to unlock powerful analytics and insights tools.</p>
     </div>
 
-    <!-- PRIMARY: Google Sign-In -->
-    <button class="btn-google" id="btnGoogle" onclick="openGoogleOAuth()">
-      <!-- Official Google G logo -->
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M19.6 10.227c0-.709-.064-1.39-.182-2.045H10v3.868h5.382a4.6 4.6 0 01-1.996 3.018v2.51h3.232c1.891-1.742 2.982-4.305 2.982-7.35z" fill="#4285F4"/>
-        <path d="M10 20c2.7 0 4.964-.895 6.618-2.423l-3.232-2.509c-.895.6-2.04.955-3.386.955-2.605 0-4.81-1.759-5.595-4.123H1.064v2.59A9.996 9.996 0 0010 20z" fill="#34A853"/>
-        <path d="M4.405 11.9A6.01 6.01 0 014.09 10c0-.663.114-1.305.314-1.9V5.51H1.064A9.996 9.996 0 000 10c0 1.614.386 3.14 1.064 4.49L4.405 11.9z" fill="#FBBC04"/>
-        <path d="M10 3.977c1.468 0 2.786.505 3.822 1.496l2.868-2.868C14.959.99 12.695 0 10 0A9.996 9.996 0 001.064 5.51l3.34 2.59C5.192 5.736 7.396 3.977 10 3.977z" fill="#EA4335"/>
-      </svg>
-      Continue with Google
-    </button>
+    <!-- Quick OAuth Row -->
+    <div class="social-buttons">
+      <!-- Google Sign-In Integration -->
+      <button class="btn-social btn-google" id="btnGoogle" onclick="openGoogleOAuth()">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19.6 10.227c0-.709-.064-1.39-.182-2.045H10v3.868h5.382a4.6 4.6 0 01-1.996 3.018v2.51h3.232c1.891-1.742 2.982-4.305 2.982-7.35z" fill="#4285F4"/>
+          <path d="M10 20c2.7 0 4.964-.895 6.618-2.423l-3.232-2.509c-.895.6-2.04.955-3.386.955-2.605 0-4.81-1.759-5.595-4.123H1.064v2.59A9.996 9.996 0 0010 20z" fill="#34A853"/>
+          <path d="M4.405 11.9A6.01 6.01 0 014.09 10c0-.663.114-1.305.314-1.9V5.51H1.064A9.996 9.996 0 000 10c0 1.614.386 3.14 1.064 4.49L4.405 11.9z" fill="#FBBC04"/>
+          <path d="M10 3.977c1.468 0 2.786.505 3.822 1.496l2.868-2.868C14.959.99 12.695 0 10 0A9.996 9.996 0 001.064 5.51l3.34 2.59C5.192 5.736 7.396 3.977 10 3.977z" fill="#EA4335"/>
+        </svg>
+        <span>Continue with Google</span>
+      </button>
 
-    <!-- Facebook (secondary social) -->
-    <button class="btn-facebook" onclick="handleFacebookLogin()" style="margin-top: 10px;">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="10" cy="10" r="10" fill="#1877F2"/>
-        <path d="M13.5 10H11.5V16H9V10H7.5V8H9V6.5C9 5 9.9 4 11.5 4H13V6H11.8C11.36 6 11 6.36 11 6.8V8H13L12.7 10H11V16" fill="white"/>
-        <path d="M11.5 10H13L12.7 10H11.5z" fill="white"/>
-      </svg>
-      Continue with Facebook
-    </button>
+      <!-- Secondary Social Channel -->
+      <button class="btn-social btn-facebook" onclick="handleFacebookLogin()">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z" fill="#1877F2"/>
+        </svg>
+        <span>Continue with Facebook</span>
+      </button>
+    </div>
 
-    <!-- Divider -->
-    <div class="divider" style="margin-top: 20px;">or continue with email</div>
+    <!-- Fine Split Divider -->
+    <div class="divider">or continue with business email</div>
 
-    <!-- Email form -->
+    <!-- Email Submission Stage -->
     <div>
-      <p class="section-label">Please enter a valid company email to get started</p>
-      <div class="input-wrap">
-        <label class="input-label" for="emailInput">Email address</label>
-        <input type="email" id="emailInput" placeholder="example@medialens.com" />
+      <div class="form-group">
+        <label class="input-label" for="emailInput">Business Email Address</label>
+        <div class="input-container">
+          <input type="email" id="emailInput" placeholder="example@medialens.com" oninput="clearErrorState()" />
+          <span class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+          </span>
+        </div>
+        <!-- Email Inline Validation Notice -->
+        <div class="error-tip" id="errorTip">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          <span id="errorText">Please enter a valid company email.</span>
+        </div>
       </div>
 
       <button class="btn-primary" onclick="handleEmailContinue()">Continue With Email</button>
     </div>
 
-    <!-- Footer -->
-    <p class="form-footer" style="margin-top: 18px;">
-      By continuing, you agree to MediaLens'
+    <!-- Policy Footnotes -->
+    <p class="form-footer">
+      By continuing, you agree to MediaLens' 
       <a href="#">Privacy Policy</a> and <a href="#">Terms of Service</a>.
     </p>
 
+    <!-- Sign-in Direction -->
     <p class="signin-row">
       Already have an account? <a href="#">Sign in</a>
     </p>
@@ -670,10 +979,10 @@ input[type="email"]::placeholder {
 </div>
 
 
-<!-- ── Google OAuth mock modal ── -->
-<div class="oauth-overlay" id="oauthOverlay">
-  <div class="oauth-modal">
-    <!-- Google logo -->
+<!-- ── Google OAuth Sandbox Pop-up Overlay ── -->
+<div class="modal-overlay" id="oauthOverlay">
+  <div class="oauth-modal" onclick="event.stopPropagation()">
+    <!-- G Brandmark -->
     <svg class="oauth-google-logo" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M47.04 24.545c0-1.702-.154-3.336-.437-4.908H24v9.283h12.917a11.04 11.04 0 01-4.79 7.243v6.025h7.756C44.554 38.18 47.04 31.82 47.04 24.545z" fill="#4285F4"/>
       <path d="M24 48c6.48 0 11.91-2.148 15.882-5.812l-7.756-6.025c-2.148 1.44-4.896 2.292-8.126 2.292-6.25 0-11.543-4.222-13.43-9.895H2.565v6.22A23.99 23.99 0 0024 48z" fill="#34A853"/>
@@ -684,6 +993,7 @@ input[type="email"]::placeholder {
     <h2 class="oauth-title">Sign in with Google</h2>
     <p class="oauth-subtitle">Choose an account to continue to MediaLens</p>
 
+    <!-- Google Sandbox Accounts -->
     <div class="account-list">
       <div class="account-item selected" id="account1" onclick="selectAccount(this)">
         <div class="avatar avatar-jl">J</div>
@@ -691,84 +1001,204 @@ input[type="email"]::placeholder {
           <div class="name">Julie Li</div>
           <div class="email-text">julie.li@presslogic.com</div>
         </div>
-        <svg style="margin-left:auto; flex-shrink:0;" width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <circle cx="9" cy="9" r="9" fill="#23A9F6" fill-opacity="0.12"/>
-          <path d="M5 9l3 3 5-5" stroke="#23A9F6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <svg class="check-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
       </div>
 
       <div class="account-item" id="account2" onclick="selectAccount(this)">
         <div class="avatar avatar-pm">P</div>
         <div class="account-info">
-          <div class="name">PM Work</div>
+          <div class="name">PM Work Account</div>
           <div class="email-text">pm@example.com</div>
         </div>
+        <svg class="check-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
       </div>
     </div>
 
-    <button class="btn-oauth-continue" onclick="confirmGoogleLogin()">Continue</button>
+    <button class="btn-oauth-continue" onclick="confirmGoogleLogin()">Continue with Selected Account</button>
+    <br>
     <button class="btn-oauth-cancel" onclick="closeOAuth()">Cancel</button>
   </div>
 </div>
 
 
+<!-- ── Success State and Redirect Animation Overlay ── -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-modal">
+    <div class="success-icon-wrapper">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+    </div>
+    
+    <h2 class="success-title">Account Created!</h2>
+    <p class="success-msg" id="successMessage">Your registration has been processed successfully. We are configuring your personalized analytics dashboard.</p>
+    
+    <div class="progress-container">
+      <div class="spinner"></div>
+      <span style="font-size: 12px; color: var(--text-muted); font-weight: 500;">Redirecting to onboarding setup...</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── Pure JS Interactive Workflows ── -->
 <script>
   var selectedEmail = 'julie.li@presslogic.com';
 
+  // Toggle Google OAuth Pop-up
   function openGoogleOAuth() {
-    document.getElementById('oauthOverlay').classList.add('visible');
+    var overlay = document.getElementById('oauthOverlay');
+    overlay.style.display = 'flex';
+    overlay.offsetHeight; // Force reflow for a flawless animation transition
+    overlay.classList.add('visible');
   }
 
+  // Close Google OAuth Sandbox
   function closeOAuth() {
-    document.getElementById('oauthOverlay').classList.remove('visible');
+    var overlay = document.getElementById('oauthOverlay');
+    overlay.classList.remove('visible');
+    setTimeout(function() {
+      overlay.style.display = 'none';
+    }, 300);
   }
 
+  // Choose Account Choice State
   function selectAccount(el) {
     document.querySelectorAll('.account-item').forEach(function(item) {
       item.classList.remove('selected');
-      var check = item.querySelector('svg:last-child');
-      if (check && check.querySelector('path[stroke="#23A9F6"]')) check.remove();
     });
     el.classList.add('selected');
 
     var emailEl = el.querySelector('.email-text');
-    if (emailEl) selectedEmail = emailEl.textContent;
-
-    var checkSvg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-    checkSvg.setAttribute('style','margin-left:auto; flex-shrink:0;');
-    checkSvg.setAttribute('width','18'); checkSvg.setAttribute('height','18');
-    checkSvg.setAttribute('viewBox','0 0 18 18'); checkSvg.setAttribute('fill','none');
-    checkSvg.innerHTML = '<circle cx="9" cy="9" r="9" fill="#23A9F6" fill-opacity="0.12"/><path d="M5 9l3 3 5-5" stroke="#23A9F6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>';
-    el.appendChild(checkSvg);
-  }
-
-  function confirmGoogleLogin() {
-    localStorage.setItem('ml_google_email', selectedEmail);
-    localStorage.setItem('ml_login_method', 'google');
-    document.getElementById('oauthOverlay').classList.remove('visible');
-    window.location.href = 'onboarding-persona-selection.html';
-  }
-
-  function handleEmailContinue() {
-    var email = document.getElementById('emailInput').value.trim();
-    if (!email || !email.includes('@')) {
-      document.getElementById('emailInput').style.borderColor = '#FF3F41';
-      document.getElementById('emailInput').focus();
-      return;
+    if (emailEl) {
+      selectedEmail = emailEl.textContent;
     }
-    document.getElementById('emailInput').style.borderColor = '#D9E3E6';
-    localStorage.setItem('ml_login_method', 'email');
-    window.location.href = 'onboarding-persona-selection.html';
   }
 
-  function handleFacebookLogin() {
-    localStorage.setItem('ml_login_method', 'facebook');
-    window.location.href = 'onboarding-persona-selection.html';
-  }
-
+  // Close Overlay on Background Click
   document.getElementById('oauthOverlay').addEventListener('click', function(e) {
     if (e.target === this) closeOAuth();
   });
+
+  // Execute Redirect Loading States
+  function triggerSuccessRedirect(method, emailValue) {
+    localStorage.setItem('ml_login_method', method);
+    if (emailValue) {
+      localStorage.setItem('ml_google_email', emailValue);
+    }
+
+    closeOAuth();
+
+    // Spawn processing state screen with premium transitions
+    var successOverlay = document.getElementById('successOverlay');
+    successOverlay.style.display = 'flex';
+    successOverlay.offsetHeight;
+    successOverlay.classList.add('visible');
+
+    // Dynamically localize dynamic messages
+    var msgText = document.getElementById('successMessage');
+    if (method === 'google') {
+      msgText.innerHTML = "Welcome back, <b>" + emailValue + "</b>!<br>We've verified your Google credentials. Let's start setting up your dashboard.";
+    } else if (method === 'email') {
+      msgText.innerHTML = "Verification link sent to <b>" + emailValue + "</b>!<br>Set up your work workspace profile to begin.";
+    } else {
+      msgText.textContent = "Connected with Facebook! Your custom sandbox workspace environment is ready.";
+    }
+
+    // Redirect simulation timeout with sandbox safety guard
+    setTimeout(function() {
+      var targetUrl = 'onboarding-persona-selection.html';
+      try {
+        window.location.href = targetUrl;
+      } catch (err) {
+        console.warn("Navigation blocked in iframe/sandbox environment:", err);
+        
+        // Beautiful fallback notification inside sandboxed viewports
+        var tip = document.createElement('div');
+        tip.style.position = 'fixed';
+        tip.style.bottom = '20px';
+        tip.style.left = '50%';
+        tip.style.transform = 'translateX(-50%)';
+        tip.style.background = '#0A1F2C';
+        tip.style.color = '#fff';
+        tip.style.padding = '12px 24px';
+        tip.style.borderRadius = '10px';
+        tip.style.zIndex = '9999';
+        tip.style.fontSize = '13px';
+        tip.style.fontWeight = '500';
+        tip.style.boxShadow = '0 8px 24px rgba(0,0,0,0.2)';
+        tip.style.border = '1px solid rgba(255,255,255,0.1)';
+        tip.style.animation = 'popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        tip.innerHTML = '👉 Simulated redirect to: <code style="background:rgba(255,255,255,0.15); padding:2px 6px; border-radius:4px; font-family: monospace;">' + targetUrl + '</code> (Blocked by preview sandbox)';
+        document.body.appendChild(tip);
+        
+        setTimeout(function() {
+          tip.style.opacity = '0';
+          tip.style.transition = 'opacity 0.5s ease';
+          setTimeout(function() { tip.remove(); }, 500);
+        }, 4000);
+      }
+    }, 2200);
+  }
+
+  // Google Flow Success
+  function confirmGoogleLogin() {
+    triggerSuccessRedirect('google', selectedEmail);
+  }
+
+  // Email Validation & Submitting Engine
+  function handleEmailContinue() {
+    var emailInput = document.getElementById('emailInput');
+    var emailValue = emailInput.value.trim();
+    var errorTip = document.getElementById('errorTip');
+    var errorText = document.getElementById('errorText');
+
+    // Comprehensive RegEx Checking
+    var emailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailValue) {
+      showInputError("Please enter your email address to proceed.");
+      return;
+    } else if (!emailReg.test(emailValue)) {
+      showInputError("Oops! That email address format looks incorrect.");
+      return;
+    }
+
+    // Successful state passed
+    clearErrorState();
+    triggerSuccessRedirect('email', emailValue);
+  }
+
+  // Help: Input Shake Triggers
+  function showInputError(message) {
+    var emailInput = document.getElementById('emailInput');
+    var errorTip = document.getElementById('errorTip');
+    var errorText = document.getElementById('errorText');
+
+    emailInput.classList.remove('error-input');
+    emailInput.offsetHeight; // Re-trigger jitter reflow
+    emailInput.classList.add('error-input');
+    
+    errorText.textContent = message;
+    errorTip.style.display = 'flex';
+    emailInput.focus();
+  }
+
+  // Help: Clear Field Warning States
+  function clearErrorState() {
+    var emailInput = document.getElementById('emailInput');
+    var errorTip = document.getElementById('errorTip');
+    emailInput.classList.remove('error-input');
+    errorTip.style.display = 'none';
+  }
+
+  // Facebook Flow Success
+  function handleFacebookLogin() {
+    triggerSuccessRedirect('facebook', 'Facebook User');
+  }
 </script>
 
 </body>
