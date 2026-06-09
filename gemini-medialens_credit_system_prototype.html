@@ -390,44 +390,68 @@
           </div>
         </div>
 
-        <!-- Card 4: Auto-refill section -->
+        <!-- Card 4: Settings & Auto-refill section -->
         <div class="mt-6 shrink-0">
-          <h3 class="text-base font-bold text-white mb-4">Auto-refill</h3>
+          <h3 class="text-base font-bold text-white mb-4">Settings</h3>
           
-          <div class="bg-[#12161f] p-5 rounded-2xl border border-slate-800/60 shadow-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div class="flex-1">
-              <div class="flex items-center gap-2">
-                <h4 class="text-sm font-bold text-white">Auto-refill credit</h4>
-                <span id="autofill-status-badge" class="text-[9px] px-2 py-0.5 rounded font-bold uppercase bg-slate-800 text-slate-400">Disabled</span>
+          <div class="space-y-4">
+            <!-- New Default Model Setting Panel -->
+            <div class="bg-[#12161f] p-5 rounded-2xl border border-slate-800/60 shadow-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-[#1b2130] rounded-xl text-sky-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </div>
+                <div>
+                  <h4 class="text-sm font-bold text-white">Default Model Settings</h4>
+                  <p class="text-xs text-slate-400 mt-1">Select the active AI Model for running backend agent tasks.</p>
+                </div>
               </div>
-              <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">
-                Automatically add credit when you reach your minimum balance. 
-                <span id="autofill-active-summary" class="hidden text-emerald-400 font-medium block mt-1.5"></span>
-              </p>
+
+              <!-- Select Model Dropdown (更新选项为：gemini-2.5-flash 与 deepseek-r4) -->
+              <div class="w-full sm:w-auto">
+                <select id="default-model-select" onchange="changeDefaultModel(this.value)" class="w-full sm:w-56 bg-[#181d28] hover:bg-[#202735] text-slate-200 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-sky-500 transition cursor-pointer">
+                  <option value="gemini-2.5-flash" selected>gemini-2.5-flash (2.5 Cr/call)</option>
+                  <option value="deepseek-r4">deepseek-r4 (10 Cr/call)</option>
+                </select>
+              </div>
             </div>
 
-            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
-              <button onclick="openAutoRefillModal()" id="btn-autofill-action" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-md transition whitespace-nowrap">
-                Enable Auto-refill
-              </button>
-            </div>
-          </div>
+            <!-- Auto-refill Card -->
+            <div class="bg-[#12161f] p-5 rounded-2xl border border-slate-800/60 shadow-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-2">
+                  <h4 class="text-sm font-bold text-white">Auto-refill credit</h4>
+                  <span id="autofill-status-badge" class="text-[9px] px-2 py-0.5 rounded font-bold uppercase bg-slate-800 text-slate-400">Disabled</span>
+                </div>
+                <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">
+                  Automatically add credit when you reach your minimum balance. 
+                  <span id="autofill-active-summary" class="hidden text-emerald-400 font-medium block mt-1.5"></span>
+                </p>
+              </div>
 
-          <!-- Email notification setting -->
-          <div class="mt-4 bg-[#12161f]/40 p-4 rounded-xl border border-slate-800/40 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-              <div class="p-2 bg-[#1b2130] rounded-lg text-blue-400">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-              </div>
-              <div>
-                <h5 class="text-xs font-bold text-white">Email notifications</h5>
-                <p class="text-[10px] text-slate-500">Receive alert when auto-refill triggers or balance runs low.</p>
+              <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                <button onclick="openAutoRefillModal()" id="btn-autofill-action" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-md transition whitespace-nowrap">
+                  Enable Auto-refill
+                </button>
               </div>
             </div>
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" id="email-notif-toggle" onchange="toggleEmailNotif()" checked class="sr-only peer">
-              <div class="w-8 h-4 bg-slate-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-600 peer-checked:after:bg-white relative"></div>
-            </label>
+
+            <!-- Email notification setting -->
+            <div class="bg-[#12161f]/40 p-4 rounded-xl border border-slate-800/40 flex justify-between items-center">
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-[#1b2130] rounded-lg text-blue-400">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                </div>
+                <div>
+                  <h5 class="text-xs font-bold text-white">Email notifications</h5>
+                  <p class="text-[10px] text-slate-500">Receive alert when auto-refill triggers or balance runs low.</p>
+                </div>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="email-notif-toggle" onchange="toggleEmailNotif()" checked class="sr-only peer">
+                <div class="w-8 h-4 bg-slate-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-600 peer-checked:after:bg-white relative"></div>
+              </label>
+            </div>
           </div>
         </div>
 
@@ -462,6 +486,10 @@
             <span>auto_refill:</span>
             <span id="be-autofill-enabled" class="text-amber-400 font-bold">false</span>
           </div>
+          <div class="flex justify-between border-t border-slate-900 pt-1.5 mt-1.5">
+            <span>selected_model:</span>
+            <span id="be-selected-model" class="text-sky-400 font-bold">gemini-2.5-flash</span>
+          </div>
         </div>
 
         <div class="border-t border-slate-800/80 pt-2.5 space-y-1 text-xs">
@@ -481,19 +509,26 @@
         <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
           ⚡ Trigger Call Cost (Simulate Usage)
         </label>
-        <div class="grid grid-cols-3 gap-2">
-          <button onclick="consumeCredits(2.5)" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg p-2 text-xs font-medium text-slate-200 transition">
-            Use 2.5 Cr
-            <span class="block text-[9px] text-slate-500 mt-0.5">($0.025)</span>
+        <div class="space-y-2">
+          <!-- Dynamic Default Model Trigger -->
+          <button onclick="consumeDefaultModelCredits()" class="w-full bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 border border-sky-400/30 rounded-xl p-2.5 text-xs font-bold text-white shadow-lg transition">
+            Use Default Model (<span id="btn-default-model-lbl">gemini-2.5-flash: 2.5 Cr</span>)
           </button>
-          <button onclick="consumeCredits(150)" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg p-2 text-xs font-medium text-slate-200 transition">
-            Use 150 Cr
-            <span class="block text-[9px] text-slate-500 mt-0.5">($1.50)</span>
-          </button>
-          <button onclick="consumeCredits(5000)" class="bg-red-950/40 hover:bg-red-950/60 border border-red-900/60 rounded-lg p-2 text-xs font-semibold text-red-200 transition">
-            Use 5,000 Cr
-            <span class="block text-[9px] text-red-400 mt-0.5">($50.00)</span>
-          </button>
+          
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="consumeCredits(2.5)" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg p-2 text-xs font-medium text-slate-200 transition">
+              Use 2.5 Cr
+              <span class="block text-[9px] text-slate-500 mt-0.5">($0.025)</span>
+            </button>
+            <button onclick="consumeCredits(150)" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg p-2 text-xs font-medium text-slate-200 transition">
+              Use 150 Cr
+              <span class="block text-[9px] text-slate-500 mt-0.5">($1.50)</span>
+            </button>
+            <button onclick="consumeCredits(5000)" class="bg-red-950/40 hover:bg-red-950/60 border border-red-900/60 rounded-lg p-2 text-xs font-semibold text-red-200 transition">
+              Use 5,000 Cr
+              <span class="block text-[9px] text-red-400 mt-0.5">($50.00)</span>
+            </button>
+          </div>
         </div>
         <p class="text-[10px] text-slate-500 mt-2 italic leading-relaxed">
           * Notice: Deduct Priority uses Subscription balance first. If Auto-refill is active, dropping below trigger threshold immediately executes top-up calculation.
@@ -721,7 +756,14 @@
       refillTargetUsd: 50,
       refillCapUsd: 200,
       emailNotifications: true,
-      testBalanceUsd: 0.25
+      testBalanceUsd: 0.25,
+      defaultModel: 'gemini-2.5-flash' // 已更新为全新的初始默认模型
+    };
+
+    // 系统模型价格表定义 (已更新为指定模型及其对应的 Credit 定价)
+    const modelPrices = {
+      'gemini-2.5-flash': 2.5,
+      'deepseek-r4': 10.0
     };
 
     // 系统装载初始化
@@ -740,6 +782,10 @@
       state.refillTargetUsd = 50;
       state.refillCapUsd = 200;
       state.testBalanceUsd = 0.25;
+      state.defaultModel = 'gemini-2.5-flash';
+      
+      const selectNode = document.getElementById('default-model-select');
+      if (selectNode) selectNode.value = 'gemini-2.5-flash';
       
       addLog("System variables initialized to defaults.", "system");
       showToast("Simulation state reset.", "info");
@@ -762,6 +808,23 @@
         btnDash.className = "px-3 py-1 rounded font-medium transition text-slate-400 hover:text-slate-200";
         btnCredit.className = "px-3 py-1 rounded font-medium transition bg-blue-600 text-white";
       }
+    }
+
+    // 切换模型变更事件
+    function changeDefaultModel(val) {
+      state.defaultModel = val;
+      const price = modelPrices[val];
+      
+      // 添加日志
+      addLog(`⚙️ Default Model updated to [${val.toUpperCase()}] ($${(price / CREDITS_PER_USD).toFixed(3)} / ${price} Credits per call)`, "system");
+      showToast(`Model set to ${val}`);
+      updateUI();
+    }
+
+    // 触发使用默认 AI 模型的费用扣减
+    function consumeDefaultModelCredits() {
+      const price = modelPrices[state.defaultModel];
+      consumeCredits(price);
     }
 
     // 切换加购包气泡菜单
@@ -1060,6 +1123,16 @@
       document.getElementById('be-autofill-enabled').innerText = state.autoRefillEnabled ? "true" : "false";
       document.getElementById('be-fe-credits').innerText = `${totalCr.toLocaleString()} Cr`;
       document.getElementById('be-fe-usd').innerText = `$${totalUsd.toFixed(2)}`;
+      
+      // 同步后端当前选中的模型
+      document.getElementById('be-selected-model').innerText = state.defaultModel;
+      
+      // 同步“扣费模拟”按钮标签
+      const modelLabels = {
+        'gemini-2.5-flash': "gemini-2.5-flash: 2.5 Cr",
+        'deepseek-r4': "deepseek-r4: 10 Cr"
+      };
+      document.getElementById('btn-default-model-lbl').innerText = modelLabels[state.defaultModel];
 
       // 弹窗内部当前状态同步
       document.getElementById('modal-curr-balance').innerHTML = `${totalCr.toLocaleString()} Credits ($${totalUsd.toFixed(2)})`;
