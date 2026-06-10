@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MediaLens 廣告主投放增長預警 — 2025年5月</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #F0F2F5; font-family: 'Poppins', -apple-system, 'PingFang HK', sans-serif; font-size: 13px; color: #102532; }
@@ -158,7 +157,7 @@
 
 <div class="view-toggle">
   <button class="view-btn active" onclick="setView('email')">Email 預覽</button>
-  <button class="view-btn" onclick="setView('excel')">Excel 欄位規格</button>
+  <button class="view-btn" onclick="setView('excel')">CSV 欄位規格</button>
   <button class="view-btn" onclick="setView('logic')">後端邏輯 + PRD 審查</button>
   <span class="view-label">MediaLens · 月度廣告增長預警</span>
 </div>
@@ -255,8 +254,8 @@
       <!-- Attachment area -->
       <div style="padding:16px 40px 20px;border-top:1px solid #F0F0F0;">
         <div style="font-size:10px;font-weight:600;color:#9AA3AD;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">1 Attachment</div>
-        <p style="font-size:12px;color:#707070;line-height:1.6;margin:0 0 10px;">The full advertiser list (<strong style="color:#102532;">15 brands</strong>) is attached to this email as an Excel file, including all fields and direct MediaLens links.</p>
-        <div onclick="downloadExcel()" style="display:inline-flex;align-items:center;gap:12px;padding:10px 14px;background:#FFFFFF;border:1px solid #E0E0E0;border-radius:10px;cursor:pointer;max-width:340px;width:100%;box-sizing:border-box;" onmouseover="this.style.background='#F7F9FC'" onmouseout="this.style.background='#FFFFFF'">
+        <p style="font-size:12px;color:#707070;line-height:1.6;margin:0 0 10px;">The full advertiser list (<strong style="color:#102532;">15 brands</strong>) is attached to this email as a CSV file, including all fields and direct MediaLens links.</p>
+        <div onclick="downloadCSV()" style="display:inline-flex;align-items:center;gap:12px;padding:10px 14px;background:#FFFFFF;border:1px solid #E0E0E0;border-radius:10px;cursor:pointer;max-width:340px;width:100%;box-sizing:border-box;" onmouseover="this.style.background='#F7F9FC'" onmouseout="this.style.background='#FFFFFF'">
           <div style="width:36px;height:36px;background:#E8F5E9;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="#2E7D32" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -265,8 +264,8 @@
             </svg>
           </div>
           <div style="flex:1;min-width:0;">
-            <div style="font-size:12px;font-weight:600;color:#102532;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">MediaLens-Sales-Signal-Brands-Increasing-Ad-Spend-2026-06.xlsx</div>
-            <div style="font-size:11px;color:#9AA3AD;margin-top:2px;">Excel · 18 KB</div>
+            <div style="font-size:12px;font-weight:600;color:#102532;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">MediaLens-Sales-Signal-Brands-Increasing-Ad-Spend-2026-06.csv</div>
+            <div style="font-size:11px;color:#9AA3AD;margin-top:2px;">CSV · 5 KB</div>
           </div>
           <div style="flex-shrink:0;width:28px;height:28px;border-radius:6px;background:#F0F0F0;display:flex;align-items:center;justify-content:center;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="#707070"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
@@ -281,14 +280,14 @@
       </div>
     </div>
     <div style="text-align:center;margin-top:12px;font-size:11px;color:#AAA;">
-      Advertiser names are clickable → MediaLens advertiser page · Attachment card is functional (click to download Excel)
+      Advertiser names are clickable → MediaLens advertiser page · Attachment card is functional (click to download CSV)
     </div>
   </div>
 </div>
 
 
 <!-- ══════════════════════════════════════
-     TAB 2  EXCEL 欄位規格
+     TAB 2  CSV 欄位規格
 ══════════════════════════════════════ -->
 <div id="view-excel" style="display:none;" class="page-canvas">
   <div class="wide">
@@ -296,8 +295,8 @@
     <!-- Overview card -->
     <div class="spec-card">
       <div class="spec-card-header">
-        <h3>Excel 導出欄位規格</h3>
-        <p>檔名：<code>MediaLens-Sales-Signal-Brands-Increasing-Ad-Spend-YYYY-MM.xlsx</code> &nbsp;·&nbsp; 共 2 個工作表 &nbsp;·&nbsp; 10 欄（A–J）&nbsp;·&nbsp; 包含超連結</p>
+        <h3>CSV 導出欄位規格</h3>
+        <p>檔名：<code>MediaLens-Sales-Signal-Brands-Increasing-Ad-Spend-YYYY-MM.csv</code> &nbsp;·&nbsp; 8 欄（A–H）&nbsp;·&nbsp; 包含超連結</p>
       </div>
       <div class="spec-meta">
         <div class="spec-meta-item"><div class="k">地區篩選</div><div class="v">HK + MO（澳門）</div></div>
@@ -388,21 +387,7 @@
 
           <tr style="background:#FFFBF0 !important;">
             <td><span class="col-chip c-orange">E</span></td>
-            <td>
-              <strong>Prev Month Period</strong><br>
-              <span style="font-size:10px;color:#92400E;">(Dynamic header)</span>
-            </td>
-            <td><span class="type-pill t-date">動態表頭</span></td>
-            <td><code>moment().subtract(2,'months')</code></td>
-            <td>
-              表頭格式：<code>"2025年4月 (04-01 ~ 04-30)"</code><br>
-              讓銷售清楚看到是哪個月的數字
-            </td>
-          </tr>
-
-          <tr style="background:#FFFBF0 !important;">
-            <td><span class="col-chip c-orange">F</span></td>
-            <td><strong>Prev Month Ad Value (HKD)</strong></td>
+            <td><strong>April Ad Value (HKD)</strong></td>
             <td><span class="type-pill t-num">數字</span></td>
             <td>
               <code>fbPost.spending + igMedia.spending</code><br>
@@ -419,22 +404,11 @@
           </tr>
 
           <tr style="background:#F0FBF0 !important;">
-            <td><span class="col-chip c-green">G</span></td>
-            <td>
-              <strong>Last Month Period</strong><br>
-              <span style="font-size:10px;color:#166534;">(Dynamic header)</span>
-            </td>
-            <td><span class="type-pill t-date">動態表頭</span></td>
-            <td><code>moment().subtract(1,'month')</code></td>
-            <td>表頭格式：<code>"2025年5月 (05-01 ~ 05-31)"</code></td>
-          </tr>
-
-          <tr style="background:#F0FBF0 !important;">
-            <td><span class="col-chip c-green">H</span></td>
-            <td><strong>Last Month Ad Value (HKD)</strong></td>
+            <td><span class="col-chip c-green">F</span></td>
+            <td><strong>May Month Ad Value (HKD)</strong></td>
             <td><span class="type-pill t-num">數字</span></td>
             <td>
-              同 H 欄，時間範圍改為上月
+              同 E 欄，時間範圍改為上月
             </td>
             <td>
               格式：千分位整數，如 <strong>418,000</strong><br>
@@ -443,20 +417,19 @@
           </tr>
 
           <tr>
-            <td><span class="col-chip c-blue">I</span></td>
+            <td><span class="col-chip c-blue">G</span></td>
             <td><strong>MoM Growth (%)</strong></td>
             <td><span class="type-pill t-pct">百分比</span></td>
-            <td><code>(H - F) / F × 100</code></td>
+            <td><code>(F - E) / E × 100</code></td>
             <td>
-              Excel numFmt: <code>0.0"%"</code><br>
-              如 <strong>67.2%</strong>（H=250,000, J=418,000）<br>
+              如 <strong>67.2%</strong>（E=250,000, F=418,000）<br>
               上上月 = 0 者排除（無基準）<br>
               <span style="font-size:11px;color:#707070;">對應 PRD 7.7「growth rate」</span>
             </td>
           </tr>
 
           <tr>
-            <td><span class="col-chip c-blue">J</span></td>
+            <td><span class="col-chip c-blue">H</span></td>
             <td><strong>MediaLens Advertiser Page</strong></td>
             <td><span class="type-pill t-link">超連結</span></td>
             <td><code>computed</code></td>
@@ -478,21 +451,17 @@
             <th style="background:#23A9F6;">B</th>
             <th style="background:#374151;">C</th>
             <th style="background:#374151;">D</th>
-            <th style="background:#F59E0B;">E</th>
-            <th style="background:#D97706;">F</th>
-            <th style="background:#52C41A;">G</th>
-            <th style="background:#3A9A2F;">H</th>
-            <th style="background:#23A9F6;">I</th>
-            <th style="background:#23A9F6;">J</th>
+            <th style="background:#D97706;">E</th>
+            <th style="background:#3A9A2F;">F</th>
+            <th style="background:#23A9F6;">G</th>
+            <th style="background:#23A9F6;">H</th>
           </tr>
           <tr>
             <td style="color:#707070;">1</td>
             <td style="color:#1565C0;text-decoration:underline;">Nike Hong Kong ↗</td>
             <td>Nike Inc.</td>
             <td>Sports</td>
-            <td style="background:#FFFBF0;">2025年4月</td>
             <td style="background:#FFFBF0;font-weight:600;">250,000</td>
-            <td style="background:#F0FBF0;">2025年5月</td>
             <td style="background:#F0FBF0;font-weight:600;">418,000</td>
             <td style="font-weight:700;color:#FF3F41;">67.2%</td>
             <td style="color:#1565C0;text-decoration:underline;">連結↗</td>
@@ -600,25 +569,25 @@
             <td>7.1</td>
             <td><strong>External link — 已移除</strong></td>
             <td><span class="removed">已移除</span></td>
-            <td>確認不需要官方帳號連結（Facebook 頁或網站），從 Email 和 Excel 均移除</td>
+            <td>確認不需要官方帳號連結（Facebook 頁或網站），從 Email 和 CSV 均移除</td>
           </tr>
           <tr>
             <td>7.2</td>
             <td><strong>Advertiser category (content)</strong></td>
             <td><span class="ok">✅ 已確認</span></td>
-            <td>同第 4 項。Email 顯示為藍色 tag，Excel D 欄 <code>advertisers.productCategory.name</code></td>
+            <td>同第 4 項。Email 顯示為藍色 tag，CSV D 欄 <code>advertisers.productCategory.name</code></td>
           </tr>
           <tr>
             <td>7.3</td>
             <td><strong>Advertiser name [link to MediaLens page]</strong></td>
             <td><span class="ok">✅ 已實作</span></td>
-            <td>Email + Excel B 欄均超連結至 <code>app.medialens.io/organization/{orgId}/advertiser/{id}</code>。廣告主名稱取 <code>advertisers.name</code>（優先 <code>regionalInfo.HK.name</code>），與 Advertisers 頁同源</td>
+            <td>Email + CSV B 欄均超連結至 <code>app.medialens.io/organization/{orgId}/advertiser/{id}</code>。廣告主名稱取 <code>advertisers.name</code>（優先 <code>regionalInfo.HK.name</code>），與 Advertisers 頁同源</td>
           </tr>
           <tr>
             <td>7.4</td>
             <td><strong>Advertiser group</strong></td>
             <td><span class="ok">✅ 已實作</span></td>
-            <td><code>.populate('group', 'name')</code> 已加入，回傳 <code>groupName</code>。Excel C 欄顯示，Email 不顯示（避免過於擁擠）</td>
+            <td><code>.populate('group', 'name')</code> 已加入，回傳 <code>groupName</code>。CSV C 欄顯示，Email 不顯示（避免過於擁擠）</td>
           </tr>
           <tr>
             <td>7.5/7.6</td>
@@ -630,7 +599,7 @@
             <td>7.7</td>
             <td><strong>Growth rate</strong></td>
             <td><span class="ok">✅ 已實作</span></td>
-            <td><code>growthRate = (lastSpend - prevSpend) / prevSpend</code>，Email 顯示 badge，Excel K 欄格式 <code>0.0"%"</code></td>
+            <td><code>growthRate = (lastSpend - prevSpend) / prevSpend</code>，Email 顯示 badge，CSV G 欄格式 <code>0.0"%"</code></td>
           </tr>
           <tr>
             <td>7.8</td>
@@ -699,8 +668,8 @@
         <h4>Subject: <code>Sales Signal Report — Brands Increasing Ad Spend · June 2026</code></h4>
         <p style="margin-top:8px;">
           Email 語言：<strong>全英文</strong>（Sales Signal 定位）<br>
-          Email 每行顯示：廣告主名稱（超連結）+ Category tag，不顯示 Group（Group 在 Excel C 欄）<br>
-          Email 上限：Top 20 · Excel 導出全部達標廣告主（12 欄 A–L）
+          Email 每行顯示：廣告主名稱（超連結）+ Category tag，不顯示 Group（Group 在 CSV C 欄）<br>
+          Email 上限：Top 20 · CSV 導出全部達標廣告主（8 欄 A–H）
         </p>
       </div>
 
@@ -763,60 +732,39 @@ ADVERTISERS.slice(0,20).forEach((adv,i) => {
     </tr>`;
 });
 
-// Excel download (SheetJS)
-function downloadExcel() {
-  const wb = XLSX.utils.book_new();
-  const prevH = '2025年4月 (04-01 ~ 04-30)';
-  const lastH = '2025年5月 (05-01 ~ 05-31)';
-
-  // 12 columns: A-L (no 官方帳號連結)
+// CSV download
+function downloadCSV() {
   const headers = ['#','Advertiser Name','Brand Group','Advertiser Category',
-                   prevH,'Prev Month Ad Value (HKD)',lastH,'Last Month Ad Value (HKD)','MoM Growth (%)','MediaLens Advertiser Page'];
+                   'April Ad Value (HKD)','May Month Ad Value (HKD)','MoM Growth (%)','MediaLens Advertiser Page'];
   const rows = [headers];
 
   ADVERTISERS.forEach((adv,i) => {
     const advUrl = `${BASE_URL}/organization/${ORG_ID}/advertiser/${adv.id}`;
     rows.push([
       i+1, adv.name, adv.group, adv.category,
-      '2025年4月', Math.round(adv.prev),
-      '2025年5月', Math.round(adv.last),
+      Math.round(adv.prev),
+      Math.round(adv.last),
       (adv.growth*100).toFixed(1) + '%',
       advUrl
     ]);
   });
 
-  const ws = XLSX.utils.aoa_to_sheet(rows);
-  // col widths: A # | B name | C group | D category | E prevH | F prev | G lastH | H last | I growth | J url
-  ws['!cols'] = [{wch:5},{wch:28},{wch:22},{wch:14},
-                 {wch:32},{wch:22},{wch:32},{wch:22},{wch:18},{wch:72}];
+  const csv = rows.map(row =>
+    row.map(v => {
+      const s = String(v == null ? '' : v);
+      return s.includes(',') || s.includes('"') || s.includes('\n')
+        ? '"' + s.replace(/"/g, '""') + '"'
+        : s;
+    }).join(',')
+  ).join('\r\n');
 
-  ADVERTISERS.forEach((adv,i) => {
-    const r = i+1;
-    const advUrl = `${BASE_URL}/organization/${ORG_ID}/advertiser/${adv.id}`;
-    const nameRef = XLSX.utils.encode_cell({r,c:1});  // B = col 1
-    const urlRef  = XLSX.utils.encode_cell({r,c:11}); // L = col 11
-    if (ws[nameRef]) ws[nameRef].l = { Target: advUrl };
-    if (ws[urlRef])  ws[urlRef].l  = { Target: advUrl };
-  });
-
-  XLSX.utils.book_append_sheet(wb, ws, 'Advertiser Growth List');
-
-  const meta = [
-    ['報告名稱','MediaLens 廣告主月環比投放增長預警'],
-    ['統計月份','2025年5月'],['上上月範圍','2025-04-01 ~ 2025-04-30'],
-    ['上月範圍','2025-05-01 ~ 2025-05-31'],
-    ['地區篩選','HK（香港）+ MO（澳門，幣別對應 HKD）'],
-    ['廣告類型','paid_post + branded_content（不含 official_post）'],
-    ['增長門檻','月環比 ≥ 30%'],['最低投放','上月 Ad Value ≥ HKD 50,000'],
-    ['廣告主數',ADVERTISERS.length],
-    ['生成時間', new Date().toLocaleString('zh-HK',{timeZone:'Asia/Hong_Kong'})],
-    ['資料來源','MediaLens Ad Intelligence (fbPost + igMedia)'],
-  ];
-  const ws2 = XLSX.utils.aoa_to_sheet(meta);
-  ws2['!cols'] = [{wch:18},{wch:55}];
-  XLSX.utils.book_append_sheet(wb, ws2, 'Metadata');
-
-  XLSX.writeFile(wb, 'MediaLens-Sales-Signal-Brands-Increasing-Ad-Spend-2026-06.xlsx');
+  const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'MediaLens-Sales-Signal-Brands-Increasing-Ad-Spend-2026-06.csv';
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function setView(v) {
