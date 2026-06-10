@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediaLens Weekly Ad Spend Growth Signal</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #F0F2F5; font-family: 'Poppins', -apple-system, 'PingFang HK', sans-serif; font-size: 13px; color: #102532; }
+
+  /* ── Nav ── */
+  .view-toggle { display: flex; gap: 6px; padding: 10px 16px; background: #1a1a2e; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; }
+  .view-btn { padding: 6px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 12px; font-weight: 600; transition: all .15s; }
+  .view-btn.active { background: #23A9F6; color: #fff; }
+  .view-btn:not(.active) { background: #2d2d44; color: #aaa; }
+  .view-btn:not(.active):hover { background: #3d3d5a; }
+  .view-label { color: #888; font-size: 11px; margin-left: auto; align-self: center; }
+
+  /* ── Shared ── */
+  .page-canvas { padding: 24px 16px 48px; }
+  .narrow { max-width: 660px; margin: 0 auto; }
+  .wide   { max-width: 920px; margin: 0 auto; }
+
+  /* ══ EMAIL ══ */
+  .email-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,.10); }
+  .email-header { background: #23A9F6; padding: 26px 40px 22px; }
+  .email-header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .brand { font-size: 20px; font-weight: 700; color: #fff; }
+  .brand span { opacity: .7; font-weight: 400; font-size: 13px; margin-left: 6px; }
+  .header-badge { background: rgba(255,255,255,.18); border-radius: 20px; padding: 4px 12px; font-size: 11px; color: #fff; font-weight: 500; }
+  .email-header h1 { color: #fff; font-size: 19px; font-weight: 700; line-height: 1.3; }
+  .email-header p { color: rgba(255,255,255,.8); font-size: 12px; margin-top: 5px; line-height: 1.5; }
+  .email-body { padding: 26px 40px; }
+  .intro-box { background: #F6F8FD; border-left: 3px solid #23A9F6; border-radius: 0 8px 8px 0; padding: 12px 16px; margin-bottom: 22px; font-size: 13px; color: #102532; line-height: 1.7; }
+  .intro-box strong { color: #23A9F6; }
+  .summary-row { display: flex; gap: 10px; margin-bottom: 22px; }
+  .summary-card { flex: 1; background: #F7F7F7; border-radius: 10px; padding: 12px 14px; text-align: center; }
+  .summary-card .num { font-size: 20px; font-weight: 700; color: #102532; }
+  .summary-card .lbl { font-size: 11px; color: #707070; margin-top: 2px; }
+  .summary-card.hl .num { color: #23A9F6; }
+
+  /* section header row */
+  .sh-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 10px; }
+  .sh { font-size: 13px; font-weight: 600; color: #102532; display: flex; align-items: center; gap: 7px; }
+  .sh-note { font-size: 10px; font-weight: 500; color: #707070; background: #F0F0F0; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+  .xlsx-btn { display: inline-flex; align-items: center; gap: 5px; background: #F0FBF0; color: #2E7D32; border: 1px solid #C8E6C9; border-radius: 8px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; text-decoration: none; white-space: nowrap; }
+  .xlsx-btn:hover { background: #E8F5E9; }
+  .xlsx-btn-sub { font-size:10px; color:#707070; text-align:right; margin-top:3px; }
+
+  /* adv table */
+  .adv-table { width: 100%; border-collapse: collapse; }
+  .adv-table thead th { font-size: 11px; font-weight: 600; color: #707070; text-align: left; padding: 8px 10px; border-bottom: 1px solid #E8E8E8; white-space: nowrap; }
+  .adv-table thead th.r { text-align: right; }
+  .adv-table tbody tr { border-bottom: 1px solid #F3F3F3; }
+  .adv-table tbody tr:hover { background: #FAFCFF; }
+  .adv-table tbody tr:last-child { border-bottom: none; }
+  .adv-table td { padding: 11px 10px; vertical-align: middle; }
+  .adv-table td.r { text-align: right; font-size: 12px; color: #707070; }
+  .adv-name-cell { display: flex; align-items: center; gap: 9px; }
+  .adv-logo { width: 30px; height: 30px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 10px; flex-shrink: 0; }
+  .adv-name-link { font-weight: 600; font-size: 12px; color: #102532; text-decoration: none; display: flex; align-items: center; gap: 4px; }
+  .adv-name-link:hover { color: #23A9F6; }
+  .adv-meta { font-size: 10px; color: #707070; margin-top: 2px; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+  .cat-tag { display: inline-block; background: #EFF8FF; color: #1D4ED8; font-size: 10px; font-weight: 500; padding: 1px 6px; border-radius: 5px; }
+  .gb { display: inline-flex; align-items: center; gap: 3px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .th { background: #FFF2F2; color: #FF3F41; }
+  .tm { background: #FFF8EC; color: #D4860A; }
+  .tb { background: #F0FBF0; color: #3A9A2F; }
+  .rank { width: 20px; height: 20px; border-radius: 50%; background: #F0F0F0; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #707070; }
+  .r1 { background: #FEF3C7; color: #92400E; }
+  .r2 { background: #E5E7EB; color: #374151; }
+  .r3 { background: #FDE8DE; color: #9A3412; }
+
+  /* export note */
+  .export-note { margin-top: 10px; padding: 10px 14px; background: #FAFAFA; border: 1px dashed #E0E0E0; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .export-note p { font-size: 11px; color: #707070; line-height: 1.5; }
+  .export-note-btn { display: inline-flex; align-items: center; gap: 5px; background: #23A9F6; color: #fff; border: none; border-radius: 8px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .export-note-btn:hover { background: #1a90d4; }
+  .cta-section { margin-top: 18px; background: linear-gradient(135deg, #EFF8FF 0%, #F6F8FD 100%); border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .cta-text h3 { font-size: 13px; font-weight: 600; color: #102532; margin-bottom: 3px; }
+  .cta-text p { font-size: 12px; color: #707070; line-height: 1.4; }
+  .cta-btn { display: inline-block; background: #23A9F6; color: #fff; font-size: 12px; font-weight: 600; padding: 9px 18px; border-radius: 10px; text-decoration: none; white-space: nowrap; }
+  .email-footer { padding: 16px 40px 20px; border-top: 1px solid #F0F0F0; text-align: center; font-size: 11px; color: #AAAAAA; line-height: 1.6; }
+  .email-footer a { color: #23A9F6; text-decoration: none; }
+
+  /* ══ EXCEL SPEC ══ */
+  .spec-card { background: #fff; border-radius: 12px; box-shadow: 0 2px 16px rgba(0,0,0,.07); overflow: hidden; margin-bottom: 16px; }
+  .spec-card-header { padding: 16px 24px; border-bottom: 1px solid #F0F0F0; background: #FAFCFF; }
+  .spec-card-header h3 { font-size: 14px; font-weight: 700; color: #102532; margin-bottom: 2px; }
+  .spec-card-header p { font-size: 12px; color: #707070; }
+  .spec-meta { padding: 12px 24px; background: #F6F8FD; border-bottom: 1px solid #EAEEF2; display: flex; gap: 24px; flex-wrap: wrap; }
+  .spec-meta-item .k { font-size: 10px; color: #707070; text-transform: uppercase; letter-spacing: .4px; }
+  .spec-meta-item .v { font-size: 12px; font-weight: 600; color: #102532; margin-top: 1px; }
+
+  .spec-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .spec-table thead th { background: #102532; color: #fff; padding: 10px 14px; text-align: left; font-weight: 600; font-size: 11px; white-space: nowrap; }
+  .spec-table tbody tr { border-bottom: 1px solid #F3F3F3; }
+  .spec-table tbody tr:nth-child(even) { background: #FAFCFF; }
+  .spec-table tbody tr:hover { background: #EFF8FF; }
+  .spec-table tbody td { padding: 11px 14px; vertical-align: top; line-height: 1.6; }
+
+  .col-chip { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 5px; font-size: 11px; font-weight: 700; font-family: monospace; color: #fff; flex-shrink: 0; }
+  .c-dark   { background: #102532; }
+  .c-blue   { background: #23A9F6; }
+  .c-green  { background: #52C41A; }
+  .c-orange { background: #F59E0B; color: #fff; }
+  .c-purple { background: #7C3AED; }
+
+  .type-pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+  .t-num  { background: #E8F4FD; color: #1565C0; }
+  .t-txt  { background: #F3E8FF; color: #6D28D9; }
+  .t-link { background: #FFF0E6; color: #C2410C; }
+  .t-pct  { background: #F0FBF0; color: #166534; }
+  .t-date { background: #FFF8E1; color: #92400E; }
+
+  code { background: #F0F2F5; padding: 1px 5px; border-radius: 4px; font-family: monospace; font-size: 11px; }
+
+  .sample-row-wrap { padding: 14px 24px; border-top: 1px solid #F0F0F0; background: #FAFAFA; overflow-x: auto; }
+  .sample-label { font-size: 11px; font-weight: 600; color: #707070; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 8px; }
+  .sample-table { border-collapse: collapse; font-size: 11px; white-space: nowrap; }
+  .sample-table th { padding: 6px 10px; font-weight: 600; color: #fff; }
+  .sample-table td { padding: 6px 10px; border: 1px solid #E8E8E8; }
+
+  /* ══ LOGIC / PRD ══ */
+  .logic-card { background: #fff; border-radius: 12px; box-shadow: 0 2px 16px rgba(0,0,0,.07); padding: 28px 32px; margin-bottom: 16px; }
+  .logic-card h2 { font-size: 16px; font-weight: 700; color: #102532; }
+  .logic-card .sub { font-size: 12px; color: #707070; margin-top: 4px; margin-bottom: 24px; }
+  .lh { font-size: 13px; font-weight: 600; color: #102532; border-left: 3px solid #23A9F6; padding-left: 10px; margin-bottom: 12px; margin-top: 20px; }
+  .prd-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 4px; }
+  .prd-table thead th { background: #F6F8FD; padding: 9px 12px; text-align: left; font-weight: 600; color: #707070; border-bottom: 1px solid #E8E8E8; }
+  .prd-table tbody td { padding: 10px 12px; border-bottom: 1px solid #F3F3F3; vertical-align: top; line-height: 1.6; }
+  .ok   { display:inline-block;background:#F0FBF0;color:#166534;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;white-space:nowrap; }
+  .gap  { display:inline-block;background:#FFF8EC;color:#92400E;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;white-space:nowrap; }
+  .ask  { display:inline-block;background:#FFF2F2;color:#9B1C1C;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;white-space:nowrap; }
+  .removed { display:inline-block;background:#F0F0F0;color:#888;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;white-space:nowrap; text-decoration:line-through; }
+  .code-block { background: #1a1a2e; border-radius: 8px; padding: 18px 22px; overflow-x: auto; margin-bottom: 16px; }
+  .code-block pre { font-family: monospace; font-size: 12px; line-height: 1.7; color: #ABB2BF; margin: 0; }
+  .qbox { background: #FFF8EC; border: 1px solid #FFC960; border-radius: 10px; padding: 14px 18px; margin-bottom: 12px; }
+  .qbox h4 { font-size: 12px; font-weight: 700; color: #92400E; margin-bottom: 6px; }
+  .qbox p { font-size: 12px; color: #78350F; line-height: 1.7; }
+  .ibox { background: #EFF8FF; border: 1px solid #BAE6FD; border-radius: 10px; padding: 14px 18px; margin-bottom: 12px; }
+  .ibox h4 { font-size: 12px; font-weight: 700; color: #075985; margin-bottom: 6px; }
+  .ibox p { font-size: 12px; color: #0c4a6e; line-height: 1.7; }
+
+  /* ── Logo Header + Meta Bar ── */
+  .logo-header { background: #fff; padding: 20px 40px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #EFEFEF; }
+  .logo-mark { display: flex; align-items: center; gap: 10px; }
+  .logo-wordmark { font-size: 16px; font-weight: 700; letter-spacing: 2px; color: #102532; }
+  .logo-wordmark span { color: #23A9F6; }
+  .meta-bar { background: #F7F8FA; padding: 18px 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px 40px; border-bottom: 1px solid #EFEFEF; }
+  .meta-item .meta-lbl { font-size: 11px; color: #9AA3AD; font-weight: 500; margin-bottom: 3px; }
+  .meta-item .meta-val { font-size: 12px; color: #102532; font-weight: 500; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<div class="view-toggle">
+  <button class="view-btn active" onclick="setView('email')">Email 預覽</button>
+  <button class="view-btn" onclick="setView('excel')">CSV 欄位規格</button>
+  <button class="view-btn" onclick="setView('logic')">後端邏輯 + PRD 審查</button>
+  <span class="view-label">MediaLens · Weekly Ad Spend Growth Signal</span>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     TAB 1  EMAIL PREVIEW
+══════════════════════════════════════ -->
+<div id="view-email" class="page-canvas">
+  <div class="narrow">
+    <div class="email-card">
+
+      <!-- Logo Header -->
+      <div class="logo-header">
+        <div class="logo-mark">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="16" cy="16" r="15" stroke="#23A9F6" stroke-width="2"/>
+            <circle cx="16" cy="16" r="6" fill="#23A9F6"/>
+            <line x1="16" y1="1" x2="16" y2="10" stroke="#23A9F6" stroke-width="2" stroke-linecap="round"/>
+            <line x1="16" y1="22" x2="16" y2="31" stroke="#23A9F6" stroke-width="2" stroke-linecap="round"/>
+            <line x1="1" y1="16" x2="10" y2="16" stroke="#23A9F6" stroke-width="2" stroke-linecap="round"/>
+            <line x1="22" y1="16" x2="31" y2="16" stroke="#23A9F6" stroke-width="2" stroke-linecap="round"/>
+            <line x1="4.93" y1="4.93" x2="11.27" y2="11.27" stroke="#23A9F6" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="20.73" y1="20.73" x2="27.07" y2="27.07" stroke="#23A9F6" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="27.07" y1="4.93" x2="20.73" y2="11.27" stroke="#23A9F6" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="11.27" y1="20.73" x2="4.93" y2="27.07" stroke="#23A9F6" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <div class="logo-wordmark">MEDIA <span>LENS</span></div>
+        </div>
+      </div>
+
+      <!-- Email Metadata Bar -->
+      <div class="meta-bar">
+        <div class="meta-item" style="grid-column:1/-1;">
+          <div class="meta-lbl">Title</div>
+          <div class="meta-val"><strong>Weekly Sales Signal Alert — Brands Increasing Ad Spend</strong></div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">From</div>
+          <div class="meta-val">noreply@medialens.com</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Send Date</div>
+          <div class="meta-val">Every Monday</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">To</div>
+          <div class="meta-val">julie@medialens.com, mark@agency.com</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-lbl">Report Type</div>
+          <div class="meta-val"><strong>Brands with Rising Ad Investment</strong></div>
+        </div>
+      </div>
+
+      <div class="email-body">
+        <h1 style="font-size:20px;font-weight:700;color:#102532;line-height:1.3;margin-bottom:16px;">Weekly Sales Signal Alert — Brands Increasing Ad Spend</h1>
+        <p style="font-size:13px;color:#102532;margin-bottom:10px;">Hi Team,</p>
+        <p style="font-size:13px;color:#444;line-height:1.75;margin-bottom:10px;">This report highlights advertisers whose ad spend increased by <strong>30%</strong> or more vs the previous 30-day period. It is designed to help the sales team quickly identify brands that may be entering a more active marketing cycle.</p>
+        <p style="font-size:13px;color:#444;line-height:1.75;margin-bottom:22px;">Rising ad spend can be a strong signal of new budget allocation, campaign expansion, or increased marketing activity — making these advertisers more timely and relevant outreach opportunities. Below is this week's advertiser list.</p>
+
+        <div class="summary-row">
+          <div class="summary-card hl"><div class="num">15</div><div class="lbl">Advertisers Growing</div></div>
+          <div class="summary-card"><div class="num">+67%</div><div class="lbl">Top Growth Rate</div></div>
+          <div class="summary-card"><div class="num">HKD 6.8M</div><div class="lbl">Avg Value Growing</div></div>
+        </div>
+
+        <div class="sh-row">
+          <div class="sh">High-Growth Advertisers (sorted by growth rate)</div>
+        </div>
+
+        <table class="adv-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Advertiser / Category</th>
+              <th class="r">Prev 30D Ad Value</th>
+              <th class="r">Last 30D Ad Value</th>
+              <th class="r">30D Growth</th>
+            </tr>
+          </thead>
+          <tbody id="adv-tbody"></tbody>
+        </table>
+
+        <div class="cta-section">
+          <div class="cta-text">
+            <h3>View Full Advertiser Intelligence</h3>
+            <p>Open MediaLens Ad Intelligence to explore spend trends, creative analysis, and competitive benchmarks.</p>
+          </div>
+          <a class="cta-btn" href="https://app.medialens.io/organization/jkay0l8p/ad-intelligence/advertisers">View Advertisers</a>
+        </div>
+      </div>
+
+      <!-- Attachment area -->
+      <div style="padding:16px 40px 20px;border-top:1px solid #F0F0F0;">
+        <div style="font-size:10px;font-weight:600;color:#9AA3AD;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">1 Attachment</div>
+        <p style="font-size:12px;color:#707070;line-height:1.6;margin:0 0 10px;">The full advertiser list (<strong style="color:#102532;">15 brands</strong>) is attached to this email as a CSV file, including all fields and direct MediaLens links.</p>
+        <div onclick="downloadCSV()" style="display:inline-flex;align-items:center;gap:12px;padding:10px 14px;background:#FFFFFF;border:1px solid #E0E0E0;border-radius:10px;cursor:pointer;max-width:340px;width:100%;box-sizing:border-box;" onmouseover="this.style.background='#F7F9FC'" onmouseout="this.style.background='#FFFFFF'">
+          <div style="width:36px;height:36px;background:#E8F5E9;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="#2E7D32" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M14 2V8H20" stroke="#2E7D32" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 13H16M8 17H13" stroke="#2E7D32" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:12px;font-weight:600;color:#102532;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">MediaLens-Sales-Signal-Brands-Increasing-Ad-Spend-2026-06.csv</div>
+            <div style="font-size:11px;color:#9AA3AD;margin-top:2px;">CSV · 5 KB</div>
+          </div>
+          <div style="flex-shrink:0;width:28px;height:28px;border-radius:6px;background:#F0F0F0;display:flex;align-items:center;justify-content:center;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#707070"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="email-footer">
+        This email is sent automatically by MediaLens every Monday.<br>
+        Filters: Region HK + MO · Ad Type Paid + Branded · Period: Last 30 days vs Previous 30 days<br>
+        <a href="#">Unsubscribe</a> &nbsp;|&nbsp; <a href="https://app.medialens.io">Open Platform</a> &nbsp;|&nbsp; &copy; 2025 MediaLens
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:12px;font-size:11px;color:#AAA;">
+      Advertiser names are clickable → MediaLens advertiser page · Attachment card is functional (click to download CSV)
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     TAB 2  CSV 欄位規格
+══════════════════════════════════════ -->
+<div id="view-excel" style="display:none;" class="page-canvas">
+  <div class="wide">
+
+    <!-- Overview card -->
+    <div class="spec-card">
+      <div class="spec-card-header">
+        <h3>CSV 導出欄位規格</h3>
+        <p>檔名：<code>MediaLens-Sales-Signal-Brands-Increasing-Ad-Spend-YYYY-MM.csv</code> &nbsp;·&nbsp; 8 欄（A–H）&nbsp;·&nbsp; 包含超連結</p>
+      </div>
+      <div class="spec-meta">
+        <div class="spec-meta-item"><div class="k">地區篩選</div><div class="v">HK + MO（澳門）</div></div>
+        <div class="spec-meta-item"><div class="k">廣告類型</div><div class="v">paid_post + branded_content</div></div>
+        <div class="spec-meta-item"><div class="k">增長門檻</div><div class="v">30 天環比 ≥ 30%</div></div>
+        <div class="spec-meta-item"><div class="k">最低投放</div><div class="v">Last 30D Ad Value ≥ HKD 50,000</div></div>
+        <div class="spec-meta-item"><div class="k">排序方式</div><div class="v">增長率由高到低</div></div>
+        <div class="spec-meta-item"><div class="k">時段</div><div class="v">動態：過去 30 天 + 前 30 天（rolling）</div></div>
+      </div>
+    </div>
+
+    <!-- Sheet 1 -->
+    <div class="spec-card">
+      <div class="spec-card-header">
+        <h3>工作表 1 — 廣告主增長清單</h3>
+        <p>主數據表 · 第一行凍結 · 表頭深色 · 隔行底色</p>
+      </div>
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th style="width:48px;">欄</th>
+            <th style="width:200px;">欄位名稱</th>
+            <th style="width:75px;">類型</th>
+            <th style="width:280px;">資料來源</th>
+            <th>說明 / 備註</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td><span class="col-chip c-dark">A</span></td>
+            <td><strong>#</strong></td>
+            <td><span class="type-pill t-num">數字</span></td>
+            <td><code>computed</code></td>
+            <td>整體排名，按增長率降序</td>
+          </tr>
+
+          <tr>
+            <td><span class="col-chip c-blue">B</span></td>
+            <td>
+              <strong>Advertiser Name</strong><br>
+              <span style="font-size:10px;color:#FF3F41;font-weight:600;">超連結 → MediaLens 廣告主頁</span>
+            </td>
+            <td><span class="type-pill t-link">超連結</span></td>
+            <td>
+              <code>advertisers.name</code><br>
+              <span style="font-size:10px;color:#707070;">優先取 <code>regionalInfo.HK.name</code></span>
+            </td>
+            <td>
+              與 Ad Intelligence Advertisers 頁同源（含 HK regional override）<br>
+              點擊直達 MediaLens 廣告主分析頁<br>
+              <code>app.medialens.io/organization/{orgId}/advertiser/{id}</code><br>
+              <span style="font-size:11px;color:#707070;">對應 PRD 7.3「link to medialens advertiser page」</span>
+            </td>
+          </tr>
+
+          <tr>
+            <td><span class="col-chip c-dark">C</span></td>
+            <td><strong>Brand Group</strong></td>
+            <td><span class="type-pill t-txt">文字</span></td>
+            <td>
+              <code>advertisers.group</code><br>
+              → <code>groups.name</code>
+            </td>
+            <td>
+              集團名稱，若無則空白<br>
+              <code>.populate('group', 'name')</code><br>
+              <span style="font-size:11px;color:#707070;">對應 PRD 7.4「advertiser group」</span>
+            </td>
+          </tr>
+
+          <tr>
+            <td><span class="col-chip c-dark">D</span></td>
+            <td><strong>Advertiser Category</strong></td>
+            <td><span class="type-pill t-txt">文字</span></td>
+            <td>
+              <code>advertisers.productCategory</code><br>
+              → <code>productCategories.name</code>
+            </td>
+            <td>
+              與 Ad Intelligence Categories 頁同源（<code>categories.js</code> line 42-43 確認）<br>
+              人工標記的固定類別，非 AI 逐貼文分類<br>
+              <code>.populate('productCategory', 'name')</code><br>
+              若無則空白<br>
+              <span style="font-size:11px;color:#707070;">對應 PRD 4「advertiser category (content)」</span>
+            </td>
+          </tr>
+
+          <tr style="background:#FFFBF0 !important;">
+            <td><span class="col-chip c-orange">E</span></td>
+            <td><strong>Prev 30D Ad Value (HKD)</strong></td>
+            <td><span class="type-pill t-num">數字</span></td>
+            <td>
+              <code>fbPost.spending + igMedia.spending</code><br>
+              <code>adType: ['paid_post','branded_content']</code><br>
+              <code>countries: ['HK','MO']</code><br>
+              <code>createdAt: [prevMonth 範圍]</code>
+            </td>
+            <td>
+              FB + IG spending 合計，以 HKD 計算<br>
+              格式：千分位整數，如 <strong>250,000</strong><br>
+              MO 幣別視同 HKD（現有 adsCurrencyExpr 邏輯）<br>
+              <span style="font-size:11px;color:#707070;">對應 PRD 7.6「ad values last month」</span>
+            </td>
+          </tr>
+
+          <tr style="background:#F0FBF0 !important;">
+            <td><span class="col-chip c-green">F</span></td>
+            <td><strong>Last 30D Ad Value (HKD)</strong></td>
+            <td><span class="type-pill t-num">數字</span></td>
+            <td>
+              同 E 欄，時間範圍改為過去 30 天
+            </td>
+            <td>
+              格式：千分位整數，如 <strong>418,000</strong><br>
+              <span style="font-size:11px;color:#707070;">對應 PRD 7.5「ad values this month」</span>
+            </td>
+          </tr>
+
+          <tr>
+            <td><span class="col-chip c-blue">G</span></td>
+            <td><strong>30D Growth (%)</strong></td>
+            <td><span class="type-pill t-pct">百分比</span></td>
+            <td><code>(F - E) / E × 100</code></td>
+            <td>
+              如 <strong>67.2%</strong>（E=250,000, F=418,000）<br>
+              上上月 = 0 者排除（無基準）<br>
+              <span style="font-size:11px;color:#707070;">對應 PRD 7.7「growth rate」</span>
+            </td>
+          </tr>
+
+          <tr>
+            <td><span class="col-chip c-blue">H</span></td>
+            <td><strong>MediaLens Advertiser Page</strong></td>
+            <td><span class="type-pill t-link">超連結</span></td>
+            <td><code>computed</code></td>
+            <td>
+              <code>app.medialens.io/organization/{orgId}/advertiser/{id}</code><br>
+              作為獨立 URL 欄，方便銷售複製或直接點擊
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <!-- Sample row -->
+      <div class="sample-row-wrap">
+        <div class="sample-label">Sample Data Row</div>
+        <table class="sample-table">
+          <tr>
+            <th style="background:#102532;">A</th>
+            <th style="background:#23A9F6;">B</th>
+            <th style="background:#374151;">C</th>
+            <th style="background:#374151;">D</th>
+            <th style="background:#D97706;">E</th>
+            <th style="background:#3A9A2F;">F</th>
+            <th style="background:#23A9F6;">G</th>
+            <th style="background:#23A9F6;">H</th>
+          </tr>
+          <tr>
+            <td style="color:#707070;">1</td>
+            <td style="color:#1565C0;text-decoration:underline;">Nike Hong Kong ↗</td>
+            <td>Nike Inc.</td>
+            <td>Sports</td>
+            <td style="background:#FFFBF0;font-weight:600;">250,000</td>
+            <td style="background:#F0FBF0;font-weight:600;">418,000</td>
+            <td style="font-weight:700;color:#FF3F41;">67.2%</td>
+            <td style="color:#1565C0;text-decoration:underline;">連結↗</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Sheet 2 -->
+    <div class="spec-card">
+      <div class="spec-card-header">
+        <h3>工作表 2 — 說明</h3>
+        <p>報告元數據，讓銷售了解數據背景</p>
+      </div>
+      <table class="spec-table">
+        <thead><tr><th>欄位</th><th>值</th></tr></thead>
+        <tbody>
+          <tr><td><strong>報告名稱</strong></td><td>MediaLens 廣告主月環比投放增長預警</td></tr>
+          <tr><td><strong>統計週期</strong></td><td>動態 rolling 30 天</td></tr>
+          <tr><td><strong>前 30 天範圍</strong></td><td>today − 60 days ~ today − 31 days（動態）</td></tr>
+          <tr><td><strong>過去 30 天範圍</strong></td><td>today − 30 days ~ today（動態）</td></tr>
+          <tr><td><strong>地區篩選</strong></td><td>HK（香港）+ MO（澳門，幣別對應 HKD）</td></tr>
+          <tr><td><strong>廣告類型篩選</strong></td><td>paid_post + branded_content（不含 official_post）</td></tr>
+          <tr><td><strong>增長門檻</strong></td><td>30 天環比 ≥ 30%</td></tr>
+          <tr><td><strong>最低投放門檻</strong></td><td>Last 30D Ad Value ≥ HKD 50,000</td></tr>
+          <tr><td><strong>廣告主數</strong></td><td>XX（實際達標數量）</td></tr>
+          <tr><td><strong>生成時間</strong></td><td>YYYY-MM-DD HH:mm（HKT）</td></tr>
+          <tr><td><strong>資料來源</strong></td><td>MediaLens Ad Intelligence（fbPost + igMedia collections）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- All questions resolved -->
+    <div class="qbox" style="background:#F0FBF0;border-color:#C8E6C9;">
+      <h4 style="color:#2E7D32;">✅ 所有欄位已確認</h4>
+      <p style="color:#388E3C;">
+        廣告主名稱：<code>advertisers.name</code>（優先 <code>regionalInfo.HK.name</code>，與 Advertisers 頁同源）<br>
+        廣告主類別：<code>advertisers.productCategory.name</code>（與 Categories 頁同源，人工標記類別）<br>
+        無官方帳號連結欄位
+      </p>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     TAB 3  後端邏輯 + PRD 審查
+══════════════════════════════════════ -->
+<div id="view-logic" style="display:none;" class="page-canvas">
+  <div class="wide">
+
+    <div class="logic-card">
+      <h2>PRD 審查 + 後端邏輯補充</h2>
+      <p class="sub">已移除 Campaign 字段 · 已確認 Weekly · 更新為 Advertiser Category (Content)</p>
+
+      <div class="lh">PRD 要求逐項審查</div>
+      <table class="prd-table">
+        <thead>
+          <tr>
+            <th style="width:32px;">#</th>
+            <th style="width:210px;">PRD 要求</th>
+            <th style="width:90px;">狀態</th>
+            <th>說明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><strong>Data period: rolling 30 days (dynamic)</strong></td>
+            <td><span class="ok">✅ 已實作</span></td>
+            <td>Rolling window: last 30 days vs previous 30 days（today−30d ~ today，today−60d ~ today−31d）</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td><strong>Country: HK + MO</strong></td>
+            <td><span class="ok">✅ 已實作</span></td>
+            <td><code>countries: { $in: ['HK', 'MO'] }</code> 已加入 $match。MO 幣別視同 HKD（adsCurrencyExpr 現有邏輯）</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><strong>Ad type: paid + branded</strong></td>
+            <td><span class="ok">✅ 已實作</span></td>
+            <td><code>adType: { $in: ['paid_post', 'branded_content'] }</code> 已加入 $match，排除 official_post</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td><strong>By advertiser category (content)</strong></td>
+            <td><span class="ok">✅ 已確認</span></td>
+            <td>使用 <code>advertisers.productCategory.name</code>（與 Ad Intelligence Categories 頁同源，<code>categories.js</code> line 42 確認）。人工標記的固定類別，非 AI 逐貼文分類。<code>.populate('productCategory', 'name')</code></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td><strong>Ad spending &gt; 0 advertiser list</strong></td>
+            <td><span class="ok">✅ 已實作</span></td>
+            <td><code>spending: { $gt: 0 }</code> 已在 $match 中，加上 <code>MIN_SPENDING_THRESHOLD = 50000</code> 二次過濾</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td><strong>30 天環比增長 ≥ 30%</strong></td>
+            <td><span class="ok">✅ 已實作</span></td>
+            <td><code>GROWTH_THRESHOLD = 0.30</code>，prevSpend = 0 者排除（新廣告主無基準）</td>
+          </tr>
+          <tr>
+            <td>7.1</td>
+            <td><strong>External link — 已移除</strong></td>
+            <td><span class="removed">已移除</span></td>
+            <td>確認不需要官方帳號連結（Facebook 頁或網站），從 Email 和 CSV 均移除</td>
+          </tr>
+          <tr>
+            <td>7.2</td>
+            <td><strong>Advertiser category (content)</strong></td>
+            <td><span class="ok">✅ 已確認</span></td>
+            <td>同第 4 項。Email 顯示為藍色 tag，CSV D 欄 <code>advertisers.productCategory.name</code></td>
+          </tr>
+          <tr>
+            <td>7.3</td>
+            <td><strong>Advertiser name [link to MediaLens page]</strong></td>
+            <td><span class="ok">✅ 已實作</span></td>
+            <td>Email + CSV B 欄均超連結至 <code>app.medialens.io/organization/{orgId}/advertiser/{id}</code>。廣告主名稱取 <code>advertisers.name</code>（優先 <code>regionalInfo.HK.name</code>），與 Advertisers 頁同源</td>
+          </tr>
+          <tr>
+            <td>7.4</td>
+            <td><strong>Advertiser group</strong></td>
+            <td><span class="ok">✅ 已實作</span></td>
+            <td><code>.populate('group', 'name')</code> 已加入，回傳 <code>groupName</code>。CSV C 欄顯示，Email 不顯示（避免過於擁擠）</td>
+          </tr>
+          <tr>
+            <td>7.5/7.6</td>
+            <td><strong>Ad values last 30D / prev 30D</strong></td>
+            <td><span class="ok">✅ 已實作</span></td>
+            <td><code>lastMonthSpending / prevMonthSpending</code> 均已計算並回傳，FB + IG 合計</td>
+          </tr>
+          <tr>
+            <td>7.7</td>
+            <td><strong>Growth rate</strong></td>
+            <td><span class="ok">✅ 已實作</span></td>
+            <td><code>growthRate = (lastSpend - prevSpend) / prevSpend</code>，Email 顯示 badge，CSV G 欄格式 <code>0.0"%"</code></td>
+          </tr>
+          <tr>
+            <td>7.8</td>
+            <td><strong>Campaign [link] — 已移除</strong></td>
+            <td><span class="removed">已移除</span></td>
+            <td>Campaign 字段及連結從報告中完全移除（campaigns 以 modal 形式開啟，無獨立 URL）</td>
+          </tr>
+          <tr>
+            <td>排序</td>
+            <td><strong>按增長率由高到低排序</strong></td>
+            <td><span class="ok">✅ 已實作</span></td>
+            <td><code>growthList.sort((a,b) => b.growthRate - a.growthRate)</code></td>
+          </tr>
+          <tr>
+            <td>頻率</td>
+            <td><strong>Weekly（已確認）</strong></td>
+            <td><span class="ok">✅ 確認</span></td>
+            <td>Cron: <code>0 1 * * 1</code>（每週一 09:00 HKT）</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="lh">已實作的完整查詢邏輯</div>
+      <div class="code-block">
+        <pre><span style="color:#C678DD;">// services/monthlySpendingGrowthReport.js — 最終 $match（已實作）</span>
+<span style="color:#61AFEF;">const</span> aggregateSpending = (Model, dateField, start, end) =>
+  Model.<span style="color:#E5C07B;">aggregate</span>([
+    { <span style="color:#E06C75;">$match</span>: {
+        [dateField]: { <span style="color:#E06C75;">$gte</span>: start, <span style="color:#E06C75;">$lte</span>: end },
+        advertisers: { <span style="color:#E06C75;">$exists</span>: <span style="color:#D19A66;">true</span>, <span style="color:#E06C75;">$not</span>: { <span style="color:#E06C75;">$size</span>: <span style="color:#D19A66;">0</span> } },
+        spending:    { <span style="color:#E06C75;">$exists</span>: <span style="color:#D19A66;">true</span>, <span style="color:#E06C75;">$gt</span>: <span style="color:#D19A66;">0</span> },
+        countries:   { <span style="color:#E06C75;">$in</span>: [<span style="color:#98C379;">'HK'</span>, <span style="color:#98C379;">'MO'</span>] },
+        adType:      { <span style="color:#E06C75;">$in</span>: [<span style="color:#98C379;">'paid_post'</span>, <span style="color:#98C379;">'branded_content'</span>] },
+    }},
+    { <span style="color:#E06C75;">$unwind</span>: <span style="color:#98C379;">'$advertisers'</span> },
+    { <span style="color:#E06C75;">$group</span>: { _id: <span style="color:#98C379;">'$advertisers'</span>, spending: { <span style="color:#E06C75;">$sum</span>: <span style="color:#98C379;">'$spending'</span> } } },
+  ]).<span style="color:#E5C07B;">allowDiskUse</span>(<span style="color:#D19A66;">true</span>);
+
+<span style="color:#C678DD;">// Advertisers.find() — 最終版（已實作）</span>
+<span style="color:#61AFEF;">const</span> advertiserDocs = <span style="color:#61AFEF;">await</span> Advertisers
+  .<span style="color:#E5C07B;">find</span>({ _id: { <span style="color:#E06C75;">$in</span>: advIds } })
+  .<span style="color:#E5C07B;">select</span>(<span style="color:#98C379;">'name fullname logo group productCategory regionalInfo'</span>)
+  .<span style="color:#E5C07B;">populate</span>(<span style="color:#98C379;">'group'</span>, <span style="color:#98C379;">'name'</span>)
+  .<span style="color:#E5C07B;">populate</span>(<span style="color:#98C379;">'productCategory'</span>, <span style="color:#98C379;">'name'</span>)
+  .<span style="color:#E5C07B;">lean</span>();
+
+<span style="color:#C678DD;">// 回傳物件（已實作）</span>
+<span style="color:#61AFEF;">return</span> growthList.<span style="color:#E5C07B;">map</span>(item => {
+  <span style="color:#61AFEF;">const</span> meta = advMetaMap[item.advertiserId] || {};
+  <span style="color:#C678DD;">// HK regional override — matches buildAdvertiserObjects() in adsAdvertiserAggregate.js</span>
+  <span style="color:#61AFEF;">const</span> regional = meta.regionalInfo?.HK || {};
+  <span style="color:#61AFEF;">return</span> {
+    ...item,
+    name:         regional.name || meta.name || meta.fullname || <span style="color:#98C379;">'Unknown'</span>,
+    logo:         regional.logo || meta.logo || <span style="color:#D19A66;">null</span>,
+    groupName:    meta.group?.name || <span style="color:#D19A66;">null</span>,
+    categoryName: meta.productCategory?.name || <span style="color:#D19A66;">null</span>,
+    lastMonthLabel,
+    prevMonthLabel,
+  };
+});</pre>
+      </div>
+
+      <div class="lh">Email 輸出格式（已更新）</div>
+      <div class="ibox">
+        <h4>Subject: <code>Sales Signal Report — Brands Increasing Ad Spend · June 2026</code></h4>
+        <p style="margin-top:8px;">
+          Email 語言：<strong>全英文</strong>（Sales Signal 定位）<br>
+          Email 每行顯示：廣告主名稱（超連結）+ Category tag，不顯示 Group（Group 在 CSV C 欄）<br>
+          Email 上限：Top 20 · CSV 導出全部達標廣告主（8 欄 A–H）
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════ DATA + SCRIPTS ══════════════════ -->
+<script>
+const ORG_ID = 'jkay0l8p';
+const BASE_URL = 'https://app.medialens.io';
+
+const ADVERTISERS = [
+  { id:'64a1b2c3d4e5f6789012ab01', name:'Nike Hong Kong',    group:'Nike Inc.',           category:'Sports',         initials:'NK', bg:'#E8F4FD', fc:'#23A9F6', prev:250000, last:418000, growth:0.672 },
+  { id:'64a1b2c3d4e5f6789012ab02', name:'Samsung HK',        group:'Samsung Group',       category:'Electronics',    initials:'SS', bg:'#E8F0FE', fc:'#4285F4', prev:310000, last:496000, growth:0.600 },
+  { id:'64a1b2c3d4e5f6789012ab03', name:'H&M Hong Kong',     group:'H&M Group',           category:'Fashion',        initials:'HM', bg:'#FFF0E6', fc:'#FF6B35', prev: 95000, last:143000, growth:0.505 },
+  { id:'64a1b2c3d4e5f6789012ab04', name:"McDonald's HK",     group:"McDonald's Corp",     category:'Food & Beverage',initials:'MD', bg:'#FFF8E1', fc:'#FFA000', prev:200000, last:290000, growth:0.450 },
+  { id:'64a1b2c3d4e5f6789012ab05', name:'SK-II',             group:'P&G',                 category:'Beauty',         initials:'SK', bg:'#F3E8FF', fc:'#9333EA', prev:175000, last:248000, growth:0.417 },
+  { id:'64a1b2c3d4e5f6789012ab06', name:'Towngas',           group:'HK & China Gas',      category:'Lifestyle',      initials:'TG', bg:'#E8F5E9', fc:'#2E7D32', prev: 80000, last:110000, growth:0.375 },
+  { id:'64a1b2c3d4e5f6789012ab07', name:'Cathay Pacific',    group:'Swire Group',         category:'Travel',         initials:'CP', bg:'#EFF6FF', fc:'#1D4ED8', prev:420000, last:571000, growth:0.360 },
+  { id:'64a1b2c3d4e5f6789012ab08', name:'Apple HK',          group:'Apple Inc.',          category:'Electronics',    initials:'AP', bg:'#FFF2F2', fc:'#FF3F41', prev:500000, last:672000, growth:0.344 },
+  { id:'64a1b2c3d4e5f6789012ab09', name:'Adidas HK',         group:'Adidas AG',           category:'Sports',         initials:'AD', bg:'#F0F0F0', fc:'#333',    prev:130000, last:173000, growth:0.331 },
+  { id:'64a1b2c3d4e5f6789012ab10', name:"L'Oréal HK",        group:"L'Oréal Group",       category:'Beauty',         initials:'LO', bg:'#FFF0F6', fc:'#DB2777', prev:220000, last:291000, growth:0.323 },
+  { id:'64a1b2c3d4e5f6789012ab11', name:'HSBC HK',           group:'HSBC Holdings',       category:'Finance',        initials:'HS', bg:'#FFF3E0', fc:'#E65100', prev:380000, last:502000, growth:0.321 },
+  { id:'64a1b2c3d4e5f6789012ab12', name:'Manulife HK',       group:'Manulife Financial',  category:'Finance',        initials:'MF', bg:'#E8F5E9', fc:'#388E3C', prev:160000, last:211000, growth:0.319 },
+  { id:'64a1b2c3d4e5f6789012ab13', name:'CLP Power',         group:'CLP Holdings',        category:'Utilities',      initials:'CL', bg:'#E3F2FD', fc:'#1565C0', prev: 75000, last: 99000, growth:0.320 },
+  { id:'64a1b2c3d4e5f6789012ab14', name:'MTR Corporation',   group:'MTR Corp',            category:'Transport',      initials:'MT', bg:'#FCE4EC', fc:'#C62828', prev:110000, last:145000, growth:0.318 },
+  { id:'64a1b2c3d4e5f6789012ab15', name:'Hang Seng Bank',    group:'HSBC Holdings',       category:'Finance',        initials:'HG', bg:'#FFF8E1', fc:'#F57F17', prev:195000, last:257000, growth:0.318 },
+];
+
+// render email table
+function gt(r) { return r>=0.5?'th':r>=0.35?'tm':'tb'; }
+function fhkd(n) { return 'HKD '+Math.round(n).toLocaleString('en-HK'); }
+function rc(i) { return i===0?'rank r1':i===1?'rank r2':i===2?'rank r3':'rank'; }
+
+const tbody = document.getElementById('adv-tbody');
+ADVERTISERS.slice(0,20).forEach((adv,i) => {
+  const advUrl = `${BASE_URL}/organization/${ORG_ID}/advertiser/${adv.id}`;
+  tbody.innerHTML += `
+    <tr>
+      <td><span class="${rc(i)}">${i+1}</span></td>
+      <td>
+        <div class="adv-name-cell">
+          <div class="adv-logo" style="background:${adv.bg};color:${adv.fc};">${adv.initials}</div>
+          <div>
+            <a class="adv-name-link" href="${advUrl}" target="_blank">
+              ${adv.name}
+              <svg style="width:10px;height:10px;opacity:.4;" viewBox="0 0 12 12" fill="currentColor"><path d="M10 7.5v2a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5h2V1H2.5A1.5 1.5 0 0 0 1 2.5v7A1.5 1.5 0 0 0 2.5 11h7A1.5 1.5 0 0 0 11 9.5V7.5h-1zm1.5-7h-4l1.5 1.5-4 4 1 1 4-4 1.5 1.5z"/></svg>
+            </a>
+            <div class="adv-meta">
+              <span class="cat-tag">${adv.category}</span>
+            </div>
+          </div>
+        </div>
+      </td>
+      <td class="r" style="color:#9AA3AD;">${fhkd(adv.prev)}</td>
+      <td class="r">${fhkd(adv.last)}</td>
+      <td class="r"><span class="gb ${gt(adv.growth)}">▲ ${(adv.growth*100).toFixed(1)}%</span></td>
+    </tr>`;
+});
+
+// CSV download
+function downloadCSV() {
+  const headers = ['#','Advertiser Name','Brand Group','Advertiser Category',
+                   'Prev 30D Ad Value (HKD)','Last 30D Ad Value (HKD)','30D Growth (%)','MediaLens Advertiser Page'];
+  const rows = [headers];
+
+  ADVERTISERS.forEach((adv,i) => {
+    const advUrl = `${BASE_URL}/organization/${ORG_ID}/advertiser/${adv.id}`;
+    rows.push([
+      i+1, adv.name, adv.group, adv.category,
+      Math.round(adv.prev),
+      Math.round(adv.last),
+      (adv.growth*100).toFixed(1) + '%',
+      advUrl
+    ]);
+  });
+
+  const csv = rows.map(row =>
+    row.map(v => {
+      const s = String(v == null ? '' : v);
+      return s.includes(',') || s.includes('"') || s.includes('\n')
+        ? '"' + s.replace(/"/g, '""') + '"'
+        : s;
+    }).join(',')
+  ).join('\r\n');
+
+  const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'MediaLens-Sales-Signal-Brands-Increasing-Ad-Spend-2026-06.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function setView(v) {
+  ['email','excel','logic'].forEach(k => {
+    document.getElementById('view-'+k).style.display = k===v?'block':'none';
+  });
+  document.querySelectorAll('.view-btn').forEach((btn,i) => {
+    btn.classList.toggle('active', ['email','excel','logic'][i]===v);
+  });
+}
+</script>
+</body>
+</html>
