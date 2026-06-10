@@ -264,7 +264,7 @@
             </svg>
           </div>
           <div style="flex:1;min-width:0;">
-            <div style="font-size:12px;font-weight:600;color:#102532;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">MediaLens-Sales-Signal-Brands-Increasing-Ad-Spend-2026-06.csv</div>
+            <div style="font-size:12px;font-weight:600;color:#102532;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">MediaLens-Sales-Signal-Brands-Increasing-Ad-Spend-2026-W24.csv</div>
             <div style="font-size:11px;color:#9AA3AD;margin-top:2px;">CSV · 5 KB</div>
           </div>
           <div style="flex-shrink:0;width:28px;height:28px;border-radius:6px;background:#F0F0F0;display:flex;align-items:center;justify-content:center;">
@@ -296,7 +296,7 @@
     <div class="spec-card">
       <div class="spec-card-header">
         <h3>CSV 導出欄位規格</h3>
-        <p>檔名：<code>MediaLens-Sales-Signal-Brands-Increasing-Ad-Spend-YYYY-MM.csv</code> &nbsp;·&nbsp; 8 欄（A–H）&nbsp;·&nbsp; 包含超連結</p>
+        <p>檔名：<code>MediaLens-Sales-Signal-Brands-Increasing-Ad-Spend-YYYY-WNN.csv</code> &nbsp;·&nbsp; 10 欄（A–J）&nbsp;·&nbsp; 包含超連結 &nbsp;·&nbsp; 含滾動日期範圍欄</p>
       </div>
       <div class="spec-meta">
         <div class="spec-meta-item"><div class="k">地區篩選</div><div class="v">HK + MO（澳門）</div></div>
@@ -387,49 +387,69 @@
 
           <tr style="background:#FFFBF0 !important;">
             <td><span class="col-chip c-orange">E</span></td>
+            <td><strong>Prev 30D Period</strong></td>
+            <td><span class="type-pill t-date">日期範圍</span></td>
+            <td><code>today−60d ~ today−31d</code></td>
+            <td>
+              格式：<code>YYYY-MM-DD ~ YYYY-MM-DD</code><br>
+              如 <strong>2026-04-11 ~ 2026-05-10</strong><br>
+              讓收件人清楚知道「前 30 天」指哪段時間
+            </td>
+          </tr>
+
+          <tr style="background:#FFFBF0 !important;">
+            <td><span class="col-chip c-orange">F</span></td>
             <td><strong>Prev 30D Ad Value (HKD)</strong></td>
             <td><span class="type-pill t-num">數字</span></td>
             <td>
               <code>fbPost.spending + igMedia.spending</code><br>
               <code>adType: ['paid_post','branded_content']</code><br>
               <code>countries: ['HK','MO']</code><br>
-              <code>createdAt: [prevMonth 範圍]</code>
+              <code>createdAt: [E 欄日期範圍]</code>
             </td>
             <td>
               FB + IG spending 合計，以 HKD 計算<br>
               格式：千分位整數，如 <strong>250,000</strong><br>
-              MO 幣別視同 HKD（現有 adsCurrencyExpr 邏輯）<br>
-              <span style="font-size:11px;color:#707070;">對應 PRD 7.6「ad values last month」</span>
+              MO 幣別視同 HKD（現有 adsCurrencyExpr 邏輯）
             </td>
           </tr>
 
           <tr style="background:#F0FBF0 !important;">
-            <td><span class="col-chip c-green">F</span></td>
+            <td><span class="col-chip c-green">G</span></td>
+            <td><strong>Last 30D Period</strong></td>
+            <td><span class="type-pill t-date">日期範圍</span></td>
+            <td><code>today−30d ~ today−1d</code></td>
+            <td>
+              格式：<code>YYYY-MM-DD ~ YYYY-MM-DD</code><br>
+              如 <strong>2026-05-11 ~ 2026-06-09</strong>
+            </td>
+          </tr>
+
+          <tr style="background:#F0FBF0 !important;">
+            <td><span class="col-chip c-green">H</span></td>
             <td><strong>Last 30D Ad Value (HKD)</strong></td>
             <td><span class="type-pill t-num">數字</span></td>
             <td>
-              同 E 欄，時間範圍改為過去 30 天
+              同 F 欄，時間範圍改為 G 欄日期範圍
             </td>
             <td>
-              格式：千分位整數，如 <strong>418,000</strong><br>
-              <span style="font-size:11px;color:#707070;">對應 PRD 7.5「ad values this month」</span>
+              格式：千分位整數，如 <strong>418,000</strong>
             </td>
           </tr>
 
           <tr>
-            <td><span class="col-chip c-blue">G</span></td>
+            <td><span class="col-chip c-blue">I</span></td>
             <td><strong>30D Growth (%)</strong></td>
             <td><span class="type-pill t-pct">百分比</span></td>
-            <td><code>(F - E) / E × 100</code></td>
+            <td><code>(H - F) / F × 100</code></td>
             <td>
-              如 <strong>67.2%</strong>（E=250,000, F=418,000）<br>
-              上上月 = 0 者排除（無基準）<br>
-              <span style="font-size:11px;color:#707070;">對應 PRD 7.7「growth rate」</span>
+              如 <strong>67.2%</strong>（F=250,000, H=418,000）<br>
+              Prev 30D = 0 者排除（無基準）
             </td>
           </tr>
 
           <tr>
-            <td><span class="col-chip c-blue">H</span></td>
+            <td><span class="col-chip c-blue">J</span></td>
             <td><strong>MediaLens Advertiser Page</strong></td>
             <td><span class="type-pill t-link">超連結</span></td>
             <td><code>computed</code></td>
@@ -451,17 +471,21 @@
             <th style="background:#23A9F6;">B</th>
             <th style="background:#374151;">C</th>
             <th style="background:#374151;">D</th>
-            <th style="background:#D97706;">E</th>
-            <th style="background:#3A9A2F;">F</th>
-            <th style="background:#23A9F6;">G</th>
-            <th style="background:#23A9F6;">H</th>
+            <th style="background:#F59E0B;">E</th>
+            <th style="background:#D97706;">F</th>
+            <th style="background:#52C41A;">G</th>
+            <th style="background:#3A9A2F;">H</th>
+            <th style="background:#23A9F6;">I</th>
+            <th style="background:#23A9F6;">J</th>
           </tr>
           <tr>
             <td style="color:#707070;">1</td>
             <td style="color:#1565C0;text-decoration:underline;">Nike Hong Kong ↗</td>
             <td>Nike Inc.</td>
             <td>Sports</td>
+            <td style="background:#FFFBF0;font-size:10px;color:#92400E;">2026-04-11 ~ 2026-05-10</td>
             <td style="background:#FFFBF0;font-weight:600;">250,000</td>
+            <td style="background:#F0FBF0;font-size:10px;color:#166534;">2026-05-11 ~ 2026-06-09</td>
             <td style="background:#F0FBF0;font-weight:600;">418,000</td>
             <td style="font-weight:700;color:#FF3F41;">67.2%</td>
             <td style="color:#1565C0;text-decoration:underline;">連結↗</td>
@@ -732,18 +756,32 @@ ADVERTISERS.slice(0,20).forEach((adv,i) => {
     </tr>`;
 });
 
+// Rolling 30-day period labels
+(function() {
+  function fmtDate(d) { return d.toISOString().slice(0, 10); }
+  const today = new Date();
+  const l0 = new Date(today); l0.setDate(today.getDate() - 1);
+  const l1 = new Date(today); l1.setDate(today.getDate() - 30);
+  const p0 = new Date(today); p0.setDate(today.getDate() - 31);
+  const p1 = new Date(today); p1.setDate(today.getDate() - 60);
+  window.LAST_30D_PERIOD = fmtDate(l1) + ' ~ ' + fmtDate(l0);
+  window.PREV_30D_PERIOD = fmtDate(p1) + ' ~ ' + fmtDate(p0);
+})();
+
 // CSV download
 function downloadCSV() {
   const headers = ['#','Advertiser Name','Brand Group','Advertiser Category',
-                   'Prev 30D Ad Value (HKD)','Last 30D Ad Value (HKD)','30D Growth (%)','MediaLens Advertiser Page'];
+                   'Prev 30D Period','Prev 30D Ad Value (HKD)',
+                   'Last 30D Period','Last 30D Ad Value (HKD)',
+                   '30D Growth (%)','MediaLens Advertiser Page'];
   const rows = [headers];
 
   ADVERTISERS.forEach((adv,i) => {
     const advUrl = `${BASE_URL}/organization/${ORG_ID}/advertiser/${adv.id}`;
     rows.push([
       i+1, adv.name, adv.group, adv.category,
-      Math.round(adv.prev),
-      Math.round(adv.last),
+      PREV_30D_PERIOD, Math.round(adv.prev),
+      LAST_30D_PERIOD, Math.round(adv.last),
       (adv.growth*100).toFixed(1) + '%',
       advUrl
     ]);
@@ -762,7 +800,7 @@ function downloadCSV() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'MediaLens-Sales-Signal-Brands-Increasing-Ad-Spend-2026-06.csv';
+  a.download = 'MediaLens-Sales-Signal-Brands-Increasing-Ad-Spend-2026-W24.csv';
   a.click();
   URL.revokeObjectURL(url);
 }

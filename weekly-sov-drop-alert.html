@@ -213,7 +213,7 @@ pre.code-block {
               </svg>
             </div>
             <div style="flex:1;min-width:0;">
-              <div style="font-size:12px;font-weight:600;color:#102532;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">MediaLens-Sales-Signal-Brands-Losing-SOV-2025-06.csv</div>
+              <div style="font-size:12px;font-weight:600;color:#102532;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">MediaLens-Sales-Signal-Brands-Losing-SOV-2026-W24.csv</div>
               <div style="font-size:11px;color:#9AA3AD;margin-top:2px;">CSV · 3 KB</div>
             </div>
             <div style="flex-shrink:0;width:28px;height:28px;border-radius:6px;background:#F0F0F0;display:flex;align-items:center;justify-content:center;">
@@ -253,7 +253,7 @@ pre.code-block {
     <strong>✅ Confirmed:</strong> Flat advertiser list sorted by within-industry engagement share drop (largest drop first). Each row notes the advertiser's industry (category). No industry-level grouping or industry-level drop calculation needed.
   </div>
 
-  <div class="section-title">Worksheet 1 — Advertiser SOV Drop List (A–K)</div>
+  <div class="section-title">Worksheet 1 — Advertiser SOV Drop List (A–M)</div>
   <table class="spec-table">
     <thead>
       <tr>
@@ -292,6 +292,14 @@ pre.code-block {
       </tr>
       <tr>
         <td>D</td>
+        <td>Prev 30D Period</td>
+        <td>String</td>
+        <td><span class="tag tag-calc">Computed: today−60d ~ today−31d</span></td>
+        <td>2026-04-11 ~ 2026-05-10</td>
+        <td>Exact date range for Prev 30D; format YYYY-MM-DD ~ YYYY-MM-DD</td>
+      </tr>
+      <tr>
+        <td>E</td>
         <td>Prev 30D SOV (%)</td>
         <td>String %</td>
         <td><span class="tag tag-calc">Computed: advPrevEng / categoryPrevTotalEng</span></td>
@@ -299,7 +307,15 @@ pre.code-block {
         <td>Previous 30-day within-category share</td>
       </tr>
       <tr>
-        <td>E</td>
+        <td>F</td>
+        <td>Last 30D Period</td>
+        <td>String</td>
+        <td><span class="tag tag-calc">Computed: today−30d ~ today−1d</span></td>
+        <td>2026-05-11 ~ 2026-06-09</td>
+        <td>Exact date range for Last 30D; format YYYY-MM-DD ~ YYYY-MM-DD</td>
+      </tr>
+      <tr>
+        <td>G</td>
         <td>Last 30D SOV (%)</td>
         <td>String %</td>
         <td><span class="tag tag-calc">Computed: advLastEng / categoryLastTotalEng</span></td>
@@ -307,15 +323,15 @@ pre.code-block {
         <td>Last 30-day within-category share</td>
       </tr>
       <tr>
-        <td>F</td>
+        <td>H</td>
         <td>SOV Drop (%)</td>
         <td>String % (negative)</td>
-        <td><span class="tag tag-calc">Computed: (E − D) / D</span></td>
+        <td><span class="tag tag-calc">Computed: (G − E) / E</span></td>
         <td>-33.6%</td>
         <td>30D vs 30D SOV change; sort column (most negative = rank 1)</td>
       </tr>
       <tr>
-        <td>G</td>
+        <td>I</td>
         <td>Advertiser Engagements (Prev 30D)</td>
         <td>Integer</td>
         <td><span class="tag tag-db">DB: aggregated fbPost + igMedia</span></td>
@@ -323,7 +339,7 @@ pre.code-block {
         <td>Previous 30-day raw engagement count for this advertiser</td>
       </tr>
       <tr>
-        <td>H</td>
+        <td>J</td>
         <td>Advertiser Engagements (Last 30D)</td>
         <td>Integer</td>
         <td><span class="tag tag-db">DB: aggregated fbPost + igMedia</span></td>
@@ -331,7 +347,7 @@ pre.code-block {
         <td>Last 30-day raw engagement count for this advertiser</td>
       </tr>
       <tr>
-        <td>I</td>
+        <td>K</td>
         <td>Category Engagements (Prev 30D)</td>
         <td>Integer</td>
         <td><span class="tag tag-calc">Computed: SUM of all advPrevEng in same productCategory</span></td>
@@ -339,7 +355,7 @@ pre.code-block {
         <td>Previous 30-day category total; denominator for Prev 30D SOV</td>
       </tr>
       <tr>
-        <td>J</td>
+        <td>L</td>
         <td>Category Engagements (Last 30D)</td>
         <td>Integer</td>
         <td><span class="tag tag-calc">Computed: SUM of all advLastEng in same productCategory</span></td>
@@ -347,7 +363,7 @@ pre.code-block {
         <td>Last 30-day category total; denominator for Last 30D SOV</td>
       </tr>
       <tr>
-        <td>K</td>
+        <td>M</td>
         <td>MediaLens Advertiser Page</td>
         <td>Hyperlink URL</td>
         <td><span class="tag tag-calc">Computed: APP_BASE_URL + /advertiser/:id</span></td>
@@ -607,6 +623,18 @@ function switchTab(idx) {
 
 const PREV_LABEL = 'Prev 30D';
 const LAST_LABEL = 'Last 30D';
+
+// Rolling 30-day period labels
+(function() {
+  function fmtDate(d) { return d.toISOString().slice(0, 10); }
+  const today = new Date();
+  const l0 = new Date(today); l0.setDate(today.getDate() - 1);
+  const l1 = new Date(today); l1.setDate(today.getDate() - 30);
+  const p0 = new Date(today); p0.setDate(today.getDate() - 31);
+  const p1 = new Date(today); p1.setDate(today.getDate() - 60);
+  window.LAST_30D_PERIOD = fmtDate(l1) + ' ~ ' + fmtDate(l0);
+  window.PREV_30D_PERIOD = fmtDate(p1) + ' ~ ' + fmtDate(p0);
+})();
 const APP_BASE   = 'https://app.medialens.io';
 const ORG_ID     = 'jkay0l8p';
 const EMAIL_TOP_N = 20;
@@ -694,7 +722,9 @@ function downloadCSV() {
     '#',
     'Advertiser Name',
     'Category',
+    'Prev 30D Period',
     `${PREV_LABEL} SOV (%)`,
+    'Last 30D Period',
     `${LAST_LABEL} SOV (%)`,
     'SOV Drop (%)',
     `Advertiser Engagements (${PREV_LABEL})`,
@@ -712,7 +742,9 @@ function downloadCSV() {
       i + 1,
       adv.name,
       adv.category,
+      PREV_30D_PERIOD,
       adv.prevShare.toFixed(1) + '%',
+      LAST_30D_PERIOD,
       adv.lastShare.toFixed(1) + '%',
       (adv.drop * 100).toFixed(1) + '%',
       adv.prevEng,
@@ -727,7 +759,7 @@ function downloadCSV() {
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
-  a.href = url; a.download = 'MediaLens-Sales-Signal-Brands-Losing-SOV-2025-06.csv';
+  a.href = url; a.download = 'MediaLens-Sales-Signal-Brands-Losing-SOV-2026-W24.csv';
   a.click();
   URL.revokeObjectURL(url);
 }
