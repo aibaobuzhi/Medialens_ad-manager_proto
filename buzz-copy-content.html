@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buzz (What's Viral?) — MediaLens</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Poppins', sans-serif; background: #F7F7F7; color: #102532; min-height: 100vh; }
+svg text { font-family: 'Poppins', sans-serif; }
+
+/* ── TRIAL BANNER ── */
+.trial-banner { background: #102532; height: 44px; display: flex; align-items: center; justify-content: center; gap: 12px; padding: 0 24px; flex-shrink: 0; }
+.trial-banner-text { color: #fff; font-size: 12.5px; }
+.trial-timer { background: rgba(255,255,255,0.12); border-radius: 20px; padding: 3px 10px; display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #fff; }
+.btn-connect { border: 1.5px solid #fff; background: transparent; color: #fff; font-size: 12px; font-weight: 600; padding: 5px 14px; border-radius: 8px; cursor: pointer; font-family: 'Poppins', sans-serif; }
+.btn-upgrade { background: #23A9F6; border: none; color: #fff; font-size: 12px; font-weight: 600; padding: 5px 14px; border-radius: 8px; cursor: pointer; font-family: 'Poppins', sans-serif; }
+
+/* ── NAV ── */
+.top-nav { background: #23A9F6; height: 60px; display: flex; align-items: center; padding: 0 24px; gap: 16px; position: sticky; top: 0; z-index: 90; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.nav-logo { color: #fff; font-weight: 700; font-size: 17px; letter-spacing: -0.3px; }
+.nav-spacer { flex: 1; }
+.nav-credit { background: rgba(255,255,255,0.2); color: #fff; font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 20px; }
+.nav-user { color: rgba(255,255,255,0.9); font-size: 12px; }
+.nav-avatar { width: 30px; height: 30px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #23A9F6; }
+
+/* ── LAYOUT ── */
+.layout { display: flex; height: calc(100vh - 104px); }
+
+/* ── SIDEBAR ── */
+.sidebar { width: 220px; flex-shrink: 0; background: #fff; border-right: 1px solid #E8EEF0; padding: 16px 0; overflow-y: auto; }
+.sidebar-org { display: flex; align-items: center; gap: 10px; padding: 10px 16px 14px; border-bottom: 1px solid #E8EEF0; margin-bottom: 6px; }
+.sidebar-org-avatar { width: 34px; height: 34px; border-radius: 8px; background: #23A9F6; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; font-size: 14px; flex-shrink: 0; }
+.sidebar-org-name { font-size: 12.5px; font-weight: 600; color: #102532; }
+.sidebar-org-role { font-size: 11px; color: #707070; }
+.sidebar-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 12.5px; font-weight: 500; color: #707070; cursor: pointer; position: relative; transition: all 0.15s; }
+.sidebar-item:hover { background: #F7F7F7; color: #102532; }
+.sidebar-item.active { color: #23A9F6; background: #EEF6FF; }
+.sidebar-item.active::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:#23A9F6; border-radius:0 2px 2px 0; }
+.sidebar-icon { width: 16px; height: 16px; opacity: 0.6; flex-shrink: 0; }
+.sidebar-item.active .sidebar-icon { opacity: 1; }
+.sidebar-dot { width: 6px; height: 6px; border-radius: 50%; background: #23A9F6; position: absolute; right: 14px; }
+
+/* ── MAIN ── */
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+
+/* ── SAMPLE DATA BANNER ── */
+.data-banner { background: #EEF6FF; border-bottom: 1px solid #D9E8FF; padding: 9px 24px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.data-banner-text { font-size: 12px; color: #23A9F6; display: flex; align-items: center; gap: 6px; }
+.btn-exit-demo { font-size: 12px; font-weight: 600; color: #23A9F6; background: #fff; border: 1px solid #23A9F6; border-radius: 6px; padding: 4px 12px; cursor: pointer; font-family: 'Poppins', sans-serif; }
+
+/* ── PAGE TABS ── */
+.page-tabs-bar { background: #fff; border-bottom: 1px solid #E8EEF0; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.page-tabs { display: flex; }
+.page-tab { padding: 12px 16px; font-size: 13px; font-weight: 500; color: #707070; cursor: pointer; border-bottom: 2.5px solid transparent; transition: all 0.15s; white-space: nowrap; }
+.page-tab:hover { color: #23A9F6; }
+.page-tab.active { background: #EEF6FF; color: #23A9F6; border-bottom-color: #23A9F6; font-weight: 600; border-radius: 6px 6px 0 0; }
+.tab-dot { width: 7px; height: 7px; border-radius: 50%; background: #23A9F6; display: inline-block; margin-left: 4px; vertical-align: middle; }
+
+/* ── FILTER AREA ── */
+.filter-area { background: #fff; border-bottom: 1px solid #E8EEF0; padding: 10px 24px; flex-shrink: 0; }
+.filter-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.filter-row:last-child { margin-bottom: 0; }
+.filter-chip { display: flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; border: 1.5px solid #E8EEF0; background: #fff; font-size: 12px; font-weight: 500; color: #707070; cursor: pointer; transition: all 0.15s; font-family: 'Poppins', sans-serif; white-space: nowrap; }
+.filter-chip:hover { border-color: #23A9F6; color: #23A9F6; }
+.filter-chip.active { border-color: #23A9F6; color: #23A9F6; background: #EEF6FF; }
+.filter-chip-icon { font-size: 11px; }
+.filter-chip-close { color: #CACACA; font-size: 12px; cursor: pointer; margin-left: 2px; }
+.filter-chip-close:hover { color: #FF3F41; }
+.filter-sep { width: 1px; height: 18px; background: #E8EEF0; margin: 0 4px; }
+.btn-clear-all { font-size: 12px; font-weight: 500; color: #707070; background: none; border: none; cursor: pointer; font-family: 'Poppins', sans-serif; padding: 5px 8px; }
+.btn-apply { background: #23A9F6; color: #fff; font-size: 12px; font-weight: 600; padding: 6px 16px; border-radius: 8px; border: none; cursor: pointer; font-family: 'Poppins', sans-serif; }
+
+/* ── SORT BAR ── */
+.sort-bar { background: #fff; border-bottom: 1px solid #E8EEF0; padding: 9px 24px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.sort-label { font-size: 12px; color: #707070; font-weight: 500; margin-right: 4px; }
+.sort-tabs { display: flex; align-items: center; gap: 2px; }
+.sort-tab { display: flex; align-items: center; gap: 5px; padding: 5px 12px; font-size: 12.5px; font-weight: 500; color: #707070; cursor: pointer; border-radius: 20px; border: none; background: none; font-family: 'Poppins', sans-serif; transition: all 0.15s; }
+.sort-tab:hover { color: #23A9F6; }
+.sort-tab.active { color: #23A9F6; background: #EEF6FF; }
+
+/* ── COPY CONTENT BUTTON ── */
+.btn-copy-content { display: flex; align-items: center; gap: 7px; padding: 7px 18px; background: #23A9F6; color: #fff; font-size: 13px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.15s; }
+.btn-copy-content:hover { background: #1a96e0; box-shadow: 0 3px 10px rgba(35,169,246,0.3); }
+.btn-copy-content.cancel-mode { background: #fff; color: #707070; border: 1.5px solid #E8EEF0; }
+.btn-copy-content.cancel-mode:hover { border-color: #FF3F41; color: #FF3F41; }
+
+/* ── CONTENT GRID ── */
+.content-scroll { flex: 1; overflow-y: auto; padding: 16px 24px 120px; }
+.content-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+/* ── BUZZ CARD ── */
+.buzz-card { background: #fff; border-radius: 10px; overflow: hidden; cursor: pointer; position: relative; box-shadow: 0 1px 4px rgba(0,0,0,0.07); border: 2.5px solid transparent; transition: all 0.18s; }
+.buzz-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.12); }
+.buzz-card.select-mode:hover { border-color: #73DFFF; }
+.buzz-card.selected { border-color: #23A9F6; box-shadow: 0 4px 16px rgba(35,169,246,0.2); }
+.card-badge { position: absolute; top: 10px; left: 10px; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; z-index: 3; }
+.badge-top25 { background: #52C41A; color: #fff; }
+.badge-top10 { background: #FFA940; color: #fff; }
+.badge-top5 { background: #FF3F41; color: #fff; }
+.card-checkbox-wrap { position: absolute; top: 10px; right: 10px; z-index: 4; display: none; }
+.select-mode .card-checkbox-wrap { display: block; }
+.card-checkbox { width: 22px; height: 22px; border-radius: 6px; border: 2px solid rgba(255,255,255,0.9); background: rgba(0,0,0,0.25); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.buzz-card.selected .card-checkbox { background: #23A9F6; border-color: #23A9F6; }
+.card-img-wrap { position: relative; width: 100%; padding-top: 100%; overflow: hidden; }
+.card-img-inner { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+.card-img-inner img { width: 100%; height: 100%; object-fit: cover; }
+.card-icons { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 2; }
+.select-mode .card-icons { display: none; }
+.card-platform-icon { width: 22px; height: 22px; border-radius: 4px; background: rgba(255,255,255,0.85); display: flex; align-items: center; justify-content: center; font-size: 11px; }
+.card-body { padding: 10px 12px 12px; }
+.card-author-row { display: flex; align-items: center; gap: 7px; margin-bottom: 7px; }
+.card-avatar { width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; }
+.card-author-info { flex: 1; min-width: 0; }
+.card-author-name { font-size: 11.5px; font-weight: 600; color: #102532; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-date { font-size: 10px; color: #CACACA; }
+.card-text { font-size: 12px; color: #102532; line-height: 1.5; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card-stats { display: flex; gap: 10px; }
+.card-stat { font-size: 11px; color: #707070; display: flex; align-items: center; gap: 3px; }
+
+/* ── SELECTION BAR ── */
+.selection-bar { position: fixed; bottom: 0; left: 220px; right: 0; background: #fff; border-top: 1px solid #E8EEF0; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; z-index: 80; transform: translateY(100%); transition: transform 0.25s ease; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); }
+.selection-bar.visible { transform: translateY(0); }
+.selection-info { display: flex; align-items: center; gap: 10px; }
+.selection-count { background: #23A9F6; color: #fff; font-size: 13px; font-weight: 700; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.selection-text { font-size: 14px; font-weight: 500; color: #102532; }
+.selection-text span { color: #707070; font-weight: 400; font-size: 12.5px; }
+.selection-actions { display: flex; gap: 10px; }
+.btn-cancel-sel { background: none; border: 1.5px solid #E8EEF0; color: #707070; font-size: 13px; font-weight: 500; padding: 9px 18px; border-radius: 10px; cursor: pointer; font-family: 'Poppins', sans-serif; }
+.btn-cancel-sel:hover { border-color: #FF3F41; color: #FF3F41; }
+.btn-create-content { background: #23A9F6; color: #fff; font-size: 14px; font-weight: 600; padding: 10px 28px; border-radius: 10px; border: none; cursor: pointer; font-family: 'Poppins', sans-serif; display: flex; align-items: center; gap: 8px; transition: all 0.15s; }
+.btn-create-content:hover { background: #1a96e0; }
+
+/* ── MODAL OVERLAY ── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(10,31,44,0.35); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+.modal-overlay.visible { opacity: 1; pointer-events: all; }
+
+/* ── CREATE PANEL ── */
+.create-panel { position: fixed; top: 0; right: 0; bottom: 0; width: 820px; background: #fff; z-index: 101; transform: translateX(100%); transition: transform 0.3s ease; display: flex; flex-direction: column; box-shadow: -8px 0 32px rgba(0,0,0,0.12); }
+.create-panel.visible { transform: translateX(0); }
+.panel-header { padding: 18px 24px; border-bottom: 1px solid #E8EEF0; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.panel-title { font-size: 17px; font-weight: 700; color: #102532; }
+.panel-subtitle { font-size: 12px; color: #707070; margin-top: 2px; }
+.panel-close { width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid #E8EEF0; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #707070; font-size: 18px; }
+.panel-close:hover { background: #F7F7F7; }
+.panel-body { flex: 1; overflow: hidden; display: flex; }
+
+/* REFERENCES SIDEBAR */
+.refs-sidebar { width: 200px; border-right: 1px solid #E8EEF0; background: #F7F7F7; padding: 14px; overflow-y: auto; flex-shrink: 0; }
+.refs-title { font-size: 10px; font-weight: 600; color: #CACACA; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
+.ref-item { background: #fff; border-radius: 8px; overflow: hidden; margin-bottom: 10px; border: 1px solid #E8EEF0; position: relative; }
+.ref-img { width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; font-size: 22px; background: #F0F4F8; }
+.ref-info { padding: 7px 9px 9px; }
+.ref-topic { font-size: 11px; font-weight: 600; color: #102532; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ref-source { font-size: 10px; color: #707070; margin-top: 2px; }
+.ref-remove { position: absolute; top: 5px; right: 7px; font-size: 14px; color: rgba(255,255,255,0.8); cursor: pointer; background: rgba(0,0,0,0.3); border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+.ref-remove:hover { background: #FF3F41; color: #fff; }
+
+/* CREATION FORM */
+.creation-form { flex: 1; overflow-y: auto; padding: 20px 24px; }
+.form-section { margin-bottom: 22px; }
+.form-label { font-size: 11px; font-weight: 600; color: #707070; text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 10px; display: block; }
+.content-type-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.type-card { border: 2px solid #E8EEF0; border-radius: 10px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.18s; background: #fff; }
+.type-card:hover { border-color: #73DFFF; }
+.type-card.active { border-color: #23A9F6; background: #EEF6FF; }
+.type-icon { font-size: 22px; margin-bottom: 5px; }
+.type-name { font-size: 12px; font-weight: 600; color: #102532; }
+.type-desc { font-size: 10px; color: #707070; margin-top: 2px; }
+.platform-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.platform-btn { display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; border: 1.5px solid #E8EEF0; background: #fff; font-size: 12px; font-weight: 500; color: #707070; cursor: pointer; transition: all 0.15s; font-family: 'Poppins', sans-serif; }
+.platform-btn.active { border-color: #23A9F6; color: #23A9F6; background: #EEF6FF; }
+.tone-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.tone-btn { padding: 6px 14px; border-radius: 20px; border: 1.5px solid #E8EEF0; background: #fff; font-size: 12px; font-weight: 500; color: #707070; cursor: pointer; transition: all 0.15s; font-family: 'Poppins', sans-serif; }
+.tone-btn.active { border-color: #23A9F6; color: #23A9F6; background: #EEF6FF; }
+.prompt-area { width: 100%; border: 1.5px solid #E8EEF0; border-radius: 10px; padding: 12px 14px; font-size: 13px; font-family: 'Poppins', sans-serif; color: #102532; resize: vertical; min-height: 80px; outline: none; transition: border 0.15s; }
+.prompt-area:focus { border-color: #23A9F6; }
+.prompt-area::placeholder { color: #CACACA; }
+.ai-hint { display: flex; align-items: flex-start; gap: 8px; background: #F6F8FD; border-radius: 8px; padding: 10px 12px; margin-top: 8px; }
+.ai-hint-text { font-size: 11px; color: #707070; line-height: 1.5; }
+.ai-hint-text strong { color: #23A9F6; }
+
+/* PANEL FOOTER */
+.panel-footer { padding: 14px 24px; border-top: 1px solid #E8EEF0; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.footer-note { font-size: 12px; color: #707070; }
+.footer-note span { color: #23A9F6; font-weight: 600; }
+.btn-generate { background: #23A9F6; color: #fff; font-size: 14px; font-weight: 600; padding: 11px 32px; border-radius: 10px; cursor: pointer; font-family: 'Poppins', sans-serif; border: none; display: flex; align-items: center; gap: 8px; transition: all 0.15s; }
+.btn-generate:hover { background: #1a96e0; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(35,169,246,0.3); }
+
+/* LOADING STATE */
+.gen-loading { display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 16px; padding: 40px; text-align: center; }
+.gen-loading.visible { display: flex; }
+.spinner-ring { width: 52px; height: 52px; border: 4px solid #EEF6FF; border-top-color: #23A9F6; border-radius: 50%; animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.gen-step { font-size: 12px; color: #23A9F6; font-weight: 500; margin-top: 4px; }
+
+/* RESULT STATE */
+.gen-result { display: none; flex-direction: column; height: 100%; overflow-y: auto; }
+.gen-result.visible { display: flex; }
+.result-header { padding: 14px 24px; border-bottom: 1px solid #E8EEF0; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.result-title { font-size: 14px; font-weight: 600; color: #102532; }
+.result-actions { display: flex; gap: 8px; }
+.btn-sm { padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.15s; }
+.btn-sm-outline { border: 1.5px solid #E8EEF0; background: #fff; color: #707070; }
+.btn-sm-outline:hover { border-color: #23A9F6; color: #23A9F6; }
+.btn-sm-primary { background: #23A9F6; color: #fff; border: none; }
+.result-body { flex: 1; padding: 20px 24px; display: flex; gap: 20px; }
+.result-image-col { flex-shrink: 0; width: 240px; }
+.result-image { width: 100%; aspect-ratio: 1/1; border-radius: 10px; overflow: hidden; background: linear-gradient(135deg,#667eea,#764ba2,#f093fb); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-size: 14px; font-weight: 600; text-align: center; padding: 20px; gap: 8px; position: relative; }
+.result-image-actions { margin-top: 10px; display: flex; gap: 8px; }
+.result-copy-col { flex: 1; }
+.copy-variants { display: flex; flex-direction: column; gap: 12px; }
+.copy-variant { border: 1.5px solid #E8EEF0; border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: all 0.18s; }
+.copy-variant:hover { border-color: #73DFFF; }
+.copy-variant.active { border-color: #23A9F6; background: #F1FCFF; }
+.copy-variant-num { font-size: 10px; font-weight: 700; color: #23A9F6; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+.copy-variant-text { font-size: 13px; color: #102532; line-height: 1.6; }
+.copy-hashtags { margin-top: 8px; font-size: 12px; color: #23A9F6; }
+.copy-source { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+.copy-source-tag { font-size: 10px; padding: 2px 8px; border-radius: 20px; background: #FFF8EB; color: #FFC960; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #E8EEF0; border-radius: 10px; }
+</style>
+</head>
+<body>
+
+<!-- TRIAL BANNER -->
+<div class="trial-banner">
+  <span style="font-size:14px;">🔔</span>
+  <span class="trial-banner-text"><strong>3 Days Left in Trial</strong></span>
+  <div class="trial-timer">🕐 2d 15h 0m 27s</div>
+  <span class="trial-banner-text">Upgrade to unlock all limits. Act now or all features will be locked!</span>
+  <button class="btn-connect">Connect</button>
+  <button class="btn-upgrade">⬆ Upgrade</button>
+</div>
+
+<!-- TOP NAV -->
+<div class="top-nav">
+  <span class="nav-logo">MEDIA LENS</span>
+  <div class="nav-spacer"></div>
+  <span class="nav-credit">150K</span>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="nav-avatar">F</div>
+    <span class="nav-user">free ...</span>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-org">
+      <div class="sidebar-org-avatar">J</div>
+      <div>
+        <div class="sidebar-org-name">julie.li+10's team</div>
+        <div class="sidebar-org-role">Owner · Freetest</div>
+      </div>
+    </div>
+    <div class="sidebar-item"><svg class="sidebar-icon" fill="none" viewBox="0 0 16 16"><rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>Dashboard</div>
+    <div class="sidebar-item"><svg class="sidebar-icon" fill="none" viewBox="0 0 16 16"><path d="M8 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6zM2 14c0-2.76 2.69-5 6-5s6 2.24 6 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>My Pages</div>
+    <div class="sidebar-item"><svg class="sidebar-icon" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M4 8h8M8 4v8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Competitor Analysis</div>
+    <div class="sidebar-item active">
+      <svg class="sidebar-icon" fill="none" viewBox="0 0 16 16"><path d="M2 8l3-3 3 3 3-3 3 3" stroke="#23A9F6" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12l3-3 3 3 3-3 3 3" stroke="#23A9F6" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Buzz (What's Viral?)
+    </div>
+    <div class="sidebar-item"><svg class="sidebar-icon" fill="none" viewBox="0 0 16 16"><rect x="2" y="4" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 4V3a3 3 0 0 1 6 0v1" stroke="currentColor" stroke-width="1.3"/></svg>Ad Manager</div>
+    <div class="sidebar-item"><svg class="sidebar-icon" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>AI Agent</div>
+    <div class="sidebar-item"><svg class="sidebar-icon" fill="none" viewBox="0 0 16 16"><path d="M8 2l1.8 4H14l-3.4 2.5 1.3 4L8 10 4.1 12.5l1.3-4L2 6h4.2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>Leader Board<div class="sidebar-dot"></div></div>
+    <div class="sidebar-item"><svg class="sidebar-icon" fill="none" viewBox="0 0 16 16"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M10 10l4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Social Listening<div class="sidebar-dot"></div></div>
+    <div class="sidebar-item"><svg class="sidebar-icon" fill="none" viewBox="0 0 16 16"><path d="M2 12l3-4 3 3 3-4 3 5H2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>Social Pulses<div class="sidebar-dot"></div></div>
+    <div class="sidebar-item"><svg class="sidebar-icon" fill="none" viewBox="0 0 16 16"><rect x="2" y="9" width="3" height="5" rx="1" fill="currentColor" opacity=".5"/><rect x="6.5" y="5.5" width="3" height="8.5" rx="1" fill="currentColor" opacity=".5"/><rect x="11" y="2" width="3" height="12" rx="1" fill="currentColor" opacity=".5"/></svg>Ad Intelligence<div class="sidebar-dot"></div></div>
+    <div class="sidebar-item"><svg class="sidebar-icon" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Report Scheduler<div class="sidebar-dot"></div></div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- Sample data banner -->
+    <div class="data-banner">
+      <div class="data-banner-text">🔔 Data shown here is sample data only. Upgrade and connect your account to see real data.</div>
+      <button class="btn-exit-demo">Exit Demo</button>
+    </div>
+
+    <!-- Page tabs -->
+    <div class="page-tabs-bar">
+      <div class="page-tabs">
+        <div class="page-tab active">Hot Posts</div>
+        <div class="page-tab">Hot Keywords</div>
+        <div class="page-tab">Hot Topics <span class="tab-dot"></span></div>
+        <div class="page-tab">LIHKG</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-area">
+      <div class="filter-row">
+        <button class="filter-chip active"><span class="filter-chip-icon">📍</span>Hong Kong and Macau <span style="font-size:10px;margin-left:2px;">▾</span></button>
+        <button class="filter-chip active"><span class="filter-chip-icon">📊</span>Top 25% Engagements <span style="font-size:10px;margin-left:2px;">▾</span></button>
+        <button class="filter-chip active"><span class="filter-chip-icon">🕐</span>1 Jun 2025 – 30 Jun 2025 <span style="font-size:10px;margin-left:2px;">▾</span></button>
+        <button class="filter-chip"><span class="filter-chip-icon">🤖</span>Chatbot <span style="font-size:10px;margin-left:2px;">▾</span></button>
+        <button class="filter-chip">Boosted <span style="font-size:10px;margin-left:2px;">▾</span></button>
+        <button class="filter-chip">Post Type <span style="font-size:10px;margin-left:2px;">▾</span></button>
+        <button class="filter-chip">AI category <span style="font-size:10px;margin-left:2px;color:#23A9F6;">●</span> <span style="font-size:10px;margin-left:2px;">▾</span></button>
+        <button class="filter-chip">Keywords <span style="font-size:10px;margin-left:2px;">▾</span></button>
+      </div>
+      <div class="filter-row">
+        <button class="filter-chip">Platform <span style="font-size:10px;margin-left:2px;">▾</span></button>
+        <button class="filter-chip active">Page Type <span style="font-size:10px;margin-left:2px;">▾</span></button>
+        <button class="filter-chip">Profile Interest <span style="font-size:10px;margin-left:2px;">ⓘ</span> <span style="font-size:10px;margin-left:2px;">▾</span></button>
+        <button class="filter-chip">Occupation <span style="font-size:10px;margin-left:2px;">ⓘ</span> <span style="font-size:10px;margin-left:2px;">▾</span></button>
+        <button class="filter-chip">Category <span style="font-size:10px;margin-left:2px;">ⓘ</span> <span style="font-size:10px;margin-left:2px;">▾</span></button>
+        <div class="filter-sep"></div>
+        <button class="filter-chip active" style="background:#EEF6FF;border-color:#23A9F6;color:#23A9F6;">Influencer <span class="filter-chip-close" onclick="event.stopPropagation()">✕</span></button>
+        <button class="filter-chip active" style="background:#EEF6FF;border-color:#23A9F6;color:#23A9F6;">Publisher <span class="filter-chip-close" onclick="event.stopPropagation()">✕</span></button>
+        <div style="margin-left:auto;display:flex;gap:8px;">
+          <button class="btn-clear-all">Clear All</button>
+          <button class="btn-apply">Apply</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sort bar with Copy Content button -->
+    <div class="sort-bar">
+      <div style="display:flex;align-items:center;">
+        <span class="sort-label">Sort By</span>
+        <div class="sort-tabs">
+          <button class="sort-tab active">📅 Date</button>
+          <button class="sort-tab">🤍 Likes</button>
+          <button class="sort-tab">▶ Views</button>
+          <button class="sort-tab">💬 Comments</button>
+          <button class="sort-tab">📊 Engagements</button>
+        </div>
+      </div>
+      <button class="btn-copy-content" id="btn-copy-content" onclick="toggleSelectMode()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 3V2a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Copy Content
+      </button>
+    </div>
+
+    <!-- Content grid -->
+    <div class="content-scroll">
+      <div class="content-grid" id="content-grid">
+
+        <!-- Card 1: 朱柏嘉●朱mic -->
+        <div class="buzz-card" onclick="toggleCard(this)" data-title="2025已經過了50%！Friendly reminder🌟 Enjoy your time in 2025!" data-source="朱柏嘉●朱mic" data-emoji="🎉">
+          <div class="card-badge badge-top25">Top 25%</div>
+          <div class="card-checkbox-wrap"><div class="card-checkbox"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          <div class="card-icons"><div class="card-platform-icon">📋</div><div class="card-platform-icon">📷</div></div>
+          <div class="card-img-wrap">
+            <div class="card-img-inner" style="background:linear-gradient(135deg,#1a1a2e,#16213e);flex-direction:column;gap:8px;">
+              <div style="font-size:13px;font-weight:700;color:#fff;text-align:center;line-height:1.3;">2025已經過了</div>
+              <div style="font-size:28px;font-weight:900;color:#fff;">50%</div>
+              <div style="font-size:20px;">🎭</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-author-row">
+              <div class="card-avatar" style="background:#e65c00;">朱</div>
+              <div class="card-author-info">
+                <div class="card-author-name">朱柏嘉●朱mic</div>
+                <div class="card-date">30 Jun 2025 23:51</div>
+              </div>
+            </div>
+            <div class="card-text">Friendly reminder🌟 Enjoy your time in 2025! 好像突然就過了一半了😅</div>
+            <div class="card-stats">
+              <span class="card-stat">🤍 21,117</span>
+              <span class="card-stat">▶ 376,621</span>
+              <span class="card-stat">💬 48</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: The Collective HK -->
+        <div class="buzz-card" onclick="toggleCard(this)" data-title="富東關結業｜最後一夜 等子杰、Ivy So 告別「後會有期」" data-source="雜誌社 The Collective HK" data-emoji="🎊">
+          <div class="card-badge badge-top10">Top 10%</div>
+          <div class="card-checkbox-wrap"><div class="card-checkbox"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          <div class="card-icons"><div class="card-platform-icon">📋</div><div class="card-platform-icon">📷</div></div>
+          <div class="card-img-wrap">
+            <div class="card-img-inner" style="background:linear-gradient(135deg,#2d4a7a,#1a3a5c);">
+              <div style="font-size:32px;">👥</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-author-row">
+              <div class="card-avatar" style="background:#23A9F6;">集</div>
+              <div class="card-author-info">
+                <div class="card-author-name">雜誌社 The Collective HK</div>
+                <div class="card-date">30 Jun 2025 23:45</div>
+              </div>
+            </div>
+            <div class="card-text">富東關結業｜最後一夜 等子杰、Ivy So 告別 一句「後會有期」員工、員工互打送離開</div>
+            <div class="card-stats">
+              <span class="card-stat">🤍 5,076</span>
+              <span class="card-stat">💬 4</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Harper's BAZAAR HK -->
+        <div class="buzz-card" onclick="toggleCard(this)" data-title="不追大牌的法國女人都在背這些小眾手袋" data-source="Harper's BAZAAR HK" data-emoji="👜">
+          <div class="card-badge badge-top25">Top 25%</div>
+          <div class="card-checkbox-wrap"><div class="card-checkbox"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          <div class="card-icons"><div class="card-platform-icon">🖼</div><div class="card-platform-icon">📷</div></div>
+          <div class="card-img-wrap">
+            <div class="card-img-inner" style="background:linear-gradient(160deg,#2c1810,#5a3020);">
+              <div style="text-align:center;padding:12px;">
+                <div style="font-size:11px;font-weight:700;color:#fff;line-height:1.5;">不追大牌的法國女人<br>都在背這些小眾手袋</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-author-row">
+              <div class="card-avatar" style="background:#102532;">B</div>
+              <div class="card-author-info">
+                <div class="card-author-name">Harper's BAZAAR HK</div>
+                <div class="card-date">30 Jun 2025 23:44</div>
+              </div>
+            </div>
+            <div class="card-text">債錢不貴，這些高質感法國品牌美得剛剛好 #法式手袋 #小眾品牌 #BAZAARfashion</div>
+            <div class="card-stats">
+              <span class="card-stat">🤍 277</span>
+              <span class="card-stat">💬 5</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4: FanWingYi -->
+        <div class="buzz-card" onclick="toggleCard(this)" data-title="Cappadocia July, 2024 — Travel diary" data-source="FanWingYi" data-emoji="🌄">
+          <div class="card-badge badge-top25">Top 25%</div>
+          <div class="card-checkbox-wrap"><div class="card-checkbox"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          <div class="card-icons"><div class="card-platform-icon">📋</div><div class="card-platform-icon">📷</div></div>
+          <div class="card-img-wrap">
+            <div class="card-img-inner" style="background:linear-gradient(135deg,#4a2c6b,#7b4fa6);">
+              <div style="font-size:32px;">📸</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-author-row">
+              <div class="card-avatar" style="background:#7b4fa6;">F</div>
+              <div class="card-author-info">
+                <div class="card-author-name">FanWingYi</div>
+                <div class="card-date">30 Jun 2025 23:44</div>
+              </div>
+            </div>
+            <div class="card-text">Cappadocia July, 2024 — golden hour never disappoints 🌅</div>
+            <div class="card-stats">
+              <span class="card-stat">🤍 277</span>
+              <span class="card-stat">💬 5</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5: COSMO HK -->
+        <div class="buzz-card" onclick="toggleCard(this)" data-title="2025 Summer Beauty Edit — 5 Products You Need Now" data-source="Cosmopolitan HK" data-emoji="💄">
+          <div class="card-badge badge-top25">Top 25%</div>
+          <div class="card-checkbox-wrap"><div class="card-checkbox"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          <div class="card-icons"><div class="card-platform-icon">🖼</div><div class="card-platform-icon">📷</div></div>
+          <div class="card-img-wrap">
+            <div class="card-img-inner" style="background:linear-gradient(135deg,#c41230,#8b0a2e);">
+              <div style="font-size:32px;">💄</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-author-row">
+              <div class="card-avatar" style="background:#c41230;">C</div>
+              <div class="card-author-info">
+                <div class="card-author-name">Cosmopolitan HK</div>
+                <div class="card-date">30 Jun 2025 22:30</div>
+              </div>
+            </div>
+            <div class="card-text">夏日彩妝必入5款產品！SPF防曬底妝超好用 #夏日美妝 #美容</div>
+            <div class="card-stats">
+              <span class="card-stat">🤍 1,842</span>
+              <span class="card-stat">💬 23</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 6: Tatler -->
+        <div class="buzz-card" onclick="toggleCard(this)" data-title="The Most Coveted Tables in Hong Kong Right Now" data-source="Tatler Asia" data-emoji="🍽">
+          <div class="card-badge badge-top5">Top 5%</div>
+          <div class="card-checkbox-wrap"><div class="card-checkbox"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          <div class="card-icons"><div class="card-platform-icon">📋</div><div class="card-platform-icon">📷</div></div>
+          <div class="card-img-wrap">
+            <div class="card-img-inner" style="background:linear-gradient(135deg,#0a1628,#1a2e4a);">
+              <div style="font-size:32px;">🍽</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-author-row">
+              <div class="card-avatar" style="background:#0a1628;">T</div>
+              <div class="card-author-info">
+                <div class="card-author-name">Tatler Asia</div>
+                <div class="card-date">30 Jun 2025 21:15</div>
+              </div>
+            </div>
+            <div class="card-text">The hottest restaurant bookings in Hong Kong — from omakase to Cantonese fine dining</div>
+            <div class="card-stats">
+              <span class="card-stat">🤍 4,210</span>
+              <span class="card-stat">▶ 28,400</span>
+              <span class="card-stat">💬 67</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 7: ELLE HK -->
+        <div class="buzz-card" onclick="toggleCard(this)" data-title="Copenhagen Fashion Week Recap — Top 10 Street Style Looks" data-source="ELLE HK" data-emoji="👗">
+          <div class="card-badge badge-top25">Top 25%</div>
+          <div class="card-checkbox-wrap"><div class="card-checkbox"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          <div class="card-icons"><div class="card-platform-icon">🖼</div><div class="card-platform-icon">📷</div></div>
+          <div class="card-img-wrap">
+            <div class="card-img-inner" style="background:linear-gradient(135deg,#1a0a28,#3a1a5a);">
+              <div style="font-size:32px;">👗</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-author-row">
+              <div class="card-avatar" style="background:#3a1a5a;">E</div>
+              <div class="card-author-info">
+                <div class="card-author-name">ELLE HK</div>
+                <div class="card-date">30 Jun 2025 20:00</div>
+              </div>
+            </div>
+            <div class="card-text">哥本哈根時裝週最受矚目的街拍造型 Top 10！你最 pick 哪個？#時尚 #穿搭</div>
+            <div class="card-stats">
+              <span class="card-stat">🤍 956</span>
+              <span class="card-stat">💬 14</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 8: Time Out HK -->
+        <div class="buzz-card" onclick="toggleCard(this)" data-title="50 Things to Do in Hong Kong This July" data-source="Time Out Hong Kong" data-emoji="🗺">
+          <div class="card-badge badge-top10">Top 10%</div>
+          <div class="card-checkbox-wrap"><div class="card-checkbox"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          <div class="card-icons"><div class="card-platform-icon">📋</div><div class="card-platform-icon">📷</div></div>
+          <div class="card-img-wrap">
+            <div class="card-img-inner" style="background:linear-gradient(135deg,#0d3349,#1a6080);">
+              <div style="font-size:32px;">🗺</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-author-row">
+              <div class="card-avatar" style="background:#FF3F41;">T</div>
+              <div class="card-author-info">
+                <div class="card-author-name">Time Out Hong Kong</div>
+                <div class="card-date">30 Jun 2025 19:30</div>
+              </div>
+            </div>
+            <div class="card-text">July in HK: 50 best things to do — concerts, pop-ups, food festivals & hidden gems</div>
+            <div class="card-stats">
+              <span class="card-stat">🤍 3,127</span>
+              <span class="card-stat">▶ 45,200</span>
+              <span class="card-stat">💬 89</span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end grid -->
+    </div><!-- end scroll -->
+
+  </main>
+</div>
+
+<!-- SELECTION BAR -->
+<div class="selection-bar" id="selection-bar">
+  <div class="selection-info">
+    <div class="selection-count" id="sel-count">0</div>
+    <div class="selection-text">posts selected <span>— will be used as creative references</span></div>
+  </div>
+  <div class="selection-actions">
+    <button class="btn-cancel-sel" onclick="clearSelection()">Clear</button>
+    <button class="btn-create-content" onclick="openCreatePanel()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 4H14l-3.5 2.5 1.5 4L8 10l-4 2.5 1.5-4L2 6h4.5L8 2z" fill="#fff"/></svg>
+      Create Content
+    </button>
+  </div>
+</div>
+
+<!-- MODAL OVERLAY -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeCreatePanel()"></div>
+
+<!-- CREATE PANEL -->
+<div class="create-panel" id="create-panel">
+  <div class="panel-header">
+    <div>
+      <div class="panel-title">✦ Create Content from Buzz</div>
+      <div class="panel-subtitle" id="panel-subtitle">Using 0 posts as creative references</div>
+    </div>
+    <button class="panel-close" onclick="closeCreatePanel()">✕</button>
+  </div>
+  <div class="panel-body">
+    <!-- References sidebar -->
+    <div class="refs-sidebar">
+      <div class="refs-title">Selected References</div>
+      <div id="refs-list"></div>
+    </div>
+    <!-- Form or Loading or Result -->
+    <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+      <!-- FORM STATE -->
+      <div class="creation-form" id="form-state">
+        <div class="form-section">
+          <span class="form-label">Content Type</span>
+          <div class="content-type-grid">
+            <div class="type-card active" onclick="selectType(this)"><div class="type-icon">📱</div><div class="type-name">Social Post</div><div class="type-desc">FB / IG caption</div></div>
+            <div class="type-card" onclick="selectType(this)"><div class="type-icon">📝</div><div class="type-name">Article</div><div class="type-desc">Long-form blog</div></div>
+            <div class="type-card" onclick="selectType(this)"><div class="type-icon">🎬</div><div class="type-name">Video Script</div><div class="type-desc">Reel / TikTok</div></div>
+            <div class="type-card" onclick="selectType(this)"><div class="type-icon">📧</div><div class="type-name">Newsletter</div><div class="type-desc">Email campaign</div></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <span class="form-label">Platform</span>
+          <div class="platform-row">
+            <button class="platform-btn active" onclick="toggleBtn(this)">📘 Facebook</button>
+            <button class="platform-btn" onclick="toggleBtn(this)">📷 Instagram</button>
+            <button class="platform-btn" onclick="toggleBtn(this)">🎵 TikTok</button>
+            <button class="platform-btn" onclick="toggleBtn(this)">🐦 Twitter / X</button>
+          </div>
+        </div>
+        <div class="form-section">
+          <span class="form-label">Tone of Voice</span>
+          <div class="tone-row">
+            <button class="tone-btn active" onclick="toggleBtn(this)">Engaging</button>
+            <button class="tone-btn" onclick="toggleBtn(this)">Witty</button>
+            <button class="tone-btn" onclick="toggleBtn(this)">Informative</button>
+            <button class="tone-btn" onclick="toggleBtn(this)">Inspirational</button>
+            <button class="tone-btn" onclick="toggleBtn(this)">Casual</button>
+          </div>
+        </div>
+        <div class="form-section">
+          <span class="form-label">Additional Instructions (Optional)</span>
+          <textarea class="prompt-area" placeholder="e.g. Focus on the lifestyle angle, mention our summer sale, keep under 150 words..."></textarea>
+          <div class="ai-hint">
+            <span>✦</span>
+            <div class="ai-hint-text">MediaLens AI will analyse the <strong id="hint-count">0 selected posts</strong> for trending angles, hooks, and tone patterns — then generate content tailored to your brand and audience.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOADING STATE -->
+      <div class="gen-loading" id="loading-state">
+        <div class="spinner-ring"></div>
+        <div style="font-size:15px;font-weight:600;color:#102532;">Generating your content…</div>
+        <div style="font-size:13px;color:#707070;">Analysing buzz patterns &amp; crafting your copy</div>
+        <div class="gen-step" id="gen-step">Extracting trending hooks from selected posts…</div>
+      </div>
+
+      <!-- RESULT STATE -->
+      <div class="gen-result" id="result-state">
+        <div class="result-header">
+          <div class="result-title">✦ 3 Variants Generated</div>
+          <div class="result-actions">
+            <button class="btn-sm btn-sm-outline" onclick="resetToForm()">↺ Regenerate</button>
+            <button class="btn-sm btn-sm-primary">Save to Library</button>
+          </div>
+        </div>
+        <div class="result-body">
+          <div class="result-image-col">
+            <div class="result-image">
+              <div style="font-size:36px;z-index:1;">🌟</div>
+              <div style="font-size:13px;font-weight:600;z-index:1;line-height:1.4;">AI-Generated<br>Visual Concept</div>
+              <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.45) 0%,transparent 60%);border-radius:10px;"></div>
+              <div style="position:absolute;bottom:12px;left:12px;right:12px;font-size:10px;color:rgba(255,255,255,0.8);z-index:1;">Based on your selected buzz posts</div>
+            </div>
+            <div class="result-image-actions">
+              <button class="btn-sm btn-sm-outline" style="flex:1;">↓ Download</button>
+              <button class="btn-sm btn-sm-outline" style="flex:1;">✏ Edit</button>
+            </div>
+          </div>
+          <div class="result-copy-col">
+            <div class="copy-variants">
+              <div class="copy-variant active" onclick="selectVariant(this)">
+                <div class="copy-variant-num">Variant 1 — Trending Hook</div>
+                <div class="copy-variant-text">2025已經過了一半，你的夏日清單完成了幾多？🌟 不管是旅行、美食還是新嘗試，現在開始都不遲！把握下半年，和我們一起創造更多難忘回憶。</div>
+                <div class="copy-hashtags">#2025下半年 #生活態度 #香港生活 #把握當下</div>
+                <div class="copy-source"><span class="copy-source-tag">📊 Buzz ref: 朱柏嘉●朱mic</span><span class="copy-source-tag">🔥 Trending</span></div>
+              </div>
+              <div class="copy-variant" onclick="selectVariant(this)">
+                <div class="copy-variant-num">Variant 2 — Lifestyle Angle</div>
+                <div class="copy-variant-text">法式優雅不一定靠大牌！😍 這個夏天，選擇一個真正屬於自己的小眾品牌，讓細節說話。品質、故事、個性——才是真正的時尚態度。</div>
+                <div class="copy-hashtags">#小眾時尚 #法式風格 #香港時尚 #個人風格</div>
+                <div class="copy-source"><span class="copy-source-tag">📊 Buzz ref: Harper's BAZAAR HK</span><span class="copy-source-tag">👜 Fashion</span></div>
+              </div>
+              <div class="copy-variant" onclick="selectVariant(this)">
+                <div class="copy-variant-num">Variant 3 — Engagement Driver</div>
+                <div class="copy-variant-text">Hong Kong in July: where are you going this month? 🗺 From hidden food gems to must-see pop-ups, there's no excuse to stay home. Drop your must-do in the comments! ⬇️</div>
+                <div class="copy-hashtags">#HongKong #HKLife #WeekendVibes #ThingsToDo</div>
+                <div class="copy-source"><span class="copy-source-tag">📊 Buzz ref: Time Out HK</span><span class="copy-source-tag">🗺 Local</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Panel footer (form state only) -->
+  <div class="panel-footer" id="panel-footer">
+    <div class="footer-note">✦ Powered by MediaLens AI · <span id="footer-count">0 posts</span> selected</div>
+    <button class="btn-generate" onclick="startGeneration()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 4H14l-3.5 2.5 1.5 4L8 10l-4 2.5 1.5-4L2 6h4.5L8 2z" fill="#fff"/></svg>
+      Generate Content
+    </button>
+  </div>
+</div>
+
+<script>
+var selectMode = false;
+var selectedCards = [];
+
+function toggleSelectMode() {
+  selectMode = !selectMode;
+  var grid = document.getElementById('content-grid');
+  var btn = document.getElementById('btn-copy-content');
+  if (selectMode) {
+    grid.querySelectorAll('.buzz-card').forEach(function(c) { c.classList.add('select-mode'); });
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l4 4 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Cancel';
+    btn.classList.add('cancel-mode');
+  } else {
+    grid.querySelectorAll('.buzz-card').forEach(function(c) { c.classList.remove('select-mode'); });
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 3V2a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Copy Content';
+    btn.classList.remove('cancel-mode');
+    clearSelection();
+  }
+}
+
+function toggleCard(card) {
+  if (!selectMode) return;
+  card.classList.toggle('selected');
+  updateSelection();
+}
+
+function updateSelection() {
+  selectedCards = Array.from(document.querySelectorAll('.buzz-card.selected'));
+  var n = selectedCards.length;
+  document.getElementById('sel-count').textContent = n;
+  var bar = document.getElementById('selection-bar');
+  if (n > 0) { bar.classList.add('visible'); } else { bar.classList.remove('visible'); }
+}
+
+function clearSelection() {
+  document.querySelectorAll('.buzz-card.selected').forEach(function(c) { c.classList.remove('selected'); });
+  updateSelection();
+}
+
+function openCreatePanel() {
+  // Build references list
+  var refs = document.getElementById('refs-list');
+  refs.innerHTML = '';
+  selectedCards.forEach(function(card) {
+    var title = card.dataset.title;
+    var source = card.dataset.source;
+    var emoji = card.dataset.emoji;
+    refs.innerHTML += '<div class="ref-item"><div class="ref-img">' + emoji + '</div><div class="ref-info"><div class="ref-topic">' + title + '</div><div class="ref-source">' + source + '</div></div></div>';
+  });
+  var n = selectedCards.length;
+  document.getElementById('panel-subtitle').textContent = 'Using ' + n + ' post' + (n > 1 ? 's' : '') + ' as creative references';
+  document.getElementById('hint-count').textContent = n + ' selected post' + (n > 1 ? 's' : '');
+  document.getElementById('footer-count').textContent = n + ' post' + (n > 1 ? 's' : '');
+  // Show form state
+  showFormState();
+  document.getElementById('modal-overlay').classList.add('visible');
+  document.getElementById('create-panel').classList.add('visible');
+}
+
+function closeCreatePanel() {
+  document.getElementById('modal-overlay').classList.remove('visible');
+  document.getElementById('create-panel').classList.remove('visible');
+}
+
+function showFormState() {
+  document.getElementById('form-state').style.display = 'block';
+  document.getElementById('loading-state').classList.remove('visible');
+  document.getElementById('result-state').classList.remove('visible');
+  document.getElementById('panel-footer').style.display = 'flex';
+}
+
+function startGeneration() {
+  document.getElementById('form-state').style.display = 'none';
+  document.getElementById('loading-state').classList.add('visible');
+  document.getElementById('panel-footer').style.display = 'none';
+  var steps = ['Extracting trending hooks from selected posts…', 'Analysing tone & engagement patterns…', 'Crafting content variants for your brand…', 'Finalising copy & hashtags…'];
+  var i = 0;
+  var stepEl = document.getElementById('gen-step');
+  var iv = setInterval(function() {
+    i++;
+    if (i < steps.length) { stepEl.textContent = steps[i]; }
+    else {
+      clearInterval(iv);
+      document.getElementById('loading-state').classList.remove('visible');
+      document.getElementById('result-state').classList.add('visible');
+    }
+  }, 900);
+}
+
+function resetToForm() { showFormState(); }
+
+function selectType(card) {
+  document.querySelectorAll('.type-card').forEach(function(c) { c.classList.remove('active'); });
+  card.classList.add('active');
+}
+
+function toggleBtn(btn) { btn.classList.toggle('active'); }
+
+function selectVariant(v) {
+  document.querySelectorAll('.copy-variant').forEach(function(c) { c.classList.remove('active'); });
+  v.classList.add('active');
+}
+</script>
+</body>
+</html>
