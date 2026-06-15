@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Content from Insights — MediaLens</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Poppins', sans-serif; background: #F7F7F7; color: #102532; min-height: 100vh; }
+
+/* NAV */
+.nav { background: #23A9F6; height: 64px; display: flex; align-items: center; padding: 0 24px; gap: 16px; }
+.nav-logo { color: #fff; font-weight: 700; font-size: 18px; letter-spacing: -0.3px; }
+.nav-sep { width: 1px; height: 24px; background: rgba(255,255,255,0.3); }
+.nav-page { color: rgba(255,255,255,0.9); font-size: 14px; font-weight: 500; }
+
+/* LAYOUT */
+.layout { display: flex; height: calc(100vh - 64px); }
+.sidebar { width: 200px; background: #fff; border-right: 1px solid #E8EEF0; padding: 16px 0; flex-shrink: 0; }
+.sidebar-item { padding: 10px 20px; font-size: 13px; color: #707070; cursor: pointer; display: flex; align-items: center; gap: 10px; border-radius: 0; transition: background 0.15s; }
+.sidebar-item:hover { background: #F1FCFF; color: #23A9F6; }
+.sidebar-item.active { background: #EEF6FF; color: #23A9F6; font-weight: 600; border-right: 3px solid #23A9F6; }
+.sidebar-icon { width: 16px; height: 16px; opacity: 0.7; }
+.sidebar-section { padding: 16px 20px 6px; font-size: 10px; font-weight: 600; color: #CACACA; text-transform: uppercase; letter-spacing: 0.8px; }
+
+/* MAIN */
+.main { flex: 1; overflow: hidden; position: relative; display: flex; flex-direction: column; }
+.page-header { background: #fff; border-bottom: 1px solid #E8EEF0; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.page-title { font-size: 18px; font-weight: 600; color: #102532; }
+.page-desc { font-size: 12px; color: #707070; margin-top: 2px; }
+.source-tabs { display: flex; gap: 4px; background: #F7F7F7; border-radius: 10px; padding: 4px; }
+.source-tab { padding: 7px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #707070; cursor: pointer; transition: all 0.18s; border: none; background: transparent; }
+.source-tab.active { background: #fff; color: #23A9F6; font-weight: 600; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+/* CONTENT AREA */
+.content-area { flex: 1; overflow-y: auto; padding: 20px 24px 100px; }
+.filter-row { display: flex; gap: 8px; margin-bottom: 18px; align-items: center; flex-wrap: wrap; }
+.filter-chip { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; border: 1.5px solid #D9E3E6; color: #707070; cursor: pointer; background: #fff; transition: all 0.15s; }
+.filter-chip:hover { border-color: #23A9F6; color: #23A9F6; }
+.filter-chip.active { background: #EEF6FF; border-color: #23A9F6; color: #23A9F6; }
+.filter-label { font-size: 12px; color: #707070; font-weight: 500; }
+
+/* GRID */
+.content-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+
+/* CONTENT CARD */
+.content-card { background: #fff; border-radius: 10px; overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: all 0.18s; position: relative; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+.content-card:hover { border-color: #73DFFF; box-shadow: 0 4px 12px rgba(35,169,246,0.12); }
+.content-card.selected { border-color: #23A9F6; box-shadow: 0 4px 16px rgba(35,169,246,0.2); }
+.card-checkbox { position: absolute; top: 10px; left: 10px; width: 22px; height: 22px; border-radius: 6px; border: 2px solid rgba(255,255,255,0.9); background: rgba(255,255,255,0.2); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; transition: all 0.15s; z-index: 2; }
+.content-card.selected .card-checkbox { background: #23A9F6; border-color: #23A9F6; }
+.card-checkbox svg { display: none; }
+.content-card.selected .card-checkbox svg { display: block; }
+.card-source-badge { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); color: #fff; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; z-index: 2; }
+.card-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; background: #F0F4F8; }
+.card-img-placeholder { width: 100%; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; font-size: 36px; }
+.card-body { padding: 10px 12px 12px; }
+.card-topic { font-size: 12px; font-weight: 600; color: #102532; line-height: 1.4; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+.card-stat { font-size: 11px; color: #707070; display: flex; align-items: center; gap: 3px; }
+.card-tag { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+.tag-buzz { background: #FFF8EB; color: #FFC960; }
+.tag-trending { background: #E6FBEB; color: #52C41A; }
+.tag-ad { background: #EEF6FF; color: #23A9F6; }
+
+/* SELECTION BAR */
+.selection-bar { position: fixed; bottom: 0; left: 200px; right: 0; background: #fff; border-top: 1px solid #E8EEF0; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; z-index: 50; transition: transform 0.25s ease; transform: translateY(100%); box-shadow: 0 -4px 20px rgba(0,0,0,0.08); }
+.selection-bar.visible { transform: translateY(0); }
+.selection-info { display: flex; align-items: center; gap: 10px; }
+.selection-count { background: #23A9F6; color: #fff; font-size: 13px; font-weight: 600; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.selection-text { font-size: 14px; color: #102532; font-weight: 500; }
+.selection-text span { color: #707070; font-weight: 400; font-size: 13px; }
+.selection-actions { display: flex; gap: 10px; align-items: center; }
+.btn-clear { background: none; border: 1.5px solid #D9E3E6; color: #707070; font-size: 13px; font-weight: 500; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.15s; }
+.btn-clear:hover { border-color: #FF3F41; color: #FF3F41; }
+.btn-create { background: #23A9F6; color: #fff; font-size: 14px; font-weight: 600; padding: 10px 24px; border-radius: 10px; cursor: pointer; font-family: 'Poppins', sans-serif; border: none; display: flex; align-items: center; gap: 8px; transition: all 0.15s; }
+.btn-create:hover { background: #1a96e0; }
+
+/* MODAL OVERLAY */
+.modal-overlay { position: fixed; inset: 0; background: rgba(10,31,44,0.35); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+.modal-overlay.visible { opacity: 1; pointer-events: all; }
+
+/* CREATE PANEL */
+.create-panel { position: fixed; top: 0; right: 0; bottom: 0; width: 780px; background: #fff; z-index: 101; transform: translateX(100%); transition: transform 0.3s ease; display: flex; flex-direction: column; box-shadow: -8px 0 32px rgba(0,0,0,0.12); }
+.create-panel.visible { transform: translateX(0); }
+.panel-header { padding: 20px 24px; border-bottom: 1px solid #E8EEF0; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.panel-title { font-size: 18px; font-weight: 600; color: #102532; }
+.panel-subtitle { font-size: 12px; color: #707070; margin-top: 2px; }
+.panel-close { width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid #D9E3E6; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #707070; font-size: 18px; transition: all 0.15s; }
+.panel-close:hover { background: #F7F7F7; }
+.panel-body { flex: 1; overflow: hidden; display: flex; }
+
+/* REFERENCES SIDEBAR */
+.refs-sidebar { width: 220px; border-right: 1px solid #E8EEF0; background: #F7F7F7; padding: 16px; overflow-y: auto; flex-shrink: 0; }
+.refs-title { font-size: 11px; font-weight: 600; color: #CACACA; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+.ref-item { background: #fff; border-radius: 8px; overflow: hidden; margin-bottom: 10px; border: 1px solid #E8EEF0; }
+.ref-img { width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; font-size: 24px; background: #F0F4F8; }
+.ref-info { padding: 8px 10px; }
+.ref-topic { font-size: 11px; font-weight: 600; color: #102532; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ref-source { font-size: 10px; color: #707070; margin-top: 3px; }
+.ref-remove { float: right; font-size: 14px; color: #CACACA; cursor: pointer; line-height: 1; margin-top: -1px; }
+.ref-remove:hover { color: #FF3F41; }
+
+/* CREATION FORM */
+.creation-form { flex: 1; overflow-y: auto; padding: 20px 24px; }
+.form-section { margin-bottom: 22px; }
+.form-label { font-size: 12px; font-weight: 600; color: #707070; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; display: block; }
+.content-type-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.type-card { border: 2px solid #D9E3E6; border-radius: 10px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.18s; background: #fff; }
+.type-card:hover { border-color: #73DFFF; }
+.type-card.active { border-color: #23A9F6; background: #EEF6FF; }
+.type-card.locked { opacity: 0.5; cursor: not-allowed; }
+.type-icon { font-size: 24px; margin-bottom: 6px; }
+.type-name { font-size: 12px; font-weight: 600; color: #102532; }
+.type-desc { font-size: 10px; color: #707070; margin-top: 2px; }
+.type-badge { font-size: 9px; background: #FFF8EB; color: #FFC960; padding: 2px 6px; border-radius: 20px; font-weight: 600; margin-top: 4px; display: inline-block; }
+.platform-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.platform-btn { display: flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 20px; border: 1.5px solid #D9E3E6; background: #fff; font-size: 12px; font-weight: 500; color: #707070; cursor: pointer; transition: all 0.15s; }
+.platform-btn.active { border-color: #23A9F6; color: #23A9F6; background: #EEF6FF; }
+.platform-icon { width: 16px; height: 16px; border-radius: 4px; }
+.tone-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.tone-btn { padding: 6px 14px; border-radius: 20px; border: 1.5px solid #D9E3E6; background: #fff; font-size: 12px; font-weight: 500; color: #707070; cursor: pointer; transition: all 0.15s; }
+.tone-btn.active { border-color: #23A9F6; color: #23A9F6; background: #EEF6FF; }
+.prompt-area { width: 100%; border: 1.5px solid #D9E3E6; border-radius: 10px; padding: 12px 14px; font-size: 13px; font-family: 'Poppins', sans-serif; color: #102532; resize: vertical; min-height: 80px; outline: none; transition: border 0.15s; }
+.prompt-area:focus { border-color: #23A9F6; }
+.prompt-area::placeholder { color: #CACACA; }
+.ai-hint { display: flex; align-items: flex-start; gap: 8px; background: #F6F8FD; border-radius: 8px; padding: 10px 12px; margin-top: 8px; }
+.ai-hint-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.ai-hint-text { font-size: 11px; color: #707070; line-height: 1.5; }
+.ai-hint-text strong { color: #23A9F6; }
+
+/* PANEL FOOTER */
+.panel-footer { padding: 16px 24px; border-top: 1px solid #E8EEF0; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: #fff; }
+.footer-note { font-size: 12px; color: #707070; }
+.footer-note span { color: #23A9F6; font-weight: 600; }
+.btn-generate { background: #23A9F6; color: #fff; font-size: 15px; font-weight: 600; padding: 12px 32px; border-radius: 10px; cursor: pointer; font-family: 'Poppins', sans-serif; border: none; display: flex; align-items: center; gap: 10px; transition: all 0.15s; }
+.btn-generate:hover { background: #1a96e0; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(35,169,246,0.3); }
+
+/* GENERATION LOADING STATE */
+.gen-loading { display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 16px; padding: 40px; text-align: center; }
+.gen-loading.visible { display: flex; }
+.spinner-ring { width: 56px; height: 56px; border: 4px solid #EEF6FF; border-top-color: #23A9F6; border-radius: 50%; animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.gen-loading-text { font-size: 15px; font-weight: 600; color: #102532; }
+.gen-loading-sub { font-size: 13px; color: #707070; }
+.gen-step { font-size: 12px; color: #23A9F6; font-weight: 500; margin-top: 4px; }
+
+/* RESULT STATE */
+.gen-result { display: none; flex-direction: column; height: 100%; overflow-y: auto; }
+.gen-result.visible { display: flex; }
+.result-header { padding: 16px 24px; border-bottom: 1px solid #E8EEF0; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.result-title { font-size: 15px; font-weight: 600; color: #102532; }
+.result-actions { display: flex; gap: 8px; }
+.btn-sm { padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.15s; }
+.btn-sm-outline { border: 1.5px solid #D9E3E6; background: #fff; color: #707070; }
+.btn-sm-outline:hover { border-color: #23A9F6; color: #23A9F6; }
+.btn-sm-primary { background: #23A9F6; color: #fff; border: none; }
+.btn-sm-primary:hover { background: #1a96e0; }
+.result-body { flex: 1; padding: 20px 24px; display: flex; gap: 20px; }
+.result-image-col { flex-shrink: 0; width: 260px; }
+.result-image { width: 100%; aspect-ratio: 1/1; border-radius: 10px; overflow: hidden; background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-size: 14px; font-weight: 600; text-align: center; padding: 20px; gap: 8px; position: relative; }
+.result-image-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 60%); }
+.result-image-caption { position: absolute; bottom: 12px; left: 12px; right: 12px; font-size: 11px; color: rgba(255,255,255,0.8); }
+.result-image-emoji { font-size: 40px; }
+.result-image-label { font-size: 13px; font-weight: 600; z-index: 1; }
+.result-image-actions { margin-top: 10px; display: flex; gap: 8px; }
+.result-copy-col { flex: 1; }
+.copy-variants { display: flex; flex-direction: column; gap: 12px; }
+.copy-variant { border: 1.5px solid #E8EEF0; border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: all 0.18s; background: #fff; }
+.copy-variant:hover { border-color: #73DFFF; }
+.copy-variant.active { border-color: #23A9F6; background: #F1FCFF; }
+.copy-variant-num { font-size: 10px; font-weight: 700; color: #23A9F6; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+.copy-variant-text { font-size: 13px; color: #102532; line-height: 1.6; }
+.copy-hashtags { margin-top: 8px; font-size: 12px; color: #23A9F6; }
+.copy-source { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+.copy-source-tag { font-size: 10px; padding: 2px 8px; border-radius: 20px; background: #F6F8FD; color: #707070; }
+.copy-source-tag.buzz { background: #FFF8EB; color: #FFC960; }
+.copy-source-tag.ad { background: #EEF6FF; color: #23A9F6; }
+
+/* EMPTY STATE */
+.source-empty { display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 60px 20px; text-align: center; color: #707070; }
+.source-empty.visible { display: flex; }
+.source-empty-icon { font-size: 40px; }
+.source-empty-text { font-size: 14px; font-weight: 500; }
+.source-empty-sub { font-size: 12px; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #D9E3E6; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #CACACA; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <span class="nav-logo">MediaLens</span>
+  <span class="nav-sep"></span>
+  <span class="nav-page">Create Content</span>
+</nav>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">Discover</div>
+    <div class="sidebar-item">
+      <svg class="sidebar-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3l2 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Buzz Spotting
+    </div>
+    <div class="sidebar-item">
+      <svg class="sidebar-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="2" width="5" height="5" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="9" width="5" height="5" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="5" height="5" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>
+      Ad Intelligence
+    </div>
+    <div class="sidebar-item">
+      <svg class="sidebar-icon" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 4H14l-3.5 2.5 1.5 4L8 10l-4 2.5 1.5-4L2 6h4.5L8 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      Competitor
+    </div>
+    <div class="sidebar-section">Create</div>
+    <div class="sidebar-item active">
+      <svg class="sidebar-icon" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M8 2v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      Create Content
+    </div>
+    <div class="sidebar-item">
+      <svg class="sidebar-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M6 3V2M10 3V2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Content Library
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Create Content</div>
+        <div class="page-desc">Pick posts from Buzz Spotting or Ad Intelligence as inspiration — MediaLens generates your content.</div>
+      </div>
+      <div class="source-tabs">
+        <button class="source-tab active" onclick="switchSource('buzz')">🔥 Buzz Spotting</button>
+        <button class="source-tab" onclick="switchSource('ad')">💡 Ad Intelligence</button>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <!-- BUZZ FILTER ROW -->
+      <div class="filter-row" id="buzz-filters">
+        <span class="filter-label">Topic:</span>
+        <button class="filter-chip active" onclick="toggleFilter(this)">All</button>
+        <button class="filter-chip" onclick="toggleFilter(this)">F&B</button>
+        <button class="filter-chip" onclick="toggleFilter(this)">Beauty</button>
+        <button class="filter-chip" onclick="toggleFilter(this)">Lifestyle</button>
+        <button class="filter-chip" onclick="toggleFilter(this)">Travel</button>
+        <button class="filter-chip" onclick="toggleFilter(this)">Tech</button>
+        &nbsp;
+        <span class="filter-label">Trend:</span>
+        <button class="filter-chip active" onclick="toggleFilter(this)">Trending</button>
+        <button class="filter-chip" onclick="toggleFilter(this)">Rising</button>
+        <button class="filter-chip" onclick="toggleFilter(this)">Viral</button>
+      </div>
+
+      <!-- AD FILTER ROW -->
+      <div class="filter-row" id="ad-filters" style="display:none">
+        <span class="filter-label">Format:</span>
+        <button class="filter-chip active" onclick="toggleFilter(this)">All</button>
+        <button class="filter-chip" onclick="toggleFilter(this)">Image</button>
+        <button class="filter-chip" onclick="toggleFilter(this)">Video</button>
+        <button class="filter-chip" onclick="toggleFilter(this)">Carousel</button>
+        &nbsp;
+        <span class="filter-label">Objective:</span>
+        <button class="filter-chip active" onclick="toggleFilter(this)">All</button>
+        <button class="filter-chip" onclick="toggleFilter(this)">TOFU</button>
+        <button class="filter-chip" onclick="toggleFilter(this)">MOFU</button>
+        <button class="filter-chip" onclick="toggleFilter(this)">BOFU</button>
+      </div>
+
+      <!-- BUZZ GRID -->
+      <div class="content-grid" id="buzz-grid">
+        <!-- Card 1 -->
+        <div class="content-card" onclick="toggleCard(this)" data-id="buzz-1" data-topic="夏日限定甜品打卡熱潮" data-source="Buzz Spotting" data-emoji="🍧">
+          <div class="card-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="card-source-badge">🔥 Trending</div>
+          <div class="card-img-placeholder" style="background: linear-gradient(135deg,#ffecd2,#fcb69f)">🍧</div>
+          <div class="card-body">
+            <div class="card-topic">夏日限定甜品打卡熱潮 — 港式糖水 vs 日式刨冰</div>
+            <div class="card-meta">
+              <span class="card-stat">❤️ 28.4K</span>
+              <span class="card-stat">💬 1.2K</span>
+              <span class="card-tag tag-buzz">F&B</span>
+            </div>
+          </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="content-card" onclick="toggleCard(this)" data-id="buzz-2" data-topic="防曬神器大測評" data-source="Buzz Spotting" data-emoji="☀️">
+          <div class="card-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="card-source-badge">📈 Rising</div>
+          <div class="card-img-placeholder" style="background: linear-gradient(135deg,#a1c4fd,#c2e9fb)">☀️</div>
+          <div class="card-body">
+            <div class="card-topic">防曬神器大測評 SPF50+ 實戰比較</div>
+            <div class="card-meta">
+              <span class="card-stat">❤️ 19.7K</span>
+              <span class="card-stat">💬 876</span>
+              <span class="card-tag tag-buzz">Beauty</span>
+            </div>
+          </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="content-card" onclick="toggleCard(this)" data-id="buzz-3" data-topic="工作假期移民熱潮" data-source="Buzz Spotting" data-emoji="✈️">
+          <div class="card-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="card-source-badge">🔥 Trending</div>
+          <div class="card-img-placeholder" style="background: linear-gradient(135deg,#d4fc79,#96e6a1)">✈️</div>
+          <div class="card-body">
+            <div class="card-topic">Working Holiday 移民熱潮 — 澳洲 vs 英國哪個好？</div>
+            <div class="card-meta">
+              <span class="card-stat">❤️ 35.1K</span>
+              <span class="card-stat">💬 2.3K</span>
+              <span class="card-tag tag-trending">Travel</span>
+            </div>
+          </div>
+        </div>
+        <!-- Card 4 -->
+        <div class="content-card" onclick="toggleCard(this)" data-id="buzz-4" data-topic="AI生產力工具推薦" data-source="Buzz Spotting" data-emoji="🤖">
+          <div class="card-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="card-source-badge">🚀 Viral</div>
+          <div class="card-img-placeholder" style="background: linear-gradient(135deg,#667eea,#764ba2)">🤖</div>
+          <div class="card-body">
+            <div class="card-topic">2025 AI生產力工具推薦 — 打工仔必裝清單</div>
+            <div class="card-meta">
+              <span class="card-stat">❤️ 52.8K</span>
+              <span class="card-stat">💬 4.1K</span>
+              <span class="card-tag tag-trending">Tech</span>
+            </div>
+          </div>
+        </div>
+        <!-- Card 5 -->
+        <div class="content-card" onclick="toggleCard(this)" data-id="buzz-5" data-topic="健身後恢復飲食" data-source="Buzz Spotting" data-emoji="💪">
+          <div class="card-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="card-source-badge">📈 Rising</div>
+          <div class="card-img-placeholder" style="background: linear-gradient(135deg,#f093fb,#f5576c)">💪</div>
+          <div class="card-body">
+            <div class="card-topic">健身後恢復飲食攻略 — 高蛋白質低卡選擇</div>
+            <div class="card-meta">
+              <span class="card-stat">❤️ 14.3K</span>
+              <span class="card-stat">💬 632</span>
+              <span class="card-tag tag-buzz">Lifestyle</span>
+            </div>
+          </div>
+        </div>
+        <!-- Card 6 -->
+        <div class="content-card" onclick="toggleCard(this)" data-id="buzz-6" data-topic="平價韓系護膚品" data-source="Buzz Spotting" data-emoji="🌸">
+          <div class="card-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="card-source-badge">🔥 Trending</div>
+          <div class="card-img-placeholder" style="background: linear-gradient(135deg,#fbc2eb,#a6c1ee)">🌸</div>
+          <div class="card-body">
+            <div class="card-topic">平價韓系護膚品大測試 — 藥妝店必買 Top 10</div>
+            <div class="card-meta">
+              <span class="card-stat">❤️ 31.2K</span>
+              <span class="card-stat">💬 1.8K</span>
+              <span class="card-tag tag-buzz">Beauty</span>
+            </div>
+          </div>
+        </div>
+        <!-- Card 7 -->
+        <div class="content-card" onclick="toggleCard(this)" data-id="buzz-7" data-topic="本地農夫市集" data-source="Buzz Spotting" data-emoji="🥦">
+          <div class="card-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="card-source-badge">📈 Rising</div>
+          <div class="card-img-placeholder" style="background: linear-gradient(135deg,#56ab2f,#a8e063)">🥦</div>
+          <div class="card-body">
+            <div class="card-topic">本地農夫市集回歸！有機食材去哪買？</div>
+            <div class="card-meta">
+              <span class="card-stat">❤️ 9.6K</span>
+              <span class="card-stat">💬 445</span>
+              <span class="card-tag tag-buzz">F&B</span>
+            </div>
+          </div>
+        </div>
+        <!-- Card 8 -->
+        <div class="content-card" onclick="toggleCard(this)" data-id="buzz-8" data-topic="極簡生活斷捨離" data-source="Buzz Spotting" data-emoji="🏠">
+          <div class="card-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="card-source-badge">🚀 Viral</div>
+          <div class="card-img-placeholder" style="background: linear-gradient(135deg,#e0e0e0,#f5f5f5)">🏠</div>
+          <div class="card-body">
+            <div class="card-topic">極簡生活斷捨離 — 30天清空計劃挑戰</div>
+            <div class="card-meta">
+              <span class="card-stat">❤️ 44.0K</span>
+              <span class="card-stat">💬 3.3K</span>
+              <span class="card-tag tag-trending">Lifestyle</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AD INTELLIGENCE GRID -->
+      <div class="content-grid" id="ad-grid" style="display:none">
+        <!-- Ad Card 1 -->
+        <div class="content-card" onclick="toggleCard(this)" data-id="ad-1" data-topic="限時優惠倒計時廣告" data-source="Ad Intelligence" data-emoji="⏰">
+          <div class="card-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="card-source-badge">💡 Ad Intel</div>
+          <div class="card-img-placeholder" style="background: linear-gradient(135deg,#f7971e,#ffd200)">⏰</div>
+          <div class="card-body">
+            <div class="card-topic">限時優惠倒計時 — 緊迫感 Hook 高轉換廣告</div>
+            <div class="card-meta">
+              <span class="card-stat">CTR 4.2%</span>
+              <span class="card-stat">ROAS 8.1×</span>
+              <span class="card-tag tag-ad">BOFU</span>
+            </div>
+          </div>
+        </div>
+        <!-- Ad Card 2 -->
+        <div class="content-card" onclick="toggleCard(this)" data-id="ad-2" data-topic="Before/After 對比廣告" data-source="Ad Intelligence" data-emoji="✨">
+          <div class="card-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="card-source-badge">💡 Ad Intel</div>
+          <div class="card-img-placeholder" style="background: linear-gradient(135deg,#fbc2eb,#a6c1ee)">✨</div>
+          <div class="card-body">
+            <div class="card-topic">Before/After 對比圖 — 護膚品高互動廣告公式</div>
+            <div class="card-meta">
+              <span class="card-stat">CTR 5.8%</span>
+              <span class="card-stat">Eng 12.3K</span>
+              <span class="card-tag tag-ad">MOFU</span>
+            </div>
+          </div>
+        </div>
+        <!-- Ad Card 3 -->
+        <div class="content-card" onclick="toggleCard(this)" data-id="ad-3" data-topic="KOL推薦短視頻格式" data-source="Ad Intelligence" data-emoji="🎬">
+          <div class="card-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="card-source-badge">💡 Ad Intel</div>
+          <div class="card-img-placeholder" style="background: linear-gradient(135deg,#4facfe,#00f2fe)">🎬</div>
+          <div class="card-body">
+            <div class="card-topic">KOL推薦 UGC 風格短視頻 — 真實感高觸及公式</div>
+            <div class="card-meta">
+              <span class="card-stat">CTR 3.9%</span>
+              <span class="card-stat">VTR 68%</span>
+              <span class="card-tag tag-ad">TOFU</span>
+            </div>
+          </div>
+        </div>
+        <!-- Ad Card 4 -->
+        <div class="content-card" onclick="toggleCard(this)" data-id="ad-4" data-topic="問題解決方案式廣告" data-source="Ad Intelligence" data-emoji="💡">
+          <div class="card-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="card-source-badge">💡 Ad Intel</div>
+          <div class="card-img-placeholder" style="background: linear-gradient(135deg,#43e97b,#38f9d7)">💡</div>
+          <div class="card-body">
+            <div class="card-topic">「你有呢個煩惱嗎？」問題導入式廣告文案</div>
+            <div class="card-meta">
+              <span class="card-stat">CTR 6.1%</span>
+              <span class="card-stat">Lead 340</span>
+              <span class="card-tag tag-ad">BOFU</span>
+            </div>
+          </div>
+        </div>
+        <!-- Ad Card 5 -->
+        <div class="content-card" onclick="toggleCard(this)" data-id="ad-5" data-topic="產品輪播Carousel" data-source="Ad Intelligence" data-emoji="🖼️">
+          <div class="card-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="card-source-badge">💡 Ad Intel</div>
+          <div class="card-img-placeholder" style="background: linear-gradient(135deg,#fa709a,#fee140)">🖼️</div>
+          <div class="card-body">
+            <div class="card-topic">產品系列輪播 Carousel — 多SKU展示高點擊率</div>
+            <div class="card-meta">
+              <span class="card-stat">CTR 4.7%</span>
+              <span class="card-stat">ROAS 6.4×</span>
+              <span class="card-tag tag-ad">BOFU</span>
+            </div>
+          </div>
+        </div>
+        <!-- Ad Card 6 -->
+        <div class="content-card" onclick="toggleCard(this)" data-id="ad-6" data-topic="社會認同口碑廣告" data-source="Ad Intelligence" data-emoji="⭐">
+          <div class="card-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="card-source-badge">💡 Ad Intel</div>
+          <div class="card-img-placeholder" style="background: linear-gradient(135deg,#fddb92,#d1fdff)">⭐</div>
+          <div class="card-body">
+            <div class="card-topic">「10,000+ 好評」社會認同廣告 — 口碑轉換策略</div>
+            <div class="card-meta">
+              <span class="card-stat">CTR 5.2%</span>
+              <span class="card-stat">CVR 9.4%</span>
+              <span class="card-tag tag-ad">MOFU</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- SELECTION BAR -->
+<div class="selection-bar" id="selection-bar">
+  <div class="selection-info">
+    <div class="selection-count" id="sel-count">0</div>
+    <div class="selection-text">
+      items selected <span id="sel-sources"></span>
+    </div>
+  </div>
+  <div class="selection-actions">
+    <button class="btn-clear" onclick="clearSelection()">Clear All</button>
+    <button class="btn-create" onclick="openCreatePanel()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+      Create Content
+    </button>
+  </div>
+</div>
+
+<!-- MODAL OVERLAY -->
+<div class="modal-overlay" id="modal-overlay" onclick="closePanel()"></div>
+
+<!-- CREATE PANEL -->
+<div class="create-panel" id="create-panel">
+  <div class="panel-header">
+    <div>
+      <div class="panel-title">✨ Create Content</div>
+      <div class="panel-subtitle" id="panel-subtitle">Generating from 0 selected references</div>
+    </div>
+    <button class="panel-close" onclick="closePanel()">×</button>
+  </div>
+
+  <!-- MAIN FORM STATE -->
+  <div id="form-state" class="panel-body">
+    <!-- REFERENCES SIDEBAR -->
+    <div class="refs-sidebar">
+      <div class="refs-title">References</div>
+      <div id="refs-list"></div>
+    </div>
+
+    <!-- CREATION FORM -->
+    <div class="creation-form">
+      <!-- CONTENT TYPE -->
+      <div class="form-section">
+        <label class="form-label">Content Type</label>
+        <div class="content-type-grid">
+          <div class="type-card active" onclick="selectType(this, 'image')">
+            <div class="type-icon">🖼️</div>
+            <div class="type-name">Single Image</div>
+            <div class="type-desc">1 image + caption</div>
+          </div>
+          <div class="type-card" onclick="selectType(this, 'album')">
+            <div class="type-icon">📸</div>
+            <div class="type-name">Album</div>
+            <div class="type-desc">3–6 image carousel</div>
+          </div>
+          <div class="type-card" onclick="selectType(this, 'copy')">
+            <div class="type-icon">📝</div>
+            <div class="type-name">Copy Only</div>
+            <div class="type-desc">Text post / caption</div>
+          </div>
+          <div class="type-card" onclick="selectType(this, 'video')">
+            <div class="type-icon">🎬</div>
+            <div class="type-name">Video</div>
+            <div class="type-desc">Script + storyboard</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLATFORM -->
+      <div class="form-section">
+        <label class="form-label">Platform</label>
+        <div class="platform-row">
+          <button class="platform-btn active" onclick="togglePlatform(this)">
+            <svg class="platform-icon" viewBox="0 0 16 16" style="background:#1877F2;border-radius:4px;padding:2px" fill="white"><path d="M10.5 8.5H9V13H7V8.5H5.5V6.5H7V5.3C7 3.8 7.9 3 9.3 3L10.5 3.1V5H9.7C9.2 5 9 5.2 9 5.7V6.5H10.5L10.5 8.5Z"/></svg>
+            Facebook
+          </button>
+          <button class="platform-btn" onclick="togglePlatform(this)">
+            <svg class="platform-icon" viewBox="0 0 16 16" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);border-radius:4px;padding:2px" fill="white"><circle cx="8" cy="8" r="3"/><circle cx="11.5" cy="4.5" r="1" fill="white"/></svg>
+            Instagram
+          </button>
+          <button class="platform-btn" onclick="togglePlatform(this)">
+            <svg class="platform-icon" viewBox="0 0 16 16" style="background:#000;border-radius:4px;padding:2px" fill="white"><path d="M9 3h2.5l-5 10H4L9 3z"/></svg>
+            Threads
+          </button>
+          <button class="platform-btn" onclick="togglePlatform(this)">
+            <svg class="platform-icon" viewBox="0 0 16 16" style="background:#0A66C2;border-radius:4px;padding:2px" fill="white"><rect x="3" y="6" width="2.5" height="7"/><circle cx="4.25" cy="4" r="1.5"/><path d="M8.5 6v.8C9.1 6.3 9.8 6 10.5 6c1.7 0 2.5 1 2.5 2.8V13H10.5V9c0-.8-.3-1.2-1-1.2-.8 0-1 .5-1 1.2V13H6V6h2.5z"/></svg>
+            LinkedIn
+          </button>
+        </div>
+      </div>
+
+      <!-- TONE -->
+      <div class="form-section">
+        <label class="form-label">Tone & Style</label>
+        <div class="tone-row">
+          <button class="tone-btn active" onclick="toggleTone(this)">Informative</button>
+          <button class="tone-btn" onclick="toggleTone(this)">Conversational</button>
+          <button class="tone-btn" onclick="toggleTone(this)">Inspirational</button>
+          <button class="tone-btn" onclick="toggleTone(this)">Promotional</button>
+          <button class="tone-btn" onclick="toggleTone(this)">Humorous</button>
+        </div>
+      </div>
+
+      <!-- PROMPT -->
+      <div class="form-section">
+        <label class="form-label">Additional Instructions <span style="color:#CACACA;font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+        <textarea class="prompt-area" placeholder="e.g. Focus on the summer theme, use Traditional Chinese, mention our product launch next week..."></textarea>
+        <div class="ai-hint">
+          <span class="ai-hint-icon">🤖</span>
+          <div class="ai-hint-text">MediaLens AI will analyse your selected references to extract <strong>trending topics, winning hooks, and engagement patterns</strong> — then generate content that fits your brand voice.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADING STATE -->
+  <div class="gen-loading" id="gen-loading">
+    <div class="spinner-ring"></div>
+    <div class="gen-loading-text">Generating your content...</div>
+    <div class="gen-loading-sub">Analysing references and applying winning patterns</div>
+    <div class="gen-step" id="gen-step-text">Extracting trending topics from Buzz Spotting...</div>
+  </div>
+
+  <!-- RESULT STATE -->
+  <div class="gen-result" id="gen-result">
+    <div class="result-header">
+      <div class="result-title">✅ Content Generated</div>
+      <div class="result-actions">
+        <button class="btn-sm btn-sm-outline" onclick="backToForm()">← Edit Settings</button>
+        <button class="btn-sm btn-sm-outline" onclick="regenerate()">🔄 Regenerate</button>
+        <button class="btn-sm btn-sm-primary">Use This Content</button>
+      </div>
+    </div>
+    <div class="result-body" id="result-body">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <div class="panel-footer" id="panel-footer">
+    <div class="footer-note">Using <span id="footer-ref-count">0</span> references from <span id="footer-sources">—</span></div>
+    <button class="btn-generate" onclick="startGeneration()">
+      <span>✨</span>
+      Generate Content
+    </button>
+  </div>
+</div>
+
+<script>
+let selected = {};
+let currentSource = 'buzz';
+
+function switchSource(src) {
+  currentSource = src;
+  document.querySelectorAll('.source-tab').forEach((t,i) => {
+    t.classList.toggle('active', (i === 0 && src === 'buzz') || (i === 1 && src === 'ad'));
+  });
+  document.getElementById('buzz-grid').style.display = src === 'buzz' ? 'grid' : 'none';
+  document.getElementById('ad-grid').style.display = src === 'ad' ? 'grid' : 'none';
+  document.getElementById('buzz-filters').style.display = src === 'buzz' ? 'flex' : 'none';
+  document.getElementById('ad-filters').style.display = src === 'ad' ? 'flex' : 'none';
+}
+
+function toggleCard(card) {
+  const id = card.dataset.id;
+  if (selected[id]) {
+    delete selected[id];
+    card.classList.remove('selected');
+  } else {
+    selected[id] = { id, topic: card.dataset.topic, source: card.dataset.source, emoji: card.dataset.emoji };
+    card.classList.add('selected');
+  }
+  updateBar();
+}
+
+function updateBar() {
+  const count = Object.keys(selected).length;
+  const bar = document.getElementById('selection-bar');
+  bar.classList.toggle('visible', count > 0);
+  document.getElementById('sel-count').textContent = count;
+  const sources = [...new Set(Object.values(selected).map(s => s.source))];
+  document.getElementById('sel-sources').textContent = sources.length ? '— ' + sources.join(' + ') : '';
+}
+
+function clearSelection() {
+  selected = {};
+  document.querySelectorAll('.content-card').forEach(c => c.classList.remove('selected'));
+  updateBar();
+}
+
+function toggleFilter(btn) {
+  const siblings = btn.parentElement.querySelectorAll('.filter-chip');
+  if (btn.textContent === 'All') {
+    siblings.forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+  } else {
+    btn.classList.toggle('active');
+    btn.parentElement.querySelector('.filter-chip').classList.remove('active');
+  }
+}
+
+function openCreatePanel() {
+  const count = Object.keys(selected).length;
+  document.getElementById('panel-subtitle').textContent = `Generating from ${count} selected reference${count !== 1 ? 's' : ''}`;
+  document.getElementById('footer-ref-count').textContent = count;
+  const sources = [...new Set(Object.values(selected).map(s => s.source))];
+  document.getElementById('footer-sources').textContent = sources.join(' + ') || '—';
+
+  // Build refs list
+  const refsList = document.getElementById('refs-list');
+  refsList.innerHTML = '';
+  Object.values(selected).forEach(item => {
+    refsList.innerHTML += `
+      <div class="ref-item">
+        <div class="ref-img">${item.emoji}</div>
+        <div class="ref-info">
+          <span class="ref-remove" onclick="removeRef('${item.id}')">×</span>
+          <div class="ref-topic">${item.topic}</div>
+          <div class="ref-source">${item.source}</div>
+        </div>
+      </div>`;
+  });
+
+  // Show form state
+  showFormState();
+  document.getElementById('modal-overlay').classList.add('visible');
+  document.getElementById('create-panel').classList.add('visible');
+}
+
+function showFormState() {
+  document.getElementById('form-state').style.display = 'flex';
+  document.getElementById('gen-loading').classList.remove('visible');
+  document.getElementById('gen-result').classList.remove('visible');
+  document.getElementById('panel-footer').style.display = 'flex';
+}
+
+function closePanel() {
+  document.getElementById('modal-overlay').classList.remove('visible');
+  document.getElementById('create-panel').classList.remove('visible');
+}
+
+function removeRef(id) {
+  delete selected[id];
+  document.querySelectorAll('.content-card').forEach(c => {
+    if (c.dataset.id === id) c.classList.remove('selected');
+  });
+  updateBar();
+  if (Object.keys(selected).length === 0) closePanel();
+  else openCreatePanel();
+}
+
+function selectType(card, type) {
+  document.querySelectorAll('.type-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+}
+
+function togglePlatform(btn) {
+  document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function toggleTone(btn) {
+  document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function startGeneration() {
+  const refs = Object.values(selected);
+  const sources = [...new Set(refs.map(r => r.source))];
+
+  // Hide form, show loading
+  document.getElementById('form-state').style.display = 'none';
+  document.getElementById('panel-footer').style.display = 'none';
+  document.getElementById('gen-loading').classList.add('visible');
+
+  // Animate steps
+  const steps = [
+    'Extracting trending topics from references...',
+    'Identifying winning hooks and engagement patterns...',
+    'Analysing tone and audience signals...',
+    'Generating image composition...',
+    'Writing copy variants...',
+    'Finalising content...'
+  ];
+  let i = 0;
+  const stepEl = document.getElementById('gen-step-text');
+  const interval = setInterval(() => {
+    if (i < steps.length) { stepEl.textContent = steps[i++]; }
+    else clearInterval(interval);
+  }, 400);
+
+  setTimeout(() => {
+    clearInterval(interval);
+    showResult(refs, sources);
+  }, 2800);
+}
+
+function showResult(refs, sources) {
+  document.getElementById('gen-loading').classList.remove('visible');
+  document.getElementById('gen-result').classList.add('visible');
+
+  const activeType = document.querySelector('.type-card.active');
+  const typeName = activeType ? activeType.querySelector('.type-name').textContent : 'Single Image';
+  const activeTone = document.querySelector('.tone-btn.active');
+  const tone = activeTone ? activeTone.textContent : 'Informative';
+
+  // Build result content based on references
+  const topTopics = refs.slice(0, 2).map(r => r.topic).join('、');
+  const buzzRefs = refs.filter(r => r.source === 'Buzz Spotting');
+  const adRefs = refs.filter(r => r.source === 'Ad Intelligence');
+
+  let imgLabel = '', imgEmoji = '', imgGradient = '';
+  if (buzzRefs.length > 0) {
+    imgEmoji = buzzRefs[0].emoji; imgLabel = buzzRefs[0].topic.slice(0, 14) + '...';
+    imgGradient = 'linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%)';
+  } else {
+    imgEmoji = adRefs[0].emoji; imgLabel = adRefs[0].topic.slice(0, 14) + '...';
+    imgGradient = 'linear-gradient(135deg,#f7971e 0%,#ffd200 100%)';
+  }
+
+  const copyData = getCopyVariants(refs, tone);
+  const sourceTags = [
+    ...buzzRefs.map(() => `<span class="copy-source-tag buzz">🔥 Buzz Spotting</span>`),
+    ...adRefs.map(() => `<span class="copy-source-tag ad">💡 Ad Intelligence</span>`)
+  ].filter((v, i, a) => a.indexOf(v) === i).join('');
+
+  document.getElementById('result-body').innerHTML = `
+    <div class="result-image-col">
+      <div class="result-image" style="background:${imgGradient}">
+        <div class="result-image-overlay"></div>
+        <div class="result-image-emoji" style="position:relative;z-index:1">${imgEmoji}</div>
+        <div class="result-image-label" style="position:relative;z-index:1">${imgLabel}</div>
+        <div class="result-image-caption">AI Generated · MediaLens</div>
+      </div>
+      <div class="result-image-actions">
+        <button class="btn-sm btn-sm-outline" style="flex:1">Download</button>
+        <button class="btn-sm btn-sm-outline" style="flex:1">🔄 New Image</button>
+      </div>
+      <div style="margin-top:12px;padding:10px;background:#F6F8FD;border-radius:8px">
+        <div style="font-size:10px;font-weight:700;color:#23A9F6;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px">AI Insights Used</div>
+        <div style="font-size:11px;color:#707070;line-height:1.6">
+          ${buzzRefs.length ? `<div>🔥 ${buzzRefs.length} Buzz topic${buzzRefs.length > 1 ? 's' : ''}</div>` : ''}
+          ${adRefs.length ? `<div>💡 ${adRefs.length} Ad pattern${adRefs.length > 1 ? 's' : ''}</div>` : ''}
+          <div>✅ Trending Hook applied</div>
+          <div>✅ Platform-optimised format</div>
+        </div>
+      </div>
+    </div>
+    <div class="result-copy-col">
+      <div style="font-size:12px;font-weight:600;color:#707070;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.6px">Copy Variants (pick one)</div>
+      <div class="copy-variants">
+        ${copyData.map((c, i) => `
+          <div class="copy-variant ${i === 0 ? 'active' : ''}" onclick="selectCopy(this)">
+            <div class="copy-variant-num">Variant ${i + 1}</div>
+            <div class="copy-variant-text">${c.text}</div>
+            <div class="copy-hashtags">${c.tags}</div>
+            <div class="copy-source">${sourceTags}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function getCopyVariants(refs, tone) {
+  const buzzTopics = refs.filter(r => r.source === 'Buzz Spotting').map(r => r.topic);
+  const adTopics = refs.filter(r => r.source === 'Ad Intelligence').map(r => r.topic);
+  const hasBuzz = buzzTopics.length > 0;
+  const hasAd = adTopics.length > 0;
+
+  const variants = [
+    {
+      text: hasBuzz
+        ? `最近熱話 ${buzzTopics[0] ? buzzTopics[0].slice(0, 12) : '打卡熱潮'} 席捲全城！你跟上了嗎？🔥 我們為你整理了最實用的攻略，一文睇清所有你需要知道的資訊。立即收藏！`
+        : `你是否有過這樣的煩惱？我們的解決方案已幫助超過 10,000 位用戶改善了他們的生活。今天就開始你的旅程 →`,
+      tags: '#熱話 #打卡 #攻略 #必睇'
+    },
+    {
+      text: hasAd
+        ? `「${adTopics[0] ? adTopics[0].slice(0, 15) : '限時優惠'}」⏰ 限時優惠倒計時開始！錯過今次，下次不知幾時先有。馬上行動，把握機會 — 名額有限，先到先得！`
+        : `${buzzTopics[0] ? buzzTopics[0].slice(0, 10) : '潮流話題'} 背後的秘密原來是這個 👇 3 個你從未聽過的方法，讓你在同行中脫穎而出。`,
+      tags: '#限時優惠 #立即行動 #名額有限'
+    },
+    {
+      text: `想了解更多關於${hasBuzz ? buzzTopics[0] ? buzzTopics[0].slice(0, 8) : '最新話題' : '行業趨勢'}的資訊？💡 我們的專業團隊為你深度分析，讓你做出最明智的選擇。DM 我們獲取免費顧問服務！`,
+      tags: '#專業分析 #免費顧問 #了解更多'
+    }
+  ];
+  return variants;
+}
+
+function selectCopy(el) {
+  document.querySelectorAll('.copy-variant').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function backToForm() {
+  document.getElementById('gen-result').classList.remove('visible');
+  document.getElementById('form-state').style.display = 'flex';
+  document.getElementById('panel-footer').style.display = 'flex';
+}
+
+function regenerate() {
+  document.getElementById('gen-result').classList.remove('visible');
+  startGeneration();
+}
+</script>
+</body>
+</html>
