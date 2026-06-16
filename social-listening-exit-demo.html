@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MediaLens — Free User Exit Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Poppins',sans-serif;background:#F7F7F7;color:#102532;font-size:14px;-webkit-font-smoothing:antialiased}
+
+/* HEADER */
+.hd{position:fixed;top:0;left:0;right:0;height:72px;background:#fff;border-bottom:1px solid #E8EEF0;display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:300;}
+.hd-left{display:flex;align-items:center;gap:20px;}
+.logo-mark{display:flex;align-items:center;gap:8px;}
+.logo-icon{width:32px;height:32px;border-radius:8px;background:#23A9F6;display:flex;align-items:center;justify-content:center;}
+.logo-text{font-size:16px;font-weight:600;color:#0A1F2C;letter-spacing:-.3px;}
+.logo-text span{color:#23A9F6;}
+.hd-right{display:flex;align-items:center;gap:20px;}
+.quota{display:flex;flex-direction:column;gap:3px;}
+.quota-label{font-size:12px;color:#102532;}
+.quota-bar{width:120px;height:5px;background:#E9F6FE;border-radius:100px;overflow:hidden;}
+.quota-fill{width:40%;height:100%;background:#23A9F6;border-radius:100px;}
+.profile{display:flex;align-items:center;gap:8px;cursor:pointer;}
+.avatar{width:36px;height:36px;border-radius:50%;background:#EEF6FF;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#23A9F6;}
+.pname{font-size:13px;font-weight:500;color:#0A1F2C;}
+
+/* SIDEBAR */
+.sb{position:fixed;top:72px;left:0;bottom:0;width:84px;background:#fff;border-right:1px solid #E8EEF0;display:flex;flex-direction:column;align-items:center;padding:8px 0;z-index:200;}
+.nb{width:84px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;position:relative;flex-shrink:0;}
+.nb::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent;border-radius:0 2px 2px 0;}
+.nb.on::before{background:#23A9F6;}
+.nb svg{opacity:.38;transition:opacity .15s;color:#0A1F2C;}
+.nb.on svg{opacity:1;color:#23A9F6;}
+.nb:hover svg{opacity:.65;}
+.nb-label{font-size:10px;color:#707070;}
+.nb.on .nb-label{color:#23A9F6;font-weight:500;}
+.sb-div{width:44px;height:1px;background:#E8EEF0;margin:4px 0;}
+
+/* MAIN */
+.main{margin-left:84px;margin-top:72px;padding:24px;min-height:calc(100vh - 72px);}
+.sc{display:none;}
+.sc.active{display:block;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:8px;padding:7px 18px;border:none;cursor:pointer;font-family:'Poppins',sans-serif;font-size:14px;font-weight:500;line-height:22px;transition:opacity .15s;white-space:nowrap;}
+.btn:hover{opacity:.86;}
+.btn-primary{background:#23A9F6;color:#fff;font-weight:600;border:1px solid #23A9F6;}
+.btn-ghost{background:#fff;color:#707070;border:1px solid #D9E3E6;}
+.btn-lg{padding:10px 28px;font-size:15px;}
+
+/* PAGE CARD */
+.page-card{background:#fff;border-radius:12px;overflow:hidden;}
+.page-hdr{display:flex;align-items:center;justify-content:space-between;padding:22px 32px;border-bottom:1px solid #E8EEF0;}
+.page-title{font-size:22px;font-weight:600;color:#0A1F2C;}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid #E8EEF0;padding:0 32px;}
+.tab{padding:10px 20px;font-size:14px;font-weight:500;color:#707070;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;}
+.tab.on{color:#23A9F6;border-bottom-color:#23A9F6;font-weight:600;}
+
+/* DEMO BANNER */
+.demo-banner{background:#FFF8EB;border-bottom:1px solid #F0D060;padding:10px 32px;display:flex;align-items:center;justify-content:space-between;}
+.demo-banner-left{display:flex;align-items:center;gap:8px;font-size:13px;color:#102532;}
+.demo-dot{width:8px;height:8px;border-radius:50%;background:#FFC960;flex-shrink:0;animation:blink 1.5s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.35;}}
+
+/* CONTENT ZONE */
+.content-zone{position:relative;min-height:500px;}
+.task-content{padding:24px 32px;min-height:500px;}
+.task-content.blurred{filter:blur(2.5px);opacity:0.28;pointer-events:none;user-select:none;}
+
+/* FILTERS */
+.filters{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+.search-wrap{position:relative;max-width:240px;flex:1;}
+.search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;}
+.search-input{width:100%;height:40px;border:1px solid #D9E3E6;border-radius:8px;padding:0 12px 0 36px;font-size:14px;font-family:'Poppins',sans-serif;color:#102532;background:#fff;outline:none;}
+.search-input::placeholder{color:#BDBDBD;}
+.filter-btn{display:inline-flex;align-items:center;gap:5px;height:40px;border:1px solid #D9E3E6;border-radius:8px;padding:0 14px;font-size:13px;font-family:'Poppins',sans-serif;color:#707070;background:#fff;cursor:pointer;}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;}
+thead th{text-align:left;font-size:12px;font-weight:500;color:#828282;padding:10px 16px;border-bottom:1px solid #E8EEF0;white-space:nowrap;}
+tbody tr{border-bottom:1px solid #E8EEF0;}
+tbody tr:last-child{border-bottom:none;}
+td{padding:12px 16px;font-size:14px;color:#102532;vertical-align:middle;}
+
+/* PLATFORM ICONS */
+.pis{display:flex;gap:4px;}
+.pi{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.pi-fb{background:#1877F2;}
+.pi-ig{background:linear-gradient(135deg,#F58529,#DD2A7B,#8134AF);}
+.pi-yt{background:#FF0000;}
+.pi-li{background:#0A66C2;}
+
+/* BADGES */
+.bdg{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:28px;font-size:12px;font-weight:500;}
+.bdg-on{background:#E6FBEB;color:#52C41A;}
+.bdg-off{background:#FFF8EB;color:#FFC960;}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.dot-on{background:#52C41A;}
+.dot-off{background:#FFC960;}
+.kwtag{display:inline-flex;padding:2px 10px;border-radius:20px;font-size:12px;background:#EEF6FF;color:#23A9F6;}
+
+/* LEADERBOARD SPECIFIC */
+.rank-cell{text-align:center;min-width:36px;}
+.rank-num{font-size:15px;font-weight:600;color:#0A1F2C;}
+.rank-1{color:#F5A623;}
+.rank-2{color:#9B9B9B;}
+.rank-3{color:#C57E40;}
+.acct-cell{display:flex;align-items:center;gap:10px;}
+.acct-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;border:2px solid #E8EEF0;}
+.acct-name{font-size:14px;font-weight:500;color:#0A1F2C;line-height:20px;}
+.acct-handle{font-size:12px;color:#828282;}
+.pi-single{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cat-pill{display:inline-flex;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:500;}
+.cat-brand{background:#EEF6FF;color:#23A9F6;}
+.cat-kol{background:#F3EDFF;color:#7B5CF5;}
+.cat-media{background:#FFF0EB;color:#E8640C;}
+.num-col{font-size:13px;font-weight:500;color:#0A1F2C;}
+.er-col{font-size:13px;font-weight:600;}
+.er-high{color:#52C41A;}
+.er-mid{color:#23A9F6;}
+.er-low{color:#707070;}
+.chg{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:500;}
+.chg-up{color:#52C41A;}
+.chg-dn{color:#FF3F41;}
+.chg-nc{color:#BDBDBD;}
+
+/* LANDING OVERLAY */
+.landing-ov{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.97);z-index:10;padding:36px 44px;display:flex;flex-direction:column;}
+.landing-row{display:flex;gap:36px;align-items:center;flex:1;}
+.landing-left{flex:1;display:flex;flex-direction:column;gap:24px;min-width:0;}
+.landing-right{width:296px;flex-shrink:0;}
+
+/* Feature cards */
+.feat-cards{display:flex;gap:14px;}
+.feat-card{flex:1;border:1px solid #E8EEF0;border-radius:12px;padding:18px 16px;display:flex;flex-direction:column;gap:10px;background:#FAFCFF;transition:border-color .15s,box-shadow .15s;min-width:0;}
+.feat-card:hover{border-color:#23A9F6;box-shadow:0 2px 14px rgba(35,169,246,.1);}
+.feat-icon{width:40px;height:40px;border-radius:10px;background:#EEF6FF;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.feat-name{font-size:14px;font-weight:600;color:#0A1F2C;line-height:20px;}
+.feat-desc{font-size:12px;color:#707070;line-height:18px;}
+.cta-row{display:flex;align-items:center;gap:12px;}
+
+/* Business illustration */
+.illus-wrap{width:100%;border-radius:16px;overflow:hidden;line-height:0;}
+.illus-wrap svg{width:100%;height:auto;display:block;}
+
+/* TOAST */
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(14px);background:#0A1F2C;color:#fff;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:500;opacity:0;transition:all .28s;z-index:900;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hd">
+  <div class="hd-left">
+    <div class="logo-mark">
+      <div class="logo-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="#fff" stroke-width="2"/><path d="M5 9h8M9 5v8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <span class="logo-text">Media<span>Lens</span></span>
+    </div>
+  </div>
+  <div class="hd-right">
+    <div class="quota">
+      <span class="quota-label">2 / 5 Tasks Used</span>
+      <div class="quota-bar"><div class="quota-fill"></div></div>
+    </div>
+    <div class="profile">
+      <div class="avatar">JL</div>
+      <span class="pname">Julie Li</span>
+    </div>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<aside class="sb">
+  <div class="nb" title="Home" onclick="switchPage(null)">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="11" y="2" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="2" y="11" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="11" y="11" width="7" height="7" rx="1.5" fill="currentColor"/></svg>
+    <span class="nb-label">Home</span>
+  </div>
+  <div class="sb-div"></div>
+  <div class="nb on" id="nb-sl" title="Social Listening" onclick="switchPage('sl')">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 3c-3.3 0-6 2.5-6 5.5 0 2.3 1.4 4.3 3.5 5.2L6 17h8l-1.5-3.3C14.6 12.8 16 10.8 16 8.5 16 5.5 13.3 3 10 3z" stroke="#23A9F6" stroke-width="1.6" fill="none" stroke-linejoin="round"/><circle cx="10" cy="8.5" r="2" fill="#23A9F6"/></svg>
+    <span class="nb-label">Listening</span>
+  </div>
+  <div class="nb" title="Social Pulses">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><polyline points="2,13 5,9 8,13 11,5 14,10 17,7" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="nb-label">Pulses</span>
+  </div>
+  <div class="nb" id="nb-lb" title="Leaderboard" onclick="switchPage('lb')">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="7" y="8" width="6" height="9" rx="1" stroke="currentColor" stroke-width="1.6"/><rect x="2" y="11" width="5" height="6" rx="1" stroke="currentColor" stroke-width="1.6"/><rect x="13" y="6" width="5" height="11" rx="1" stroke="currentColor" stroke-width="1.6"/><path d="M10 2v2M9 4h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    <span class="nb-label">Leaderboard</span>
+  </div>
+  <div class="nb" title="AI Agent">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="6" width="14" height="10" rx="3" stroke="currentColor" stroke-width="1.6"/><path d="M7 6V5a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="11" r="1.2" fill="currentColor"/><circle cx="12" cy="11" r="1.2" fill="currentColor"/></svg>
+    <span class="nb-label">AI Agent</span>
+  </div>
+  <div class="sb-div"></div>
+  <div class="nb" title="Settings">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.1 4.1l1.4 1.4M14.5 14.5l1.4 1.4M4.1 15.9l1.4-1.4M14.5 5.5l1.4-1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <span class="nb-label">Settings</span>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- ══════════ SOCIAL LISTENING ══════════ -->
+  <div class="sc active" id="sc-sl">
+    <div class="page-card">
+      <div class="page-hdr">
+        <div class="page-title">Social Listening</div>
+      </div>
+      <div class="tabs">
+        <div class="tab on">All Tasks</div>
+        <div class="tab">Active</div>
+        <div class="tab">Paused</div>
+        <div class="tab">Draft</div>
+      </div>
+      <div id="sl-banner" class="demo-banner" style="display:none">
+        <div class="demo-banner-left"><div class="demo-dot"></div><span><strong>Demo Mode</strong> — You're exploring sample data, not your real account.</span></div>
+        <button class="btn btn-ghost" style="font-size:13px;padding:6px 16px;" onclick="exitDemoSL()">Exit Demo</button>
+      </div>
+      <div class="content-zone">
+        <!-- Blurred background task list -->
+        <div class="task-content blurred" id="sl-content">
+          <div class="filters">
+            <div class="search-wrap">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:#CACACA"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.4"/><path d="M9 9l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              <input class="search-input" type="text" placeholder="Search tasks…">
+            </div>
+            <button class="filter-btn">Filter</button>
+            <button class="filter-btn">Platform</button>
+            <button class="filter-btn">Date Range</button>
+            <button class="btn btn-primary" style="margin-left:auto;font-size:13px;padding:7px 16px;">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+              Create Task
+            </button>
+          </div>
+          <table>
+            <thead><tr>
+              <th style="width:22px"><input type="checkbox"></th>
+              <th>Task Name</th><th>Platforms</th><th>Keywords</th>
+              <th>Email Recipients</th><th>Status</th><th>Created</th><th></th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td><div style="font-weight:500;color:#0A1F2C">Brand Sentiment Tracking</div><div style="font-size:12px;color:#828282;margin-top:2px">Weekly brand health check</div></td>
+                <td><div class="pis">
+                  <div class="pi pi-fb"><svg width="12" height="12" viewBox="0 0 12 12" fill="white"><path d="M7.5 2H6.5C5.67 2 5 2.67 5 3.5V5H4v1.5h1V10h1.5V6.5h1L8 5H6.5V3.5c0-.28.22-.5.5-.5H7.5V2z"/></svg></div>
+                  <div class="pi pi-ig"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="2" y="2" width="8" height="8" rx="2.5" stroke="white" stroke-width="1.2"/><circle cx="6" cy="6" r="1.8" stroke="white" stroke-width="1.2"/><circle cx="8.5" cy="3.5" r=".7" fill="white"/></svg></div>
+                </div></td>
+                <td><div style="display:flex;flex-wrap:wrap;gap:4px"><span class="kwtag">MediaLens</span><span class="kwtag">brand</span><span style="font-size:12px;color:#828282">+2</span></div></td>
+                <td><div style="font-size:12px;color:#707070">marketing@co.com<br>ceo@co.com</div></td>
+                <td><div class="bdg bdg-on"><div class="dot dot-on"></div>Active</div></td>
+                <td><div style="font-size:12px;color:#828282">May 1, 2026</div></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td><div style="font-weight:500;color:#0A1F2C">Competitor Analysis</div><div style="font-size:12px;color:#828282;margin-top:2px">Monitor competitor mentions</div></td>
+                <td><div class="pis">
+                  <div class="pi pi-yt"><svg width="12" height="12" viewBox="0 0 12 12" fill="white"><path d="M10 6L4.5 9.2V2.8L10 6z"/></svg></div>
+                  <div class="pi pi-li"><svg width="12" height="12" viewBox="0 0 12 12" fill="white"><rect x="2" y="5" width="2" height="5"/><circle cx="3" cy="3.5" r="1"/><path d="M6 5v5M6 7c0-1.1.9-2 2-2s2 .9 2 2v3" stroke="white" stroke-width="1" fill="none"/></svg></div>
+                </div></td>
+                <td><div style="display:flex;gap:4px"><span class="kwtag">competitor</span><span class="kwtag">market</span></div></td>
+                <td><div style="font-size:12px;color:#707070">analyst@co.com</div></td>
+                <td><div class="bdg bdg-off"><div class="dot dot-off"></div>Paused</div></td>
+                <td><div style="font-size:12px;color:#828282">Apr 22, 2026</div></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td><div style="font-weight:500;color:#0A1F2C">Crisis Alert Monitor</div><div style="font-size:12px;color:#828282;margin-top:2px">PR emergency detection</div></td>
+                <td><div class="pis">
+                  <div class="pi pi-fb"><svg width="12" height="12" viewBox="0 0 12 12" fill="white"><path d="M7.5 2H6.5C5.67 2 5 2.67 5 3.5V5H4v1.5h1V10h1.5V6.5h1L8 5H6.5V3.5c0-.28.22-.5.5-.5H7.5V2z"/></svg></div>
+                  <div class="pi pi-ig"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="2" y="2" width="8" height="8" rx="2.5" stroke="white" stroke-width="1.2"/><circle cx="6" cy="6" r="1.8" stroke="white" stroke-width="1.2"/><circle cx="8.5" cy="3.5" r=".7" fill="white"/></svg></div>
+                </div></td>
+                <td><div style="display:flex;flex-wrap:wrap;gap:4px"><span class="kwtag">PR</span><span class="kwtag">crisis</span><span style="font-size:12px;color:#828282">+3</span></div></td>
+                <td><div style="font-size:12px;color:#707070">pr@co.com</div></td>
+                <td><div class="bdg bdg-on"><div class="dot dot-on"></div>Active</div></td>
+                <td><div style="font-size:12px;color:#828282">Mar 15, 2026</div></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Landing overlay -->
+        <div class="landing-ov" id="sl-ov">
+          <div class="landing-row">
+            <div class="landing-left">
+              <div>
+                <h2 style="font-size:26px;font-weight:600;color:#0A1F2C;line-height:34px;margin-bottom:10px;">Experience Social Listening</h2>
+                <p style="font-size:14px;color:#707070;line-height:22px;max-width:460px;">Track brand mentions, keywords, and competitor conversations across every major platform — all in one place. Upgrade to start monitoring in real time.</p>
+              </div>
+              <div class="feat-cards">
+                <div class="feat-card">
+                  <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="#23A9F6" stroke-width="1.6"/><circle cx="10" cy="10" r="4" stroke="#23A9F6" stroke-width="1.4"/><circle cx="10" cy="10" r="1.2" fill="#23A9F6"/><path d="M10 2.5V1M18 10h1.5M10 17.5V19M1 10h1.5" stroke="#23A9F6" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+                  <div class="feat-name">Brand Mention Monitoring</div>
+                  <div class="feat-desc">Track every mention of your brand across Facebook, Instagram, YouTube, and more in real time</div>
+                </div>
+                <div class="feat-card">
+                  <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 3a5 5 0 015 5c0 4-2 6-5 6s-5-2-5-6a5 5 0 015-5z" stroke="#23A9F6" stroke-width="1.6" fill="none"/><path d="M10 14v2M8 17h4" stroke="#23A9F6" stroke-width="1.6" stroke-linecap="round"/><circle cx="14.5" cy="4" r="2.5" fill="#FF3F41"/><path d="M14.5 2.8v1.5M14.5 5v.3" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+                  <div class="feat-name">Real-time Keyword Alerts</div>
+                  <div class="feat-desc">Get email notifications the moment keyword volume spikes — never miss a critical conversation</div>
+                </div>
+                <div class="feat-card">
+                  <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><polyline points="2,15 6,10 9,13 13,6 18,9" stroke="#23A9F6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="18" cy="9" r="1.5" fill="#23A9F6"/><path d="M2 17h16" stroke="#23A9F6" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+                  <div class="feat-name">Cross-platform Analysis</div>
+                  <div class="feat-desc">Compare sentiment, reach, and engagement trends across all platforms in a unified dashboard</div>
+                </div>
+              </div>
+              <div class="cta-row">
+                <button class="btn btn-ghost" onclick="enterDemoSL()">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2.5L4.5 7 9 11.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Back to Demo
+                </button>
+                <button class="btn btn-primary btn-lg" onclick="clickUpgrade()">
+                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1l2 4.5 4.5 1-3.2 3.2.8 4.8-4.1-2.3-4.1 2.3.8-4.8L1 6.5l4.5-1z" fill="#fff"/></svg>
+                  Upgrade Plan
+                </button>
+              </div>
+            </div>
+            <!-- Business illustration -->
+            <div class="landing-right">
+              <div class="illus-wrap">
+                <svg viewBox="0 0 296 340" xmlns="http://www.w3.org/2000/svg" fill="none">
+                  <!-- Background -->
+                  <rect width="296" height="340" rx="16" fill="#EEF6FF"/>
+                  <!-- Bg circles -->
+                  <circle cx="268" cy="36" r="80" fill="#D4E8F8" opacity=".45"/>
+                  <circle cx="28" cy="312" r="90" fill="#D4E8F8" opacity=".35"/>
+                  <!-- Desk -->
+                  <rect x="18" y="234" width="260" height="10" rx="5" fill="#BFD4E6"/>
+                  <rect x="38" y="244" width="9" height="58" rx="4" fill="#BFD4E6"/>
+                  <rect x="249" y="244" width="9" height="58" rx="4" fill="#BFD4E6"/>
+                  <!-- Laptop base -->
+                  <rect x="84" y="222" width="128" height="14" rx="7" fill="#2B4870"/>
+                  <!-- Laptop screen body -->
+                  <rect x="90" y="134" width="116" height="90" rx="9" fill="#1E3A5F"/>
+                  <!-- Screen surface -->
+                  <rect x="99" y="143" width="98" height="72" rx="5" fill="#F0F6FF"/>
+                  <!-- Chart heading lines -->
+                  <rect x="104" y="149" width="52" height="7" rx="3" fill="#C8DFF0"/>
+                  <rect x="160" y="149" width="28" height="7" rx="3" fill="#C8DFF0" opacity=".6"/>
+                  <!-- Bar chart -->
+                  <rect x="106" y="202" width="10" height="11" rx="2" fill="#23A9F6" opacity=".65"/>
+                  <rect x="120" y="191" width="10" height="22" rx="2" fill="#23A9F6" opacity=".85"/>
+                  <rect x="134" y="196" width="10" height="17" rx="2" fill="#23A9F6" opacity=".75"/>
+                  <rect x="148" y="184" width="10" height="29" rx="2" fill="#52C41A"/>
+                  <rect x="162" y="193" width="10" height="20" rx="2" fill="#23A9F6" opacity=".8"/>
+                  <rect x="176" y="187" width="10" height="26" rx="2" fill="#FFC960" opacity=".85"/>
+                  <!-- Trend line -->
+                  <polyline points="111,199 125,188 139,193 153,181 167,190 181,184" stroke="#0A3060" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".2" fill="none"/>
+                  <!-- Person 1: seated left -->
+                  <!-- Shadow/seat hint -->
+                  <ellipse cx="56" cy="232" rx="22" ry="5" fill="#BAD2E6" opacity=".5"/>
+                  <!-- Body -->
+                  <path d="M37 202 Q56 193 75 202 L79 234 H33Z" fill="#23A9F6"/>
+                  <!-- Neck -->
+                  <rect x="52" y="192" width="8" height="12" rx="3" fill="#FDDCB5"/>
+                  <!-- Head -->
+                  <circle cx="56" cy="177" r="16" fill="#FDDCB5"/>
+                  <!-- Hair -->
+                  <path d="M41 174 Q56 155 71 174 Q71 167 56 158 Q41 167 41 174Z" fill="#4A3325"/>
+                  <!-- Left arm relaxed -->
+                  <path d="M37 210 Q25 220 30 235" stroke="#FDDCB5" stroke-width="10" stroke-linecap="round" fill="none"/>
+                  <!-- Right arm to keyboard -->
+                  <path d="M75 210 Q88 220 99 227" stroke="#FDDCB5" stroke-width="10" stroke-linecap="round" fill="none"/>
+                  <!-- Person 2: standing right -->
+                  <!-- Body -->
+                  <path d="M222 183 Q240 174 258 183 L262 222 H218Z" fill="#7B5CF5"/>
+                  <!-- Neck -->
+                  <rect x="236" y="173" width="8" height="12" rx="3" fill="#FDDCB5"/>
+                  <!-- Head -->
+                  <circle cx="240" cy="160" r="15" fill="#FDDCB5"/>
+                  <!-- Hair -->
+                  <path d="M226 156 Q240 139 254 156 Q254 164 248 169 Q244 157 240 156 Q236 157 232 169 Q226 164 226 156Z" fill="#1A1210"/>
+                  <!-- Left arm pointing at screen -->
+                  <path d="M222 191 Q200 194 188 202" stroke="#FDDCB5" stroke-width="9" stroke-linecap="round" fill="none"/>
+                  <!-- Right arm down -->
+                  <path d="M258 191 Q266 205 263 222" stroke="#FDDCB5" stroke-width="9" stroke-linecap="round" fill="none"/>
+                  <!-- Floating card 1 (top right) — shadow then card -->
+                  <rect x="174" y="53" width="102" height="50" rx="10" fill="#C8DCF0" opacity=".4"/>
+                  <rect x="172" y="50" width="102" height="50" rx="10" fill="white" stroke="#E0EAF4" stroke-width="1"/>
+                  <text x="183" y="71" font-family="Poppins,sans-serif" font-size="9.5" fill="#828282">Total Mentions</text>
+                  <text x="183" y="90" font-family="Poppins,sans-serif" font-size="16" font-weight="600" fill="#0A1F2C">4,821</text>
+                  <text x="222" y="90" font-family="Poppins,sans-serif" font-size="11" fill="#52C41A">↑ 23%</text>
+                  <!-- Floating card 2 (left mid) — shadow then card -->
+                  <rect x="7" y="106" width="78" height="46" rx="10" fill="#C8DCF0" opacity=".4"/>
+                  <rect x="5" y="103" width="78" height="46" rx="10" fill="white" stroke="#E0EAF4" stroke-width="1"/>
+                  <text x="16" y="122" font-family="Poppins,sans-serif" font-size="9.5" fill="#828282">Eng. Rate</text>
+                  <text x="16" y="140" font-family="Poppins,sans-serif" font-size="16" font-weight="600" fill="#23A9F6">4.8%</text>
+                  <!-- Decorative dots -->
+                  <circle cx="170" cy="104" r="5" fill="#23A9F6" opacity=".25"/>
+                  <circle cx="181" cy="91" r="3.5" fill="#23A9F6" opacity=".18"/>
+                  <circle cx="160" cy="91" r="4" fill="#FFC960" opacity=".4"/>
+                  <circle cx="22" cy="65" r="6" fill="#23A9F6" opacity=".18"/>
+                  <circle cx="37" cy="53" r="4" fill="#52C41A" opacity=".3"/>
+                  <circle cx="250" cy="260" r="5" fill="#7B5CF5" opacity=".2"/>
+                  <circle cx="40" cy="270" r="4" fill="#23A9F6" opacity=".15"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /sc-sl -->
+
+
+  <!-- ══════════ LEADERBOARD ══════════ -->
+  <div class="sc" id="sc-lb">
+    <div class="page-card">
+      <div class="page-hdr">
+        <div class="page-title">Leaderboard</div>
+      </div>
+      <div class="tabs">
+        <div class="tab on">All Platforms</div>
+        <div class="tab">Instagram</div>
+        <div class="tab">Facebook</div>
+        <div class="tab">YouTube</div>
+      </div>
+      <div id="lb-banner" class="demo-banner" style="display:none">
+        <div class="demo-banner-left"><div class="demo-dot"></div><span><strong>Demo Mode</strong> — You're exploring sample data, not your real account.</span></div>
+        <button class="btn btn-ghost" style="font-size:13px;padding:6px 16px;" onclick="exitDemoLB()">Exit Demo</button>
+      </div>
+      <div class="content-zone">
+        <!-- Blurred leaderboard table -->
+        <div class="task-content blurred" id="lb-content">
+          <div class="filters">
+            <div class="search-wrap">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:#CACACA"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.4"/><path d="M9 9l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              <input class="search-input" type="text" placeholder="Search accounts…">
+            </div>
+            <button class="filter-btn">Category</button>
+            <button class="filter-btn">Sort by: Followers</button>
+            <div style="margin-left:auto;font-size:12px;color:#828282;display:flex;align-items:center;gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="#CACACA" stroke-width="1.4"/><path d="M7 4v3l2 2" stroke="#CACACA" stroke-width="1.4" stroke-linecap="round"/></svg>
+              Updated: Jun 16, 2026
+            </div>
+          </div>
+          <table>
+            <thead><tr>
+              <th style="width:40px;text-align:center">Rank</th>
+              <th>Account</th><th>Platform</th><th>Category</th>
+              <th style="text-align:right">Followers</th>
+              <th style="text-align:right">Eng. Rate</th>
+              <th style="text-align:right">Posts (30d)</th>
+              <th style="text-align:right">Avg. Likes</th>
+              <th style="text-align:center">Change</th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td><div class="rank-cell"><span class="rank-num rank-1">1</span></div></td>
+                <td><div class="acct-cell"><div class="acct-av" style="background:#FEF3D0;color:#C68A00;border-color:#FAE08A;">HK</div><div><div class="acct-name">HK Tourism Board</div><div class="acct-handle">@discoverhongkong</div></div></div></td>
+                <td><div class="pi-single pi-ig"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="10" height="10" rx="3" stroke="white" stroke-width="1.4"/><circle cx="7" cy="7" r="2.5" stroke="white" stroke-width="1.3"/><circle cx="9.8" cy="4.2" r=".9" fill="white"/></svg></div></td>
+                <td><span class="cat-pill cat-brand">Brand</span></td>
+                <td class="num-col" style="text-align:right">1.24M</td>
+                <td class="er-col er-high" style="text-align:right">4.8%</td>
+                <td class="num-col" style="text-align:right">28</td>
+                <td class="num-col" style="text-align:right">12,480</td>
+                <td style="text-align:center"><span class="chg chg-up">▲ 2</span></td>
+              </tr>
+              <tr>
+                <td><div class="rank-cell"><span class="rank-num rank-2">2</span></div></td>
+                <td><div class="acct-cell"><div class="acct-av" style="background:#E8F0FE;color:#1A56DB;border-color:#C0D4FA;">CP</div><div><div class="acct-name">Cathay Pacific</div><div class="acct-handle">@cathaypacific</div></div></div></td>
+                <td><div class="pi-single pi-ig"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="10" height="10" rx="3" stroke="white" stroke-width="1.4"/><circle cx="7" cy="7" r="2.5" stroke="white" stroke-width="1.3"/><circle cx="9.8" cy="4.2" r=".9" fill="white"/></svg></div></td>
+                <td><span class="cat-pill cat-brand">Brand</span></td>
+                <td class="num-col" style="text-align:right">982K</td>
+                <td class="er-col er-mid" style="text-align:right">3.2%</td>
+                <td class="num-col" style="text-align:right">45</td>
+                <td class="num-col" style="text-align:right">7,640</td>
+                <td style="text-align:center"><span class="chg chg-nc">— 0</span></td>
+              </tr>
+              <tr>
+                <td><div class="rank-cell"><span class="rank-num rank-3">3</span></div></td>
+                <td><div class="acct-cell"><div class="acct-av" style="background:#FFF0F0;color:#CC3300;border-color:#FFBCB2;">LC</div><div><div class="acct-name">Lane Crawford</div><div class="acct-handle">@lanecrawford</div></div></div></td>
+                <td><div class="pi-single pi-ig"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="10" height="10" rx="3" stroke="white" stroke-width="1.4"/><circle cx="7" cy="7" r="2.5" stroke="white" stroke-width="1.3"/><circle cx="9.8" cy="4.2" r=".9" fill="white"/></svg></div></td>
+                <td><span class="cat-pill cat-brand">Brand</span></td>
+                <td class="num-col" style="text-align:right">421K</td>
+                <td class="er-col er-high" style="text-align:right">5.1%</td>
+                <td class="num-col" style="text-align:right">19</td>
+                <td class="num-col" style="text-align:right">5,920</td>
+                <td style="text-align:center"><span class="chg chg-up">▲ 1</span></td>
+              </tr>
+              <tr>
+                <td><div class="rank-cell"><span class="rank-num">4</span></div></td>
+                <td><div class="acct-cell"><div class="acct-av" style="background:#F0FAF0;color:#2D7D40;border-color:#A8E0B4;">MR</div><div><div class="acct-name">Mr. Bag</div><div class="acct-handle">@mr_bags</div></div></div></td>
+                <td><div class="pi-single pi-ig"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="10" height="10" rx="3" stroke="white" stroke-width="1.4"/><circle cx="7" cy="7" r="2.5" stroke="white" stroke-width="1.3"/><circle cx="9.8" cy="4.2" r=".9" fill="white"/></svg></div></td>
+                <td><span class="cat-pill cat-kol">KOL</span></td>
+                <td class="num-col" style="text-align:right">348K</td>
+                <td class="er-col er-high" style="text-align:right">6.2%</td>
+                <td class="num-col" style="text-align:right">31</td>
+                <td class="num-col" style="text-align:right">4,310</td>
+                <td style="text-align:center"><span class="chg chg-up">▲ 3</span></td>
+              </tr>
+              <tr>
+                <td><div class="rank-cell"><span class="rank-num">5</span></div></td>
+                <td><div class="acct-cell"><div class="acct-av" style="background:#F5F0FF;color:#6930C3;border-color:#D4C0F8;">SC</div><div><div class="acct-name">South China Morning Post</div><div class="acct-handle">@scmpnews</div></div></div></td>
+                <td><div class="pi-single pi-fb"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M8.5 2.5H7.5C6.67 2.5 6 3.17 6 4V5.5H5V7h1V12h2V7h1.5L10 5.5H8V4c0-.28.22-.5.5-.5H8.5V2.5z"/></svg></div></td>
+                <td><span class="cat-pill cat-media">Media</span></td>
+                <td class="num-col" style="text-align:right">2.1M</td>
+                <td class="er-col er-low" style="text-align:right">1.4%</td>
+                <td class="num-col" style="text-align:right">84</td>
+                <td class="num-col" style="text-align:right">3,120</td>
+                <td style="text-align:center"><span class="chg chg-dn">▼ 2</span></td>
+              </tr>
+              <tr>
+                <td><div class="rank-cell"><span class="rank-num">6</span></div></td>
+                <td><div class="acct-cell"><div class="acct-av" style="background:#FFF5E6;color:#C06A00;border-color:#FFCC80;">OP</div><div><div class="acct-name">Ocean Park HK</div><div class="acct-handle">@oceanparkhk</div></div></div></td>
+                <td><div class="pi-single pi-ig"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="10" height="10" rx="3" stroke="white" stroke-width="1.4"/><circle cx="7" cy="7" r="2.5" stroke="white" stroke-width="1.3"/><circle cx="9.8" cy="4.2" r=".9" fill="white"/></svg></div></td>
+                <td><span class="cat-pill cat-brand">Brand</span></td>
+                <td class="num-col" style="text-align:right">312K</td>
+                <td class="er-col er-high" style="text-align:right">4.9%</td>
+                <td class="num-col" style="text-align:right">22</td>
+                <td class="num-col" style="text-align:right">3,890</td>
+                <td style="text-align:center"><span class="chg chg-nc">— 0</span></td>
+              </tr>
+              <tr>
+                <td><div class="rank-cell"><span class="rank-num">7</span></div></td>
+                <td><div class="acct-cell"><div class="acct-av" style="background:#EDF4FF;color:#0055CC;border-color:#A3C4F5;">HM</div><div><div class="acct-name">HKTV Mall</div><div class="acct-handle">@hktvmall</div></div></div></td>
+                <td><div class="pi-single pi-fb"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M8.5 2.5H7.5C6.67 2.5 6 3.17 6 4V5.5H5V7h1V12h2V7h1.5L10 5.5H8V4c0-.28.22-.5.5-.5H8.5V2.5z"/></svg></div></td>
+                <td><span class="cat-pill cat-brand">Brand</span></td>
+                <td class="num-col" style="text-align:right">384K</td>
+                <td class="er-col er-mid" style="text-align:right">2.8%</td>
+                <td class="num-col" style="text-align:right">62</td>
+                <td class="num-col" style="text-align:right">2,740</td>
+                <td style="text-align:center"><span class="chg chg-dn">▼ 1</span></td>
+              </tr>
+              <tr>
+                <td><div class="rank-cell"><span class="rank-num">8</span></div></td>
+                <td><div class="acct-cell"><div class="acct-av" style="background:#F0F0F0;color:#444;border-color:#D0D0D0;">MP</div><div><div class="acct-name">Ming Pao Daily</div><div class="acct-handle">@mingpaonews</div></div></div></td>
+                <td><div class="pi-single pi-fb"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M8.5 2.5H7.5C6.67 2.5 6 3.17 6 4V5.5H5V7h1V12h2V7h1.5L10 5.5H8V4c0-.28.22-.5.5-.5H8.5V2.5z"/></svg></div></td>
+                <td><span class="cat-pill cat-media">Media</span></td>
+                <td class="num-col" style="text-align:right">890K</td>
+                <td class="er-col er-low" style="text-align:right">1.8%</td>
+                <td class="num-col" style="text-align:right">71</td>
+                <td class="num-col" style="text-align:right">2,180</td>
+                <td style="text-align:center"><span class="chg chg-up">▲ 1</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Leaderboard landing overlay -->
+        <div class="landing-ov" id="lb-ov">
+          <div class="landing-row">
+            <div class="landing-left">
+              <div>
+                <h2 style="font-size:26px;font-weight:600;color:#0A1F2C;line-height:34px;margin-bottom:10px;">Experience Leaderboard</h2>
+                <p style="font-size:14px;color:#707070;line-height:22px;max-width:460px;">See exactly how your brand stacks up against competitors and industry leaders — ranked by followers, engagement, and growth across every major platform.</p>
+              </div>
+              <div class="feat-cards">
+                <div class="feat-card">
+                  <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="7" y="7" width="6" height="10" rx="1" stroke="#23A9F6" stroke-width="1.6"/><rect x="2" y="10" width="5" height="7" rx="1" stroke="#23A9F6" stroke-width="1.6"/><rect x="13" y="5" width="5" height="12" rx="1" stroke="#23A9F6" stroke-width="1.6"/><circle cx="10" cy="4" r="1.5" fill="#23A9F6"/><path d="M10 5.5V7" stroke="#23A9F6" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+                  <div class="feat-name">Competitive Ranking</div>
+                  <div class="feat-desc">Track your brand's real position among 100+ industry accounts — see who's ahead, who's declining, and where you truly stand</div>
+                </div>
+                <div class="feat-card">
+                  <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#23A9F6" stroke-width="1.6"/><path d="M7 10h6M10 7v6" stroke="#23A9F6" stroke-width="1.6" stroke-linecap="round"/><path d="M14 6l2-2M6 14l-2 2M14 14l2 2M6 6L4 4" stroke="#23A9F6" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+                  <div class="feat-name">Industry Benchmarking</div>
+                  <div class="feat-desc">Understand what top performance looks like in your sector — compare engagement rate and follower growth against the best</div>
+                </div>
+                <div class="feat-card">
+                  <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 14l4-5 3 3 4-7 4 4" stroke="#23A9F6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="16" cy="5" r="2.5" fill="#FF3F41"/><path d="M16 3.8v1.5M16 6v.3" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+                  <div class="feat-name">Spot Rising Competitors Early</div>
+                  <div class="feat-desc">Get alerted when a newcomer climbs the rankings fast — before they take your audience share</div>
+                </div>
+              </div>
+              <div class="cta-row">
+                <button class="btn btn-ghost" onclick="enterDemoLB()">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2.5L4.5 7 9 11.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Back to Demo
+                </button>
+                <button class="btn btn-primary btn-lg" onclick="clickUpgrade()">
+                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1l2 4.5 4.5 1-3.2 3.2.8 4.8-4.1-2.3-4.1 2.3.8-4.8L1 6.5l4.5-1z" fill="#fff"/></svg>
+                  Upgrade Plan
+                </button>
+              </div>
+            </div>
+            <!-- Same business illustration -->
+            <div class="landing-right">
+              <div class="illus-wrap">
+                <svg viewBox="0 0 296 340" xmlns="http://www.w3.org/2000/svg" fill="none">
+                  <rect width="296" height="340" rx="16" fill="#EEF6FF"/>
+                  <circle cx="268" cy="36" r="80" fill="#D4E8F8" opacity=".45"/>
+                  <circle cx="28" cy="312" r="90" fill="#D4E8F8" opacity=".35"/>
+                  <rect x="18" y="234" width="260" height="10" rx="5" fill="#BFD4E6"/>
+                  <rect x="38" y="244" width="9" height="58" rx="4" fill="#BFD4E6"/>
+                  <rect x="249" y="244" width="9" height="58" rx="4" fill="#BFD4E6"/>
+                  <rect x="84" y="222" width="128" height="14" rx="7" fill="#2B4870"/>
+                  <rect x="90" y="134" width="116" height="90" rx="9" fill="#1E3A5F"/>
+                  <rect x="99" y="143" width="98" height="72" rx="5" fill="#F0F6FF"/>
+                  <rect x="104" y="149" width="52" height="7" rx="3" fill="#C8DFF0"/>
+                  <rect x="160" y="149" width="28" height="7" rx="3" fill="#C8DFF0" opacity=".6"/>
+                  <rect x="106" y="202" width="10" height="11" rx="2" fill="#23A9F6" opacity=".65"/>
+                  <rect x="120" y="191" width="10" height="22" rx="2" fill="#23A9F6" opacity=".85"/>
+                  <rect x="134" y="196" width="10" height="17" rx="2" fill="#23A9F6" opacity=".75"/>
+                  <rect x="148" y="184" width="10" height="29" rx="2" fill="#52C41A"/>
+                  <rect x="162" y="193" width="10" height="20" rx="2" fill="#23A9F6" opacity=".8"/>
+                  <rect x="176" y="187" width="10" height="26" rx="2" fill="#FFC960" opacity=".85"/>
+                  <polyline points="111,199 125,188 139,193 153,181 167,190 181,184" stroke="#0A3060" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".2" fill="none"/>
+                  <ellipse cx="56" cy="232" rx="22" ry="5" fill="#BAD2E6" opacity=".5"/>
+                  <path d="M37 202 Q56 193 75 202 L79 234 H33Z" fill="#23A9F6"/>
+                  <rect x="52" y="192" width="8" height="12" rx="3" fill="#FDDCB5"/>
+                  <circle cx="56" cy="177" r="16" fill="#FDDCB5"/>
+                  <path d="M41 174 Q56 155 71 174 Q71 167 56 158 Q41 167 41 174Z" fill="#4A3325"/>
+                  <path d="M37 210 Q25 220 30 235" stroke="#FDDCB5" stroke-width="10" stroke-linecap="round" fill="none"/>
+                  <path d="M75 210 Q88 220 99 227" stroke="#FDDCB5" stroke-width="10" stroke-linecap="round" fill="none"/>
+                  <path d="M222 183 Q240 174 258 183 L262 222 H218Z" fill="#7B5CF5"/>
+                  <rect x="236" y="173" width="8" height="12" rx="3" fill="#FDDCB5"/>
+                  <circle cx="240" cy="160" r="15" fill="#FDDCB5"/>
+                  <path d="M226 156 Q240 139 254 156 Q254 164 248 169 Q244 157 240 156 Q236 157 232 169 Q226 164 226 156Z" fill="#1A1210"/>
+                  <path d="M222 191 Q200 194 188 202" stroke="#FDDCB5" stroke-width="9" stroke-linecap="round" fill="none"/>
+                  <path d="M258 191 Q266 205 263 222" stroke="#FDDCB5" stroke-width="9" stroke-linecap="round" fill="none"/>
+                  <rect x="174" y="53" width="102" height="50" rx="10" fill="#C8DCF0" opacity=".4"/>
+                  <rect x="172" y="50" width="102" height="50" rx="10" fill="white" stroke="#E0EAF4" stroke-width="1"/>
+                  <text x="183" y="71" font-family="Poppins,sans-serif" font-size="9.5" fill="#828282">Total Mentions</text>
+                  <text x="183" y="90" font-family="Poppins,sans-serif" font-size="16" font-weight="600" fill="#0A1F2C">4,821</text>
+                  <text x="222" y="90" font-family="Poppins,sans-serif" font-size="11" fill="#52C41A">↑ 23%</text>
+                  <rect x="7" y="106" width="78" height="46" rx="10" fill="#C8DCF0" opacity=".4"/>
+                  <rect x="5" y="103" width="78" height="46" rx="10" fill="white" stroke="#E0EAF4" stroke-width="1"/>
+                  <text x="16" y="122" font-family="Poppins,sans-serif" font-size="9.5" fill="#828282">Eng. Rate</text>
+                  <text x="16" y="140" font-family="Poppins,sans-serif" font-size="16" font-weight="600" fill="#23A9F6">4.8%</text>
+                  <circle cx="170" cy="104" r="5" fill="#23A9F6" opacity=".25"/>
+                  <circle cx="181" cy="91" r="3.5" fill="#23A9F6" opacity=".18"/>
+                  <circle cx="160" cy="91" r="4" fill="#FFC960" opacity=".4"/>
+                  <circle cx="22" cy="65" r="6" fill="#23A9F6" opacity=".18"/>
+                  <circle cx="37" cy="53" r="4" fill="#52C41A" opacity=".3"/>
+                  <circle cx="250" cy="260" r="5" fill="#7B5CF5" opacity=".2"/>
+                  <circle cx="40" cy="270" r="4" fill="#23A9F6" opacity=".15"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /sc-lb -->
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  function switchPage(page) {
+    ['sc-sl','sc-lb'].forEach(id => document.getElementById(id).classList.remove('active'));
+    ['nb-sl','nb-lb'].forEach(id => document.getElementById(id).classList.remove('on'));
+    if (page === 'sl') {
+      document.getElementById('sc-sl').classList.add('active');
+      document.getElementById('nb-sl').classList.add('on');
+    } else if (page === 'lb') {
+      document.getElementById('sc-lb').classList.add('active');
+      document.getElementById('nb-lb').classList.add('on');
+    }
+  }
+  function enterDemoSL() {
+    document.getElementById('sl-ov').style.display = 'none';
+    document.getElementById('sl-content').classList.remove('blurred');
+    document.getElementById('sl-banner').style.display = 'flex';
+    showToast('Demo mode — exploring sample data');
+  }
+  function exitDemoSL() {
+    document.getElementById('sl-ov').style.display = 'flex';
+    document.getElementById('sl-content').classList.add('blurred');
+    document.getElementById('sl-banner').style.display = 'none';
+  }
+  function enterDemoLB() {
+    document.getElementById('lb-ov').style.display = 'none';
+    document.getElementById('lb-content').classList.remove('blurred');
+    document.getElementById('lb-banner').style.display = 'flex';
+    showToast('Demo mode — exploring sample data');
+  }
+  function exitDemoLB() {
+    document.getElementById('lb-ov').style.display = 'flex';
+    document.getElementById('lb-content').classList.add('blurred');
+    document.getElementById('lb-banner').style.display = 'none';
+  }
+  function clickUpgrade() {
+    showToast('Redirecting to plan selection… (prototype placeholder)');
+  }
+  let _t;
+  function showToast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(_t);
+    _t = setTimeout(() => el.classList.remove('show'), 2800);
+  }
+</script>
+</body>
+</html>
