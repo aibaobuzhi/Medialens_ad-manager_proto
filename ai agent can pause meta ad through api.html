@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Media Lens - AI Agent Workspace</title>
-    <!-- Modern crisp design UI libraries -->
+    <!-- Use standard crisp styling libraries -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <style>
@@ -14,41 +14,16 @@
             color: #1f2937;
             font-size: 0.9rem;
         }
-        /* Top Navigation Bar */
-        .top-navbar {
-            background-color: #fff;
-            padding: 12px 24px;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .nav-tabs-container {
-            display: flex;
-            gap: 4px;
-        }
-        .nav-tab-item {
-            padding: 6px 12px;
-            color: #4b5563;
-            cursor: pointer;
-            font-size: 0.85rem;
-            border-radius: 4px;
-        }
-        .nav-tab-item.active {
-            background-color: #1d4ed8;
-            color: #fff;
-            font-weight: 500;
-        }
-
-        /* Layout Grid */
+        
+        /* Layout Structure matching image_a524a2.jpg */
         .workspace-container {
             display: grid;
             grid-template-columns: 320px 1fr;
-            min-height: calc(100vh - 60px);
+            min-height: 100vh;
             background-color: #fff;
         }
 
-        /* Left Side: Quick Starters Panel */
+        /* Left Side Panel */
         .quick-starters-panel {
             border-right: 1px solid #e5e7eb;
             padding: 24px;
@@ -75,7 +50,6 @@
             text-align: left;
             cursor: pointer;
         }
-        .qs-card:hover { border-color: #1d4ed8; background-color: #f8fafc; }
         .qs-badge {
             font-size: 0.65rem;
             font-weight: bold;
@@ -85,26 +59,37 @@
             margin-right: 4px;
             margin-bottom: 6px;
         }
+        .qs-badge.tofu { border: 1px solid #3b82f6; color: #3b82f6; }
+        .qs-badge.mofu { border: 1px solid #f59e0b; color: #f59e0b; }
+        .qs-badge.edu { border: 1px solid #10b981; color: #10b981; }
+        .qs-badge.life { border: 1px solid #10b981; color: #10b981; }
+        .qs-badge.diag { border: 1px solid #ef4444; color: #ef4444; }
+        .qs-badge.opt { border: 1px solid #f59e0b; color: #f59e0b; }
         .qs-title { font-size: 0.8rem; font-weight: 500; color: #374151; display: block; }
 
-        /* Right Side: Main Interactive Workspace */
+        /* Right Side Content Area */
         .main-workspace {
-            padding: 30px;
-            max-width: 900px;
-            margin: 0 auto;
+            padding: 40px;
+            max-width: 1000px;
             width: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            padding-bottom: 120px;
+            padding-bottom: 140px;
         }
-
-        /* Recommendation Table Layout */
         .ai-response-block {
             border-left: 3px solid #3b82f6;
             padding-left: 16px;
             margin-bottom: 24px;
         }
+        .context-card {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        /* Recommendation Data Table styling matching snapshot verbatim */
         .rec-table {
             width: 100%;
             border-collapse: collapse;
@@ -113,239 +98,197 @@
         }
         .rec-table th, .rec-table td {
             border: 1px solid #e5e7eb;
-            padding: 10px 12px;
+            padding: 12px;
             text-align: left;
+            vertical-align: middle;
         }
-        .rec-table th { background-color: #f9fafb; font-weight: 600; }
+        .rec-table th { background-color: #fff; font-weight: 600; color: #374151; border-bottom: 2px solid #e5e7eb; }
         
-        /* Status dots */
-        .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+        .status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 8px; vertical-align: middle;}
         .status-dot.scale { background-color: #3b82f6; }
         .status-dot.hold { background-color: #10b981; }
         .status-dot.pause { background-color: #ef4444; }
 
-        /* Embedded seamlessly right above the input bar */
+        /* NEUTRAL INQUIRY CARD STYLE */
         .ai-action-plan-card {
             background-color: #f8fafc;
             border: 1px solid #e5e7eb;
-            border-left: 4px solid #9ca3af; /* Neutral border indicating a suggestion rather than a forced plan */
+            border-left: 4px solid #6b7280; 
             border-radius: 8px;
             padding: 16px 20px;
             margin-top: 24px;
             margin-bottom: 20px;
-            transition: all 0.3s ease;
+            position: relative;
         }
-        
-        /* Highlight the card slightly when active or ready */
-        .ai-action-plan-card.ready-state {
-            border-color: #3b82f6;
-            border-left-color: #3b82f6;
-        }
-
-        .plan-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #e2e8f0;
-        }
+        .plan-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0; }
         .plan-row:last-child { border-bottom: none; }
 
-        /* Audit Trail Layout */
-        .audit-trail-panel {
-            background-color: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 16px;
-            margin-top: 20px;
-        }
-        .audit-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            padding: 6px 0;
-            color: #4b5563;
-            border-bottom: 1px dashed #e5e7eb;
-        }
+        /* System Audit logs tracking panel */
+        .audit-trail-panel { background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-top: 20px; }
+        .audit-row { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 6px 0; color: #4b5563; border-bottom: 1px dashed #e5e7eb; }
         .audit-row:last-child { border-bottom: none; }
 
-        /* Bottom Sticky Prompt input element matching snapshot */
-        .prompt-sticky-footer {
-            position: fixed;
-            bottom: 0;
-            right: 0;
-            width: calc(100% - 320px);
-            background-color: #fff;
-            border-top: 1px solid #e5e7eb;
-            padding: 16px 40px;
-            z-index: 999;
-        }
-        .prompt-input-wrapper {
-            background-color: #f3f4f6;
-            border-radius: 24px;
-            padding: 8px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .prompt-input-field {
-            border: none;
-            background: transparent;
-            width: 100%;
-            outline: none;
-            color: #1f2937;
-            font-size: 0.9rem;
-        }
+        /* Floating Input Deck frame alignment */
+        .prompt-sticky-footer { position: fixed; bottom: 0; right: 0; width: calc(100% - 320px); background-color: #fff; border-top: 1px solid #e5e7eb; padding: 16px 40px; z-index: 999; }
+        .prompt-input-wrapper { background-color: #f3f4f6; border-radius: 24px; padding: 10px 18px; display: flex; align-items: center; gap: 12px; border: 1px solid transparent;}
+        .prompt-input-wrapper:focus-within { border-color: #d1d5db; background-color: #fff; }
+        .prompt-input-field { border: none; background: transparent; width: 100%; outline: none; color: #1f2937; font-size: 0.9rem; }
 
-        /* Sync / Spinner utilities */
-        .sync-loading { color: #2563eb; font-weight: 500; font-size: 0.85rem; }
+        .sync-loading { color: #4b5563; font-weight: 500; font-size: 0.85rem; }
         .spin-icon { display: inline-block; animation: spin 1.2s infinite linear; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
-</div >
 </head>
 <body>
 
-<!-- Top Navigation Module -->
-<div class="top-navbar">
-    <div class="d-flex align-items-center gap-3">
-        <span class="fw-bold text-dark">Ad Manager</span>
-        <span class="text-muted">/</span>
-        <select class="form-select form-select-sm border-0 bg-light fw-bold" style="width: auto;">
-            <option>KEEPP HKD</option>
-        </select>
-    </div>
-    <div class="d-flex align-items-center gap-4">
-        <div class="nav-tabs-container">
-            <div class="nav-tab-item">Performance</div>
-            <div class="nav-tab-item">Content Intel</div>
-            <div class="nav-tab-item">Creative Intel</div>
-            <div class="nav-tab-item">Video Intel</div>
-            <div class="nav-tab-item">Angle / Topic</div>
-            <div class="nav-tab-item">Ad Set Analysis</div>
-            <div class="nav-tab-item">Benchmarks</div>
-            <div class="nav-tab-item active">AI Agent</div>
-        </div>
-        <div class="text-success small d-flex align-items-center gap-1">
-            <i class="bi bi-circle-fill" style="font-size: 0.5rem;"></i> Connected <span class="text-muted">Synced 40m ago</span>
-        </div>
-    </div>
-</div>
-
-<!-- Core Content Window split -->
 <div class="workspace-container">
-    
-    <!-- Left Column: Preset Quick Starters -->
+    <!-- Left Column Panel Structure -->
     <div class="quick-starters-panel">
-        <h6 class="fw-bold mb-1">Quick Starters</h6>
+        <h6 class="fw-bold mb-1" style="font-size: 0.95rem;">Quick Starters</h6>
         <p class="text-muted small">Click any preset to ask the AI agent</p>
-
+        
         <div class="section-tag">CREATIVE BRIEFS</div>
         <div class="qs-grid">
-            <div class="qs-card"><span class="qs-badge border text-primary border-primary">TOFU</span><span class="qs-badge border text-success border-success">EDUCATION</span><span class="qs-title">Acquisition</span></div>
-            <div class="qs-card"><span class="qs-badge border text-primary border-primary">TOFU</span><span class="qs-badge border text-success border-success">LIFESTYLE</span><span class="qs-title">Acquisition</span></div>
-            <div class="qs-card"><span class="qs-badge border text-warning border-warning">MOFU</span><span class="qs-badge border text-success border-success">EDUCATION</span><span class="qs-title">Interest</span></div>
-            <div class="qs-card"><span class="qs-badge border text-warning border-warning">MOFU</span><span class="qs-badge border text-success border-success">LIFESTYLE</span><span class="qs-title">Interest</span></div>
+            <div class="qs-card"><span class="qs-badge tofu">TOFU</span><span class="qs-badge edu">EDUCATION</span><span class="qs-title">Acquisition</span></div>
+            <div class="qs-card"><span class="qs-badge tofu">TOFU</span><span class="qs-badge life">LIFESTYLE</span><span class="qs-title">Acquisition</span></div>
+            <div class="qs-card"><span class="qs-badge mofu">MOFU</span><span class="qs-badge edu">EDUCATION</span><span class="qs-title">Interest</span></div>
+            <div class="qs-card"><span class="qs-badge mofu">MOFU</span><span class="qs-badge life">LIFESTYLE</span><span class="qs-title">Interest</span></div>
         </div>
-
+        
         <div class="section-tag">ACCOUNT INSIGHTS</div>
         <div class="qs-grid">
-            <div class="qs-card"><span class="qs-badge border text-danger border-danger">DIAGNOSE</span><span class="qs-title">Weekly Summary</span></div>
-            <div class="qs-card"><span class="qs-badge border text-danger border-danger">DIAGNOSE</span><span class="qs-title">Fatigued Ads</span></div>
-            <div class="qs-card"><span class="qs-badge border text-warning border-warning">OPTIMIZE</span><span class="qs-title">Scale / Pause</span></div>
-            <div class="qs-card"><span class="qs-badge border text-warning border-warning">OPTIMIZE</span><span class="qs-title">Audience Overlap</span></div>
+            <div class="qs-card"><span class="qs-badge diag">DIAGNOSE</span><span class="qs-title">Weekly Summary</span></div>
+            <div class="qs-card"><span class="qs-badge diag">DIAGNOSE</span><span class="qs-title">Find Fatigued Ads</span></div>
+            <div class="qs-card"><span class="qs-badge opt">OPTIMIZE</span><span class="qs-title">Scale / Pause</span></div>
+            <div class="qs-card"><span class="qs-badge opt">OPTIMIZE</span><span class="qs-title">Audience Overlap</span></div>
         </div>
     </div>
 
-    <!-- Right Column: Workspace containing snapshot data -->
+    <!-- Right Side Dashboard Sheet Workspace Frame -->
     <div class="main-workspace">
         <div>
-            <h5 class="fw-bold mb-3">AI Agent — Ask anything about this ad account</h5>
+            <h5 class="fw-bold mb-3" style="font-size: 1.15rem;">AI Agent — Ask anything about this ad account</h5>
             
+            <!-- VERBATIM: Text imported directly from image_a524a2.jpg -->
             <div class="ai-response-block">
-                <p class="mb-2">Based on the current performance distribution and industry benchmarks for <strong>Outcome Sales</strong>, here are the campaign recommendations. The account currently maintains a healthy audience frequency (<strong>avgFrequency 1.27, k=1.00</strong>), indicating significant room for scaling without immediate saturation risk.</p>
+                <p class="mb-0" style="line-height: 1.6; color: #374151;">Based on the current performance distribution and industry benchmarks for <strong>Outcome Sales</strong>, here are the campaign recommendations. The account currently maintains a healthy audience frequency (<strong>avgFrequency 1.27, k=1.00</strong>), indicating significant room for scaling without immediate saturation risk.</p>
             </div>
 
-            <div class="card border p-3 bg-light mb-4" style="border-radius: 8px;">
+            <!-- VERBATIM: Content structure matched precisely with image_a524a2.jpg -->
+            <div class="context-card">
                 <h6 class="fw-bold text-dark small mb-2">Account Distribution Context (Sales Objective)</h6>
-                <ul class="list-unstyled small mb-0 text-muted" style="line-height: 1.6;">
+                <ul class="list-unstyled small mb-0 text-muted" style="line-height: 1.7; font-size: 0.8rem;">
                     <li>• <strong>CPA (CPR) Benchmarks:</strong> P25: HK$80.67 | P50: HK$108.07 | P75: HK$127.72</li>
                     <li>• <strong>ROAS Benchmarks:</strong> P75: 0.76 (Current Account ROAS: 0.64)</li>
                     <li>• <strong>CTR Benchmarks:</strong> P25: 1.05% | P50: 1.30% | P75: 1.58%</li>
                 </ul>
             </div>
 
-            <h6 class="fw-bold text-dark mb-2">Campaign Recommendations</h6>
+            <h6 class="fw-bold text-dark mb-2" style="font-size: 0.9rem;">Campaign Recommendations</h6>
+            
+            <!-- VERBATIM: Every single string inside this dataset table remains completely unaltered -->
             <table class="rec-table">
                 <thead>
                     <tr>
                         <th style="width: 100px;">Action</th>
-                        <th style="width: 220px;">Campaign</th>
+                        <th style="width: 200px;">Campaign</th>
                         <th>Rationale</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td><span class="status-dot scale"></span>Scale</td><td class="text-primary">KOL-Janis (Sales)</td><td class="text-muted">Strong upward CTR trend (slope +0.21) with latest CTR (1.49%) nearing P75 levels.</td></tr>
-                    <tr><td><span class="status-dot scale"></span>Scale</td><td class="text-primary">Straight Package - 護髮只做一半？</td><td class="text-muted">Healthy CTR (1.43%) and consistent improvement in engagement (slope +0.17).</td></tr>
-                    <tr><td><span class="status-dot hold"></span>Hold</td><td class="text-primary">護膚新手必睇 (Sales)</td><td class="text-muted">Highly efficient CPR (HK$60.42) well below P25, but CTR slope is currently flat (+0.01).</td></tr>
-                    <tr><td><span class="status-dot hold"></span>Hold</td><td class="text-primary">#TopLab實測隊 (Sales)</td><td class="text-muted">Maintain current spend to monitor if the high CTR (2.35%) converts into scalable CPA.</td></tr>
-                    <tr class="target-row-1"><td><span class="status-dot pause"></span>Pause</td><td class="text-primary">KOL-Manlui (Sales)</td><td class="text-muted">Critical creative fatigue detected with a sharp CTR drop (slope -0.32) over 6 days.</td></tr>
-                    <tr class="target-row-2"><td><span class="status-dot pause"></span>Pause</td><td class="text-primary">KOL-Kaki (Sales)</td><td class="text-muted">CPA (HK$128.97) has exceeded the P75 benchmark (HK$127.72) alongside a declining CTR trend.</td></tr>
+                    <tr>
+                        <td><span class="status-dot scale"></span>Scale</td>
+                        <td class="text-primary">KOL-Janis (Sales)</td>
+                        <td class="text-muted">Strong upward CTR trend (slope +0.21) with latest CTR (1.49%) nearing P75 levels.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="status-dot scale"></span>Scale</td>
+                        <td class="text-primary">Straight Package - 護髮只做一半？</td>
+                        <td class="text-muted">Healthy CTR (1.43%) and consistent improvement in engagement (slope +0.17).</td>
+                    </tr>
+                    <tr>
+                        <td><span class="status-dot hold"></span>Hold</td>
+                        <td class="text-primary">護膚新手必睇 (Sales)</td>
+                        <td class="text-muted">Highly efficient CPR (HK$60.42) well below P25, but CTR slope is currently flat (+0.01).</td>
+                    </tr>
+                    <tr>
+                        <td><span class="status-dot hold"></span>Hold</td>
+                        <td class="text-primary">#TopLab實測隊 (Sales)</td>
+                        <td class="text-muted">Maintain current spend to monitor if the high CTR (2.35%) converts into scalable CPA.</td>
+                    </tr>
+                    <tr class="target-row-1">
+                        <td><span class="status-dot pause"></span>Pause</td>
+                        <td class="text-primary">KOL-Manlui (Sales)</td>
+                        <td class="text-muted">Critical creative fatigue detected with a sharp CTR drop (slope -0.32) over 6 days.</td>
+                    </tr>
+                    <tr class="target-row-2">
+                        <td><span class="status-dot pause"></span>Pause</td>
+                        <td class="text-primary">KOL-Kaki (Sales)</td>
+                        <td class="text-muted">CPA (HK$128.97) has exceeded the P75 benchmark (HK$127.72) alongside a declining CTR trend.</td>
+                    </tr>
                 </tbody>
             </table>
-            
+
             <div class="d-flex justify-content-end mt-2">
-                <button class="btn btn-sm btn-outline-secondary border-0 text-muted"><i class="bi bi-files me-1"></i>Copy table</button>
+                <button class="btn btn-sm btn-outline-secondary border-0 text-muted small" style="font-size: 0.75rem;"><i class="bi bi-files me-1"></i>Copy table</button>
             </div>
 
-            <div class="text-muted mt-3" style="font-size: 0.8rem; line-height: 1.5;">
-                <strong>Sources:</strong> Performance, Benchmarks, Adset Analysis <strong>Citations:</strong> 6 <br>
+            <!-- VERBATIM: Footnotes configuration remains untouched -->
+            <div class="text-muted mt-3" style="font-size: 0.8rem; line-height: 1.6;">
+                <strong>Sources:</strong> Performance, Benchmarks, Adset Analysis &nbsp;&nbsp;<strong>Citations:</strong> 6 <br>
                 <strong>Confidence:</strong> High <br>
                 • <strong>Rationale:</strong> Analysis is grounded in full 7-day performance data, industry-specific benchmarks for the Sales objective, and localized CTR slope fitting. No data gaps were detected.<br>
                 • <strong>Missing Fields:</strong> None.
             </div>
 
-            <!-- Visual Snapshot Anchor Timestamp + Icons Group -->
+            <!-- Anchor Time Mark from image_a524a2.jpg -->
             <div class="d-flex align-items-center justify-content-between mt-3 pb-2 border-bottom">
-                <span class="text-muted italic" style="font-size: 0.8rem;">As of 2026-06-16 18:44 HKT</span>
-                <div class="d-flex gap-3 text-muted" style="font-size: 0.9rem; cursor: pointer;">
+                <span class="text-muted" style="font-size: 0.8rem; font-style: italic;">As of 2026-06-16 18:44 HKT</span>
+                <div class="d-flex gap-3 text-muted" style="font-size: 0.85rem; cursor: pointer;">
                     <i class="bi bi-file-earmark-text"></i>
                     <i class="bi bi-arrow-clockwise"></i>
                     <i class="bi bi-share"></i>
                 </div>
             </div>
 
-            <!-- ================= NEW CARDS AND REVISED COPY PLACEMENT ================= -->
-            <div class="ai-action-plan-card ready-state" id="executionPlanCard">
-                <div class="d-flex justify-content-between align-items-start mb-3">
+            <!-- ================= INTERACTIVE COMPONENT PLACEMENT ================= -->
+            <div class="ai-action-plan-card" id="executionPlanCard">
+                <!-- Close Button in Top Right Corner -->
+                <button type="button" class="btn-close position-absolute top-0 end-0 m-3" id="closeCardX" aria-label="Close" style="font-size: 0.75rem;"></button>
+                
+                <div class="d-flex justify-content-between align-items-start mb-2">
                     <div>
-                        <!-- FIXED: Toned down confidence, framed clearly as a recommendation based on metrics -->
-                        <h6 class="fw-bold text-dark mb-1">💡 Suggested Optimization Adjustments</h6>
-                        <p class="text-muted small mb-0">Based on a <strong>High Confidence</strong> score and <strong>declining CTR trends</strong>, the agent suggests applying these changes.</p>
+                        <!-- FIXED: Exact Neutral Heading Title -->
+                        <h6 class="fw-bold text-dark mb-1">Pause Ad?</h6>
+                        <p class="text-muted small mb-0">Based on high confidence analysis and declining CTR trends.</p>
                     </div>
                 </div>
 
-                <div class="bg-white rounded border px-3 py-1 mb-3 shadow-sm">
+                <div class="bg-white rounded border px-3 py-1 mb-3">
                     <div class="plan-row">
-                        <span class="text-danger fw-bold small"><i class="bi bi-pause-circle me-1"></i> SUGGEST PAUSE</span>
+                        <span class="text-muted small fw-bold" style="font-size: 0.7rem;"><i class="bi bi-info-circle me-1"></i> SUGGESTION</span>
                         <span class="text-dark small flex-grow-1 ms-3 fw-bold">KOL-Manlui (Sales)</span>
-                        <span class="text-muted small">6-day CTR drop detected</span>
+                        <span class="text-muted small">6-day CTR drop</span>
                     </div>
                     <div class="plan-row">
-                        <span class="text-danger fw-bold small"><i class="bi bi-pause-circle me-1"></i> SUGGEST PAUSE</span>
+                        <span class="text-muted small fw-bold" style="font-size: 0.7rem;"><i class="bi bi-info-circle me-1"></i> SUGGESTION</span>
                         <span class="text-dark small flex-grow-1 ms-3 fw-bold">KOL-Kaki (Sales)</span>
-                        <span class="text-muted small">Declining CTR & high CPA</span>
+                        <span class="text-muted small">High CPA</span>
                     </div>
                 </div>
 
-                <div id="cardTriggerZone">
-                    <button class="btn btn-primary btn-sm px-4 fw-bold shadow-sm" id="triggerApplyBtn">
-                        Review & Apply Suggestions
+                <!-- FIXED: Completely subdued un-highlighted button style -->
+                <div id="cardTriggerZone" class="d-flex align-items-center gap-2">
+                    <button class="btn btn-outline-secondary btn-sm px-4 fw-bold" id="triggerApplyBtn" style="color: #4b5563; border-color: #d1d5db;">
+                        Review & Apply
+                    </button>
+                    <button class="btn btn-link btn-sm text-decoration-none text-muted small" id="cancelCardBtn">
+                        Cancel
                     </button>
                 </div>
             </div>
 
-            <!-- Dynamic Audit Log Panel -->
+            <!-- System Activity Auditing panel sheet -->
             <div class="audit-trail-panel d-none" id="auditTrailPanel">
                 <h6 class="fw-bold text-dark mb-2 small"><i class="bi bi-shield-check text-success me-1"></i> Platform Change Logs</h6>
                 <div id="auditContainer"></div>
@@ -354,67 +297,50 @@
     </div>
 </div>
 
-<!-- Bottom Prompt Input Fixed Layout Frame -->
+<!-- Input Dock Element matching screenshot capsule styling -->
 <footer class="prompt-sticky-footer">
     <div class="prompt-input-wrapper">
         <i class="bi bi-plus-lg text-muted" style="cursor: pointer;"></i>
-        <input type="text" id="promptText" class="prompt-input-field" placeholder="Enter a prompt here..." disabled>
-        <i class="bi bi-send text-muted"></i>
+        <!-- FIXED: Keypress activity here automatically triggers card dismissal -->
+        <input type="text" id="promptInput" class="prompt-input-field" placeholder="Enter a prompt here...">
+        <i class="bi bi-send text-muted" style="cursor: pointer;"></i>
     </div>
-    <div class="text-center text-muted mt-1" style="font-size: 0.7rem;">Token Total: 98875 | Input: 97411 | Output: 1464 | Last Token Used: 98875</div>
 </footer>
 
-<!-- Simplified Enterprise Safety Net Modal -->
+<!-- Safety Net Verification Popup Module -->
 <div class="modal fade" id="safetyNetModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header border-bottom-0 pb-0">
-                <h6 class="modal-title fw-bold text-dark d-flex align-items-center">
-                    <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i> Confirm Meta Account Changes?
-                </h6>
+                <h6 class="modal-title fw-bold text-dark d-flex align-items-center"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i> Confirm Meta Account Changes?</h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body py-3">
-                <p class="text-muted small mb-3">
-                    The agent will pause the following campaigns inside your live Meta account based on your review:
-                </p>
-
-                <!-- Data Preview (Target Account, 7d Spend, 7d CTR) -->
+                <p class="text-muted small mb-3">The agent will pause the following campaigns inside your live Meta account based on your review:</p>
                 <div class="bg-light rounded p-3 mb-3 border">
-                    <div class="small text-muted mb-2 pb-1 border-bottom">
-                        Account: <strong>PL - Hong Kong (1100755461)</strong>
-                    </div>
-                    
+                    <div class="small text-muted mb-2 pb-1 border-bottom">Account: <strong>PL - Hong Kong (1100755461)</strong></div>
                     <div class="mb-2">
                         <div class="small fw-bold text-dark">🚫 KOL-Manlui (Sales)</div>
                         <div class="d-flex gap-3 text-muted" style="font-size: 0.75rem;">
                             <span>7-Day Spend: <strong class="text-dark">HK$ 14,250.00</strong></span>
-                            <span>7-Day CTR: <strong class="text-danger">0.65% (Declining)</strong></span>
+                            <span>7-Day CTR: <strong class="text-danger">0.65%</strong></span>
                         </div>
                     </div>
-
                     <div>
                         <div class="small fw-bold text-dark">🚫 KOL-Kaki (Sales)</div>
                         <div class="d-flex gap-3 text-muted" style="font-size: 0.75rem;">
                             <span>7-Day Spend: <strong class="text-dark">HK$ 18,920.00</strong></span>
-                            <span>7-Day CTR: <strong class="text-danger">0.82% (Declining)</strong></span>
+                            <span>7-Day CTR: <strong class="text-danger">0.82%</strong></span>
                         </div>
                     </div>
                 </div>
-
-                <!-- Irreversibility Warning Message -->
                 <div class="p-2 bg-danger bg-opacity-10 rounded text-danger small border border-danger border-opacity-25 mb-3 fw-bold">
                     <i class="bi bi-info-circle-fill me-1"></i> Irreversible Action Notice
-                    <div class="text-muted fw-normal mt-1" style="font-size: 0.75rem;">
-                        This operation cannot be undone automatically. To restart these campaigns later, you must manually reactivate them directly inside your Meta Ads Manager dashboard.
-                    </div>
+                    <div class="text-muted fw-normal mt-1" style="font-size: 0.75rem;">This operation cannot be undone automatically. To restart later, you must manually reactivate them inside Meta Ads Manager.</div>
                 </div>
-
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="skipFuturePrompts">
-                    <label class="form-check-label text-muted small" for="skipFuturePrompts">
-                        Don't show this confirmation warning again for this account.
-                    </label>
+                    <label class="form-check-label text-muted small" for="skipFuturePrompts">Don't show this confirmation warning again for this account.</label>
                 </div>
             </div>
             <div class="modal-footer border-top-0 pt-0">
@@ -425,50 +351,52 @@
     </div>
 </div>
 
-<!-- Script Interactions -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const triggerApplyBtn = document.getElementById('triggerApplyBtn');
         const confirmChangesBtn = document.getElementById('confirmChangesBtn');
         const cardTriggerZone = document.getElementById('cardTriggerZone');
+        const cardElement = document.getElementById('executionPlanCard');
+        const closeCardX = document.getElementById('closeCardX');
+        const cancelCardBtn = document.getElementById('cancelCardBtn');
+        const promptInput = document.getElementById('promptInput');
         const safetyNetModal = new bootstrap.Modal(document.getElementById('safetyNetModal'));
         
         let bypassSafetyModal = false;
 
-        triggerApplyBtn.addEventListener('click', function() {
-            if (bypassSafetyModal) {
-                commitChangesToMeta();
-            } else {
-                safetyNetModal.show();
+        // Dismiss card triggers
+        function dismissCard() { cardElement.style.display = 'none'; }
+        closeCardX.addEventListener('click', dismissCard);
+        cancelCardBtn.addEventListener('click', dismissCard);
+
+        // FIXED: Typing in the bottom box drops the current card recommendation focus
+        promptInput.addEventListener('input', function() {
+            if (this.value.trim().length > 0) {
+                dismissCard();
             }
         });
 
+        triggerApplyBtn.addEventListener('click', function() {
+            if (bypassSafetyModal) { commitChangesToMeta(); } else { safetyNetModal.show(); }
+        });
+
         confirmChangesBtn.addEventListener('click', function() {
-            if (document.getElementById('skipFuturePrompts').checked) {
-                bypassSafetyModal = true;
-            }
+            if (document.getElementById('skipFuturePrompts').checked) { bypassSafetyModal = true; }
             safetyNetModal.hide();
             commitChangesToMeta();
         });
 
         function commitChangesToMeta() {
-            cardTriggerZone.innerHTML = `
-                <span class="sync-loading">
-                    <i class="bi bi-arrow-repeat spin-icon me-2"></i>Synchronizing state changes live to Meta Ads Manager...
-                </span>
-            `;
+            closeCardX.style.display = 'none';
+            cardTriggerZone.innerHTML = `<span class="sync-loading"><i class="bi bi-arrow-repeat spin-icon me-2"></i>Synchronizing changes live to Meta Ads Manager...</span>`;
 
             setTimeout(() => {
-                cardTriggerZone.innerHTML = `
-                    <div class="alert alert-success m-0 py-2 px-3 small d-flex align-items-center">
-                        <i class="bi bi-check-circle-fill me-2"></i> Recommendations successfully applied. 2 campaigns are now Paused on Meta Ads Manager.
-                    </div>
-                `;
+                cardTriggerZone.innerHTML = `<div class="alert alert-success m-0 py-2 px-3 small d-flex align-items-center"><i class="bi bi-check-circle-fill me-2"></i> Recommendations applied. 2 campaigns are now Paused.</div>`;
                 
+                // Visual synchronization inside the dataset table matrix
                 document.querySelector('.target-row-1').style.color = '#9ca3af';
                 document.querySelector('.target-row-2').style.color = '#9ca3af';
-
                 appendAuditRecords();
             }, 1400);
         }
@@ -477,22 +405,18 @@
             const panel = document.getElementById('auditTrailPanel');
             const container = document.getElementById('auditContainer');
             panel.classList.remove('d-none');
-
             const timestamp = "2026-06-16 18:45 HKT"; 
-            const operator = "AI Agent Julie Li";
             const items = ["KOL-Manlui (Sales)", "KOL-Kaki (Sales)"];
 
-            items.forEach(campaignName => {
+            items.forEach(name => {
                 const div = document.createElement('div');
                 div.className = 'audit-row';
-                div.innerHTML = `
-                    <div><strong>Meta API WRITE</strong> · Paused campaign [${campaignName}]</div>
-                    <div>Executed by <strong>${operator}</strong> at <strong>${timestamp}</strong></div>
-                `;
+                div.innerHTML = `<div><strong>[Meta API WRITE]</strong> · <strong>[SUCCESS]</strong> · Paused campaign [${name}]</div><div>By <strong>AI Agent Julie Li</strong> | <strong>${timestamp}</strong></div>`;
                 container.appendChild(div);
             });
         }
     });
 </script>
+<style>.spin-icon { display: inline-block; animation: spin 1.2s infinite linear; } @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }</style>
 </body>
 </html>
