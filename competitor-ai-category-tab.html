@@ -118,7 +118,7 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
 .src-ai{background:#F0ECFF;color:#6B4BD8;}
 
 /* metric switcher */
-.metric-group{display:inline-flex;background:#eef2f5;border-radius:8px;padding:2px;gap:1px;}
+.metric-group{display:inline-flex;flex-wrap:wrap;background:#eef2f5;border-radius:8px;padding:2px;gap:1px;}
 .metric-btn{border:none;background:transparent;font-family:inherit;font-size:11.5px;color:var(--muted);padding:5px 11px;border-radius:6px;cursor:pointer;font-weight:500;white-space:nowrap;}
 .metric-btn.active{background:#fff;color:var(--brand);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08);}
 
@@ -397,12 +397,16 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
                 <span class="tooltip-box"><span class="tt-t">Performance per post by category</span>
                 <span class="tt-r"><b>What:</b> Average value of the selected metric each category earns per post.</span>
                 <span class="tt-r"><b>Why it matters:</b> Per-post averages remove the bias of how often you post a theme, so you see which content genuinely resonates.</span>
+                <span class="tt-r"><b>ER:</b> My page = engagements ÷ reach ×100; competitor = engagements ÷ followers ×100 (per current code).</span>
+                <span class="tt-r"><b>Page ER:</b> page engagement ÷ days ÷ followers ×100 (daily page rate).</span>
                 <span class="tt-src">Source: <span class="s-meta">Meta ✓ metrics</span> · <span class="s-ai">MediaLens AI category</span></span></span>
               </span>
             </div>
             <div class="metric-group" id="metricGroup">
               <button class="metric-btn active" data-m="aeng" onclick="setMetric('aeng')">Avg Engagement</button>
               <button class="metric-btn" data-m="eng" onclick="setMetric('eng')">Engagement</button>
+              <button class="metric-btn" data-m="er" onclick="setMetric('er')">ER</button>
+              <button class="metric-btn" data-m="pageer" onclick="setMetric('pageer')">Page ER</button>
               <button class="metric-btn" data-m="lk" onclick="setMetric('lk')">Likes</button>
               <button class="metric-btn" data-m="cm" onclick="setMetric('cm')">Comments</button>
               <button class="metric-btn" data-m="vv" onclick="setMetric('vv')">Video Views</button>
@@ -760,8 +764,8 @@ var TOPPOSTS=[
   {th:'🚇',name:'Breaking: new MTR line opens ahead of schedule',fmt:'LINK',cat:'News & Current Affairs',sub:'Local & Regional News',adcat:'Text-Only Graphic',eng:1240,likes:680,comments:360,vv:2100,d:-6}
 ];
 
-var METRIC_LABEL = {aeng:'Avg Engagement',eng:'Engagement',lk:'Likes',cm:'Comments',vv:'Video Views'};
-var METRIC_UNIT  = {aeng:'per post',eng:'total',lk:'total',cm:'total',vv:'total'};
+var METRIC_LABEL = {aeng:'Avg Engagement',eng:'Engagement',er:'ER',pageer:'Page ER',lk:'Likes',cm:'Comments',vv:'Video Views'};
+var METRIC_UNIT  = {aeng:'per post',eng:'total',er:'vs followers',pageer:'daily · vs followers',lk:'total',cm:'total',vv:'total'};
 /* derive sub-row metric values from its avg engagement using lens-stable ratios */
 var SUB_RATIO = {lk:0.74,cm:0.13,vv:3.0};
 
@@ -774,10 +778,13 @@ function fmtK(n){if(n>=1000000)return (n/1000000).toFixed(1)+'M';if(n>=1000)retu
 function val(row,m){return row[m];}
 function subVal(subEng,m){return m==='eng'?subEng:Math.round(subEng*SUB_RATIO[m]);}
 function metricVal(r,m){
-  if(m==='aeng') return r.eng;          /* avg engagement per post */
-  if(m==='eng')  return r.posts*r.eng;  /* total engagement */
-  return r.posts*r[m];                  /* total likes / comments / video views */
+  if(m==='aeng') return r.eng;                       /* avg engagement per post */
+  if(m==='eng')  return r.posts*r.eng;               /* total engagement */
+  if(m==='er')   return r.eng/FOLLOWERS*100;         /* ER: per-post eng ÷ followers (competitor / nominal) */
+  if(m==='pageer') return (r.posts*r.eng)/12000000*100; /* Page ER: daily page rate (mock) */
+  return r.posts*r[m];                               /* total likes / comments / video views */
 }
+function barValText(v){ return metric==='er'?v.toFixed(1)+'%':metric==='pageer'?v.toFixed(2)+'%':fmt(v); }
 function overallAvg(d,m){ // weighted by posts
   var tp=0,tv=0; d.rows.forEach(function(r){tp+=r.posts;tv+=r.posts*val(r,m);});
   return tv/tp;
@@ -811,7 +818,7 @@ function renderBars(){
     }
     return '<div class="bar-row"><div class="bar-name" title="'+r.n+'">'+r.n+'</div>'+
       bars+
-      '<div class="bar-val">'+fmt(v)+'<span class="d '+dcls+'">'+darrow+Math.abs(r.d)+'%</span>'+
+      '<div class="bar-val">'+barValText(v)+'<span class="d '+dcls+'">'+darrow+Math.abs(r.d)+'%</span>'+
       '<span class="u">'+METRIC_UNIT[metric]+'</span></div></div>';
   }).join('');
   document.getElementById('catBars').innerHTML=html;
