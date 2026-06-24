@@ -241,11 +241,14 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
 
 /* ===== COMBO BARS ===== */
 .cbars{display:flex;flex-direction:column;gap:13px;margin-top:8px;}
-.cbar-row{display:grid;grid-template-columns:1fr 62px;align-items:center;gap:12px;}
+.cbar-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;}
 .cbar-label{font-size:11.5px;color:var(--text);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .cbar-track{height:18px;background:#EEF3F6;border-radius:6px;overflow:hidden;}
 .cbar-fill{height:100%;border-radius:6px;transition:width .45s ease;}
-.cbar-val{font-size:13px;font-weight:600;text-align:right;color:var(--text);}
+.cbar-val{font-size:13px;font-weight:600;text-align:right;color:var(--text);min-width:110px;line-height:1.4;}
+.cbar-pct{font-size:11px;color:var(--secondary);font-weight:400;}
+.cbar-delta{font-size:10.5px;font-weight:600;}
+.cbar-delta.up{color:var(--success);} .cbar-delta.down{color:var(--danger);}
 
 /* ===== TOP CONTENT LIST ===== */
 .tc-row{display:grid;grid-template-columns:30px 56px 1fr auto;align-items:center;gap:14px;padding:14px 4px;border-bottom:1px solid #F1F5F7;}
@@ -750,88 +753,88 @@ var BESTFORMAT={
 
 /* Best combinations (Content × Ad / Content × Image) — avg engagements per post */
 var COMBO_AD=[
-  {a:'Lifestyle & Personal Dev.',b:'UGC & Lifestyle Shots',v:3120,c:'#23A9F6'},
-  {a:'Trends & Viral Content',b:'UGC & Lifestyle Shots',v:2680,c:'#7C5CFF'},
-  {a:'Entertainment & Pop Culture',b:'Face-Only Image',v:2210,c:'#FF7AC2'},
-  {a:'Lifestyle & Personal Dev.',b:'Before & After Comparison',v:2040,c:'#FFBA33'},
-  {a:'Lifestyle & Personal Dev.',b:'Customer Review & Testimonial',v:1880,c:'#16C2C2'},
-  {a:'Society & Culture',b:'Text-Only Graphic',v:1240,c:'#52C41A'},
-  {a:'News & Current Affairs',b:'Product-Only Image',v:980,c:'#9AA7B0'},
-  {a:'Business & Finance',b:'Infographic & Data Visualization',v:760,c:'#9AA7B0'}
+  {a:'Lifestyle & Personal Dev.',b:'UGC & Lifestyle Shots',v:3120,d:+18,c:'#23A9F6'},
+  {a:'Trends & Viral Content',b:'UGC & Lifestyle Shots',v:2680,d:+12,c:'#7C5CFF'},
+  {a:'Entertainment & Pop Culture',b:'Face-Only Image',v:2210,d:+6,c:'#FF7AC2'},
+  {a:'Lifestyle & Personal Dev.',b:'Before & After Comparison',v:2040,d:+9,c:'#FFBA33'},
+  {a:'Lifestyle & Personal Dev.',b:'Customer Review & Testimonial',v:1880,d:+4,c:'#16C2C2'},
+  {a:'Society & Culture',b:'Text-Only Graphic',v:1240,d:-3,c:'#52C41A'},
+  {a:'News & Current Affairs',b:'Product-Only Image',v:980,d:-8,c:'#9AA7B0'},
+  {a:'Business & Finance',b:'Infographic & Data Visualization',v:760,d:+2,c:'#9AA7B0'}
 ];
 var COMBO_IMG=[
-  {a:'Lifestyle & Personal Dev.',b:'People & Portraits',v:2980,c:'#23A9F6'},
-  {a:'Entertainment & Pop Culture',b:'People & Portraits',v:2540,c:'#7C5CFF'},
-  {a:'Trends & Viral Content',b:'Lifestyle & Fashion',v:2360,c:'#FF7AC2'},
-  {a:'Lifestyle & Personal Dev.',b:'Lifestyle & Fashion',v:2180,c:'#FFBA33'},
-  {a:'Society & Culture',b:'Social & Cultural Themes',v:1620,c:'#16C2C2'},
-  {a:'Entertainment & Pop Culture',b:'Animals & Wildlife',v:1380,c:'#52C41A'},
-  {a:'News & Current Affairs',b:'Urban & Architecture',v:1080,c:'#9AA7B0'},
-  {a:'Technology & Innovation',b:'Technology & Digital',v:690,c:'#9AA7B0'}
+  {a:'Lifestyle & Personal Dev.',b:'People & Portraits',v:2980,d:+15,c:'#23A9F6'},
+  {a:'Entertainment & Pop Culture',b:'People & Portraits',v:2540,d:+8,c:'#7C5CFF'},
+  {a:'Trends & Viral Content',b:'Lifestyle & Fashion',v:2360,d:+11,c:'#FF7AC2'},
+  {a:'Lifestyle & Personal Dev.',b:'Lifestyle & Fashion',v:2180,d:+7,c:'#FFBA33'},
+  {a:'Society & Culture',b:'Social & Cultural Themes',v:1620,d:+3,c:'#16C2C2'},
+  {a:'Entertainment & Pop Culture',b:'Animals & Wildlife',v:1380,d:+5,c:'#52C41A'},
+  {a:'News & Current Affairs',b:'Urban & Architecture',v:1080,d:-4,c:'#9AA7B0'},
+  {a:'Technology & Innovation',b:'Technology & Digital',v:690,d:+1,c:'#9AA7B0'}
 ];
 /* sub-category level combinations */
 var COMBO_AD_SUB=[
-  {a:'Food & Cooking',b:'UGC & Lifestyle Shots',v:3320,c:'#23A9F6'},
-  {a:'Social Media Trends',b:'UGC & Lifestyle Shots',v:2740,c:'#7C5CFF'},
-  {a:'Health & Wellness',b:'Before & After Comparison',v:2510,c:'#FF7AC2'},
-  {a:'Celebrity News & Gossip',b:'Face-Only Image',v:2280,c:'#FFBA33'},
-  {a:'Fashion & Beauty',b:'Customer Review & Testimonial',v:2040,c:'#16C2C2'},
-  {a:'Travel & Adventure',b:'Product-Only Image',v:1760,c:'#52C41A'},
-  {a:'Local & Regional News',b:'Text-Only Graphic',v:1120,c:'#9AA7B0'},
-  {a:'Personal Finance & Budgeting',b:'Infographic & Data Visualization',v:880,c:'#9AA7B0'}
+  {a:'Food & Cooking',b:'UGC & Lifestyle Shots',v:3320,d:+21,c:'#23A9F6'},
+  {a:'Social Media Trends',b:'UGC & Lifestyle Shots',v:2740,d:+14,c:'#7C5CFF'},
+  {a:'Health & Wellness',b:'Before & After Comparison',v:2510,d:+10,c:'#FF7AC2'},
+  {a:'Celebrity News & Gossip',b:'Face-Only Image',v:2280,d:+7,c:'#FFBA33'},
+  {a:'Fashion & Beauty',b:'Customer Review & Testimonial',v:2040,d:+5,c:'#16C2C2'},
+  {a:'Travel & Adventure',b:'Product-Only Image',v:1760,d:-2,c:'#52C41A'},
+  {a:'Local & Regional News',b:'Text-Only Graphic',v:1120,d:-6,c:'#9AA7B0'},
+  {a:'Personal Finance & Budgeting',b:'Infographic & Data Visualization',v:880,d:+3,c:'#9AA7B0'}
 ];
 var COMBO_IMG_SUB=[
-  {a:'Food & Cooking',b:'Lifestyle & Fashion',v:3180,c:'#23A9F6'},
-  {a:'Celebrity News & Gossip',b:'People & Portraits',v:2620,c:'#7C5CFF'},
-  {a:'Social Media Trends',b:'People & Portraits',v:2410,c:'#FF7AC2'},
-  {a:'Fashion & Beauty',b:'Lifestyle & Fashion',v:2230,c:'#FFBA33'},
-  {a:'Health & Wellness',b:'Social & Cultural Themes',v:1740,c:'#16C2C2'},
-  {a:'Travel & Adventure',b:'Urban & Architecture',v:1520,c:'#52C41A'},
-  {a:'Education & Learning',b:'Social & Cultural Themes',v:1180,c:'#9AA7B0'},
-  {a:'Gadgets & Reviews',b:'Technology & Digital',v:720,c:'#9AA7B0'}
+  {a:'Food & Cooking',b:'Lifestyle & Fashion',v:3180,d:+17,c:'#23A9F6'},
+  {a:'Celebrity News & Gossip',b:'People & Portraits',v:2620,d:+9,c:'#7C5CFF'},
+  {a:'Social Media Trends',b:'People & Portraits',v:2410,d:+13,c:'#FF7AC2'},
+  {a:'Fashion & Beauty',b:'Lifestyle & Fashion',v:2230,d:+8,c:'#FFBA33'},
+  {a:'Health & Wellness',b:'Social & Cultural Themes',v:1740,d:+4,c:'#16C2C2'},
+  {a:'Travel & Adventure',b:'Urban & Architecture',v:1520,d:-1,c:'#52C41A'},
+  {a:'Education & Learning',b:'Social & Cultural Themes',v:1180,d:-5,c:'#9AA7B0'},
+  {a:'Gadgets & Reviews',b:'Technology & Digital',v:720,d:+2,c:'#9AA7B0'}
 ];
 /* Ad × Image (ad lens, card 2) */
 var COMBO_AD_IMG=[
-  {a:'UGC & Lifestyle Shots',b:'People & Portraits',v:2640,c:'#23A9F6'},
-  {a:'Face-Only Image',b:'People & Portraits',v:2380,c:'#7C5CFF'},
-  {a:'UGC & Lifestyle Shots',b:'Lifestyle & Fashion',v:2210,c:'#FF7AC2'},
-  {a:'Customer Review & Testimonial',b:'People & Portraits',v:1880,c:'#FFBA33'},
-  {a:'Before & After Comparison',b:'Lifestyle & Fashion',v:1720,c:'#16C2C2'},
-  {a:'Product-Only Image',b:'Business & Finance',v:1040,c:'#52C41A'},
-  {a:'Text-Only Graphic',b:'Social & Cultural Themes',v:880,c:'#9AA7B0'},
-  {a:'Infographic & Data Visualization',b:'Technology & Digital',v:690,c:'#9AA7B0'}
+  {a:'UGC & Lifestyle Shots',b:'People & Portraits',v:2640,d:+16,c:'#23A9F6'},
+  {a:'Face-Only Image',b:'People & Portraits',v:2380,d:+10,c:'#7C5CFF'},
+  {a:'UGC & Lifestyle Shots',b:'Lifestyle & Fashion',v:2210,d:+8,c:'#FF7AC2'},
+  {a:'Customer Review & Testimonial',b:'People & Portraits',v:1880,d:+5,c:'#FFBA33'},
+  {a:'Before & After Comparison',b:'Lifestyle & Fashion',v:1720,d:+3,c:'#16C2C2'},
+  {a:'Product-Only Image',b:'Business & Finance',v:1040,d:-4,c:'#52C41A'},
+  {a:'Text-Only Graphic',b:'Social & Cultural Themes',v:880,d:-7,c:'#9AA7B0'},
+  {a:'Infographic & Data Visualization',b:'Technology & Digital',v:690,d:+1,c:'#9AA7B0'}
 ];
 /* Image × Content (image lens, card 1) */
 var COMBO_IMG_CONTENT=[
-  {a:'People & Portraits',b:'Lifestyle & Personal Dev.',v:2980,c:'#23A9F6'},
-  {a:'People & Portraits',b:'Entertainment & Pop Culture',v:2540,c:'#7C5CFF'},
-  {a:'Lifestyle & Fashion',b:'Trends & Viral Content',v:2360,c:'#FF7AC2'},
-  {a:'Lifestyle & Fashion',b:'Lifestyle & Personal Dev.',v:2180,c:'#FFBA33'},
-  {a:'Social & Cultural Themes',b:'Society & Culture',v:1620,c:'#16C2C2'},
-  {a:'Animals & Wildlife',b:'Entertainment & Pop Culture',v:1380,c:'#52C41A'},
-  {a:'Urban & Architecture',b:'News & Current Affairs',v:1080,c:'#9AA7B0'},
-  {a:'Technology & Digital',b:'Technology & Innovation',v:690,c:'#9AA7B0'}
+  {a:'People & Portraits',b:'Lifestyle & Personal Dev.',v:2980,d:+15,c:'#23A9F6'},
+  {a:'People & Portraits',b:'Entertainment & Pop Culture',v:2540,d:+8,c:'#7C5CFF'},
+  {a:'Lifestyle & Fashion',b:'Trends & Viral Content',v:2360,d:+11,c:'#FF7AC2'},
+  {a:'Lifestyle & Fashion',b:'Lifestyle & Personal Dev.',v:2180,d:+7,c:'#FFBA33'},
+  {a:'Social & Cultural Themes',b:'Society & Culture',v:1620,d:+3,c:'#16C2C2'},
+  {a:'Animals & Wildlife',b:'Entertainment & Pop Culture',v:1380,d:+5,c:'#52C41A'},
+  {a:'Urban & Architecture',b:'News & Current Affairs',v:1080,d:-4,c:'#9AA7B0'},
+  {a:'Technology & Digital',b:'Technology & Innovation',v:690,d:+1,c:'#9AA7B0'}
 ];
 var COMBO_IMG_CONTENT_SUB=[
-  {a:'Lifestyle & Fashion',b:'Food & Cooking',v:3180,c:'#23A9F6'},
-  {a:'People & Portraits',b:'Celebrity News & Gossip',v:2620,c:'#7C5CFF'},
-  {a:'People & Portraits',b:'Social Media Trends',v:2410,c:'#FF7AC2'},
-  {a:'Lifestyle & Fashion',b:'Fashion & Beauty',v:2230,c:'#FFBA33'},
-  {a:'Social & Cultural Themes',b:'Health & Wellness',v:1740,c:'#16C2C2'},
-  {a:'Urban & Architecture',b:'Travel & Adventure',v:1520,c:'#52C41A'},
-  {a:'Social & Cultural Themes',b:'Education & Learning',v:1180,c:'#9AA7B0'},
-  {a:'Technology & Digital',b:'Gadgets & Reviews',v:720,c:'#9AA7B0'}
+  {a:'Lifestyle & Fashion',b:'Food & Cooking',v:3180,d:+17,c:'#23A9F6'},
+  {a:'People & Portraits',b:'Celebrity News & Gossip',v:2620,d:+9,c:'#7C5CFF'},
+  {a:'People & Portraits',b:'Social Media Trends',v:2410,d:+13,c:'#FF7AC2'},
+  {a:'Lifestyle & Fashion',b:'Fashion & Beauty',v:2230,d:+8,c:'#FFBA33'},
+  {a:'Social & Cultural Themes',b:'Health & Wellness',v:1740,d:+4,c:'#16C2C2'},
+  {a:'Urban & Architecture',b:'Travel & Adventure',v:1520,d:-1,c:'#52C41A'},
+  {a:'Social & Cultural Themes',b:'Education & Learning',v:1180,d:-5,c:'#9AA7B0'},
+  {a:'Technology & Digital',b:'Gadgets & Reviews',v:720,d:+2,c:'#9AA7B0'}
 ];
 /* Image × Ad (image lens, card 2) */
 var COMBO_IMG_AD=[
-  {a:'People & Portraits',b:'UGC & Lifestyle Shots',v:2640,c:'#23A9F6'},
-  {a:'People & Portraits',b:'Face-Only Image',v:2380,c:'#7C5CFF'},
-  {a:'Lifestyle & Fashion',b:'UGC & Lifestyle Shots',v:2210,c:'#FF7AC2'},
-  {a:'People & Portraits',b:'Customer Review & Testimonial',v:1880,c:'#FFBA33'},
-  {a:'Lifestyle & Fashion',b:'Before & After Comparison',v:1720,c:'#16C2C2'},
-  {a:'Business & Finance',b:'Product-Only Image',v:1040,c:'#52C41A'},
-  {a:'Social & Cultural Themes',b:'Text-Only Graphic',v:880,c:'#9AA7B0'},
-  {a:'Technology & Digital',b:'Infographic & Data Visualization',v:690,c:'#9AA7B0'}
+  {a:'People & Portraits',b:'UGC & Lifestyle Shots',v:2640,d:+16,c:'#23A9F6'},
+  {a:'People & Portraits',b:'Face-Only Image',v:2380,d:+10,c:'#7C5CFF'},
+  {a:'Lifestyle & Fashion',b:'UGC & Lifestyle Shots',v:2210,d:+8,c:'#FF7AC2'},
+  {a:'People & Portraits',b:'Customer Review & Testimonial',v:1880,d:+5,c:'#FFBA33'},
+  {a:'Lifestyle & Fashion',b:'Before & After Comparison',v:1720,d:+3,c:'#16C2C2'},
+  {a:'Business & Finance',b:'Product-Only Image',v:1040,d:-4,c:'#52C41A'},
+  {a:'Social & Cultural Themes',b:'Text-Only Graphic',v:880,d:-7,c:'#9AA7B0'},
+  {a:'Technology & Digital',b:'Infographic & Data Visualization',v:690,d:+1,c:'#9AA7B0'}
 ];
 /* per-lens combo card config: pairs the active lens with the other two systems */
 var COMBOS={
@@ -999,16 +1002,22 @@ function comboMetricVal(baseV){
   return baseV;
 }
 function renderCombo(elId,data){
-  var rows=data.slice().map(function(r){return {a:r.a,b:r.b,c:r.c,mv:comboMetricVal(r.v)};})
+  var rows=data.slice().map(function(r){return {a:r.a,b:r.b,c:r.c,mv:comboMetricVal(r.v),d:r.d||0};})
                .sort(function(a,b){return b.mv-a.mv;});
   var max=rows[0].mv;
+  var total=0; rows.forEach(function(r){total+=r.mv;});
   var isPct=metric==='er'||metric==='pageer'||metric==='ctr';
   document.getElementById(elId).innerHTML=rows.map(function(r){
     var w=r.mv/max*100, label=r.a+' + '+r.b;
     var disp=isPct?r.mv+'%':fmt(r.mv);
+    var share=total>0?(r.mv/total*100).toFixed(1)+'%':'—';
+    var dcls=r.d>0?'up':(r.d<0?'down':'');
+    var dtext=r.d!==0
+      ? '<span class="cbar-delta '+dcls+'">'+(r.d>0?'▲':'▼')+Math.abs(r.d)+'%</span>'
+      : '<span class="cbar-delta" style="color:var(--secondary)">–</span>';
     return '<div class="cbar-row"><div><div class="cbar-label" title="'+label+'">'+label+'</div>'+
       '<div class="cbar-track"><div class="cbar-fill" style="width:'+w+'%;background:'+r.c+'"></div></div></div>'+
-      '<div class="cbar-val">'+disp+'</div></div>';
+      '<div class="cbar-val">'+disp+' <span class="cbar-pct">('+share+')</span><br>'+dtext+'</div></div>';
   }).join('');
 }
 function renderCombos(){
