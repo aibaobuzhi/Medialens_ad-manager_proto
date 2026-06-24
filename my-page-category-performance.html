@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Page — Category Performance</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Poppins', 'Noto Sans HK', system-ui, sans-serif; background: #F7F7F7; color: #102532; font-size: 14px; }
+
+  /* NAV */
+  .top-nav { background: #23A9F6; height: 72px; display: flex; align-items: center; padding: 0 24px; gap: 12px; position: sticky; top: 0; z-index: 100; }
+  .top-nav .logo { color: #fff; font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .top-nav .logo svg { width: 28px; height: 28px; }
+  .top-nav .spacer { flex: 1; }
+  .top-nav .avatar { width: 32px; height: 32px; border-radius: 50%; background: #EEF6FF; color: #23A9F6; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  .top-nav .user-name { color: #fff; font-size: 14px; }
+
+  /* LAYOUT */
+  .layout { display: flex; min-height: calc(100vh - 72px); }
+
+  /* SIDEBAR */
+  .sidebar { width: 200px; background: #fff; border-right: 1px solid #E8EEF0; padding: 16px 0; flex-shrink: 0; }
+  .sidebar .org { padding: 8px 16px 16px; border-bottom: 1px solid #E8EEF0; margin-bottom: 8px; }
+  .sidebar .org-name { font-weight: 600; font-size: 13px; color: #102532; }
+  .sidebar .org-role { font-size: 11px; color: #828282; }
+  .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; cursor: pointer; color: #707070; font-size: 13px; border-left: 3px solid transparent; transition: all 0.15s; }
+  .sidebar-item:hover { background: #F7F7F7; }
+  .sidebar-item.active { color: #23A9F6; border-left-color: #23A9F6; background: #EEF6FF; font-weight: 500; }
+  .sidebar-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* MAIN */
+  .main { flex: 1; padding: 0; overflow: hidden; }
+
+  /* PAGE HEADER TABS */
+  .page-header { background: #fff; border-bottom: 1px solid #E8EEF0; padding: 0 32px; }
+  .page-meta { display: flex; align-items: center; gap: 12px; padding: 16px 0 12px; }
+  .page-icon { width: 56px; height: 56px; border-radius: 50%; background: #102532; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 10px; text-align: center; line-height: 1.2; flex-shrink: 0; }
+  .page-info h2 { font-size: 16px; font-weight: 600; color: #102532; }
+  .page-info .page-stats { font-size: 12px; color: #707070; margin-top: 2px; }
+  .page-info .page-tags { display: flex; gap: 6px; margin-top: 4px; font-size: 11px; color: #707070; }
+  .page-tags span { display: flex; align-items: center; gap: 3px; }
+  .tabs { display: flex; gap: 0; border-bottom: none; }
+  .tab { padding: 10px 14px; cursor: pointer; font-size: 13px; color: #707070; border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.15s; }
+  .tab:hover { color: #23A9F6; }
+  .tab.active { color: #23A9F6; border-bottom-color: #23A9F6; font-weight: 500; }
+  .date-row { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 8px 32px; font-size: 12px; color: #707070; background: #fff; border-bottom: 1px solid #E8EEF0; }
+  .date-row .date-badge { display: flex; align-items: center; gap: 6px; background: #EEF6FF; border-radius: 6px; padding: 4px 10px; color: #23A9F6; font-size: 12px; }
+
+  /* FILTER BAR */
+  .filter-bar { display: flex; align-items: center; gap: 8px; padding: 14px 32px; background: #fff; border-bottom: 1px solid #E8EEF0; flex-wrap: wrap; }
+  .filter-chip { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid #D9E3E6; border-radius: 8px; font-size: 13px; color: #102532; cursor: pointer; background: #fff; transition: all 0.15s; white-space: nowrap; }
+  .filter-chip:hover { border-color: #23A9F6; color: #23A9F6; }
+  .filter-chip svg { width: 14px; height: 14px; color: #707070; }
+
+  /* CONTENT */
+  .content { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+
+  /* OVERVIEW CARDS */
+  .overview-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .metric-card { background: #fff; border: 1px solid #D9E3E6; border-radius: 10px; padding: 18px 20px; }
+  .metric-card .label { font-size: 12px; color: #707070; margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
+  .metric-card .value { font-size: 26px; font-weight: 600; color: #102532; }
+
+  /* SECTION HEADING */
+  .section-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .section-title { font-size: 16px; font-weight: 600; color: #102532; display: flex; align-items: center; gap: 8px; }
+  .section-title .ai-dot { width: 18px; height: 18px; border-radius: 50%; background: #23A9F6; display: flex; align-items: center; justify-content: center; }
+  .section-title .ai-dot svg { width: 10px; height: 10px; color: #fff; }
+
+  /* METRIC SELECTOR */
+  .metric-selector { position: relative; display: inline-block; }
+  .metric-btn { display: flex; align-items: center; gap: 8px; padding: 7px 12px; border: 1px solid #D9E3E6; border-radius: 8px; background: #fff; font-size: 13px; color: #102532; cursor: pointer; font-family: 'Poppins', sans-serif; font-weight: 500; }
+  .metric-btn svg { width: 14px; height: 14px; color: #707070; }
+  .metric-btn .metric-icon { color: #23A9F6; }
+  .metric-dropdown { position: absolute; top: calc(100% + 4px); right: 0; background: #fff; border: 1px solid #D9E3E6; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); min-width: 200px; z-index: 50; padding: 4px 0; display: none; }
+  .metric-dropdown.open { display: block; }
+  .metric-option { padding: 10px 16px; font-size: 14px; color: #102532; cursor: pointer; transition: background 0.12s; }
+  .metric-option:hover { background: #F7F7F7; }
+  .metric-option.selected { font-weight: 600; color: #23A9F6; background: #EEF6FF; }
+  /* Average toggle row */
+  .metric-avg-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px 10px; border-bottom: 1px solid #E8EEF0; margin-bottom: 4px; }
+  .metric-avg-label { font-size: 14px; color: #102532; }
+  .toggle-track { width: 36px; height: 20px; border-radius: 10px; background: #D9E3E6; position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+  .toggle-track.on { background: #23A9F6; }
+  .toggle-thumb { width: 16px; height: 16px; border-radius: 50%; background: #fff; position: absolute; top: 2px; left: 2px; transition: left 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  .toggle-track.on .toggle-thumb { left: 18px; }
+
+  /* CATEGORY CARDS GRID */
+  .categories-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .categories-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+  /* TAB CONTENT SWITCHING */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* OVERVIEW DASHBOARD */
+  .ov-dashboard-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .ov-dashboard-title { font-size: 17px; font-weight: 600; color: #102532; }
+  .ov-ai-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: #23A9F6; color: #fff; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; font-family: 'Poppins', sans-serif; }
+  .ov-metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  .ov-metric-card { background: #fff; border: 1px solid #D9E3E6; border-radius: 10px; padding: 16px 18px; }
+  .ov-metric-card .ov-label { font-size: 11px; color: #707070; margin-bottom: 4px; display: flex; align-items: center; gap: 3px; }
+  .ov-metric-card .ov-value { font-size: 20px; font-weight: 700; color: #102532; }
+  .ov-metric-card .ov-date { font-size: 10px; color: #828282; }
+  .ov-metric-card .ov-delta { font-size: 11px; color: #FF3F41; }
+  .ov-metric-card .ov-delta.up { color: #52C41A; }
+  .ov-metric-top { display: flex; align-items: flex-start; justify-content: space-between; }
+  .ov-sparkline { height: 40px; margin-top: 8px; position: relative; overflow: hidden; border-radius: 4px; }
+  .ov-sparkline svg { width: 100%; height: 100%; }
+  .ov-metrics-grid-2 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+
+  /* CATEGORY CARD */
+  .cat-card { background: #fff; border: 1px solid #D9E3E6; border-radius: 10px; padding: 20px; }
+  .cat-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .cat-card-title { font-size: 14px; font-weight: 600; color: #102532; }
+
+  /* Each category row: rank+name+meta on top line, stacked bar underneath */
+  .cat-row { padding: 8px 0; border-bottom: 1px solid #F0F0F0; cursor: pointer; transition: background 0.12s; border-radius: 6px; }
+  .cat-row:last-child { border-bottom: none; }
+  .cat-row:hover { background: #F7F7F7; margin: 0 -8px; padding-left: 8px; padding-right: 8px; }
+
+  .cat-row-top { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .cat-rank { width: 16px; font-size: 12px; color: #828282; flex-shrink: 0; }
+  .cat-name { flex: 1; font-size: 13px; color: #102532; font-weight: 400; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cat-meta { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .cat-value { font-size: 13px; color: #102532; font-weight: 500; white-space: nowrap; }
+  .cat-pct { font-size: 12px; color: #707070; white-space: nowrap; }
+  .cat-arrow { color: #CACACA; font-size: 13px; line-height: 1; flex-shrink: 0; }
+
+  /* Stacked segmented bar */
+  /* Outer grey rail = full width; inner coloured fill = row.bar% of rail */
+  .cat-bar-rail { height: 7px; border-radius: 4px; background: #E8EEF0; overflow: hidden; width: 100%; }
+  .cat-bar-fill { height: 100%; display: flex; border-radius: 4px; overflow: hidden; }
+  .cat-bar-seg  { height: 100%; flex-shrink: 0; }
+
+  /* POST TYPE LEGEND */
+  .legend { display: flex; align-items: center; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #707070; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+  /* MODAL OVERLAY */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(10,31,44,0.45); z-index: 200; display: none; align-items: center; justify-content: center; padding: 24px; }
+  .modal-overlay.open { display: flex; }
+  .modal-panel { width: 92%; max-width: 1080px; max-height: 90vh; background: #fff; border-radius: 16px; box-shadow: 0 12px 48px rgba(0,0,0,0.18); display: flex; flex-direction: column; overflow: hidden; }
+
+  /* MODAL HEADER */
+  .modal-top { padding: 18px 24px; border-bottom: 1px solid #E8EEF0; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .modal-title { font-size: 15px; font-weight: 600; color: #102532; }
+  .modal-close { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #D9E3E6; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #707070; }
+  .modal-close:hover { background: #F7F7F7; }
+
+  /* MODAL BODY: two-column */
+  .modal-body { display: flex; flex: 1; overflow: hidden; }
+
+  /* LEFT SIDEBAR */
+  .modal-sidebar { width: 240px; flex-shrink: 0; border-right: 1px solid #E8EEF0; padding: 20px 20px; overflow-y: auto; }
+  .modal-sidebar-section { margin-bottom: 24px; }
+  .modal-sidebar-section h4 { font-size: 13px; font-weight: 600; color: #102532; margin-bottom: 12px; }
+  .info-row { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-bottom: 1px solid #F0F0F0; }
+  .info-row:last-child { border-bottom: none; }
+  .info-row .info-label { font-size: 12px; color: #828282; }
+  .info-row .info-val { font-size: 12px; color: #102532; font-weight: 500; text-align: right; max-width: 130px; word-break: break-word; }
+  .summary-stat { display: flex; justify-content: space-between; align-items: baseline; padding: 7px 0; border-bottom: 1px solid #F0F0F0; }
+  .summary-stat:last-child { border-bottom: none; }
+  .summary-stat .s-label { font-size: 12px; color: #828282; }
+  .summary-stat .s-val { font-size: 13px; font-weight: 600; color: #102532; }
+
+  /* RIGHT: TABLE AREA */
+  .modal-table-wrap { flex: 1; overflow-y: auto; padding: 0; display: flex; flex-direction: column; }
+
+  /* POST TABLE */
+  .post-table { width: 100%; border-collapse: collapse; }
+  .post-table thead { position: sticky; top: 0; background: #fff; z-index: 2; }
+  .post-table th { font-size: 12px; font-weight: 500; color: #828282; text-align: left; padding: 12px 12px; border-bottom: 1px solid #E8EEF0; white-space: nowrap; }
+  .post-table th svg { vertical-align: middle; margin-left: 2px; }
+  .post-table th.sortable { cursor: pointer; user-select: none; }
+  .post-table th.sortable:hover { color: #23A9F6; }
+  .post-table td { padding: 12px 12px; border-bottom: 1px solid #F0F0F0; vertical-align: middle; }
+  .post-table tr:last-child td { border-bottom: none; }
+  .post-row:hover td { background: #F7F7F7; cursor: pointer; }
+
+  /* POST CELL */
+  .post-cell { display: flex; align-items: flex-start; gap: 10px; }
+  .post-thumb { width: 68px; height: 56px; border-radius: 6px; background: #E8EEF0; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; overflow: hidden; }
+  .post-meta-wrap { flex: 1; min-width: 0; }
+  .post-header-row { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+  .post-logo { width: 22px; height: 22px; border-radius: 50%; background: #102532; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 7px; font-weight: 700; flex-shrink: 0; line-height: 1.1; text-align: center; }
+  .post-page-name { font-size: 12px; font-weight: 600; color: #102532; }
+  .post-type-icon { margin-left: auto; width: 18px; height: 18px; border: 1px solid #D9E3E6; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .post-date-row { font-size: 11px; color: #828282; margin-bottom: 4px; }
+  .post-text { font-size: 12px; color: #102532; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* METRIC CELL */
+  .metric-val { font-size: 13px; color: #102532; font-weight: 500; white-space: nowrap; }
+  .metric-bar-wrap { height: 4px; background: #E8EEF0; border-radius: 2px; margin-top: 4px; width: 72px; }
+  .metric-bar-fill { height: 100%; border-radius: 2px; background: #23A9F6; }
+
+  /* PAGINATION */
+  .pagination { display: flex; align-items: center; justify-content: flex-end; gap: 4px; padding: 14px 16px; border-top: 1px solid #F0F0F0; flex-shrink: 0; }
+  .page-btn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #D9E3E6; background: #fff; cursor: pointer; font-size: 12px; color: #707070; display: flex; align-items: center; justify-content: center; }
+  .page-btn.active { background: #23A9F6; color: #fff; border-color: #23A9F6; }
+  .page-btn:hover:not(.active) { background: #F7F7F7; }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="logo">
+    <svg viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="14" fill="white" fill-opacity="0.2"/><circle cx="14" cy="14" r="8" fill="white" fill-opacity="0.4"/><circle cx="14" cy="14" r="4" fill="white"/></svg>
+    MEDIA LENS
+  </div>
+  <div class="spacer"></div>
+  <div class="avatar">J</div>
+  <span class="user-name">Julie li ▾</span>
+</nav>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="org">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+        <div style="width:28px;height:28px;border-radius:6px;background:#102532;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;">PL</div>
+        <div>
+          <div class="org-name">PL – Hong Kong</div>
+          <div class="org-role">Admin · Julie Li</div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke-width="1.5"/><rect x="14" y="3" width="7" height="7" rx="1" stroke-width="1.5"/><rect x="3" y="14" width="7" height="7" rx="1" stroke-width="1.5"/><rect x="14" y="14" width="7" height="7" rx="1" stroke-width="1.5"/></svg>
+      Dashboard
+    </div>
+    <div class="sidebar-item active">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.5" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path stroke-width="1.5" d="M12 6v6l4 2"/></svg>
+      My Pages
+    </div>
+    <div class="sidebar-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.5" d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4" stroke-width="1.5"/><path stroke-width="1.5" d="M23 21v-2a4 4 0 0 0-3-3.87"/><path stroke-width="1.5" d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Competitor Analysis
+    </div>
+    <div class="sidebar-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.5" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      Buzz (What's Viral?)
+    </div>
+    <div class="sidebar-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.5" d="M18 20V10M12 20V4M6 20v-6"/></svg>
+      Leader Board
+    </div>
+    <div class="sidebar-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke-width="1.5"/><path stroke-width="1.5" d="M21 21l-4.35-4.35"/></svg>
+      Social Listening
+    </div>
+    <div class="sidebar-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.5" d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      Social Pulses
+    </div>
+    <div class="sidebar-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" stroke-width="1.5"/><path stroke-width="1.5" d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+      Ad Manager
+    </div>
+    <div class="sidebar-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.5" d="M2 12l5 5L15 5"/><path stroke-width="1.5" d="M22 12l-5 5-8-12"/></svg>
+      Ad Intelligence
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div class="page-meta">
+        <div class="page-icon">Business Focus</div>
+        <div class="page-info">
+          <h2>🔗 BusinessFocus <span style="font-size:11px;color:#707070;">↗</span></h2>
+          <div class="page-stats">32,329 Posts &nbsp;·&nbsp; 952,123 Likes &nbsp;·&nbsp; 952,173 Followers</div>
+          <div class="page-tags">
+            <span>📍 HK</span>
+            <span>Publisher Page Type</span>
+            <span style="color:#828282;">Business News &amp; Finance, Computers &amp; Gadgets, … Profile Interest</span>
+          </div>
+        </div>
+      </div>
+      <div class="tabs">
+        <div class="tab" onclick="switchTab('overview',this)">Overview</div>
+        <div class="tab active" onclick="switchTab('page',this)">Page</div>
+        <div class="tab">Posts</div>
+        <div class="tab">Fans Demographics</div>
+        <div class="tab">Editor Performance</div>
+        <div class="tab">Tags</div>
+        <div class="tab">Top Posts</div>
+        <div class="tab">Ad Library</div>
+        <div class="tab">Keywords</div>
+        <div class="tab">Hashtags</div>
+        <div class="tab">Ad Intelligence</div>
+      </div>
+    </div>
+
+    <div class="date-row">
+      <div class="date-badge">
+        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke-width="1.5"/><line x1="16" y1="2" x2="16" y2="6" stroke-width="1.5"/><line x1="8" y1="2" x2="8" y2="6" stroke-width="1.5"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="1.5"/></svg>
+        2026-06-16 &nbsp; to &nbsp; 2026-06-22
+      </div>
+      <span style="color:#23A9F6;font-size:12px;cursor:pointer;">⬇ Export PDF</span>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <div class="filter-chip">≡ Engagements</div>
+      <div class="filter-chip">⊘ Post Types</div>
+      <div class="filter-chip">🏷 Tags</div>
+      <div class="filter-chip">💬 Chatbot</div>
+      <div class="filter-chip">🚀 Boosted</div>
+      <div class="filter-chip">🌑 Dark Post</div>
+      <div class="filter-chip">📢 Ad</div>
+      <div class="filter-chip">🏢 Advertisers</div>
+      <div class="filter-chip">🔑 Keyword</div>
+      <div class="filter-chip" style="color:#23A9F6;border-color:#23A9F6;">🤖 AI category <span style="background:#23A9F6;color:#fff;border-radius:50%;width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;margin-left:4px;">✓</span></div>
+    </div>
+
+    <!-- ══ OVERVIEW TAB CONTENT ══ -->
+    <div id="overview-content" class="tab-content content">
+
+      <!-- DASHBOARD HEADER -->
+      <div class="ov-dashboard-header">
+        <div class="ov-dashboard-title">Dashboard</div>
+        <button class="ov-ai-btn">✦ AI Profile Analysis</button>
+      </div>
+
+      <!-- METRICS ROW 1 -->
+      <div class="ov-metrics-grid">
+        <div class="ov-metric-card">
+          <div class="ov-metric-top">
+            <div>
+              <div class="ov-value">952,123 <span class="ov-date" style="font-size:11px;font-weight:400;">(22 Jun)</span></div>
+              <div class="ov-label">Page Fans <span style="color:#CACACA;">ⓘ</span></div>
+            </div>
+            <span class="ov-delta">0.00% ↘</span>
+          </div>
+          <div class="ov-sparkline"><svg viewBox="0 0 120 40" preserveAspectRatio="none"><polyline points="0,20 40,20 80,20 120,20" fill="none" stroke="#23A9F6" stroke-width="1.5" opacity="0.4"/></svg></div>
+        </div>
+        <div class="ov-metric-card">
+          <div class="ov-metric-top">
+            <div>
+              <div class="ov-value">101</div>
+              <div class="ov-label">New Page Likes <span style="color:#CACACA;">ⓘ</span></div>
+            </div>
+            <svg width="14" height="14" fill="none" stroke="#CACACA" viewBox="0 0 24 24" style="margin-top:2px;"><circle cx="11" cy="11" r="8" stroke-width="1.5"/><path d="M21 21l-4.35-4.35" stroke-width="1.5"/></svg>
+          </div>
+          <div class="ov-sparkline"><svg viewBox="0 0 120 40" preserveAspectRatio="none"><polyline points="0,35 30,30 60,10 90,8 120,6" fill="none" stroke="#23A9F6" stroke-width="1.5"/><polygon points="0,40 30,35 60,15 90,13 120,11 120,40" fill="#23A9F6" opacity="0.12"/></svg></div>
+        </div>
+        <div class="ov-metric-card">
+          <div class="ov-metric-top">
+            <div>
+              <div class="ov-value">134,819</div>
+              <div class="ov-label">FB Page Post Engagements <span style="color:#CACACA;">ⓘ</span></div>
+            </div>
+            <span class="ov-delta">-77.38% ↘</span>
+          </div>
+          <div class="ov-sparkline"><svg viewBox="0 0 120 40" preserveAspectRatio="none"><polyline points="0,2 40,4 80,20 120,36" fill="none" stroke="#23A9F6" stroke-width="1.5"/><polygon points="0,7 40,9 80,25 120,41 120,40 0,40" fill="#23A9F6" opacity="0.12"/></svg></div>
+        </div>
+        <div class="ov-metric-card">
+          <div style="margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+              <span class="ov-label">Daily FB Page ER <span style="color:#CACACA;">ⓘ</span></span>
+              <span style="font-size:11px;background:#F7F7F7;border:1px solid #E8EEF0;border-radius:6px;padding:2px 7px;color:#707070;">FB ▾</span>
+            </div>
+            <div style="display:flex;align-items:baseline;gap:8px;"><span class="ov-value" style="font-size:18px;">2.02%</span><span class="ov-delta">-77.38% ↘</span></div>
+          </div>
+          <div style="border-top:1px solid #F0F0F0;padding-top:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+              <span class="ov-label">FB Post ER <span style="color:#CACACA;">ⓘ</span></span>
+              <span style="font-size:11px;background:#F7F7F7;border:1px solid #E8EEF0;border-radius:6px;padding:2px 7px;color:#707070;">FB ▾</span>
+            </div>
+            <div style="display:flex;align-items:baseline;gap:8px;"><span class="ov-value" style="font-size:18px;">0.47%</span><span class="ov-delta">-11.78% ↘</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- METRICS ROW 2 -->
+      <div class="ov-metrics-grid">
+        <div class="ov-metric-card">
+          <div class="ov-metric-top">
+            <div>
+              <div class="ov-value">1,329,019</div>
+              <div class="ov-label">Page Post Organic Impression <span style="color:#CACACA;">ⓘ</span></div>
+            </div>
+            <span class="ov-delta">-75.56% ↘</span>
+          </div>
+          <div class="ov-sparkline"><svg viewBox="0 0 120 40" preserveAspectRatio="none"><polyline points="0,2 40,4 80,22 120,38" fill="none" stroke="#23A9F6" stroke-width="1.5"/><polygon points="0,7 40,9 80,27 120,43 120,40 0,40" fill="#23A9F6" opacity="0.12"/></svg></div>
+        </div>
+        <div class="ov-metric-card">
+          <div class="ov-metric-top">
+            <div>
+              <div class="ov-value">1,643,702</div>
+              <div class="ov-label">Page Post Impressions <span style="color:#CACACA;">ⓘ</span></div>
+            </div>
+            <span class="ov-delta">-74.62% ↘</span>
+          </div>
+          <div class="ov-sparkline"><svg viewBox="0 0 120 40" preserveAspectRatio="none"><polyline points="0,2 40,5 80,24 120,38" fill="none" stroke="#23A9F6" stroke-width="1.5"/><polygon points="0,7 40,10 80,29 120,43 120,40 0,40" fill="#23A9F6" opacity="0.12"/></svg></div>
+        </div>
+        <div class="ov-metric-card">
+          <div class="ov-metric-top">
+            <div>
+              <div class="ov-value">408,688 <span class="ov-date" style="font-size:10px;font-weight:400;">(22 Jun)</span></div>
+              <div class="ov-label">Page Posts Reach <span style="color:#CACACA;">ⓘ</span></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;"><span class="ov-delta">-15.35% ↘</span><span style="font-size:11px;background:#F7F7F7;border:1px solid #E8EEF0;border-radius:6px;padding:2px 7px;color:#707070;">Day ▾</span></div>
+          </div>
+          <div class="ov-sparkline"><svg viewBox="0 0 120 40" preserveAspectRatio="none"><polyline points="0,2 40,6 80,26 120,38" fill="none" stroke="#23A9F6" stroke-width="1.5"/><polygon points="0,7 40,11 80,31 120,43 120,40 0,40" fill="#23A9F6" opacity="0.12"/></svg></div>
+        </div>
+        <div class="ov-metric-card">
+          <div class="ov-metric-top">
+            <div>
+              <div class="ov-value">7,604</div>
+              <div class="ov-label">Post Engagements <span style="color:#CACACA;">ⓘ</span></div>
+            </div>
+            <span class="ov-delta">-78.90% ↘</span>
+          </div>
+          <div class="ov-sparkline"><svg viewBox="0 0 120 40" preserveAspectRatio="none"><polyline points="0,2 30,3 60,10 90,28 120,38" fill="none" stroke="#23A9F6" stroke-width="1.5"/><polygon points="0,7 30,8 60,15 90,33 120,43 120,40 0,40" fill="#23A9F6" opacity="0.12"/></svg></div>
+        </div>
+      </div>
+
+      <!-- CATEGORY SECTION HEADING -->
+      <div class="section-heading">
+        <div class="section-title">
+          <div class="ai-dot"><svg viewBox="0 0 10 10" fill="white"><circle cx="5" cy="5" r="3"/></svg></div>
+          <span id="ovSectionTitle">Engagement</span> by AI category
+        </div>
+        <div class="metric-selector" id="ovMetricSelector">
+          <button class="metric-btn" onclick="toggleOvMetricDropdown(event)">
+            <svg class="metric-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor"><rect x="1" y="9" width="3" height="6" rx="0.5" stroke-width="1.2"/><rect x="6" y="5" width="3" height="10" rx="0.5" stroke-width="1.2"/><rect x="11" y="1" width="3" height="14" rx="0.5" stroke-width="1.2"/></svg>
+            Metric: <strong id="ovSelectedMetricLabel">Engagement</strong>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><path d="M4 6l4 4 4-4" stroke-width="1.5"/></svg>
+          </button>
+          <div class="metric-dropdown" id="ovMetricDropdown">
+            <div class="metric-avg-row">
+              <span class="metric-avg-label">Average</span>
+              <div class="toggle-track" id="ovAvgToggle" onclick="toggleOvAverage(event)">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+            <div class="metric-option selected" data-metric="Engagement" onclick="selectOvMetric('Engagement',this)">Engagement</div>
+            <div class="metric-option" data-metric="Reach" onclick="selectOvMetric('Reach',this)">Reach</div>
+            <div class="metric-option" data-metric="Post Views" onclick="selectOvMetric('Post Views',this)">Post Views</div>
+            <div class="metric-option" data-metric="Follows" onclick="selectOvMetric('Follows',this)">Follows</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 CARDS 2×2 -->
+      <div class="categories-grid">
+        <div class="cat-card">
+          <div class="cat-card-header"><div class="cat-card-title">Top Content Categories</div></div>
+          <div id="ov-content-cats"></div>
+          <div class="legend" style="margin-top:12px;">
+            <div class="legend-item"><div class="legend-dot" style="background:#23A9F6;"></div>Link</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#73DFFF;"></div>Share</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#FF6B6B;"></div>Photo</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#FFC960;"></div>Album</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#52C41A;"></div>Video</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#8B5CF6;"></div>Status</div>
+          </div>
+        </div>
+        <div class="cat-card">
+          <div class="cat-card-header"><div class="cat-card-title">Top Ad Categories</div></div>
+          <div id="ov-ad-cats"></div>
+          <div class="legend" style="margin-top:12px;">
+            <div class="legend-item"><div class="legend-dot" style="background:#23A9F6;"></div>Link</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#73DFFF;"></div>Share</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#FF6B6B;"></div>Photo</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#FFC960;"></div>Album</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#52C41A;"></div>Video</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#8B5CF6;"></div>Status</div>
+          </div>
+        </div>
+        <div class="cat-card">
+          <div class="cat-card-header"><div class="cat-card-title">Top Image Categories</div></div>
+          <div id="ov-image-cats"></div>
+          <div class="legend" style="margin-top:12px;">
+            <div class="legend-item"><div class="legend-dot" style="background:#23A9F6;"></div>Link</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#73DFFF;"></div>Share</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#FF6B6B;"></div>Photo</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#FFC960;"></div>Album</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#52C41A;"></div>Video</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#8B5CF6;"></div>Status</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /overview-content -->
+
+    <!-- ══ PAGE TAB CONTENT ══ -->
+    <div id="page-content" class="tab-content active content">
+
+      <!-- OVERVIEW METRICS -->
+      <div class="overview-row">
+        <div class="metric-card">
+          <div class="label">Posts</div>
+          <div class="value">38</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">Engagements <span style="color:#CACACA;font-size:11px;">ⓘ</span></div>
+          <div class="value">9,664</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">Reaches</div>
+          <div class="value">1,153,774</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">Clicks</div>
+          <div class="value">99,825</div>
+        </div>
+      </div>
+
+      <!-- CATEGORY PERFORMANCE SECTION -->
+      <div>
+        <div class="section-heading">
+          <div class="section-title">
+            <div class="ai-dot"><svg viewBox="0 0 10 10" fill="white"><circle cx="5" cy="5" r="3"/></svg></div>
+            <span id="sectionTitle">Engagement</span> by AI category
+          </div>
+          <!-- METRIC SELECTOR -->
+          <div class="metric-selector" id="metricSelector">
+            <button class="metric-btn" onclick="toggleMetricDropdown(event)">
+              <svg class="metric-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor"><rect x="1" y="9" width="3" height="6" rx="0.5" stroke-width="1.2"/><rect x="6" y="5" width="3" height="10" rx="0.5" stroke-width="1.2"/><rect x="11" y="1" width="3" height="14" rx="0.5" stroke-width="1.2"/></svg>
+              Metric: <strong id="selectedMetricLabel">Engagement</strong>
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><path d="M4 6l4 4 4-4" stroke-width="1.5"/></svg>
+            </button>
+            <div class="metric-dropdown" id="metricDropdown">
+              <div class="metric-avg-row">
+                <span class="metric-avg-label">Average</span>
+                <div class="toggle-track" id="avgToggle" onclick="toggleAverage(event)">
+                  <div class="toggle-thumb"></div>
+                </div>
+              </div>
+              <div class="metric-option selected" data-metric="Engagement" onclick="selectMetric('Engagement',this)">Engagement</div>
+              <div class="metric-option" data-metric="Reach" onclick="selectMetric('Reach',this)">Reach</div>
+              <div class="metric-option" data-metric="Post Views" onclick="selectMetric('Post Views',this)">Post Views</div>
+              <div class="metric-option" data-metric="Follows" onclick="selectMetric('Follows',this)">Follows</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 CARDS GRID -->
+        <div class="categories-grid">
+
+          <!-- TOP CONTENT CATEGORIES -->
+          <div class="cat-card">
+            <div class="cat-card-header">
+              <div class="cat-card-title">Top Content Categories</div>
+            </div>
+            <div id="content-cats"></div>
+            <div class="legend" style="margin-top:12px;">
+              <div class="legend-item"><div class="legend-dot" style="background:#23A9F6;"></div>Link</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#73DFFF;"></div>Share</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#FF6B6B;"></div>Photo</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#FFC960;"></div>Album</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#52C41A;"></div>Video</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#8B5CF6;"></div>Status</div>
+            </div>
+          </div>
+
+          <!-- TOP AD CATEGORIES -->
+          <div class="cat-card">
+            <div class="cat-card-header">
+              <div class="cat-card-title">Top Ad Categories</div>
+            </div>
+            <div id="ad-cats"></div>
+            <div class="legend" style="margin-top:12px;">
+              <div class="legend-item"><div class="legend-dot" style="background:#23A9F6;"></div>Link</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#73DFFF;"></div>Share</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#FF6B6B;"></div>Photo</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#FFC960;"></div>Album</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#52C41A;"></div>Video</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#8B5CF6;"></div>Status</div>
+            </div>
+          </div>
+
+          <!-- TOP IMAGE CATEGORIES -->
+          <div class="cat-card">
+            <div class="cat-card-header">
+              <div class="cat-card-title">Top Image Categories</div>
+            </div>
+            <div id="image-cats"></div>
+            <div class="legend" style="margin-top:12px;">
+              <div class="legend-item"><div class="legend-dot" style="background:#23A9F6;"></div>Link</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#73DFFF;"></div>Share</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#FF6B6B;"></div>Photo</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#FFC960;"></div>Album</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#52C41A;"></div>Video</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#8B5CF6;"></div>Status</div>
+            </div>
+          </div>
+
+        </div><!-- /categories-grid -->
+      </div>
+    </div><!-- /page-content -->
+  </main>
+</div>
+
+<!-- POST TABLE MODAL -->
+<div class="modal-overlay" id="postModal" onclick="closeModalOnOverlay(event)">
+  <div class="modal-panel" onclick="event.stopPropagation()">
+
+    <!-- HEADER -->
+    <div class="modal-top">
+      <div class="modal-title" id="modalTitle">Business &amp; Finance — Posts</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+
+    <!-- BODY: sidebar + table -->
+    <div class="modal-body">
+
+      <!-- LEFT SIDEBAR -->
+      <div class="modal-sidebar">
+
+        <!-- CATEGORY -->
+        <div class="modal-sidebar-section">
+          <h4>AI Category</h4>
+          <div class="info-row">
+            <span class="info-label">AI Content category</span>
+            <span class="info-val" id="catContent">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">AI Ad category</span>
+            <span class="info-val" id="catAd">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">AI Image category</span>
+            <span class="info-val" id="catImage">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">AI Video category</span>
+            <span class="info-val" id="catVideo">—</span>
+          </div>
+        </div>
+
+        <!-- POSTS DATE RANGE -->
+        <div class="modal-sidebar-section">
+          <h4>Posts Date Range</h4>
+          <div class="info-row">
+            <span class="info-label">Start Date</span>
+            <span class="info-val">16 Jun 2026</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">End Date</span>
+            <span class="info-val">22 Jun 2026</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Weekdays</span>
+            <span class="info-val">Any</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Hours</span>
+            <span class="info-val">Any</span>
+          </div>
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="modal-sidebar-section">
+          <h4>Summary</h4>
+          <div class="summary-stat">
+            <span class="s-label">Number of posts</span>
+            <span class="s-val" id="summaryPosts">23</span>
+          </div>
+          <div class="summary-stat">
+            <span class="s-label">Engagement</span>
+            <span class="s-val" id="summaryEng">4,894</span>
+          </div>
+          <div class="summary-stat">
+            <span class="s-label">Average Engagement</span>
+            <span class="s-val" id="summaryAvg">213</span>
+          </div>
+        </div>
+
+      </div><!-- /modal-sidebar -->
+
+      <!-- RIGHT: TABLE -->
+      <div class="modal-table-wrap">
+        <table class="post-table">
+          <thead>
+            <tr>
+              <th style="width:44%;" class="sortable">Post
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#CACACA"><path d="M5 1v8M2 6l3 3 3-3M2 4l3-3 3 3" stroke-width="1.2"/></svg>
+              </th>
+              <th class="sortable">Engagements
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#CACACA"><path d="M5 1v8M2 6l3 3 3-3M2 4l3-3 3 3" stroke-width="1.2"/></svg>
+              </th>
+              <th class="sortable">Reaches
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#CACACA"><path d="M5 1v8M2 6l3 3 3-3M2 4l3-3 3 3" stroke-width="1.2"/></svg>
+              </th>
+              <th class="sortable">Clicks
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#CACACA"><path d="M5 1v8M2 6l3 3 3-3M2 4l3-3 3 3" stroke-width="1.2"/></svg>
+              </th>
+              <th class="sortable">ER
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#CACACA" style="margin-left:1px;"><circle cx="5" cy="5" r="4" stroke-width="1.2"/><text x="5" y="7" text-anchor="middle" fill="#CACACA" font-size="5" stroke="none">i</text></svg>
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#CACACA"><path d="M5 1v8M2 6l3 3 3-3M2 4l3-3 3 3" stroke-width="1.2"/></svg>
+              </th>
+              <th class="sortable">CTR
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#CACACA" style="margin-left:1px;"><circle cx="5" cy="5" r="4" stroke-width="1.2"/><text x="5" y="7" text-anchor="middle" fill="#CACACA" font-size="5" stroke="none">i</text></svg>
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#CACACA"><path d="M5 1v8M2 6l3 3 3-3M2 4l3-3 3 3" stroke-width="1.2"/></svg>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="postTableBody"></tbody>
+        </table>
+
+        <!-- PAGINATION -->
+        <div class="pagination">
+          <button class="page-btn">‹</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">›</button>
+        </div>
+      </div><!-- /modal-table-wrap -->
+
+    </div><!-- /modal-body -->
+  </div><!-- /modal-panel -->
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+
+// Format colours per post type (Link, Share, Photo, Album, Video, Status)
+const SEG_COLORS = {
+  Link:   '#23A9F6',
+  Share:  '#73DFFF',
+  Photo:  '#FF6B6B',
+  Album:  '#FFC960',
+  Video:  '#52C41A',
+  Status: '#8B5CF6',
+};
+
+// segs: array of {type, pct} — proportions within this category row that add up to ~100
+// bar: width % of the track relative to the top row (top row = 100)
+const CAT_DATA = {
+  content: [
+    { name: 'Business & Finance',     raw: 4894, pct: 50.64, bar: 100, segs:[{type:'Link',pct:42},{type:'Share',pct:18},{type:'Photo',pct:20},{type:'Album',pct:8},{type:'Video',pct:9},{type:'Status',pct:3}] },
+    { name: 'Sports & Recreation',    raw: 2196, pct: 22.72, bar: 45,  segs:[{type:'Link',pct:30},{type:'Share',pct:12},{type:'Photo',pct:28},{type:'Album',pct:10},{type:'Video',pct:16},{type:'Status',pct:4}] },
+    { name: 'Society & Culture',      raw: 1783, pct: 18.45, bar: 36,  segs:[{type:'Link',pct:25},{type:'Share',pct:20},{type:'Photo',pct:22},{type:'Album',pct:12},{type:'Video',pct:14},{type:'Status',pct:7}] },
+    { name: 'Opinion & Editorial',    raw: 592,  pct: 6.13,  bar: 12,  segs:[{type:'Link',pct:50},{type:'Share',pct:15},{type:'Photo',pct:10},{type:'Album',pct:5},{type:'Video',pct:12},{type:'Status',pct:8}] },
+    { name: 'Technology & Innovation',raw: 518,  pct: 5.36,  bar: 10,  segs:[{type:'Link',pct:38},{type:'Share',pct:20},{type:'Photo',pct:18},{type:'Album',pct:8},{type:'Video',pct:12},{type:'Status',pct:4}] },
+  ],
+  ad: [
+    { name: 'Product-Only Image',              raw: 2693, pct: 27.87, bar: 100, segs:[{type:'Photo',pct:60},{type:'Album',pct:25},{type:'Link',pct:10},{type:'Video',pct:5}] },
+    { name: 'UGC & Lifestyle',                 raw: 1604, pct: 16.60, bar: 60,  segs:[{type:'Photo',pct:45},{type:'Video',pct:30},{type:'Link',pct:15},{type:'Share',pct:10}] },
+    { name: 'Text-Only Graphic',               raw: 1413, pct: 14.62, bar: 52,  segs:[{type:'Photo',pct:55},{type:'Link',pct:25},{type:'Status',pct:20}] },
+    { name: 'Face-Only Image',                 raw: 845,  pct: 8.74,  bar: 31,  segs:[{type:'Photo',pct:70},{type:'Album',pct:20},{type:'Video',pct:10}] },
+    { name: 'Customer Review & Testimonial',   raw: 238,  pct: 2.46,  bar: 9,   segs:[{type:'Photo',pct:40},{type:'Video',pct:35},{type:'Link',pct:25}] },
+  ],
+  image: [
+    { name: 'Business News Infographic', raw: 1840, pct: 38.20, bar: 100, segs:[{type:'Link',pct:10},{type:'Share',pct:5},{type:'Photo',pct:50},{type:'Album',pct:28},{type:'Video',pct:4},{type:'Status',pct:3}] },
+    { name: 'Event Announcement',        raw: 1102, pct: 22.87, bar: 60,  segs:[{type:'Link',pct:8},{type:'Share',pct:6},{type:'Photo',pct:44},{type:'Album',pct:36},{type:'Video',pct:4},{type:'Status',pct:2}] },
+    { name: 'Product Showcase',          raw: 874,  pct: 18.14, bar: 47,  segs:[{type:'Link',pct:12},{type:'Share',pct:4},{type:'Photo',pct:55},{type:'Album',pct:24},{type:'Video',pct:3},{type:'Status',pct:2}] },
+    { name: 'Quote Card',                raw: 560,  pct: 11.63, bar: 30,  segs:[{type:'Link',pct:6},{type:'Share',pct:5},{type:'Photo',pct:62},{type:'Album',pct:20},{type:'Video',pct:5},{type:'Status',pct:2}] },
+    { name: 'Promotional Banner',        raw: 440,  pct: 9.14,  bar: 24,  segs:[{type:'Link',pct:9},{type:'Share',pct:7},{type:'Photo',pct:46},{type:'Album',pct:32},{type:'Video',pct:4},{type:'Status',pct:2}] },
+  ],
+  video: [
+    { name: 'News Recap',            raw: 3210, pct: 44.52, bar: 100, segs:[{type:'Link',pct:8},{type:'Share',pct:6},{type:'Photo',pct:5},{type:'Album',pct:3},{type:'Video',pct:75},{type:'Status',pct:3}] },
+    { name: 'Interview & Commentary',raw: 1895, pct: 26.29, bar: 59,  segs:[{type:'Link',pct:6},{type:'Share',pct:5},{type:'Photo',pct:4},{type:'Album',pct:2},{type:'Video',pct:80},{type:'Status',pct:3}] },
+    { name: 'Explainer Video',       raw: 1120, pct: 15.54, bar: 35,  segs:[{type:'Link',pct:10},{type:'Share',pct:4},{type:'Photo',pct:4},{type:'Album',pct:2},{type:'Video',pct:77},{type:'Status',pct:3}] },
+    { name: 'Live Replay',           raw: 643,  pct: 8.92,  bar: 20,  segs:[{type:'Link',pct:5},{type:'Share',pct:4},{type:'Photo',pct:3},{type:'Album',pct:2},{type:'Video',pct:83},{type:'Status',pct:3}] },
+    { name: 'Behind the Scenes',     raw: 343,  pct: 4.76,  bar: 11,  segs:[{type:'Link',pct:7},{type:'Share',pct:5},{type:'Photo',pct:5},{type:'Album',pct:3},{type:'Video',pct:78},{type:'Status',pct:2}] },
+  ],
+};
+
+// Build METRICS by transforming raw values per metric key, keeping segs/bar from CAT_DATA
+function buildMetric(transforms, fmt) {
+  const out = { fmt };
+  ['content','ad','image','video'].forEach(k => {
+    out[k] = CAT_DATA[k].map((row, i) => ({
+      ...row,
+      raw: transforms[k] ? transforms[k][i] : row.raw,
+    }));
+  });
+  return out;
+}
+
+const METRICS = {
+  Engagement: buildMetric({
+    content: [4894, 2196, 1783, 592, 518],
+    ad:      [2693, 1604, 1413, 845, 238],
+    image:   [1840, 1102, 874, 560, 440],
+    video:   [3210, 1895, 1120, 643, 343],
+  }, v => v.toLocaleString()),
+
+  Reach: buildMetric({
+    content: [153200, 72400, 58100, 19300, 16800],
+    ad:      [88400, 52600, 46200, 27600, 7800],
+    image:   [60200, 36000, 28600, 18300, 14400],
+    video:   [105000, 62000, 36700, 21000, 11200],
+  }, v => v >= 1000 ? (v/1000).toFixed(1)+'K' : v.toString()),
+
+  'Post Views': buildMetric({
+    content: [412000, 185000, 150400, 49800, 43600],
+    ad:      [226800, 135000, 119000, 71100, 20100],
+    image:   [155000, 92800, 73600, 47100, 37000],
+    video:   [885000, 522000, 308000, 177000, 94400],
+  }, v => v >= 1000 ? (v/1000).toFixed(1)+'K' : v.toString()),
+
+  Follows: buildMetric({
+    content: [312, 140, 114, 38, 33],
+    ad:      [172, 103, 90, 54, 15],
+    image:   [118, 70, 56, 36, 28],
+    video:   [672, 396, 234, 134, 72],
+  }, v => v.toLocaleString()),
+};
+
+const POSTS_BY_CATEGORY = {
+  default: [
+    { page:'BusinessFocus', date:'16 Jun 2026 22:30', author:'Lazycat Chan', text:'馬斯克的SpaceX (SPCX)上市起連升3天，今晚開市曾再狂漲17%，但隨即傳出', eng:215, reach:'40.5K', clicks:'7.4K', er:'0.53%', ctr:'10.73%', erW:53, ctrW:73, thumb:'📰' },
+    { page:'BusinessFocus', date:'16 Jun 2026 19:52', author:'Lazycat Chan', text:'【小股民千萬身家被盜】女股民乘飛機斷網5小時 竟遭偷走證券戶口900萬 末日期', eng:528, reach:'108.6K', clicks:'6K', er:'0.49%', ctr:'3.72%', erW:49, ctrW:30, thumb:'🖼' },
+    { page:'BusinessFocus', date:'16 Jun 2026 19:21', author:'Lazycat Chan', text:'旅遊乘飛機斷網5小時 竟遭偷走證券戶口900萬', eng:422, reach:'78.1K', clicks:'6.4K', er:'0.54%', ctr:'5.21%', erW:54, ctrW:40, thumb:'📰' },
+    { page:'BusinessFocus', date:'16 Jun 2026 18:40', author:'Chant Chiu', text:'英國疑推全球最狠「社媒令」！施紀賢宣布16歲以下將禁用社交媒體 16至17歲', eng:80, reach:'10.3K', clicks:'619', er:'0.78%', ctr:'4.03%', erW:78, ctrW:33, thumb:'🖼' },
+    { page:'BusinessFocus', date:'16 Jun 2026 15:37', author:'Johnny Chu', text:'新股市場炙熱，投資要趁勢，究竟新股可以點炒？半新股如何捕捉有爆發潛力的', eng:39, reach:'14.8K', clicks:'265', er:'0.26%', ctr:'1.35%', erW:26, ctrW:10, thumb:'📰' },
+    { page:'BusinessFocus', date:'16 Jun 2026 15:19', author:'Lazycat Chan', text:'港樓冰火兩重天，豪宅不濟，但中價半新樓熱炒。「短炒天堂」西沙SIERRA SEA最', eng:80, reach:'15.9K', clicks:'1.3K', er:'0.50%', ctr:'5.03%', erW:50, ctrW:41, thumb:'📰' },
+    { page:'BusinessFocus', date:'16 Jun 2026 15:00', author:'Lazycat Chan', text:'為何中東停火，港都要跌？美伊確認已簽署停戰諒解備忘錄，將重新開放霍爾木', eng:985, reach:'102.4K', clicks:'26.4K', er:'0.96%', ctr:'14.51%', erW:96, ctrW:100, thumb:'📰' },
+    { page:'BusinessFocus', date:'16 Jun 2026 14:36', author:'Lazycat Chan', text:'港股近月表現差勁，新股市場雖活躍，IPO禁售期的解禁潮也將於7月到到，散戶', eng:165, reach:'23.4K', clicks:'2.6K', er:'0.70%', ctr:'6.75%', erW:70, ctrW:51, thumb:'📰' },
+  ]
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let currentMetric = 'Engagement';
+let currentCategory = '';
+let avgMode = true;
+
+function metricLabel() {
+  return avgMode ? 'Average ' + currentMetric : currentMetric;
+}
+
+function updateMetricLabel() {
+  const label = metricLabel();
+  document.getElementById('selectedMetricLabel').textContent = label;
+  document.getElementById('sectionTitle').textContent = label;
+}
+
+function toggleAverage(e) {
+  e.stopPropagation();
+  avgMode = !avgMode;
+  const t = document.getElementById('avgToggle');
+  t.classList.toggle('on', avgMode);
+  updateMetricLabel();
+  renderCategories(currentMetric);
+}
+
+// ── RENDER CATEGORIES ─────────────────────────────────────────────────────────
+function renderCategories(metric) {
+  const data = METRICS[metric] || METRICS.CTR;
+  const fmt = data.fmt;
+
+  const keys = ['content','ad','image','video'];
+  const ids  = ['content-cats','ad-cats','image-cats','video-cats'];
+
+  keys.forEach((key, i) => {
+    const rows = data[key];
+    const el = document.getElementById(ids[i]);
+    el.innerHTML = rows.map((row, idx) => {
+      // Build stacked bar segments — each segment width is seg.pct% of the track,
+      // but the whole track is scaled to row.bar% of full width
+      const segs = row.segs.map(s =>
+        `<div class="cat-bar-seg" style="width:${s.pct}%;background:${SEG_COLORS[s.type] || '#CCC'};"></div>`
+      ).join('');
+
+      return `
+        <div class="cat-row" onclick="openPostModal('${row.name.replace(/'/g,"\\'")}', '${keys[i]}')">
+          <div class="cat-row-top">
+            <span class="cat-rank">${idx + 1}</span>
+            <span class="cat-name">${row.name}</span>
+            <span class="cat-meta">
+              <span class="cat-value">${fmt(row.raw)}</span>
+              <span class="cat-pct">(${row.pct.toFixed(2)}%)</span>
+              <span class="cat-arrow">›</span>
+            </span>
+          </div>
+          <div style="padding-left:22px; padding-right:4px;">
+            <div class="cat-bar-rail">
+              <div class="cat-bar-fill" style="width:${row.bar}%;">${segs}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  });
+}
+
+// ── METRIC SELECTOR ───────────────────────────────────────────────────────────
+function toggleMetricDropdown(e) {
+  e.stopPropagation();
+  document.getElementById('metricDropdown').classList.toggle('open');
+}
+
+function selectMetric(metric, el) {
+  currentMetric = metric;
+  updateMetricLabel();
+  document.querySelectorAll('.metric-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('metricDropdown').classList.remove('open');
+  renderCategories(metric);
+}
+
+document.addEventListener('click', () => {
+  document.getElementById('metricDropdown').classList.remove('open');
+  document.getElementById('ovMetricDropdown').classList.remove('open');
+});
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+const TYPE_LABELS = { content: 'AI Content category', ad: 'AI Ad category', image: 'AI Image category', video: 'AI Video category' };
+
+function openPostModal(catName, type) {
+  currentCategory = catName;
+  document.getElementById('modalTitle').textContent = catName + ' — Posts';
+
+  // Populate category sidebar: show selected name for the clicked type, — for others
+  document.getElementById('catContent').textContent = type === 'content' ? catName : '—';
+  document.getElementById('catAd').textContent      = type === 'ad'      ? catName : '—';
+  document.getElementById('catImage').textContent   = type === 'image'   ? catName : '—';
+  document.getElementById('catVideo').textContent   = type === 'video'   ? catName : '—';
+
+  renderPostTable(catName);
+  document.getElementById('postModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('postModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeModalOnOverlay(e) {
+  if (e.target === document.getElementById('postModal')) closeModal();
+}
+
+// Post type icon SVG snippets
+function postTypeIcon(thumb) {
+  if (thumb === '🖼') return `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#828282" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>`;
+  return `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#828282" stroke-width="1.8"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`;
+}
+
+function renderPostTable(cat) {
+  const posts = POSTS_BY_CATEGORY[cat] || POSTS_BY_CATEGORY.default;
+  const tbody = document.getElementById('postTableBody');
+  tbody.innerHTML = posts.map(p => `
+    <tr class="post-row">
+      <td>
+        <div class="post-cell">
+          <div class="post-thumb" style="background:#D9E3E6;">${p.thumb === '🖼' ? '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#A0B0BB" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>' : '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#A0B0BB" stroke-width="1.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'}</div>
+          <div class="post-meta-wrap">
+            <div class="post-header-row">
+              <div class="post-logo">BF</div>
+              <span class="post-page-name">${p.page}</span>
+              <div class="post-type-icon">${postTypeIcon(p.thumb)}</div>
+            </div>
+            <div class="post-date-row">${p.date} &nbsp;by ${p.author}</div>
+            <div class="post-text">${p.text}</div>
+          </div>
+        </div>
+      </td>
+      <td>
+        <div class="metric-val">${p.eng.toLocaleString()}</div>
+        <div class="metric-bar-wrap"><div class="metric-bar-fill" style="width:${p.erW}%;"></div></div>
+      </td>
+      <td>
+        <div class="metric-val">${p.reach}</div>
+        <div class="metric-bar-wrap"><div class="metric-bar-fill" style="width:${p.erW * 0.85}%;"></div></div>
+      </td>
+      <td>
+        <div class="metric-val">${p.clicks}</div>
+        <div class="metric-bar-wrap"><div class="metric-bar-fill" style="width:${p.ctrW * 0.7}%;"></div></div>
+      </td>
+      <td>
+        <div class="metric-val">${p.er}</div>
+        <div class="metric-bar-wrap"><div class="metric-bar-fill" style="width:${p.erW}%;"></div></div>
+      </td>
+      <td>
+        <div class="metric-val">${p.ctr}</div>
+        <div class="metric-bar-wrap"><div class="metric-bar-fill" style="width:${p.ctrW}%;"></div></div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ── TAB SWITCHING ─────────────────────────────────────────────────────────────
+function switchTab(tabId, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById(tabId + '-content').classList.add('active');
+}
+
+// ── OVERVIEW METRIC SELECTOR ──────────────────────────────────────────────────
+let ovMetric = 'Engagement';
+let ovAvgMode = true;
+
+function ovMetricLabel() {
+  return ovAvgMode ? 'Average ' + ovMetric : ovMetric;
+}
+
+function updateOvMetricLabel() {
+  const label = ovMetricLabel();
+  document.getElementById('ovSelectedMetricLabel').textContent = label;
+  document.getElementById('ovSectionTitle').textContent = label;
+}
+
+function toggleOvMetricDropdown(e) {
+  e.stopPropagation();
+  document.getElementById('ovMetricDropdown').classList.toggle('open');
+}
+
+function toggleOvAverage(e) {
+  e.stopPropagation();
+  ovAvgMode = !ovAvgMode;
+  document.getElementById('ovAvgToggle').classList.toggle('on', ovAvgMode);
+  updateOvMetricLabel();
+  renderOvCategories(ovMetric);
+}
+
+function selectOvMetric(metric, el) {
+  ovMetric = metric;
+  updateOvMetricLabel();
+  document.querySelectorAll('#ovMetricDropdown .metric-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('ovMetricDropdown').classList.remove('open');
+  renderOvCategories(metric);
+}
+
+// ── RENDER OVERVIEW CATEGORIES ────────────────────────────────────────────────
+function renderOvCategories(metric) {
+  const data = METRICS[metric] || METRICS.Engagement;
+  const fmt = data.fmt;
+  const map = { content:'ov-content-cats', ad:'ov-ad-cats', image:'ov-image-cats', video:'ov-video-cats' };
+
+  Object.entries(map).forEach(([key, elId]) => {
+    const rows = data[key];
+    const el = document.getElementById(elId);
+    if (!el) return;
+    el.innerHTML = rows.map((row, idx) => {
+      const segs = row.segs.map(s =>
+        `<div class="cat-bar-seg" style="width:${s.pct}%;background:${SEG_COLORS[s.type]||'#CCC'};"></div>`
+      ).join('');
+      return `
+        <div class="cat-row" onclick="openPostModal('${row.name.replace(/'/g,"\\'")}','${key}')">
+          <div class="cat-row-top">
+            <span class="cat-rank">${idx+1}</span>
+            <span class="cat-name">${row.name}</span>
+            <span class="cat-meta">
+              <span class="cat-value">${fmt(row.raw)}</span>
+              <span class="cat-pct">(${row.pct.toFixed(2)}%)</span>
+              <span class="cat-arrow">›</span>
+            </span>
+          </div>
+          <div style="padding-left:22px;padding-right:4px;">
+            <div class="cat-bar-rail">
+              <div class="cat-bar-fill" style="width:${row.bar}%;">${segs}</div>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  });
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+// Apply default Average Engagement state visually
+document.getElementById('avgToggle').classList.add('on');
+document.getElementById('ovAvgToggle').classList.add('on');
+updateMetricLabel();
+updateOvMetricLabel();
+renderCategories('Engagement');
+renderOvCategories('Engagement');
+</script>
+</body>
+</html>
