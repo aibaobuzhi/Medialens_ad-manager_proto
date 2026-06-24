@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  COMPETITOR ANALYSIS — "AI CATEGORY" PERFORMANCE TAB (v2)
+  ============================================================
+  Channel-level performance view built ONLY from the 3 real AI
+  category taxonomies (Content / Ad / Image) produced by
+  post-tag-deepseek-pubsub/main.py. Answers "which category of
+  content performs better" for own channel vs competitor.
+
+  Data correctness:
+   - Content category = 11 real mains -> real sub-categories (hierarchical)
+   - Ad category      = the real 7 flat marketing-image types
+   - Image category   = the real 13 flat image-content types
+  Metrics are real Meta fields only (engagement / likes / comments /
+  video views). No "engagement rate" (reach not available per category).
+  Self-contained: inline CSS/JS + Google Fonts CDN only. Opens via file://.
+  ============================================================
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediaLens — Competitor Analysis · AI Category Performance</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand:#23A9F6; --brand-tint:#EEF6FF; --brand-subtle:#F1FCFF;
+  --title:#0A1F2C; --text:#102532; --muted:#707070; --secondary:#828282;
+  --bg:#F7F7F7; --surface:#FFFFFF; --surface-ai:#F6F8FD;
+  --border:#D9E3E6; --divider:#E8EEF0;
+  --danger:#FF3F41; --danger-l:#FFECEC; --success:#52C41A; --success-l:#E6FBEB;
+  --warning:#FFC960; --warning-l:#FFF8EB;
+  --r:10px; --r-tag:20px; --r-card:12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;}
+
+/* ===== TOP NAV ===== */
+.topnav{background:var(--brand);height:60px;display:flex;align-items:center;padding:0 28px;position:sticky;top:0;z-index:90;}
+.logo{display:flex;align-items:center;gap:9px;color:#fff;font-weight:700;font-size:19px;letter-spacing:.5px;}
+.logo-mark{width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;}
+.nav-user{margin-left:auto;display:flex;align-items:center;gap:9px;color:#fff;font-size:13px;}
+.nav-avatar{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;}
+
+/* ===== SHELL ===== */
+.shell{display:flex;min-height:calc(100vh - 60px);}
+.sidebar{width:220px;background:#0f1c2e;border-right:none;padding:16px 0;flex-shrink:0;}
+.org{padding:0 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:8px;}
+.org-badge{width:36px;height:36px;border-radius:8px;background:rgba(35,169,246,.2);color:var(--brand);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;}
+.org-name{font-weight:600;font-size:13px;color:#fff;}
+.org-sub{font-size:10.5px;color:rgba(255,255,255,.38);}
+.nav-section{padding:14px 16px 5px;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.28);}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 16px;color:rgba(255,255,255,.5);font-size:12.5px;cursor:pointer;border-left:3px solid transparent;transition:all .12s;}
+.nav-item:hover{background:rgba(255,255,255,.04);color:#fff;}
+.nav-item.active{background:rgba(35,169,246,.12);color:var(--brand);border-left-color:var(--brand);font-weight:600;}
+.nav-icon{width:15px;height:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:.9;}
+
+.content{flex:1;min-width:0;}
+.page-card{background:var(--surface);margin:0;min-height:100%;}
+
+/* ===== HEADER + SUBTABS ===== */
+.pg-head{display:flex;align-items:center;padding:18px 24px 0;gap:14px;flex-wrap:wrap;}
+.subtabs-wrap{flex:1;min-width:0;overflow-x:auto;}
+.subtabs{display:flex;gap:2px;background:#EEF2F5;border-radius:10px;padding:3px;width:fit-content;}
+.subtab{padding:6px 14px;font-size:12.5px;font-weight:500;color:var(--muted);cursor:pointer;border-radius:8px;white-space:nowrap;transition:all .12s;}
+.subtab:hover{color:var(--text);}
+.subtab.active{background:#fff;color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+.subtab.new::after{content:'NEW';font-size:7.5px;font-weight:700;background:var(--brand);color:#fff;border-radius:5px;padding:1px 4px;margin-left:5px;vertical-align:middle;letter-spacing:.4px;}
+.pg-daterange{display:flex;align-items:center;gap:14px;color:var(--muted);font-size:12.5px;flex-shrink:0;}
+.pg-daterange .dr{display:flex;align-items:center;gap:6px;}
+.pg-export{color:var(--secondary);font-size:12.5px;display:flex;align-items:center;gap:5px;cursor:pointer;}
+
+/* ===== FILTER STRIP ===== */
+.filterstrip{margin:14px 24px 0;background:var(--surface);border:1px solid var(--divider);border-radius:var(--r);padding:10px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.fchip{display:flex;align-items:center;gap:5px;font-size:12.5px;color:#4A6270;background:#fff;border:1px solid var(--border);border-radius:8px;padding:5px 12px;cursor:pointer;transition:all .12s;white-space:nowrap;}
+.fchip:hover{border-color:#23A9F6;color:#23A9F6;}
+.fchip svg{width:13px;height:13px;opacity:.7;flex-shrink:0;}
+.fchip.ai{border-color:var(--brand);color:var(--brand);background:var(--brand-tint);}
+.fchip.ai svg{opacity:1;}
+.fchip-check{width:16px;height:16px;border-radius:50%;background:var(--brand);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;margin-left:2px;}
+
+/* ===== TAB BODY ===== */
+.tabbody{padding:18px 32px 48px;}
+.lensbar{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+.lens-group{display:inline-flex;background:#eef2f5;border-radius:var(--r);padding:3px;gap:2px;}
+.lens-btn{border:none;background:transparent;font-family:inherit;font-size:13px;color:var(--muted);padding:8px 18px;border-radius:8px;cursor:pointer;font-weight:500;}
+.lens-btn.active{background:#fff;color:var(--brand);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+.lens-meta{font-size:12px;color:var(--secondary);}
+.compare{margin-left:auto;display:flex;align-items:center;gap:9px;font-size:13px;color:var(--text);}
+.toggle{width:42px;height:24px;border-radius:12px;background:#cdd7dc;border:none;cursor:pointer;position:relative;transition:background .25s;flex-shrink:0;}
+.toggle.on{background:var(--brand);}
+.toggle::after{content:'';position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .25s;}
+.toggle.on::after{transform:translateX(18px);}
+
+/* ===== AI SUMMARY BANNER ===== */
+.ai-banner{background:var(--surface-ai);border:1px solid #DCE6FB;border-radius:var(--r-card);padding:20px 22px;margin-bottom:18px;}
+.ai-banner-top{display:flex;align-items:center;gap:11px;margin-bottom:12px;}
+.ai-spark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--brand),#7C5CFF);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.ai-banner-title{font-size:16px;font-weight:600;color:var(--text);}
+.ai-banner-meta{font-size:11.5px;color:var(--secondary);margin-top:1px;}
+.ai-reanalyze{margin-left:auto;background:#fff;border:1px solid var(--brand);color:var(--brand);font-family:inherit;font-size:12.5px;font-weight:500;border-radius:var(--r);padding:7px 15px;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.ai-reanalyze:hover{background:var(--brand-tint);}
+.ai-headline{font-size:14.5px;line-height:1.7;color:var(--text);background:#fff;border-left:3px solid var(--brand);border-radius:8px;padding:13px 16px;}
+.ai-headline b{color:var(--brand);font-weight:600;}
+.ai-chips{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;}
+.ai-chip{flex:1;min-width:180px;background:#fff;border:1px solid var(--divider);border-radius:10px;padding:12px 14px;}
+.ai-chip .lbl{font-size:10.5px;font-weight:600;color:var(--secondary);text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:5px;}
+.ai-chip .val{font-size:15px;font-weight:600;color:var(--text);margin-top:5px;line-height:1.3;}
+.ai-chip .sub{font-size:11.5px;color:var(--success);font-weight:600;margin-top:3px;}
+
+/* ===== CARDS / GRID ===== */
+.grid{display:grid;gap:16px;margin-bottom:16px;}
+.grid.c2-wide{grid-template-columns:1.25fr 1fr;}
+.grid.c2{grid-template-columns:1fr 1fr;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);padding:20px 22px;}
+.card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:12px;}
+.card-title{font-size:15px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;}
+.card-sub{font-size:12px;color:var(--secondary);margin-bottom:16px;}
+.src-tag{font-size:10px;font-weight:600;border-radius:6px;padding:2px 8px;display:inline-flex;align-items:center;gap:4px;letter-spacing:.2px;white-space:nowrap;}
+.src-meta{background:#E8F5FE;color:#1B82C4;}
+.src-ai{background:#F0ECFF;color:#6B4BD8;}
+
+/* metric switcher */
+.metric-group{display:inline-flex;flex-wrap:wrap;background:#eef2f5;border-radius:8px;padding:2px;gap:1px;}
+.metric-btn{border:none;background:transparent;font-family:inherit;font-size:11.5px;color:var(--muted);padding:5px 11px;border-radius:6px;cursor:pointer;font-weight:500;white-space:nowrap;}
+.metric-btn.active{background:#fff;color:var(--brand);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08);}
+
+/* ===== CAT-ROW BAR CHART (reference style) ===== */
+.bars{display:flex;flex-direction:column;margin-top:4px;}
+.cat-row{padding:9px 0;border-bottom:1px solid #F0F0F0;transition:background .12s;border-radius:6px;}
+.cat-row:last-child{border-bottom:none;}
+.cat-row:hover{background:#fafcfe;margin:0 -8px;padding-left:8px;padding-right:8px;}
+.cat-row-top{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.cat-rank{width:18px;font-size:11.5px;color:var(--secondary);flex-shrink:0;font-weight:500;}
+.cat-name{flex:1;font-size:12.5px;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cat-meta{display:flex;align-items:center;gap:7px;flex-shrink:0;}
+.cat-value{font-size:12.5px;color:var(--text);font-weight:600;white-space:nowrap;}
+.cat-pct{font-size:11.5px;color:var(--secondary);white-space:nowrap;}
+.cat-delta{font-size:10.5px;font-weight:600;white-space:nowrap;}
+.cat-delta.up{color:var(--success);} .cat-delta.down{color:var(--danger);}
+.cat-bar-rail{height:7px;border-radius:4px;background:#E8EEF0;overflow:hidden;width:100%;}
+.cat-bar-fill{height:100%;border-radius:4px;transition:width .45s ease;}
+/* compare second bar */
+.cat-bar-rail.mine{height:5px;margin-top:3px;background:#EEF3F6;}
+.cat-bar-fill.mine{background:repeating-linear-gradient(45deg,#B9C6CF,#B9C6CF 4px,#cdd7dc 4px,#cdd7dc 8px);}
+.legend-mine{display:flex;gap:16px;justify-content:flex-end;margin-top:14px;font-size:11px;color:var(--secondary);}
+.legend-mine span{display:flex;align-items:center;gap:6px;}
+.legend-mine i{width:16px;height:7px;border-radius:3px;display:inline-block;}
+.legend-mine i.comp{background:var(--brand);}
+.legend-mine i.mine{background:repeating-linear-gradient(45deg,#B9C6CF,#B9C6CF 4px,#cdd7dc 4px,#cdd7dc 8px);}
+
+/* ===== INDEX TABLE ===== */
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px;}
+.tbl th{text-align:left;font-size:10px;font-weight:600;color:var(--secondary);text-transform:uppercase;letter-spacing:.5px;padding:8px 10px;border-bottom:1px solid var(--divider);}
+.tbl th.num,.tbl td.num{text-align:right;}
+.tbl td{padding:9px 10px;border-bottom:1px solid #F1F5F7;}
+.tbl tr.parent{cursor:pointer;}
+.tbl tr.parent.flat{cursor:default;}
+.tbl tr.parent:hover td{background:#fafcfe;}
+.tbl tr.sub td{background:#fbfdfe;color:var(--muted);font-size:11.5px;}
+.tbl tr.sub td:first-child{padding-left:30px;}
+.tbl tr.sub{display:none;}
+.tbl tr.sub.show{display:table-row;}
+.cat-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle;}
+.idx-pill{font-size:11px;font-weight:600;border-radius:20px;padding:2px 9px;}
+.idx-over{background:var(--success-l);color:#3A9410;}
+.idx-under{background:var(--danger-l);color:#D8302F;}
+.idx-even{background:#EEF3F6;color:var(--muted);}
+.caret{display:inline-block;width:0;height:0;border-left:5px solid var(--secondary);border-top:4px solid transparent;border-bottom:4px solid transparent;margin-right:8px;transition:transform .2s;vertical-align:middle;}
+.parent.open .caret{transform:rotate(90deg);}
+.caret-sp{display:inline-block;width:13px;}
+
+/* ===== TOP EXAMPLES ===== */
+.ex-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.ex-card{border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.ex-thumb{height:108px;background:linear-gradient(135deg,#dce7ee,#eef3f6);display:flex;align-items:center;justify-content:center;color:#aab8c0;font-size:11px;}
+.ex-body{padding:12px 13px;}
+.ex-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.ex-tag{font-size:10px;font-weight:500;border-radius:20px;padding:2px 9px;background:var(--brand-tint);color:var(--brand);}
+.ex-tag.sub{background:#F0ECFF;color:#6B4BD8;}
+.ex-cap{font-size:12px;color:var(--text);line-height:1.5;margin-bottom:9px;height:36px;overflow:hidden;}
+.ex-metric{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);border-top:1px solid var(--divider);padding-top:8px;}
+.ex-metric b{color:var(--text);font-weight:600;}
+
+/* ===== SCATTER MATRIX ===== */
+.scatter{position:relative;height:300px;margin:22px 8px 8px 44px;border-left:1px solid var(--divider);border-bottom:1px solid var(--divider);}
+.scatter .ax-y{position:absolute;left:-38px;top:0;bottom:0;display:flex;align-items:center;}
+.scatter .ax-y span{transform:rotate(-90deg);white-space:nowrap;font-size:10px;color:var(--secondary);font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+.scatter .ax-x{position:absolute;left:0;right:0;bottom:-22px;text-align:center;font-size:10px;color:var(--secondary);font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+.med{position:absolute;}
+.med.x{top:0;bottom:0;width:1px;background:repeating-linear-gradient(180deg,#dfe7eb,#dfe7eb 4px,transparent 4px,transparent 8px);}
+.med.y{left:0;right:0;height:1px;background:repeating-linear-gradient(90deg,#dfe7eb,#dfe7eb 4px,transparent 4px,transparent 8px);}
+.quad{position:absolute;font-size:10px;font-weight:600;color:#bcc8d0;padding:5px 8px;letter-spacing:.3px;}
+.bub{position:absolute;border-radius:50%;transform:translate(-50%,50%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;cursor:default;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.18);}
+.scatter-legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:30px;}
+.sl-item{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text);}
+.sl-num{width:16px;height:16px;border-radius:50%;color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* ===== HEATMAP ===== */
+.hm{width:100%;border-collapse:collapse;font-size:11.5px;}
+.hm th{font-size:10px;font-weight:600;color:var(--secondary);text-transform:uppercase;letter-spacing:.4px;padding:7px 8px;text-align:center;}
+.hm th.rowh{text-align:left;min-width:180px;}
+.hm td{padding:5px;text-align:center;}
+.hm td.rowh{text-align:left;font-size:12px;color:var(--text);}
+.hm-cell{border-radius:7px;padding:9px 6px;font-weight:600;font-size:12px;}
+
+/* ===== SENTIMENT STACKED ===== */
+.sent-row{display:grid;grid-template-columns:158px 1fr 42px;align-items:center;gap:10px;margin-bottom:9px;}
+.sent-name{font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sent-bar{display:flex;height:18px;border-radius:5px;overflow:hidden;background:#eef3f6;}
+.sent-seg{height:100%;}
+.sent-seg.good{background:#52C41A;} .sent-seg.neu{background:#cfd8dd;} .sent-seg.sad{background:#FF6B6C;}
+.sent-score{font-size:12px;font-weight:600;text-align:right;}
+.sent-legend{display:flex;gap:14px;justify-content:flex-end;font-size:11px;color:var(--secondary);margin-top:8px;}
+.sent-legend i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:4px;vertical-align:middle;}
+
+/* ===== ENTITY TYPE PILL ===== */
+.ety{font-size:9.5px;font-weight:600;border-radius:20px;padding:1px 8px;background:#EEF3F6;color:var(--muted);letter-spacing:.3px;}
+
+/* ===== AUDIT TABLE ===== */
+.audit-cat{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--text);}
+.audit-pct{color:var(--secondary);font-weight:400;font-size:12px;margin-left:4px;}
+.er-pill{font-size:12.5px;font-weight:600;border-radius:20px;padding:4px 14px;display:inline-block;min-width:62px;text-align:center;}
+.er-hi{background:#E6FBEB;color:#3A9410;}
+.er-mid{background:#FFF8EB;color:#C98A1A;}
+.er-lo{background:#EEF3F6;color:#8A99A3;}
+.fmt-pill{font-size:12px;font-weight:600;border-radius:8px;padding:4px 16px;background:#F0ECFF;color:#6B4BD8;display:inline-block;}
+.tbl.audit td{padding:13px 10px;}
+.tbl.audit th{padding:10px;}
+.tbl.audit tr.parent{cursor:pointer;}
+.tbl.audit tr.parent.flat{cursor:default;}
+.tbl.audit tr.parent:hover td{background:#fafcfe;}
+.tbl.audit tr.aud-sub{display:none;}
+.tbl.audit tr.aud-sub.show{display:table-row;}
+.tbl.audit tr.aud-sub td{padding:9px 10px;background:#fbfdfe;color:var(--muted);font-size:12px;}
+.aud-subname{padding-left:30px;display:inline-block;}
+.aud-caret{display:inline-block;margin-left:10px;color:var(--secondary);font-size:13px;transition:transform .2s;}
+.tbl.audit tr.parent.open .aud-caret{transform:rotate(180deg);}
+
+/* ===== COMBO BARS ===== */
+.cbars{display:flex;flex-direction:column;gap:13px;margin-top:8px;}
+.cbar-row{display:grid;grid-template-columns:1fr 62px;align-items:center;gap:12px;}
+.cbar-label{font-size:11.5px;color:var(--text);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cbar-track{height:18px;background:#EEF3F6;border-radius:6px;overflow:hidden;}
+.cbar-fill{height:100%;border-radius:6px;transition:width .45s ease;}
+.cbar-val{font-size:13px;font-weight:600;text-align:right;color:var(--text);}
+
+/* ===== TOP CONTENT LIST ===== */
+.tc-row{display:grid;grid-template-columns:30px 56px 1fr auto;align-items:center;gap:14px;padding:14px 4px;border-bottom:1px solid #F1F5F7;}
+.tc-rank{font-size:15px;font-weight:700;color:var(--secondary);text-align:center;}
+.tc-rank.g{color:var(--brand);}
+.tc-thumb{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#dce7ee,#eef3f6);display:flex;align-items:center;justify-content:center;font-size:25px;flex-shrink:0;}
+.tc-name{font-size:13.5px;font-weight:500;color:var(--text);margin-bottom:8px;}
+.tc-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.tc-tag{font-size:10px;font-weight:600;border-radius:6px;padding:3px 9px;}
+.tc-tag.fmt{background:#E8F5FE;color:#1B82C4;}
+.tc-tag.cat{background:var(--brand-tint);color:var(--brand);}
+.tc-tag.sub{background:#F0ECFF;color:#6B4BD8;}
+.tc-tag.ad{background:#FFF3E8;color:#C97A1A;}
+.tc-metrics{display:flex;gap:24px;}
+.tc-metric{text-align:right;min-width:60px;}
+.tc-metric .ml{font-size:9.5px;font-weight:600;color:var(--secondary);text-transform:uppercase;letter-spacing:.4px;}
+.tc-metric .mv{font-size:14px;font-weight:600;color:var(--text);margin-top:3px;}
+.tc-metric.active .mv{color:var(--brand);}
+.tc-metric .md{font-size:10px;font-weight:600;margin-top:2px;}
+.tc-metric .md.up{color:var(--success);} .tc-metric .md.down{color:var(--danger);}
+@media(max-width:1180px){.tc-row{grid-template-columns:26px 48px 1fr;}.tc-metrics{grid-column:1/-1;justify-content:flex-start;flex-wrap:wrap;margin-top:6px;}}
+
+/* ===== AI ADVISOR ===== */
+.advisor{background:var(--surface-ai);border:1px solid #DCE6FB;position:relative;margin-bottom:18px;}
+.adv-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.adv-title{font-size:17px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+.adv-expand{font-size:13px;color:var(--brand);cursor:pointer;font-weight:500;}
+.adv-expand:hover{text-decoration:underline;}
+.adv-intro{font-size:13.5px;color:var(--muted);margin-bottom:14px;}
+.adv-gen{background:var(--brand);color:#fff;border:none;font-family:inherit;font-size:13.5px;font-weight:600;border-radius:var(--r);padding:11px 20px;cursor:pointer;}
+.adv-gen:hover{background:#0E8FE0;}
+.adv-meta{font-size:11.5px;color:var(--secondary);margin-top:10px;}
+.adv-ask{display:flex;gap:10px;margin-top:18px;}
+.adv-input{flex:1;border:1px solid var(--border);border-radius:var(--r);padding:11px 15px;font-family:inherit;font-size:14px;color:var(--text);outline:none;}
+.adv-input:focus{border-color:var(--brand);}
+.adv-ask-btn{background:#9FD4F4;color:#fff;border:none;font-family:inherit;font-size:14px;font-weight:600;border-radius:var(--r);padding:11px 26px;cursor:pointer;}
+.adv-ask-btn:hover{background:var(--brand);}
+.adv-collapse{position:absolute;right:22px;bottom:74px;width:34px;height:34px;border-radius:50%;background:#fff;border:1px solid var(--divider);box-shadow:0 2px 8px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--brand);font-size:11px;transition:transform .2s;}
+.advisor.collapsed .adv-collapsible{display:none;}
+.advisor.collapsed .adv-collapse{transform:rotate(180deg);}
+.adv-qa{background:#fff;border:1px solid var(--divider);border-radius:10px;padding:13px 16px;margin-top:12px;font-size:13px;color:var(--text);line-height:1.6;}
+.adv-qa .q{font-weight:600;color:var(--brand);margin-bottom:5px;}
+
+/* ===== SUB-CAT PANEL (inline drill-down) ===== */
+.subcat-panel{display:none;}
+.subcat-panel.open{display:block;}
+.subcat-back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;margin-bottom:14px;padding:6px 0;}
+.subcat-back:hover{color:var(--brand);}
+.subcat-back svg{width:14px;height:14px;}
+.cat-arrow{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:12px;cursor:pointer;flex-shrink:0;transition:all .12s;margin-left:4px;}
+.cat-arrow:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-tint);}
+
+/* ===== POST MODAL ===== */
+.post-modal-overlay{position:fixed;inset:0;background:rgba(10,31,44,.45);z-index:200;display:none;align-items:center;justify-content:center;padding:24px;}
+.post-modal-overlay.open{display:flex;}
+.post-modal{width:92%;max-width:860px;max-height:88vh;background:#fff;border-radius:16px;box-shadow:0 12px 48px rgba(0,0,0,.18);display:flex;flex-direction:column;overflow:hidden;}
+.post-modal-hd{padding:16px 22px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.post-modal-title{font-size:14px;font-weight:600;color:var(--text);}
+.post-modal-close{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);}
+.post-modal-close:hover{background:var(--bg);}
+.post-modal-body{flex:1;overflow-y:auto;}
+.post-tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.post-tbl thead th{text-align:left;padding:10px 14px;background:#F7F9FB;font-size:10.5px;font-weight:600;color:var(--secondary);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--divider);white-space:nowrap;position:sticky;top:0;}
+.post-tbl td{padding:11px 14px;border-bottom:1px solid #F1F5F7;vertical-align:middle;}
+.post-tbl tr:last-child td{border-bottom:none;}
+.post-tbl tr:hover td{background:#fafcfe;}
+.post-thumb-cell{width:52px;height:44px;border-radius:6px;background:#E8EEF0;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.post-name-cell{font-size:12.5px;color:var(--text);line-height:1.5;max-width:320px;}
+.post-tag{display:inline-block;font-size:10px;font-weight:600;border-radius:5px;padding:2px 7px;margin-right:4px;margin-top:3px;}
+.post-tag.fmt{background:#E8F5FE;color:#1B82C4;}
+.post-tag.sub{background:#F0ECFF;color:#6B4BD8;}
+.post-num{font-size:12.5px;font-weight:600;color:var(--text);text-align:right;white-space:nowrap;}
+.post-delta{font-size:10px;font-weight:600;display:block;text-align:right;}
+.post-delta.up{color:var(--success);} .post-delta.down{color:var(--danger);}
+
+/* ===== tooltip ===== */
+.has-tooltip{position:relative;cursor:help;}
+.has-tooltip .qm{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;background:#dde5e9;border-radius:50%;font-size:9px;font-weight:700;color:var(--muted);margin-left:5px;vertical-align:middle;}
+.tooltip-box{display:none;}
+#tt{position:fixed;z-index:9999;display:none;background:var(--title);color:#fff;border-radius:10px;padding:13px 15px;width:300px;font-size:11.5px;line-height:1.6;box-shadow:0 8px 32px rgba(0,0,0,.28);pointer-events:none;}
+.tt-t{font-size:12.5px;font-weight:700;margin-bottom:7px;}
+.tt-r{margin-bottom:5px;color:#dbe4ea;}
+.tt-r b{color:#9CCBF0;font-weight:600;}
+.tt-src{margin-top:9px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15);font-size:10px;font-weight:600;}
+.tt-src .s-meta{color:#7FD0FF;} .tt-src .s-ai{color:#C3B0FF;}
+@media(max-width:1180px){.grid.c2-wide,.grid.c2{grid-template-columns:1fr;}.ex-grid{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="topnav">
+  <div class="logo"><span class="logo-mark"><svg width="16" height="16" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="14" fill="rgba(255,255,255,.15)"/><path d="M8 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><circle cx="14" cy="14" r="2.5" fill="#fff"/></svg></span>MEDIA LENS</div>
+  <div class="nav-user"><span class="nav-avatar">J</span>Julie li ▾</div>
+</div>
+
+<div class="shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="org">
+      <div class="org-badge">P</div>
+      <div><div class="org-name">PL – Hong Kong</div><div class="org-sub">Admin · Julie Li</div></div>
+    </div>
+    <div class="nav-section">Intelligence</div>
+    <div class="nav-item">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/></svg></span>
+      <span>Dashboard</span>
+    </div>
+    <div class="nav-item active">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 5h6M5 8h6M5 11h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></span>
+      <span>My Pages</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M7 4.5v5M4.5 7h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></span>
+      <span>Competitor Analysis</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 12L5 7l3 3 3-5 3 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span>Buzz (What's Viral?)</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1l1.8 3.6L14 5.4l-3 2.9.7 4.1L8 10.4l-3.7 2 .7-4.1-3-2.9 4.2-.8L8 1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></span>
+      <span>Leader Board</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M13 7A6 6 0 1 1 1 7a6 6 0 0 1 12 0z" stroke="currentColor" stroke-width="1.5"/><path d="M15 15l-3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+      <span>Social Listening</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M1 8h2.5l2-5 2 10 2-7 1.5 4H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span>Social Pulses</span>
+    </div>
+    <div class="nav-section">Ad Manager</div>
+    <div class="nav-item">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 7h6M5 9.5h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></span>
+      <span>Ad Manager</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M6 6c0-1.1.9-2 2-2s2 .9 2 2c0 1.4-2 2-2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="11.5" r=".8" fill="currentColor"/></svg></span>
+      <span>Ad Intelligence</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3.5l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span>Report Scheduler</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1l1.2 3.8L13 3.5 10.5 7l2.5 1.5-3.5.5-.5 3.5-2-3-3 2 1-3.5L1.5 6 5 5 3.5 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></span>
+      <span>AIGC</span>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+    <div class="page-card">
+      <!-- HEADER + SUBTABS -->
+      <div class="pg-head">
+        <div class="subtabs-wrap">
+          <div class="subtabs">
+            <div class="subtab">Overview</div>
+            <div class="subtab">Page</div>
+            <div class="subtab">Posts</div>
+            <div class="subtab">Fans Demographics</div>
+            <div class="subtab">Editor Performance</div>
+            <div class="subtab">Tags</div>
+            <div class="subtab">Top Posts</div>
+            <div class="subtab">Ad Library</div>
+            <div class="subtab">Keywords</div>
+            <div class="subtab">Hashtags</div>
+            <div class="subtab">Ad Intelligence</div>
+            <div class="subtab active">AI Category</div>
+          </div>
+        </div>
+        <div class="pg-daterange">
+          <div class="dr">📅 2026-06-08 &nbsp;to&nbsp; 2026-06-14</div>
+          <div class="pg-export">✨ Export PDF</div>
+        </div>
+      </div>
+
+      <!-- FILTER STRIP -->
+      <div class="filterstrip">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#707070" stroke-width="1.5"><path d="M2 3h12M4 8h8M6 13h4" stroke-linecap="round"/></svg>
+        <span class="fchip"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="3" width="6" height="8" rx="1.5"/><rect x="9" y="3" width="6" height="8" rx="1.5"/><path d="M4 11v2M12 11v2" stroke-linecap="round"/></svg>Post Types</span>
+        <span class="fchip"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M4 8h8M6 12h4" stroke-linecap="round"/><circle cx="13" cy="4" r="1.5" fill="currentColor" stroke="none"/></svg>Tags</span>
+        <span class="fchip"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="6" r="3"/><path d="M8 9v2M6 13h4" stroke-linecap="round"/><path d="M3 13c0-2.2 2.2-4 5-4s5 1.8 5 4" stroke-linecap="round"/></svg>Chatbot</span>
+        <span class="fchip"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2l1 3h3l-2.5 2 1 3L8 8.5 5.5 10l1-3L4 5h3z" stroke-linejoin="round"/></svg>Boosted</span>
+        <span class="fchip"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="5.5"/><path d="M5 5l6 6M11 5l-6 6" stroke-linecap="round"/></svg>Dark Post</span>
+        <span class="fchip"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="4" width="14" height="9" rx="1.5"/><path d="M5 8h6M5 10.5h4" stroke-linecap="round"/></svg>Ad</span>
+        <span class="fchip"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 14V8a5 5 0 0 1 10 0v6"/><path d="M1 8h2M13 8h2" stroke-linecap="round"/></svg>Advertisers</span>
+        <span class="fchip"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6.5" cy="6.5" r="4"/><path d="M10 10l3.5 3.5" stroke-linecap="round"/></svg>Keyword</span>
+        <span class="fchip ai"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8h6M8 5v6" stroke-linecap="round"/></svg>AI category<span class="fchip-check">✓</span></span>
+      </div>
+
+      <!-- ============ AI CATEGORY PERFORMANCE TAB ============ -->
+      <div class="tabbody" id="tabbody">
+
+        <!-- LENS -->
+        <div class="lensbar">
+          <div class="lens-group">
+            <button class="lens-btn active" data-lens="content" onclick="setLens('content')">Content category</button>
+            <button class="lens-btn" data-lens="ad" onclick="setLens('ad')">Ad category</button>
+            <button class="lens-btn" data-lens="image" onclick="setLens('image')">Image category</button>
+          </div>
+        </div>
+
+        <!-- A. AI ADVISOR -->
+        <div class="card advisor" id="advisor">
+          <div class="adv-hd">
+            <div class="adv-title">✨ AI Advisor</div>
+            <a class="adv-expand" id="advExpand" onclick="toggleAdvExpand()">Expand</a>
+          </div>
+          <div class="adv-collapsible" id="advCollapsible">
+            <div class="adv-intro" id="advIntro">Click below to generate AI insights for the current view</div>
+            <button class="adv-gen" onclick="generateInsights()">Generate AI Insights</button>
+            <div id="aiOut" style="display:none;margin-top:16px;"></div>
+          </div>
+          <div class="adv-collapse" id="advCollapse" onclick="toggleAdvCollapse()" title="Collapse">▲</div>
+          <div class="adv-ask">
+            <input id="advInput" class="adv-input" type="text" placeholder="Ask the AI advisor…" onkeydown="if(event.key==='Enter'){askAdvisor();}">
+            <button class="adv-ask-btn" onclick="askAdvisor()">Ask</button>
+          </div>
+        </div>
+
+        <!-- B. AVG ENGAGEMENT BY CATEGORY (bars) -->
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-hd">
+            <div class="card-title" id="barsTitle">Engagement per post by category
+              <span class="has-tooltip"><span class="qm">?</span>
+                <span class="tooltip-box"><span class="tt-t">Performance per post by category</span>
+                <span class="tt-r"><b>What:</b> Average value of the selected metric each category earns per post.</span>
+                <span class="tt-r"><b>Why it matters:</b> Per-post averages remove the bias of how often you post a theme, so you see which content genuinely resonates.</span>
+                <span class="tt-r"><b>ER:</b> My page = engagements ÷ reach ×100; competitor = engagements ÷ followers ×100 (per current code).</span>
+                <span class="tt-r"><b>Page ER:</b> page engagement ÷ days ÷ followers ×100 (daily page rate).</span>
+                <span class="tt-src">Source: <span class="s-meta">Meta ✓ metrics</span> · <span class="s-ai">MediaLens AI category</span></span></span>
+              </span>
+            </div>
+            <div class="metric-group" id="metricGroup">
+              <button class="metric-btn active" data-m="aeng" onclick="setMetric('aeng')">Avg Engagement</button>
+              <button class="metric-btn" data-m="eng" onclick="setMetric('eng')">Engagement</button>
+              <button class="metric-btn" data-m="er" onclick="setMetric('er')">ER</button>
+              <button class="metric-btn" data-m="pageer" onclick="setMetric('pageer')">Page ER</button>
+              <button class="metric-btn" data-m="avv" onclick="setMetric('avv')">Avg Video Views</button>
+              <button class="metric-btn" data-m="ctr" onclick="setMetric('ctr')">CTR</button>
+              <button class="metric-btn" data-m="nfr" onclick="setMetric('nfr')">Non-Fans Reach</button>
+            </div>
+          </div>
+          <div class="card-sub" id="barsSub">
+            <span id="barsSubText">Ranked by avg engagement. Δ = vs prior 7 days.</span>
+          </div>
+          <!-- main bars view -->
+          <div id="mainBarsView">
+            <div class="bars" id="catBars"></div>
+          </div>
+          <!-- sub-cat drill-down (inline) -->
+          <div class="subcat-panel" id="subcatPanel">
+            <div class="subcat-back" onclick="backToMain()">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 3L5 8l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span id="subcatTitle">Sub-categories</span>
+            </div>
+            <div class="bars" id="subcatBars"></div>
+          </div>
+        </div>
+
+        <!-- C. PERFORMANCE × VOLUME MATRIX (mirrors Ad Manager · Angle bubble matrix) -->
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-hd">
+            <div class="card-title">Performance vs volume matrix
+              <span class="has-tooltip"><span class="qm">?</span>
+                <span class="tooltip-box"><span class="tt-t">Performance vs volume</span>
+                <span class="tt-r"><b>What:</b> Each bubble is a category — X = avg engagement per post, Y = how many posts, size = total engagement.</span>
+                <span class="tt-r"><b>Why it matters:</b> High engagement + low volume (bottom-right) = scale up; high volume + low engagement (top-left) = over-served.</span>
+                <span class="tt-src">Source: <span class="s-meta">Meta ✓ engagement</span> · <span class="s-ai">MediaLens AI category</span></span></span>
+              </span>
+            </div>
+          </div>
+          <div class="card-sub" id="matrixSub">Dashed lines = channel average. Bubble size = total engagement the category earned.</div>
+          <div class="scatter" id="scatter">
+            <div class="ax-y"><span id="matrixAxisY">Avg Engagement →</span></div>
+            <div class="ax-x">Posts (volume) →</div>
+          </div>
+          <div class="scatter-legend" id="scatterLegend"></div>
+        </div>
+
+        <!-- D. CATEGORY × FORMAT HEATMAP (mirrors Ad Manager · Visual × Funnel) -->
+        <div class="card" id="heatCard" style="margin-bottom:16px;">
+          <div class="card-hd">
+            <div class="card-title">Which format wins in each category
+              <span class="has-tooltip"><span class="qm">?</span>
+                <span class="tooltip-box"><span class="tt-t">Format × Category</span>
+                <span class="tt-r"><b>What:</b> Relative engagement (index vs channel average = 100) for each category in each post format.</span>
+                <span class="tt-r"><b>Why it matters:</b> The same theme can perform very differently as a Photo vs a Video — this tells you the format to publish it in.</span>
+                <span class="tt-src">Source: <span class="s-meta">Meta ✓ format &amp; engagement</span> · <span class="s-ai">MediaLens AI category</span></span></span>
+              </span>
+            </div>
+          </div>
+          <div class="card-sub" id="heatSub">Index 100 = channel average engagement. Darker = stronger. Format = Meta post type (Link / Share / Photo / Album / Video / Status).</div>
+          <table class="hm" id="heatmap"></table>
+        </div>
+
+        <!-- E. BEST COMBINATIONS (Content × Ad, Content × Image) -->
+        <div class="grid c2">
+          <div class="card">
+            <div class="card-hd">
+              <div class="card-title" id="comboTitle1">Content category × Ad category
+                <span class="has-tooltip"><span class="qm">?</span>
+                  <span class="tooltip-box"><span class="tt-t">Content × Ad combinations</span>
+                  <span class="tt-r"><b>What:</b> Each post carries both a content-theme tag and an ad-format tag — this ranks the pairings by avg engagements per post.</span>
+                  <span class="tt-r"><b>Why it matters:</b> Shows which theme delivered in which creative format — the recipes worth repeating.</span>
+                  <span class="tt-src">Source: <span class="s-meta">Meta ✓ engagement</span> · <span class="s-ai">MediaLens AI categories</span></span></span>
+                </span>
+              </div>
+            </div>
+            <div class="card-sub" id="comboSub1">Best combinations by avg engagements.</div>
+            <div class="cbars" id="comboAd"></div>
+          </div>
+          <div class="card">
+            <div class="card-hd">
+              <div class="card-title" id="comboTitle2">Content category × Image category
+                <span class="has-tooltip"><span class="qm">?</span>
+                  <span class="tooltip-box"><span class="tt-t">Content × Image combinations</span>
+                  <span class="tt-r"><b>What:</b> Pairs each post's content-theme tag with its image-content tag, ranked by avg engagements per post.</span>
+                  <span class="tt-r"><b>Why it matters:</b> Reveals which subject matter on screen lifts which theme.</span>
+                  <span class="tt-src">Source: <span class="s-meta">Meta ✓ engagement</span> · <span class="s-ai">MediaLens AI categories</span></span></span>
+                </span>
+              </div>
+            </div>
+            <div class="card-sub" id="comboSub2">Best combinations by avg engagements.</div>
+            <div class="cbars" id="comboImg"></div>
+          </div>
+        </div>
+
+        <!-- F. TOP CONTENT (per-post) -->
+        <div class="card" style="margin-top:16px;">
+          <div class="card-hd">
+            <div class="card-title">Top content
+              <span class="has-tooltip"><span class="qm">?</span>
+                <span class="tooltip-box"><span class="tt-t">Top content</span>
+                <span class="tt-r"><b>What:</b> The best-performing individual posts, each tagged with its content category, sub-category and ad-format.</span>
+                <span class="tt-r"><b>Why it matters:</b> Drills from category averages down to the actual posts driving them — the concrete winners to learn from.</span>
+                <span class="tt-src">Source: <span class="s-meta">Meta ✓ metrics</span> · <span class="s-ai">MediaLens AI categories</span></span></span>
+              </span>
+            </div>
+            <span class="src-tag src-ai" id="topMetricLabel">Avg Engagement</span>
+          </div>
+          <div class="card-sub">Ranked individual posts by selected metric.</div>
+          <div id="topContent"></div>
+        </div>
+
+      </div><!-- /tabbody -->
+    </div>
+  </main>
+</div>
+
+<div id="tt"></div>
+
+<!-- POST MODAL -->
+<div class="post-modal-overlay" id="postModalOverlay" onclick="if(event.target===this)closePostModal()">
+  <div class="post-modal">
+    <div class="post-modal-hd">
+      <div class="post-modal-title" id="postModalTitle">Posts</div>
+      <button class="post-modal-close" onclick="closePostModal()">✕</button>
+    </div>
+    <div class="post-modal-body">
+      <table class="post-tbl">
+        <thead><tr>
+          <th style="width:60px"></th>
+          <th>Post</th>
+          <th style="text-align:right">Engagements</th>
+          <th style="text-align:right">Avg Eng</th>
+          <th style="text-align:right">Video Views</th>
+          <th style="text-align:right">Δ 7d</th>
+        </tr></thead>
+        <tbody id="postModalBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   DATA — real taxonomies only (post-tag-deepseek-pubsub/main.py)
+   Each row: per-post averages for engagement(eng)/likes(lk)/comments(cm)/videoViews(vv)
+   posts = number of posts tagged in period; d = Δ% vs prior 7d; mf = your-channel factor
+   ========================================================= */
+var DATA = {
+  content: {
+    label:'Content category',
+    hierarchical:true,
+    note:'Classified from post text (caption). 11 main categories → sub-categories.',
+    rows:[
+      {n:'Lifestyle & Personal Development',c:'#23A9F6',posts:62,eng:2760,lk:2090,cm:360,vv:9200,d:+14,mf:0.82,
+        sub:[['Food & Cooking',24,3120],['Health & Wellness',16,2680],['Fashion & Beauty',14,2510],['Travel & Adventure',8,2380]]},
+      {n:'Trends & Viral Content',c:'#7C5CFF',posts:28,eng:2140,lk:1560,cm:300,vv:11800,d:+9,mf:0.74,
+        sub:[['Social Media Trends',11,2390],['Influencer & Creator Content',9,2050],['Challenges & Viral Videos',5,2010],['Internet Memes',3,1880]]},
+      {n:'Entertainment & Pop Culture',c:'#FF7AC2',posts:48,eng:1680,lk:1280,cm:240,vv:6400,d:-3,mf:0.91,
+        sub:[['Celebrity News & Gossip',19,1920],['Movies & TV Shows',15,1640],['Music & Podcasts',9,1410],['Memes & Viral Trends',5,1520]]},
+      {n:'Society & Culture',c:'#FFBA33',posts:24,eng:1150,lk:840,cm:210,vv:3100,d:+5,mf:1.06,
+        sub:[['Education & Learning',10,1280],['History & Heritage',8,1090],['Psychology & Mental Health',6,1060]]},
+      {n:'News & Current Affairs',c:'#52C41A',posts:96,eng:980,lk:610,cm:280,vv:4200,d:-6,mf:1.02,
+        sub:[['Local & Regional News',38,1080],['Breaking News',22,1240],['Community & Human Interest',20,860],['Politics & Government',16,760]]},
+      {n:'Business & Finance',c:'#16C2C2',posts:34,eng:760,lk:520,cm:140,vv:2100,d:+2,mf:0.95,
+        sub:[['Personal Finance & Budgeting',14,880],['E-commerce & Retail',12,720],['Stock Market & Investments',8,640]]},
+      {n:'Technology & Innovation',c:'#9AA7B0',posts:22,eng:690,lk:470,cm:120,vv:2600,d:+1,mf:0.88,
+        sub:[['Gadgets & Reviews',10,780],['AI & Automation',7,640],['Software & Apps',5,560]]},
+      {n:'Sports & Recreation',c:'#9AA7B0',posts:16,eng:610,lk:430,cm:110,vv:3400,d:0,mf:0.9,
+        sub:[['Football (Soccer)',9,720],['Basketball & NBA',7,540]]},
+      {n:'Opinion & Editorial',c:'#9AA7B0',posts:18,eng:540,lk:330,cm:160,vv:1500,d:-2,mf:1.0,
+        sub:[['Opinion Pieces & Commentary',11,560],['Debates & Discussions',7,510]]},
+      {n:'Science & Environment',c:'#9AA7B0',posts:10,eng:480,lk:340,cm:80,vv:1900,d:+3,mf:0.97,
+        sub:[['Climate Change & Sustainability',6,520],['Health & Medical Science',4,420]]},
+      {n:'Miscellaneous & Niche Topics',c:'#9AA7B0',posts:8,eng:430,lk:300,cm:70,vv:1400,d:0,mf:0.93,
+        sub:[['Pets & Animal Care',5,470],['Hobbies & DIY Projects',3,360]]}
+    ]
+  },
+  ad: {
+    label:'Ad category',
+    hierarchical:false,
+    note:'Classified from the post image (single still / video cover). 7 marketing-format types — max one per post.',
+    rows:[
+      {n:'User-Generated Content (UGC) & Lifestyle Shots',c:'#23A9F6',posts:46,eng:1980,lk:1480,cm:260,vv:5200,d:+9,mf:0.8},
+      {n:'Customer Review & Testimonial',c:'#7C5CFF',posts:31,eng:1620,lk:1180,cm:300,vv:2100,d:+6,mf:0.86},
+      {n:'Before & After Comparison',c:'#FF7AC2',posts:18,eng:1410,lk:1040,cm:220,vv:3800,d:+4,mf:0.9},
+      {n:'Face-Only Image',c:'#FFBA33',posts:27,eng:1240,lk:960,cm:170,vv:1600,d:+3,mf:0.94},
+      {n:'Product-Only Image',c:'#9AA7B0',posts:84,eng:840,lk:640,cm:90,vv:900,d:-2,mf:1.04},
+      {n:'Text-Only Graphic',c:'#9AA7B0',posts:48,eng:760,lk:520,cm:140,vv:700,d:-3,mf:0.99},
+      {n:'Infographic & Data Visualization',c:'#9AA7B0',posts:24,eng:690,lk:470,cm:120,vv:600,d:+1,mf:1.02}
+    ]
+  },
+  image: {
+    label:'Image category',
+    hierarchical:false,
+    note:'Classified from the post image (single still / video cover). 13 content types — up to 5 per post.',
+    rows:[
+      {n:'People & Portraits',c:'#23A9F6',posts:88,eng:2280,lk:1740,cm:320,vv:5600,d:+12,mf:0.83},
+      {n:'Lifestyle & Fashion',c:'#7C5CFF',posts:64,eng:1940,lk:1480,cm:260,vv:4200,d:+8,mf:0.85},
+      {n:'Social & Cultural Themes',c:'#FF7AC2',posts:42,eng:1560,lk:1140,cm:280,vv:3100,d:+5,mf:0.97},
+      {n:'Animals & Wildlife',c:'#FFBA33',posts:22,eng:1180,lk:920,cm:170,vv:2600,d:+6,mf:1.08},
+      {n:'Urban & Architecture',c:'#16C2C2',posts:34,eng:1020,lk:780,cm:140,vv:1900,d:-1,mf:0.96},
+      {n:'Entertainment & Pop Culture',c:'#52C41A',posts:28,eng:940,lk:700,cm:150,vv:3400,d:+2,mf:0.92},
+      {n:'Nature & Landscape',c:'#9AA7B0',posts:30,eng:880,lk:680,cm:110,vv:1700,d:+3,mf:0.98},
+      {n:'Business & Finance',c:'#9AA7B0',posts:24,eng:620,lk:450,cm:110,vv:1200,d:-2,mf:0.95},
+      {n:'Technology & Digital',c:'#9AA7B0',posts:26,eng:520,lk:370,cm:90,vv:1400,d:-3,mf:0.9},
+      {n:'Science & Medicine',c:'#9AA7B0',posts:11,eng:540,lk:400,cm:80,vv:1100,d:+1,mf:0.97},
+      {n:'Transportation & Vehicles',c:'#9AA7B0',posts:14,eng:470,lk:350,cm:70,vv:1500,d:0,mf:0.93},
+      {n:'Weather & Natural Phenomena',c:'#9AA7B0',posts:9,eng:410,lk:300,cm:60,vv:900,d:-1,mf:0.94},
+      {n:'Symbols & Abstract Concepts',c:'#9AA7B0',posts:16,eng:380,lk:260,cm:70,vv:700,d:0,mf:0.91}
+    ]
+  }
+};
+
+var EXAMPLES = {
+  content:[
+    {cat:'Lifestyle & Personal Dev.',sub:'Food & Cooking',cap:'5 things every HK foodie gets wrong about dim sum 🥟',eng:'4,210',extra:'1.2k likes'},
+    {cat:'Trends & Viral Content',sub:'Social Media Trends',cap:'Everyone in Central is doing this right now 👀',eng:'3,680',extra:'12k views'},
+    {cat:'Lifestyle & Personal Dev.',sub:'Health & Wellness',cap:'This 60-second morning routine changed my week',eng:'3,120',extra:'380 comments'}
+  ],
+  ad:[
+    {cat:'UGC & Lifestyle Shots',sub:'',cap:'Real customers, real mornings — tag us in yours ☕',eng:'2,540',extra:'1.5k likes'},
+    {cat:'Customer Review & Testimonial',sub:'',cap:'"Honestly the best purchase this year." — Karen',eng:'2,010',extra:'300 comments'},
+    {cat:'Before & After Comparison',sub:'',cap:'30 days. Same room. Swipe to see the difference →',eng:'1,820',extra:'3.8k views'}
+  ],
+  image:[
+    {cat:'People & Portraits',sub:'',cap:'Behind the counter with our head barista ☕',eng:'3,040',extra:'1.7k likes'},
+    {cat:'Lifestyle & Fashion',sub:'',cap:'Styling one jacket three ways for HK summer',eng:'2,460',extra:'4.2k views'},
+    {cat:'Animals & Wildlife',sub:'',cap:'Shop cat update: he has chosen the new sofa 🐈',eng:'1,980',extra:'320 comments'}
+  ]
+};
+
+/* NLP entities (channel-level) — types from main.py: PERSON / ORGANIZATION / LOCATION / EVENT / TITLE / COMMERCIAL_ITEM / OTHER */
+var ENTITIES = [
+  {t:'MIRROR',ty:'PERSON',freq:14,eng:3120},
+  {t:'張敬軒',ty:'PERSON',freq:8,eng:2890},
+  {t:'香港迪士尼樂園',ty:'ORGANIZATION',freq:18,eng:2480},
+  {t:'《飯戲攻心2》',ty:'TITLE',freq:6,eng:2240},
+  {t:'端午節',ty:'EVENT',freq:9,eng:2010},
+  {t:'西九文化區',ty:'LOCATION',freq:6,eng:1620},
+  {t:'iPhone 16',ty:'COMMERCIAL_ITEM',freq:7,eng:1560},
+  {t:'美心',ty:'ORGANIZATION',freq:11,eng:1340},
+  {t:'中環',ty:'LOCATION',freq:22,eng:1180},
+  {t:'香港國際機場',ty:'LOCATION',freq:5,eng:980}
+];
+
+/* Format heatmap — Meta post types; multiplier vs a category's own engagement */
+var FORMATS=['Link','Share','Photo','Album','Video','Status'];
+var FMULT={Link:0.66,Share:0.72,Photo:1.00,Album:1.08,Video:1.26,Status:0.58};
+
+/* Page followers (Meta ✓, page-level) — used for Eng. Rate = engagements ÷ followers */
+var FOLLOWERS=33000;
+/* Best-performing format per category (the format with the highest avg engagement) */
+var BESTFORMAT={
+  'Lifestyle & Personal Development':'Video','Trends & Viral Content':'Video','Entertainment & Pop Culture':'Video',
+  'Society & Culture':'Photo','News & Current Affairs':'Link','Business & Finance':'Link',
+  'Technology & Innovation':'Video','Sports & Recreation':'Video','Opinion & Editorial':'Photo',
+  'Science & Environment':'Photo','Miscellaneous & Niche Topics':'Photo',
+  'User-Generated Content (UGC) & Lifestyle Shots':'Video','Customer Review & Testimonial':'Video',
+  'Before & After Comparison':'Video','Face-Only Image':'Photo','Product-Only Image':'Photo',
+  'Text-Only Graphic':'Photo','Infographic & Data Visualization':'Album',
+  'People & Portraits':'Video','Lifestyle & Fashion':'Video','Social & Cultural Themes':'Photo',
+  'Animals & Wildlife':'Video','Urban & Architecture':'Photo','Nature & Landscape':'Photo',
+  'Technology & Digital':'Video','Science & Medicine':'Photo','Transportation & Vehicles':'Photo',
+  'Weather & Natural Phenomena':'Photo','Symbols & Abstract Concepts':'Album'
+};
+
+/* Best combinations (Content × Ad / Content × Image) — avg engagements per post */
+var COMBO_AD=[
+  {a:'Lifestyle & Personal Dev.',b:'UGC & Lifestyle Shots',v:3120,c:'#23A9F6'},
+  {a:'Trends & Viral Content',b:'UGC & Lifestyle Shots',v:2680,c:'#7C5CFF'},
+  {a:'Entertainment & Pop Culture',b:'Face-Only Image',v:2210,c:'#FF7AC2'},
+  {a:'Lifestyle & Personal Dev.',b:'Before & After Comparison',v:2040,c:'#FFBA33'},
+  {a:'Lifestyle & Personal Dev.',b:'Customer Review & Testimonial',v:1880,c:'#16C2C2'},
+  {a:'Society & Culture',b:'Text-Only Graphic',v:1240,c:'#52C41A'},
+  {a:'News & Current Affairs',b:'Product-Only Image',v:980,c:'#9AA7B0'},
+  {a:'Business & Finance',b:'Infographic & Data Visualization',v:760,c:'#9AA7B0'}
+];
+var COMBO_IMG=[
+  {a:'Lifestyle & Personal Dev.',b:'People & Portraits',v:2980,c:'#23A9F6'},
+  {a:'Entertainment & Pop Culture',b:'People & Portraits',v:2540,c:'#7C5CFF'},
+  {a:'Trends & Viral Content',b:'Lifestyle & Fashion',v:2360,c:'#FF7AC2'},
+  {a:'Lifestyle & Personal Dev.',b:'Lifestyle & Fashion',v:2180,c:'#FFBA33'},
+  {a:'Society & Culture',b:'Social & Cultural Themes',v:1620,c:'#16C2C2'},
+  {a:'Entertainment & Pop Culture',b:'Animals & Wildlife',v:1380,c:'#52C41A'},
+  {a:'News & Current Affairs',b:'Urban & Architecture',v:1080,c:'#9AA7B0'},
+  {a:'Technology & Innovation',b:'Technology & Digital',v:690,c:'#9AA7B0'}
+];
+/* sub-category level combinations */
+var COMBO_AD_SUB=[
+  {a:'Food & Cooking',b:'UGC & Lifestyle Shots',v:3320,c:'#23A9F6'},
+  {a:'Social Media Trends',b:'UGC & Lifestyle Shots',v:2740,c:'#7C5CFF'},
+  {a:'Health & Wellness',b:'Before & After Comparison',v:2510,c:'#FF7AC2'},
+  {a:'Celebrity News & Gossip',b:'Face-Only Image',v:2280,c:'#FFBA33'},
+  {a:'Fashion & Beauty',b:'Customer Review & Testimonial',v:2040,c:'#16C2C2'},
+  {a:'Travel & Adventure',b:'Product-Only Image',v:1760,c:'#52C41A'},
+  {a:'Local & Regional News',b:'Text-Only Graphic',v:1120,c:'#9AA7B0'},
+  {a:'Personal Finance & Budgeting',b:'Infographic & Data Visualization',v:880,c:'#9AA7B0'}
+];
+var COMBO_IMG_SUB=[
+  {a:'Food & Cooking',b:'Lifestyle & Fashion',v:3180,c:'#23A9F6'},
+  {a:'Celebrity News & Gossip',b:'People & Portraits',v:2620,c:'#7C5CFF'},
+  {a:'Social Media Trends',b:'People & Portraits',v:2410,c:'#FF7AC2'},
+  {a:'Fashion & Beauty',b:'Lifestyle & Fashion',v:2230,c:'#FFBA33'},
+  {a:'Health & Wellness',b:'Social & Cultural Themes',v:1740,c:'#16C2C2'},
+  {a:'Travel & Adventure',b:'Urban & Architecture',v:1520,c:'#52C41A'},
+  {a:'Education & Learning',b:'Social & Cultural Themes',v:1180,c:'#9AA7B0'},
+  {a:'Gadgets & Reviews',b:'Technology & Digital',v:720,c:'#9AA7B0'}
+];
+/* Ad × Image (ad lens, card 2) */
+var COMBO_AD_IMG=[
+  {a:'UGC & Lifestyle Shots',b:'People & Portraits',v:2640,c:'#23A9F6'},
+  {a:'Face-Only Image',b:'People & Portraits',v:2380,c:'#7C5CFF'},
+  {a:'UGC & Lifestyle Shots',b:'Lifestyle & Fashion',v:2210,c:'#FF7AC2'},
+  {a:'Customer Review & Testimonial',b:'People & Portraits',v:1880,c:'#FFBA33'},
+  {a:'Before & After Comparison',b:'Lifestyle & Fashion',v:1720,c:'#16C2C2'},
+  {a:'Product-Only Image',b:'Business & Finance',v:1040,c:'#52C41A'},
+  {a:'Text-Only Graphic',b:'Social & Cultural Themes',v:880,c:'#9AA7B0'},
+  {a:'Infographic & Data Visualization',b:'Technology & Digital',v:690,c:'#9AA7B0'}
+];
+/* Image × Content (image lens, card 1) */
+var COMBO_IMG_CONTENT=[
+  {a:'People & Portraits',b:'Lifestyle & Personal Dev.',v:2980,c:'#23A9F6'},
+  {a:'People & Portraits',b:'Entertainment & Pop Culture',v:2540,c:'#7C5CFF'},
+  {a:'Lifestyle & Fashion',b:'Trends & Viral Content',v:2360,c:'#FF7AC2'},
+  {a:'Lifestyle & Fashion',b:'Lifestyle & Personal Dev.',v:2180,c:'#FFBA33'},
+  {a:'Social & Cultural Themes',b:'Society & Culture',v:1620,c:'#16C2C2'},
+  {a:'Animals & Wildlife',b:'Entertainment & Pop Culture',v:1380,c:'#52C41A'},
+  {a:'Urban & Architecture',b:'News & Current Affairs',v:1080,c:'#9AA7B0'},
+  {a:'Technology & Digital',b:'Technology & Innovation',v:690,c:'#9AA7B0'}
+];
+var COMBO_IMG_CONTENT_SUB=[
+  {a:'Lifestyle & Fashion',b:'Food & Cooking',v:3180,c:'#23A9F6'},
+  {a:'People & Portraits',b:'Celebrity News & Gossip',v:2620,c:'#7C5CFF'},
+  {a:'People & Portraits',b:'Social Media Trends',v:2410,c:'#FF7AC2'},
+  {a:'Lifestyle & Fashion',b:'Fashion & Beauty',v:2230,c:'#FFBA33'},
+  {a:'Social & Cultural Themes',b:'Health & Wellness',v:1740,c:'#16C2C2'},
+  {a:'Urban & Architecture',b:'Travel & Adventure',v:1520,c:'#52C41A'},
+  {a:'Social & Cultural Themes',b:'Education & Learning',v:1180,c:'#9AA7B0'},
+  {a:'Technology & Digital',b:'Gadgets & Reviews',v:720,c:'#9AA7B0'}
+];
+/* Image × Ad (image lens, card 2) */
+var COMBO_IMG_AD=[
+  {a:'People & Portraits',b:'UGC & Lifestyle Shots',v:2640,c:'#23A9F6'},
+  {a:'People & Portraits',b:'Face-Only Image',v:2380,c:'#7C5CFF'},
+  {a:'Lifestyle & Fashion',b:'UGC & Lifestyle Shots',v:2210,c:'#FF7AC2'},
+  {a:'People & Portraits',b:'Customer Review & Testimonial',v:1880,c:'#FFBA33'},
+  {a:'Lifestyle & Fashion',b:'Before & After Comparison',v:1720,c:'#16C2C2'},
+  {a:'Business & Finance',b:'Product-Only Image',v:1040,c:'#52C41A'},
+  {a:'Social & Cultural Themes',b:'Text-Only Graphic',v:880,c:'#9AA7B0'},
+  {a:'Technology & Digital',b:'Infographic & Data Visualization',v:690,c:'#9AA7B0'}
+];
+/* per-lens combo card config: pairs the active lens with the other two systems */
+var COMBOS={
+  content:{c1:{t:'Content category × Ad category',main:COMBO_AD,sub:COMBO_AD_SUB},
+           c2:{t:'Content category × Image category',main:COMBO_IMG,sub:COMBO_IMG_SUB}},
+  ad:{c1:{t:'Content category × Ad category',main:COMBO_AD,sub:COMBO_AD_SUB},
+      c2:{t:'Ad category × Image category',main:COMBO_AD_IMG,sub:COMBO_AD_IMG}},
+  image:{c1:{t:'Image category × Content category',main:COMBO_IMG_CONTENT,sub:COMBO_IMG_CONTENT_SUB},
+         c2:{t:'Image category × Ad category',main:COMBO_IMG_AD,sub:COMBO_IMG_AD}}
+};
+/* Top individual posts — each carries content cat + sub + ad-format tags */
+var TOPPOSTS=[
+  {th:'🍤',name:'5 things every HK foodie gets wrong about dim sum 🥟',fmt:'VIDEO',cat:'Lifestyle & Personal Development',sub:'Food & Cooking',adcat:'UGC & Lifestyle Shots',eng:4210,likes:3180,comments:520,vv:18400,d:+22},
+  {th:'📍',name:'Everyone in Central is doing this right now 👀',fmt:'VIDEO',cat:'Trends & Viral Content',sub:'Social Media Trends',adcat:'UGC & Lifestyle Shots',eng:3680,likes:2600,comments:410,vv:24100,d:+15},
+  {th:'🌅',name:'This 60-second morning routine changed my week',fmt:'VIDEO',cat:'Lifestyle & Personal Development',sub:'Health & Wellness',adcat:'Before & After Comparison',eng:3120,likes:2280,comments:380,vv:12600,d:+9},
+  {th:'🍸',name:'Hong Kong’s most underrated rooftop bars',fmt:'PHOTO',cat:'Lifestyle & Personal Development',sub:'Travel & Adventure',adcat:'Product-Only Image',eng:2890,likes:2310,comments:240,vv:0,d:+6},
+  {th:'🎤',name:'MIRROR comeback concert — full recap',fmt:'VIDEO',cat:'Entertainment & Pop Culture',sub:'Celebrity News & Gossip',adcat:'Face-Only Image',eng:2540,likes:1980,comments:420,vv:15800,d:-3},
+  {th:'💬',name:'“Honestly the best purchase this year.” — Karen',fmt:'PHOTO',cat:'Lifestyle & Personal Development',sub:'Fashion & Beauty',adcat:'Customer Review & Testimonial',eng:2010,likes:1560,comments:300,vv:0,d:+4},
+  {th:'🚇',name:'Breaking: new MTR line opens ahead of schedule',fmt:'LINK',cat:'News & Current Affairs',sub:'Local & Regional News',adcat:'Text-Only Graphic',eng:1240,likes:680,comments:360,vv:2100,d:-6}
+];
+
+var METRIC_LABEL = {aeng:'Avg Engagement',eng:'Engagement',er:'ER',pageer:'Page ER',avv:'Avg Video Views',ctr:'CTR',nfr:'Non-Fans Reach'};
+var METRIC_UNIT  = {aeng:'per post',eng:'total',er:'vs followers',pageer:'daily · vs followers',avv:'per post',ctr:'per post',nfr:'total'};
+
+/* ============ STATE ============ */
+var lens='content', metric='aeng', comboLevel='main';
+
+/* ============ HELPERS ============ */
+function fmt(n){return n>=1000?(n/1000).toFixed(n>=10000?0:1)+'k':String(Math.round(n));}
+function fmtK(n){if(n>=1000000)return (n/1000000).toFixed(1)+'M';if(n>=1000)return (n/1000).toFixed(n>=10000?0:1)+'K';return String(Math.round(n));}
+function val(row,m){return row[m];}
+function subVal(subEng,m){return m==='eng'?subEng:Math.round(subEng*SUB_RATIO[m]);}
+function metricVal(r,m){
+  if(m==='aeng')  return r.eng;
+  if(m==='eng')   return r.posts*r.eng;
+  if(m==='er')    return r.eng/FOLLOWERS*100;
+  if(m==='pageer')return (r.posts*r.eng)/12000000*100;
+  if(m==='avv')   return r.vv;                          /* avg video views per post */
+  if(m==='ctr')   return +(r.eng/FOLLOWERS*2.8).toFixed(2); /* mock CTR */
+  if(m==='nfr')   return Math.round(r.posts*r.eng*4.2); /* mock non-fans reach */
+  return 0;
+}
+function barValText(v){
+  if(metric==='er'||metric==='pageer') return v.toFixed(1)+'%';
+  if(metric==='ctr') return v.toFixed(2)+'%';
+  return fmt(v);
+}
+function overallAvg(d,m){ // weighted by posts
+  var tp=0,tv=0; d.rows.forEach(function(r){tp+=r.posts;tv+=r.posts*val(r,m);});
+  return tv/tp;
+}
+function totalPosts(d){var t=0;d.rows.forEach(function(r){t+=r.posts;});return t;}
+
+/* ============ RENDER BARS (shared for main + sub-cat) ============ */
+function renderBarRows(rows, containerEl, isSubCat){
+  var max=metricVal(rows[0],metric);
+  var totalEng=0; rows.forEach(function(r){totalEng+=r.posts*r.eng;});
+  var html=rows.map(function(r,i){
+    var v=metricVal(r,metric), w=Math.round(v/max*100);
+    var pct=totalEng>0?Math.round(r.posts*r.eng/totalEng*100):0;
+    var dcls=r.d>0?'up':(r.d<0?'down':'');
+    var darrow=r.d>0?'▲':(r.d<0?'▼':'–');
+    var hasSub=!isSubCat&&lens==='content'&&r.sub&&r.sub.length>0;
+    var arrowBtn=hasSub
+      ? '<span class="cat-arrow" onclick="event.stopPropagation();openSubCat(\''+r.n.replace(/'/g,"\\'")+'\')">›</span>'
+      : '';
+    var clickAttr=!isSubCat?'onclick="openPostModal(\''+r.n.replace(/'/g,"\\'")+'\','+i+')"':'';
+    return '<div class="cat-row" style="cursor:pointer" '+clickAttr+'>'+
+      '<div class="cat-row-top">'+
+        '<div class="cat-rank" style="color:#FFA500;font-weight:700">'+(i+1)+'</div>'+
+        '<div class="cat-name" title="'+r.n+'">'+r.n+'</div>'+
+        '<div class="cat-meta">'+
+          '<span class="cat-value">'+barValText(v)+'</span>'+
+          '<span class="cat-pct">('+pct+'%)</span>'+
+          (r.d!==0?'<span class="cat-delta '+dcls+'">'+darrow+Math.abs(r.d)+'%</span>':'')+
+          arrowBtn+
+        '</div>'+
+      '</div>'+
+      '<div class="cat-bar-rail"><div class="cat-bar-fill" style="width:'+w+'%;background:#FFA500"></div></div>'+
+    '</div>';
+  }).join('');
+  containerEl.innerHTML=html;
+}
+
+function renderBars(){
+  var d=DATA[lens];
+  var rows=d.rows.slice().sort(function(a,b){return metricVal(b,metric)-metricVal(a,metric);});
+  renderBarRows(rows, document.getElementById('catBars'), false);
+  document.getElementById('barsTitle').childNodes[0].nodeValue='Category vs '+METRIC_LABEL[metric]+' ';
+  document.getElementById('barsSubText').textContent='Ranked by '+METRIC_LABEL[metric].toLowerCase()+'. % = share of total engagement. Δ = vs prior 7 days.';
+  backToMain();
+}
+
+/* ============ SUB-CAT DRILL-DOWN ============ */
+function openSubCat(catName){
+  var d=DATA[lens];
+  var parent=null;
+  for(var i=0;i<d.rows.length;i++){if(d.rows[i].n===catName){parent=d.rows[i];break;}}
+  if(!parent||!parent.sub)return;
+  var subRows=parent.sub.map(function(s){
+    return {n:s[0],c:parent.c,posts:s[1],eng:s[2],
+      vv:Math.round(s[2]*3.0),d:parent.d,mf:parent.mf};
+  }).sort(function(a,b){return metricVal(b,metric)-metricVal(a,metric);});
+  document.getElementById('subcatTitle').textContent='Top Sub-Categories In '+catName;
+  renderBarRows(subRows, document.getElementById('subcatBars'), true);
+  document.getElementById('mainBarsView').style.display='none';
+  document.getElementById('subcatPanel').classList.add('open');
+}
+function backToMain(){
+  document.getElementById('subcatPanel').classList.remove('open');
+  document.getElementById('mainBarsView').style.display='block';
+}
+
+/* ============ POST MODAL ============ */
+var POST_EMOJIS=['🍤','📍','🌅','🍸','🎤','💬','🚇','📸','🎬','🌿'];
+function openPostModal(catName, idx){
+  var d=DATA[lens];
+  var parent=d.rows[idx]||d.rows[0];
+  /* build 5 mock posts for this category */
+  var captions=[
+    '5 things every HK foodie gets wrong about dim sum 🥟',
+    'Everyone in '+catName.split(' ')[0]+' is doing this right now 👀',
+    'This 60-second morning routine changed everything',
+    'Hong Kong\'s most underrated spots — full guide',
+    'Behind the scenes: our team at work ☕'
+  ];
+  var rows='';
+  for(var i=0;i<5;i++){
+    var eng=Math.round(parent.eng*(1-(i*0.18)));
+    var vv=Math.round(parent.vv*(1-(i*0.22)));
+    var d7=parent.d-(i*3);
+    var dcls=d7>0?'up':'down', darr=d7>0?'▲':'▼';
+    var sub=parent.sub?parent.sub[i%parent.sub.length][0]:'';
+    rows+='<tr>'+
+      '<td><div class="post-thumb-cell">'+POST_EMOJIS[i%10]+'</div></td>'+
+      '<td class="post-name-cell">'+captions[i]+
+        '<div style="margin-top:4px">'+
+          '<span class="post-tag fmt">VIDEO</span>'+
+          (sub?'<span class="post-tag sub">'+sub+'</span>':'')+
+        '</div>'+
+      '</td>'+
+      '<td><div class="post-num">'+fmtK(eng*parent.posts/10)+'</div></td>'+
+      '<td><div class="post-num">'+fmt(eng)+'</div></td>'+
+      '<td><div class="post-num">'+(vv>0?fmtK(vv*parent.posts/10):'—')+'</div></td>'+
+      '<td><div class="post-num"><span class="post-delta '+dcls+'">'+darr+Math.abs(d7)+'%</span></div></td>'+
+    '</tr>';
+  }
+  document.getElementById('postModalTitle').textContent='Posts · '+catName;
+  document.getElementById('postModalBody').innerHTML=rows;
+  document.getElementById('postModalOverlay').classList.add('open');
+}
+function closePostModal(){
+  document.getElementById('postModalOverlay').classList.remove('open');
+}
+
+/* ============ RENDER: BEST COMBINATIONS ============ */
+function comboMetricVal(baseV){
+  /* scale the base avg-engagement combo value to the selected metric */
+  if(metric==='aeng'||metric==='eng') return baseV;
+  if(metric==='avv') return Math.round(baseV*3.2);
+  if(metric==='er')  return +(baseV/FOLLOWERS*100).toFixed(2);
+  if(metric==='pageer') return +(baseV*0.0004).toFixed(3);
+  if(metric==='ctr') return +(baseV/FOLLOWERS*2.8).toFixed(2);
+  if(metric==='nfr') return Math.round(baseV*4.2);
+  return baseV;
+}
+function renderCombo(elId,data){
+  var rows=data.slice().map(function(r){return {a:r.a,b:r.b,c:r.c,mv:comboMetricVal(r.v)};})
+               .sort(function(a,b){return b.mv-a.mv;});
+  var max=rows[0].mv;
+  var isPct=metric==='er'||metric==='pageer'||metric==='ctr';
+  document.getElementById(elId).innerHTML=rows.map(function(r){
+    var w=r.mv/max*100, label=r.a+' + '+r.b;
+    var disp=isPct?r.mv+'%':fmt(r.mv);
+    return '<div class="cbar-row"><div><div class="cbar-label" title="'+label+'">'+label+'</div>'+
+      '<div class="cbar-track"><div class="cbar-fill" style="width:'+w+'%;background:'+r.c+'"></div></div></div>'+
+      '<div class="cbar-val">'+disp+'</div></div>';
+  }).join('');
+}
+function renderCombos(){
+  var c=COMBOS[lens];
+  var lbl=METRIC_LABEL[metric];
+  document.getElementById('comboTitle1').childNodes[0].nodeValue=c.c1.t+' ';
+  document.getElementById('comboTitle2').childNodes[0].nodeValue=c.c2.t+' ';
+  document.getElementById('comboSub1').textContent='Best combinations by '+lbl+'.';
+  document.getElementById('comboSub2').textContent='Best combinations by '+lbl+'.';
+  renderCombo('comboAd', comboLevel==='sub'?c.c1.sub:c.c1.main);
+  renderCombo('comboImg', comboLevel==='sub'?c.c2.sub:c.c2.main);
+}
+function setComboLevel(l){
+  comboLevel=l;
+  document.querySelectorAll('.combo-level .metric-btn').forEach(function(b){b.classList.toggle('active',b.dataset.cl===l);});
+  renderCombos();
+}
+
+/* ============ AI ADVISOR ============ */
+function generateInsights(){
+  var d=DATA[lens];
+  var ovEng=overallAvg(d,'eng'), tp=totalPosts(d);
+  var best=d.rows.slice().sort(function(a,b){return b.eng-a.eng;})[0];
+  var bestX=(best.eng/ovEng).toFixed(1);
+  var opp=d.rows.slice().filter(function(r){return r.posts>=Math.max(8,tp*0.05);})
+                .sort(function(a,b){return b.eng-a.eng;})
+                .filter(function(r){return Math.round(r.eng/ovEng*100)>=115;})[0]||best;
+  var oppIdx=Math.round(opp.eng/ovEng*100), oppShare=Math.round(opp.posts/tp*100);
+  var byVol=d.rows.slice().sort(function(a,b){return b.posts-a.posts;});
+  var over=byVol[0], overIdx=Math.round(over.eng/ovEng*100);
+  var lname=d.label;
+  var headline='In <b>'+lname+'</b>, <b>'+best.n+'</b> earns <b>'+bestX+'× the channel-average engagement</b> per post'+
+    (opp!==best?', while <b>'+opp.n+'</b> is the clearest under-served opportunity (index '+oppIdx+', only '+oppShare+'% of posts).':'.')+
+    ' Meanwhile <b>'+over.n+'</b> is posted most ('+Math.round(over.posts/tp*100)+'% of posts) but indexes '+overIdx+' — '+(overIdx<100?'below':'above')+' channel average.';
+  var chips=
+    '<div class="ai-chip"><div class="lbl">🏅 Best by engagement</div><div class="val">'+best.n+'</div><div class="sub">'+bestX+'× channel avg / post</div></div>'+
+    '<div class="ai-chip"><div class="lbl">🚀 Under-served opportunity</div><div class="val">'+opp.n+'</div><div class="sub">Index '+oppIdx+' · post more</div></div>'+
+    '<div class="ai-chip"><div class="lbl">⚠ Over-posted, average</div><div class="val">'+over.n+'</div><div class="sub" style="color:'+(overIdx<100?'var(--danger)':'var(--secondary)')+'">Index '+overIdx+'</div></div>';
+  document.getElementById('advIntro').style.display='none';
+  var out=document.getElementById('aiOut'); out.style.display='block';
+  out.innerHTML='<div class="ai-headline">'+headline+'</div>'+
+    '<div class="adv-meta">Whole-channel pass · '+tp+' posts tagged in this '+lname.toLowerCase()+'</div>'+
+    '<div class="ai-chips">'+chips+'</div>';
+}
+function askAdvisor(){
+  var inp=document.getElementById('advInput'); var q=inp.value.trim(); if(!q)return;
+  var d=DATA[lens];
+  var best=d.rows.slice().sort(function(a,b){return b.eng-a.eng;})[0];
+  document.getElementById('advIntro').style.display='none';
+  var out=document.getElementById('aiOut'); out.style.display='block';
+  var div=document.createElement('div'); div.className='adv-qa';
+  div.innerHTML='<div class="q">'+q+'</div><div>Based on the current <b>'+d.label+'</b> view, <b>'+best.n+'</b> is your strongest performer — a good place to focus. <i>(Demo response.)</i></div>';
+  out.appendChild(div); inp.value='';
+}
+function resetAdvisor(){
+  var out=document.getElementById('aiOut'); if(out){out.style.display='none';out.innerHTML='';}
+  var intro=document.getElementById('advIntro'); if(intro){intro.style.display='block';}
+}
+function toggleAdvCollapse(){document.getElementById('advisor').classList.toggle('collapsed');}
+function toggleAdvExpand(){
+  var a=document.getElementById('advisor'); a.classList.toggle('expanded');
+  document.getElementById('advExpand').textContent=a.classList.contains('expanded')?'Collapse':'Expand';
+}
+
+/* ============ RENDER: TOP CONTENT (per-post) ============ */
+function postMetricVal(p,m){
+  if(m==='aeng'||m==='eng') return p.eng;
+  if(m==='avv') return p.vv;
+  if(m==='er')  return +(p.eng/FOLLOWERS*100).toFixed(2);
+  if(m==='pageer') return +(p.eng*0.0004).toFixed(3);
+  if(m==='ctr') return +(p.eng/FOLLOWERS*2.8).toFixed(2);
+  if(m==='nfr') return Math.round(p.eng*4.2);
+  return p.eng;
+}
+function renderTopContent(){
+  var lbl=METRIC_LABEL[metric];
+  document.getElementById('topMetricLabel').textContent=lbl;
+  var isPct=metric==='er'||metric==='pageer'||metric==='ctr';
+  var rows=TOPPOSTS.slice().sort(function(a,b){return postMetricVal(b,metric)-postMetricVal(a,metric);});
+  document.getElementById('topContent').innerHTML=rows.map(function(p,i){
+    var mv=postMetricVal(p,metric);
+    var disp=isPct?mv+'%':fmtK(mv);
+    var dcls=p.d>0?'up':(p.d<0?'down':''), darrow=p.d>0?'▲':(p.d<0?'▼':'–');
+    return '<div class="tc-row"><div class="tc-rank'+(i===0?' g':'')+'">'+(i+1)+'</div>'+
+      '<div class="tc-thumb">'+p.th+'</div>'+
+      '<div><div class="tc-name">'+p.name+'</div>'+
+      '<div class="tc-tags"><span class="tc-tag fmt">'+p.fmt+'</span>'+
+      '<span class="tc-tag cat">'+p.cat+'</span>'+
+      (p.sub?'<span class="tc-tag sub">'+p.sub+'</span>':'')+
+      '<span class="tc-tag ad">'+p.adcat+'</span></div></div>'+
+      '<div class="tc-metrics">'+
+        '<div class="tc-metric active"><div class="ml">'+lbl+'</div><div class="mv">'+disp+'</div>'+
+        '<div class="md '+dcls+'">'+darrow+Math.abs(p.d)+'% 7d</div></div>'+
+        '<div class="tc-metric"><div class="ml">Engagements</div><div class="mv">'+fmtK(p.eng)+'</div></div>'+
+        '<div class="tc-metric"><div class="ml">Video Views</div><div class="mv">'+(p.vv>0?fmtK(p.vv):'—')+'</div></div>'+
+      '</div></div>';
+  }).join('');
+}
+
+/* ============ RENDER: PERFORMANCE × VOLUME MATRIX ============ */
+function addQuad(sc,text,v,h){
+  var q=document.createElement('div');q.className='quad';q.textContent=text;
+  if(v==='top'){q.style.top='4px';}else{q.style.bottom='4px';}
+  if(h==='left'){q.style.left='4px';}else{q.style.right='4px';}
+  sc.appendChild(q);
+}
+function renderMatrix(){
+  var d=DATA[lens];
+  var mVals=d.rows.map(function(r){return metricVal(r,metric);});
+  var maxE=Math.max.apply(null,mVals);
+  var maxP=Math.max.apply(null,d.rows.map(function(r){return r.posts;}));
+  var maxS=Math.max.apply(null,d.rows.map(function(r){return r.posts*r.eng;}));
+  var ovE=0; d.rows.forEach(function(r){ovE+=metricVal(r,metric);}); ovE/=d.rows.length;
+  var avgP=totalPosts(d)/d.rows.length;
+  var sc=document.getElementById('scatter');
+  sc.querySelectorAll('.bub,.med,.quad').forEach(function(e){e.remove();});
+  var mx=document.createElement('div');mx.className='med x';mx.style.left=(8+avgP/maxP*84)+'%';sc.appendChild(mx);
+  var my=document.createElement('div');my.className='med y';my.style.bottom=(8+ovE/maxE*82)+'%';sc.appendChild(my);
+  addQuad(sc,'⬆ Scale up','top','left');
+  addQuad(sc,'Keep winning','top','right');
+  addQuad(sc,'Test / niche','bottom','left');
+  addQuad(sc,'Over-served','bottom','right');
+  var leg='';
+  d.rows.forEach(function(r,i){
+    var mv=metricVal(r,metric);
+    var x=8+r.posts/maxP*84, y=8+mv/maxE*82, sz=12+(r.posts*r.eng)/maxS*22;
+    var b=document.createElement('div');b.className='bub';
+    b.style.left=x+'%';b.style.bottom=y+'%';b.style.width=sz+'px';b.style.height=sz+'px';
+    b.style.background=r.c;b.textContent=(i+1);
+    b.title=r.n+' — '+barValText(mv)+' '+METRIC_LABEL[metric]+' · '+r.posts+' posts';
+    sc.appendChild(b);
+    leg+='<div class="sl-item"><span class="sl-num" style="background:'+r.c+'">'+(i+1)+'</span>'+r.n+'</div>';
+  });
+  document.getElementById('scatterLegend').innerHTML=leg;
+  document.getElementById('matrixAxisY').textContent=METRIC_LABEL[metric]+' →';
+  document.getElementById('matrixSub').textContent='Dashed lines = channel average '+METRIC_LABEL[metric]+'. Bubble size = total engagement the category earned.';
+}
+
+/* ============ RENDER: FORMAT HEATMAP ============ */
+function heatColor(v){
+  var t=Math.max(0,Math.min(1,(v-40)/170));
+  var r=Math.round(238+(35-238)*t), g=Math.round(243+(169-243)*t), b=246;
+  return 'rgb('+r+','+g+','+b+')';
+}
+function renderFormatHeat(){
+  var d=DATA[lens];
+  var ovRaw=0; d.rows.forEach(function(r){ovRaw+=metricVal(r,metric);}); ovRaw/=d.rows.length;
+  var rows=d.rows.slice().sort(function(a,b){return metricVal(b,metric)-metricVal(a,metric);}).slice(0,6);
+  var head='<tr><th class="rowh">Category \\ Format</th>'+FORMATS.map(function(f){return '<th>'+f+'</th>';}).join('')+'</tr>';
+  var body=rows.map(function(r,i){
+    var base=metricVal(r,metric)/ovRaw*100;
+    return '<tr><td class="rowh">'+r.n+'</td>'+FORMATS.map(function(f,ci){
+      var v=Math.round(base*FMULT[f]*(0.9+((i*7+ci)%5)*0.05));
+      v=Math.max(28,Math.min(235,v));
+      var dark=v>=120, col=heatColor(v);
+      return '<td><div class="hm-cell" style="background:'+col+';color:'+(dark?'#fff':'#5a6b75')+'">'+v+'</div></td>';
+    }).join('')+'</tr>';
+  }).join('');
+  document.getElementById('heatmap').innerHTML=head+body;
+  document.getElementById('heatSub').textContent='Index 100 = channel average '+METRIC_LABEL[metric]+'. Darker = stronger. Format = Meta post type (Link / Share / Photo / Album / Video / Status).';
+}
+
+/* ============ ORCHESTRATION ============ */
+function renderAll(){
+  renderBars();
+  renderMatrix();
+  var hc=document.getElementById('heatCard');
+  if(lens==='content'){hc.style.display='block';renderFormatHeat();}
+  else{hc.style.display='none';}
+  renderCombos();
+  renderTopContent();
+}
+function setLens(l){
+  lens=l;
+  document.querySelectorAll('.lens-btn').forEach(function(b){b.classList.toggle('active',b.dataset.lens===l);});
+  resetAdvisor();renderAll();
+}
+function setMetric(m){
+  metric=m;
+  document.querySelectorAll('#metricGroup .metric-btn').forEach(function(b){b.classList.toggle('active',b.dataset.m===m);});
+  renderAll();
+  renderTopContent();
+}
+renderAll();
+renderTopContent();
+
+/* ============ TOOLTIP FLOATER ============ */
+(function(){
+  var tt=document.getElementById('tt');
+  function pos(e){
+    var w=tt.offsetWidth||300,h=tt.offsetHeight||100,m=16,p=12;
+    var x=e.clientX+m,y=e.clientY+m;
+    if(x+w+p>innerWidth)x=e.clientX-w-m;
+    if(y+h+p>innerHeight)y=e.clientY-h-m;
+    tt.style.left=Math.max(p,x)+'px';tt.style.top=Math.max(p,y)+'px';
+  }
+  document.querySelectorAll('.has-tooltip').forEach(function(el){
+    var box=el.querySelector('.tooltip-box');if(!box)return;
+    el.addEventListener('mouseenter',function(e){tt.innerHTML=box.innerHTML;tt.style.display='block';pos(e);});
+    el.addEventListener('mousemove',pos);
+    el.addEventListener('mouseleave',function(){tt.style.display='none';});
+  });
+})();
+</script>
+</body>
+</html>
