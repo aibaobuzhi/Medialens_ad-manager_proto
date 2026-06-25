@@ -202,9 +202,7 @@ body{font-family:'Poppins','Noto Sans HK',system-ui,sans-serif;background:#f5f5f
 <nav class="nav">
   <span class="nav-logo">MediaLens</span>
   <div class="nav-tabs">
-    <button class="nav-tab" onclick="showView('campaigns')">Campaigns</button>
     <button class="nav-tab active" onclick="showView('settings')">Settings</button>
-    <button class="nav-tab" onclick="showView('userAccess')">User Access</button>
     <button class="nav-tab" onclick="showView('reconnect')" style="background:rgba(255,200,0,0.18);color:#fff">Req 2 — Reconnect Prompt</button>
     <button class="nav-tab" onclick="showView('useraccess')" style="background:rgba(255,200,0,0.18);color:#fff">Req 3 — User Access (Read-only)</button>
     <button class="nav-tab" onclick="showView('aiagent')" style="background:rgba(255,200,0,0.18);color:#fff">Req 4 — AI Agent Pause</button>
@@ -438,66 +436,7 @@ body{font-family:'Poppins','Noto Sans HK',system-ui,sans-serif;background:#f5f5f
   </div>
 </div>
 
-
-<!-- ============================================================
-     VIEW 2: CAMPAIGNS LIST
-     Requirements covered: Req 4 (Pause disabled + tooltip for ANALYZE/CREATIVE),
-                           Req 5 (token expired → banner + disabled)
-     ============================================================ -->
-<div id="view-campaigns" class="page-wrap hidden">
-  <div class="page-head">
-    <div>
-      <div class="page-title">Campaigns</div>
-      <div class="page-sub" id="campaign-sub">
-        My Store &nbsp;·&nbsp; act_123456
-      </div>
-    </div>
-    <div class="row">
-      <button class="btn btn-secondary">Last 30 days ▾</button>
-      <button class="btn btn-outline">+ Create Campaign</button>
-    </div>
-  </div>
-
-  <!-- Scenario bar -->
-  <div class="scenario-bar">
-    <strong>模擬場景：</strong>
-    <button class="s-btn active" id="cs-advertise" onclick="setCampaignState('advertise')">ADVERTISE 用戶（正常操作）</button>
-    <button class="s-btn" id="cs-analyze" onclick="setCampaignState('analyze')">ANALYZE 用戶（只讀）</button>
-    <button class="s-btn" id="cs-expired" onclick="setCampaignState('expired')">Token 已過期</button>
-  </div>
-
-  <!-- Expired token banner (hidden by default) -->
-  <div id="campaign-banner" class="banner hidden">
-    <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" stroke="#FFC960" stroke-width="1.5"/><path d="M8 5v3.5" stroke="#FFC960" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11" r=".75" fill="#FFC960"/></svg>
-    <span>你的廣告帳戶授權需要更新，部分功能暫時無法使用。</span>
-    <button class="banner-link" onclick="showView('settings');setSettingsState('expired')">重新連接廣告帳戶</button>
-  </div>
-
-  <div class="card" style="padding:0;overflow:hidden">
-    <table class="table">
-      <thead>
-        <tr>
-          <th style="padding-left:20px">Campaign</th>
-          <th>狀態</th>
-          <th class="col-r">Spend</th>
-          <th class="col-r">ROAS</th>
-          <th class="col-r">Impressions</th>
-          <th class="col-r" style="padding-right:20px">操作</th>
-        </tr>
-      </thead>
-      <tbody id="campaign-tbody">
-        <!-- Populated by JS -->
-      </tbody>
-    </table>
-  </div>
-</div>
-
-
-<!-- ============================================================
-     VIEW 3: SETTINGS → USER ACCESS (Admin only)
-     Requirements covered: Req 3 (admin reads full-org Meta permissions)
-     ============================================================ -->
-<div id="view-userAccess" class="page-wrap hidden">
+<div id="view-userAccess" class="page-wrap hidden" style="display:none">
   <div class="page-head">
     <div>
       <div class="page-title">User Access</div>
@@ -982,68 +921,6 @@ function setAgentState(s) {
 // init agent view
 setTimeout(function(){ setAgentState('advertise'); }, 0);
 
-// ── User Access: Ad Accounts read-only tab ─────────────────────
-var uaData = {
-  mixed: [
-    {name:'KEEPP',biz:'Beauty Advance Technology',task:'ADVERTISE',taskClass:'b-advertise',connected:true},
-    {name:'PL Client Boosting',biz:'PressLogic Girlstyle - BusinessFocus',task:'ADVERTISE',taskClass:'b-advertise',connected:true},
-    {name:'PressLogic Malaysia - General boosting',biz:'PressLogic Girlstyle - BusinessFocus',task:'ANALYZE',taskClass:'b-analyze',connected:true},
-    {name:'Singapore - General boosting (SSSG)',biz:'PressLogic HK',task:'ANALYZE',taskClass:'b-analyze',connected:true},
-  ],
-  none: [
-  ]
-};
-
-function setUAUser(key) {
-  ['mixed','none'].forEach(function(k) {
-    var el = document.getElementById('ua-'+k);
-    if(el) el.classList.toggle('active', k===key);
-  });
-  // update user info
-  var names = {mixed:'Jason Fung', none:'徐昊'};
-  var emails = {mixed:'jason.fung@presslogic.com', none:'xuhao@presslogic.com'};
-  document.getElementById('ua-username').textContent = names[key];
-  document.getElementById('ua-useremail').textContent = emails[key];
-
-  var list = document.getElementById('ua-account-list');
-  var empty = document.getElementById('ua-empty');
-  var accounts = uaData[key].filter(function(a){ return a.connected; });
-
-  if(!accounts.length) {
-    list.innerHTML = '';
-    list.classList.add('hidden');
-    empty.classList.remove('hidden');
-    return;
-  }
-  list.classList.remove('hidden');
-  empty.classList.add('hidden');
-
-  // badge dot class by task
-  function dotClass(tc) {
-    return tc==='b-analyze' ? 'dot-gray' : 'dot-ok';
-  }
-
-  list.innerHTML = accounts.map(function(a) {
-    var initial = a.name.charAt(0).toUpperCase();
-    var badge = '<span class="badge '+a.taskClass+'" style="font-size:12px">'
-      + '<span class="dot '+dotClass(a.taskClass)+'"></span>'+a.task+'</span>';
-
-    return '<div style="background:#f9f9f9;border:1px solid var(--border);border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:12px">'
-      + '<div style="width:36px;height:36px;border-radius:8px;background:#e8f4fd;display:grid;place-items:center;flex-shrink:0">'
-        + '<svg width="18" height="18" fill="none" viewBox="0 0 18 18"><rect x="1" y="4" width="16" height="11" rx="2.5" stroke="#5ba8d4" stroke-width="1.4"/><path d="M6 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" stroke="#5ba8d4" stroke-width="1.4"/><path d="M6 9h6" stroke="#5ba8d4" stroke-width="1.4" stroke-linecap="round"/></svg>'
-      + '</div>'
-      + '<div style="flex:1;min-width:0">'
-        + '<div style="font-size:13px;font-weight:600;color:var(--title);line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">'+a.name+'</div>'
-        + '<div style="font-size:11px;color:var(--muted);margin-top:2px">'+a.biz+'</div>'
-      + '</div>'
-      + '<div style="flex-shrink:0">'+badge+'</div>'
-      + '</div>';
-  }).join('');
-}
-
-// init UA
-setTimeout(function(){ setUAUser('mixed'); }, 0);
-
 // ── Settings: Ad Accounts ──────────────────────────────────────
 function renderAccountList(accounts) {
   var list = document.getElementById('account-list-settings');
@@ -1137,70 +1014,6 @@ function openMembersModal(accId) {
   document.getElementById('modal-members').classList.add('open');
 }
 
-// ── Campaigns ─────────────────────────────────────────────────
-var campaigns = [
-  {name:'Summer Sale 2026',status:'Active',statusClass:'b-ok',spend:'$8,420',roas:'3.2x',impressions:'1.2M',action:'pause'},
-  {name:'Brand Awareness Q2',status:'Paused',statusClass:'b-analyze',spend:'$3,100',roas:'1.8x',impressions:'580K',action:'resume'},
-  {name:'Retargeting — July',status:'Active',statusClass:'b-ok',spend:'$5,880',roas:'4.1x',impressions:'920K',action:'pause'},
-];
-
-function renderCampaigns(state) {
-  var ANALYZE_TIP = 'Your Meta permission (ANALYZE) does not allow this action. To proceed, request ADVERTISE or MANAGE access in Meta Business Manager and reconnect.';
-
-  var sub = document.getElementById('campaign-sub');
-  var banner = document.getElementById('campaign-banner');
-  banner.classList.add('hidden');
-
-  if(state === 'advertise') {
-    sub.innerHTML = 'My Store &nbsp;·&nbsp; act_123456 &nbsp;<span class="badge b-advertise" style="font-size:11px"><span class="dot dot-ok"></span>ADVERTISE</span>';
-  } else if(state === 'analyze') {
-    sub.innerHTML = 'My Store &nbsp;·&nbsp; act_123456 &nbsp;<span class="badge b-analyze" style="font-size:11px"><span class="dot dot-gray"></span>ANALYZE</span>';
-  } else if(state === 'expired') {
-    sub.innerHTML = 'My Store &nbsp;·&nbsp; act_123456 &nbsp;<span class="badge b-expired" style="font-size:11px"><span class="dot dot-exp"></span>Token Expired</span>';
-    banner.classList.remove('hidden');
-  }
-
-  var tbody = document.getElementById('campaign-tbody');
-  tbody.innerHTML = campaigns.map(function(c, i) {
-    var actionHtml;
-    var label = c.action === 'pause' ? 'Pause' : 'Resume';
-    var icon = c.action === 'pause'
-      ? '<svg width="11" height="11" fill="none" viewBox="0 0 11 11"><rect x="1.5" y="1" width="3" height="9" rx="1" fill="currentColor"/><rect x="6.5" y="1" width="3" height="9" rx="1" fill="currentColor"/></svg>'
-      : '<svg width="11" height="11" fill="none" viewBox="0 0 11 11"><path d="M2 1.5l8 4-8 4V1.5z" fill="currentColor"/></svg>';
-
-    if(state === 'advertise') {
-      actionHtml = '<button class="btn-sm" onclick="alert(\'執行操作: '+label+' Campaign '+i+'\')">' + icon + ' ' + label + '</button>';
-    } else if(state === 'analyze') {
-      actionHtml = '<div class="tip-wrap"><button class="btn-sm-disabled">'
-        + '<svg width="11" height="11" fill="none" viewBox="0 0 11 11"><rect x="2" y="5" width="7" height="5.5" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3.5 5V3.5a2 2 0 0 1 4 0V5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>'
-        + ' ' + label + '</button>'
-        + '<span class="tip-box">' + ANALYZE_TIP + '</span></div>';
-    } else if(state === 'expired') {
-      // Button looks normal — token expiry is only discovered on API call
-      actionHtml = '<button class="btn-sm" onclick="document.getElementById(\'modal-expired\').classList.add(\'open\')">' + icon + ' ' + label + '</button>';
-    }
-
-    var dot = (c.statusClass==='b-ok') ? 'dot-ok' : 'dot-gray';
-    return '<tr>'
-      + '<td style="padding-left:20px;font-weight:500;color:var(--title)">'+c.name+'</td>'
-      + '<td><span class="badge '+c.statusClass+'"><span class="dot '+dot+'"></span>'+c.status+'</span></td>'
-      + '<td class="col-r">'+c.spend+'</td>'
-      + '<td class="col-r">'+c.roas+'</td>'
-      + '<td class="col-r">'+c.impressions+'</td>'
-      + '<td class="col-r" style="padding-right:20px">'+actionHtml+'</td>'
-      + '</tr>';
-  }).join('');
-}
-
-function setCampaignState(s) {
-  campaignState = s;
-  ['advertise','analyze','expired'].forEach(function(k) {
-    var el = document.getElementById('cs-'+k);
-    if(el) el.classList.toggle('active', k===s);
-  });
-  renderCampaigns(s);
-}
-
 // ── Modal ──────────────────────────────────────────────────────
 function closeModal(id) {
   document.getElementById(id).classList.remove('open');
@@ -1208,7 +1021,6 @@ function closeModal(id) {
 
 // ── Init ───────────────────────────────────────────────────────
 setSettingsState('normal');
-renderCampaigns('advertise');
 showView('settings');
 </script>
 </body>
