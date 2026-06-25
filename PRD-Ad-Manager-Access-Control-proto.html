@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<!--
+  Ad Manager Access Control — Permission UX Prototype
+  PRD: PRD-Ad-Manager-Access-Control.md v1.0.3
+  Covers:
+    - Settings → Ad Accounts: Meta permission badge, Disconnect / Reconnect
+    - Campaigns list: Pause/Resume disabled + tooltip for ANALYZE users
+    - Settings → User Access: Admin-only full-org permission view
+-->
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ad Manager Access Control — Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Poppins','Noto Sans HK',system-ui,sans-serif;background:#f5f5f5;min-height:100vh}
+:root{
+  --blue:#23A9F6;--blue-tint:#EEF6FF;
+  --title:#102532;--text:#102532;--muted:#8b939b;--secondary:#828282;
+  --surface:#fff;--card-bg:#fafafa;--page:#f5f5f5;
+  --border:#D9E3E6;--divider:#ebebeb;
+  --success:#52C41A;--success-bg:#E6FBEB;
+  --warning:#FFC960;--warning-bg:#FFF8EB;
+  --danger:#FF3F41;--danger-bg:#FFECEC;
+  --r-card:12px;--r-md:8px;--r-sm:6px;--r-tag:20px;
+}
+
+/* --- NAV --- */
+.nav{background:var(--blue);height:56px;display:flex;align-items:center;padding:0 24px;gap:12px;color:#fff;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(35,169,246,0.18)}
+.nav-logo{font-weight:700;font-size:15px;letter-spacing:-0.2px}
+.nav-tabs{display:flex;gap:2px;margin-left:8px}
+.nav-tab{background:none;border:0;color:rgba(255,255,255,0.75);font-size:13px;font-weight:500;padding:6px 14px;border-radius:20px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .12s,color .12s}
+.nav-tab:hover{color:#fff;background:rgba(255,255,255,0.12)}
+.nav-tab.active{color:#fff;background:rgba(255,255,255,0.22);font-weight:600}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.avatar{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.22);color:#fff;display:grid;place-items:center;font-weight:600;font-size:12px}
+
+/* --- LAYOUT --- */
+.page-wrap{max-width:900px;margin:0 auto;padding:24px 20px;display:flex;flex-direction:column;gap:16px}
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+.page-title{font-size:22px;font-weight:600;color:var(--title);letter-spacing:-0.1px}
+.page-sub{font-size:13px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+
+/* --- CARD --- */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);padding:20px 24px}
+
+/* --- SETTINGS INNER CARD --- */
+.inner-card{background:var(--card-bg);border-radius:10px;padding:20px 16px}
+.inner-divider{height:1px;background:var(--divider);margin:12px 0}
+
+/* --- PLATFORM ROW --- */
+.platform-row{display:flex;align-items:center;justify-content:space-between}
+.platform-name{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:var(--title)}
+
+/* --- ACCOUNT ITEM --- */
+.account-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--divider)}
+.account-item:last-child{border-bottom:none;padding-bottom:0}
+.account-name{font-size:14px;font-weight:600;color:var(--title)}
+.account-biz{font-size:14px;font-weight:400;color:var(--secondary)}
+
+/* --- BADGE --- */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:500;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.b-manage{background:#EEF6FF;color:#0c7ad6}
+.b-advertise{background:var(--success-bg);color:#2f9c0a}
+.b-analyze{background:#F5F5F5;color:#666}
+.b-creative{background:#F5F5F5;color:#666}
+.b-expired{background:var(--danger-bg);color:var(--danger)}
+.b-ok{background:var(--success-bg);color:#2f9c0a}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dot-ok{background:#52C41A}
+.dot-exp{background:var(--danger)}
+.dot-gray{background:#ccc}
+
+/* --- BUTTONS --- */
+.btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;padding:6px 14px;border-radius:8px;border:1px solid transparent;cursor:pointer;font-family:inherit;transition:background .12s,color .12s;height:36px}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn-primary:hover{background:#1b9bea}
+.btn-secondary{background:#fff;color:var(--muted);border-color:#AEAEAE;font-weight:400}
+.btn-secondary:hover{color:#d8476f;border-color:#d8476f}
+.btn-outline{background:#fff;color:var(--blue);border-color:var(--blue)}
+.btn-outline:hover{background:var(--blue-tint)}
+.btn-ghost{background:none;border:0;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px;padding:2px 4px}
+.btn-sm-disabled{background:#f5f5f5;color:#bbb;border:1px solid #e8e8e8;cursor:not-allowed;display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:4px 10px;border-radius:6px;font-family:inherit;height:30px}
+.btn-sm{background:#fff;color:var(--muted);border:1px solid #e0e0e0;cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:4px 10px;border-radius:6px;font-family:inherit;height:30px;transition:background .1s}
+.btn-sm:hover{background:var(--page);color:var(--title)}
+
+/* --- TABLE --- */
+.table{width:100%;border-collapse:collapse;font-size:13px}
+.table th{text-align:left;font-size:11px;font-weight:600;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);padding:8px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+.table td{padding:10px 12px;border-bottom:1px solid #f4f4f4;vertical-align:middle}
+.table tr:last-child td{border-bottom:0}
+.table tr:hover td{background:#f9fdff}
+.col-r{text-align:right;font-variant-numeric:tabular-nums}
+
+/* --- SETTINGS SECTION LABEL --- */
+.sec-label{color:var(--muted);font-size:14px;margin-bottom:14px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:2px 0}
+.toggle-label{font-size:14px;color:var(--title);font-weight:400;max-width:600px}
+.toggle{width:44px;height:24px;border-radius:12px;background:var(--blue);position:relative;cursor:pointer;border:none;flex-shrink:0}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s}
+.toggle.on::after{transform:translateX(20px)}
+.sep{height:1px;background:var(--divider);margin:18px 0}
+.tz-row{display:flex;align-items:center;justify-content:space-between}
+.tz-text{font-size:14px;color:var(--title);font-weight:400}
+.btn-edit{border:1px solid var(--blue);color:var(--blue);border-radius:8px;padding:4px 14px;height:34px;background:#fff;font-size:13px;font-family:'Poppins';cursor:pointer}
+.btn-edit:hover{background:var(--blue-tint)}
+
+/* --- TOOLTIP --- */
+.tip-wrap{position:relative;display:inline-flex}
+.tip-box{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1a2e3b;color:#fff;font-size:11px;line-height:1.5;padding:8px 12px;border-radius:6px;pointer-events:none;z-index:50;opacity:0;transition:opacity .15s;width:240px;text-align:center}
+.tip-box::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:#1a2e3b}
+.tip-wrap:hover .tip-box{opacity:1}
+
+/* --- BANNER --- */
+.banner{background:var(--warning-bg);border:1px solid #FFD591;border-radius:8px;padding:10px 16px;display:flex;align-items:center;gap:10px;font-size:13px;color:#7a5a10}
+.banner-link{color:var(--blue);font-weight:500;cursor:pointer;background:none;border:0;font-family:inherit;font-size:13px;text-decoration:underline;padding:0}
+
+/* --- USER ACCESS --- */
+.acc-group{margin-bottom:20px}
+.acc-group:last-child{margin-bottom:0}
+.acc-group-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;color:var(--muted);padding:8px 0 6px;border-bottom:1px solid var(--border);margin-bottom:8px}
+.member-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f4f4f4}
+.member-row:last-child{border-bottom:0}
+.uavatar{width:30px;height:30px;border-radius:50%;background:var(--blue-tint);color:var(--blue);display:grid;place-items:center;font-weight:600;font-size:11px;flex-shrink:0}
+.member-name{font-size:13px;font-weight:500;color:var(--title);min-width:80px}
+.member-email{font-size:11px;color:var(--muted)}
+
+/* --- MODAL --- */
+.modal-overlay{background:rgba(10,31,44,0.45);display:none;align-items:center;justify-content:center;padding:20px;position:fixed;inset:0;z-index:200}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:12px;width:min(100%,440px);overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.12)}
+.modal-head{padding:20px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:16px;font-weight:600;color:var(--title)}
+.modal-body{padding:16px 20px}
+.modal-foot{padding:12px 20px 20px;display:flex;justify-content:flex-end;gap:8px}
+
+/* --- MISC --- */
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.note{font-size:12px;color:var(--muted);display:flex;align-items:flex-start;gap:5px;margin-top:12px;padding-top:12px;border-top:1px solid var(--divider);line-height:1.6}
+.hidden{display:none!important}
+
+/* --- SCENARIO SWITCHER --- */
+.scenario-bar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:10px 12px;background:#f0f7ff;border:1px dashed #b0d9f7;border-radius:8px;font-size:11px;color:var(--muted)}
+.scenario-bar strong{color:var(--title);margin-right:2px}
+.s-btn{background:#fff;color:var(--blue);border:1px solid var(--blue);font-size:11px;padding:3px 10px;height:26px;border-radius:20px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .1s}
+.s-btn:hover{background:var(--blue-tint)}
+.s-btn.active{background:var(--blue);color:#fff}
+
+/* --- ADMIN ACCOUNT ROW --- */
+.admin-acc-item{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--divider);gap:10px}
+.admin-acc-item:last-child{border-bottom:none;padding-bottom:0}
+.admin-acc-left{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.admin-acc-name{font-size:14px;font-weight:600;color:var(--title)}
+.admin-acc-id{font-size:11px;color:var(--muted)}
+.admin-acc-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.b-noaccess{background:#f5f5f5;color:#999;border:1px solid #e8e8e8}
+.btn-members{background:#fff;color:var(--blue);border:1px solid var(--blue);font-size:12px;padding:3px 10px;border-radius:6px;height:28px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.btn-members:hover{background:var(--blue-tint)}
+
+/* --- MEMBER MODAL TABLE --- */
+.mem-table{width:100%;border-collapse:collapse}
+.mem-table td{padding:9px 0;border-bottom:1px solid #f4f4f4;vertical-align:middle}
+.mem-table tr:last-child td{border-bottom:0}
+.modal-box-lg{width:min(100%,560px)}
+
+/* --- AD ACCOUNTS PAGE (Req 2 reconnect view) --- */
+.app-shell{display:flex;height:calc(100vh - 56px);overflow:hidden}
+.sidebar{width:220px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);padding:16px 0;overflow-y:auto}
+.sidebar-org{display:flex;align-items:center;gap:10px;padding:8px 16px 16px;border-bottom:1px solid var(--border);margin-bottom:8px}
+.sidebar-org-avatar{width:32px;height:32px;border-radius:8px;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px;flex-shrink:0}
+.sidebar-org-name{font-size:13px;font-weight:600;color:var(--title);line-height:1.3}
+.sidebar-org-role{font-size:11px;color:var(--muted)}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:8px 16px;font-size:13px;color:#555;cursor:pointer;border-radius:0;transition:background .1s}
+.sidebar-item:hover{background:#f5f5f5}
+.sidebar-item.active{color:var(--blue);background:var(--blue-tint);font-weight:600}
+.main-content{flex:1;overflow-y:auto;padding:32px 36px;background:linear-gradient(135deg,#f0f4ff 0%,#fdf0f8 50%,#eff8ff 100%)}
+.adacc-title{font-size:26px;font-weight:700;color:var(--blue);margin-bottom:24px}
+.adacc-topbar{display:flex;justify-content:flex-end;gap:10px;margin-bottom:20px;margin-top:-44px}
+.adacc-group{background:#fff;border-radius:12px;padding:20px 24px;margin-bottom:16px;border:1px solid var(--border)}
+.adacc-group-title{font-size:14px;font-weight:700;color:var(--title);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.adacc-group-count{margin-left:auto;font-size:12px;color:var(--muted);font-weight:400}
+.adacc-table{width:100%;border-collapse:collapse;font-size:13px}
+.adacc-table th{text-align:left;font-size:11px;color:var(--muted);font-weight:500;padding:0 10px 10px;border-bottom:1px solid var(--border)}
+.adacc-table td{padding:12px 10px;border-bottom:1px solid #f5f5f5;vertical-align:middle}
+.adacc-table tr:last-child td{border-bottom:0}
+.adacc-row-highlight{background:#fffaf0;outline:2px solid #FF3F41;outline-offset:-2px;border-radius:4px}
+.pill{display:inline-flex;align-items:center;font-size:12px;font-weight:500;padding:2px 10px;border-radius:20px}
+.pill-green{background:#e6fbeb;color:#2f9c0a}
+.pill-conn{color:var(--success)}
+/* dimmed overlay for reconnect modal backdrop */
+.reconnect-dimmed{position:relative}
+.reconnect-dimmed::after{content:'';position:absolute;inset:0;background:rgba(10,31,44,0.38);border-radius:12px;pointer-events:none;z-index:1}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <span class="nav-logo">MediaLens</span>
+  <div class="nav-tabs">
+    <button class="nav-tab" onclick="showView('campaigns')">Campaigns</button>
+    <button class="nav-tab active" onclick="showView('settings')">Settings</button>
+    <button class="nav-tab" onclick="showView('userAccess')">User Access</button>
+    <button class="nav-tab" onclick="showView('reconnect')" style="background:rgba(255,200,0,0.18);color:#fff">Req 2 — Reconnect Prompt</button>
+    <button class="nav-tab" onclick="showView('useraccess')" style="background:rgba(255,200,0,0.18);color:#fff">Req 3 — User Access (Read-only)</button>
+    <button class="nav-tab" onclick="showView('aiagent')" style="background:rgba(255,200,0,0.18);color:#fff">Req 4 — AI Agent Pause</button>
+  </div>
+  <div class="nav-right">
+    <span style="font-size:12px;color:rgba(255,255,255,0.75)">PressLogic Org</span>
+    <span class="avatar">ZS</span>
+  </div>
+</nav>
+
+
+<!-- ============================================================
+     VIEW 4: REQ 2 — Reconnect prompt modal
+     Trigger: user enters Ad Accounts page, metaUserTasks missing/incomplete
+     Background: Ad Accounts page (matches real app screenshot)
+     ============================================================ -->
+<div id="view-reconnect" class="hidden" style="height:calc(100vh - 56px);position:relative">
+
+  <!-- App shell behind the modal -->
+  <div class="app-shell" style="filter:blur(1px) brightness(0.92);pointer-events:none;user-select:none">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-org">
+        <div class="sidebar-org-avatar">P</div>
+        <div><div class="sidebar-org-name">PL – Hong Kong</div><div class="sidebar-org-role">Admin – Julie Li</div></div>
+      </div>
+      <div class="sidebar-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1.5" stroke="#888" stroke-width="1.3"/><rect x="9" y="1" width="6" height="6" rx="1.5" stroke="#888" stroke-width="1.3"/><rect x="1" y="9" width="6" height="6" rx="1.5" stroke="#888" stroke-width="1.3"/><rect x="9" y="9" width="6" height="6" rx="1.5" stroke="#888" stroke-width="1.3"/></svg>
+        Dashboard
+      </div>
+      <div class="sidebar-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="5" r="3" stroke="#888" stroke-width="1.3"/><path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="#888" stroke-width="1.3" stroke-linecap="round"/></svg>
+        My Pages
+      </div>
+      <div class="sidebar-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="#888" stroke-width="1.3"/><path d="M8 5v3l2 2" stroke="#888" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Competitor Analysis
+      </div>
+      <div class="sidebar-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M3 12L6 7l3 3 2-4 2 5" stroke="#888" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Buzz (What's Viral?)
+      </div>
+      <div class="sidebar-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><rect x="1" y="9" width="3" height="6" rx="1" stroke="#888" stroke-width="1.3"/><rect x="6" y="5" width="3" height="10" rx="1" stroke="#888" stroke-width="1.3"/><rect x="11" y="1" width="3" height="14" rx="1" stroke="#888" stroke-width="1.3"/></svg>
+        Leader Board
+      </div>
+      <div class="sidebar-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5" stroke="#888" stroke-width="1.3"/><path d="M11 11l3 3" stroke="#888" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Social Listening
+      </div>
+      <div class="sidebar-item active">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 7h6M5 10h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Ad Manager
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-content">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+        <h1 class="adacc-title" style="margin-bottom:0">Ad Accounts</h1>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-secondary" style="gap:6px">
+            <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4v3l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            Connect
+          </button>
+          <button class="btn btn-primary">+ Import</button>
+        </div>
+      </div>
+
+      <!-- Group 1 -->
+      <div class="adacc-group reconnect-dimmed">
+        <div class="adacc-group-title">
+          <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><rect x="1" y="1" width="12" height="12" rx="2" stroke="#888" stroke-width="1.3"/><path d="M4 5h6M4 8h4" stroke="#888" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Beauty Advance Technology
+          <span class="adacc-group-count">1 account</span>
+        </div>
+        <table class="adacc-table">
+          <thead><tr>
+            <th>Account Name</th><th>Status</th><th>Data Sync</th><th>AI Analysis</th><th>Currency</th><th>Connection</th>
+          </tr></thead>
+          <tbody>
+            <tr class="adacc-row-highlight">
+              <td style="font-weight:500">KEEPP</td>
+              <td><span class="pill pill-green">Active</span></td>
+              <td><span class="pill pill-green">Ready</span></td>
+              <td><span class="pill pill-green">Enabled</span></td>
+              <td>HKD</td>
+              <td><span class="pill-conn">● Connected</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Group 2 -->
+      <div class="adacc-group">
+        <div class="adacc-group-title">
+          <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><rect x="1" y="1" width="12" height="12" rx="2" stroke="#888" stroke-width="1.3"/><path d="M4 5h6M4 8h4" stroke="#888" stroke-width="1.3" stroke-linecap="round"/></svg>
+          PressLogic Girlstyle - BusinessFocus
+          <span class="adacc-group-count">3 accounts</span>
+        </div>
+        <table class="adacc-table">
+          <thead><tr>
+            <th>Account Name</th><th>Status</th><th>Data Sync</th><th>AI Analysis</th><th>Currency</th><th>Connection</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:500">PL Client Boosting (previously known as Maxlytics - General Boosting)</td>
+              <td><span class="pill pill-green">Active</span></td>
+              <td><span class="pill pill-green">Ready</span></td>
+              <td><span class="pill pill-green">Enabled</span></td>
+              <td>HKD</td>
+              <td><span class="pill-conn">● Connected</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:500">PressLogic Malaysia - General boosting</td>
+              <td><span class="pill pill-green">Active</span></td>
+              <td><span class="pill pill-green">Ready</span></td>
+              <td><span class="pill pill-green">Enabled</span></td>
+              <td>HKD</td>
+              <td><span class="pill-conn">● Connected</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:500">GirlStyle HK - General boosting</td>
+              <td><span class="pill pill-green">Active</span></td>
+              <td><span class="pill pill-green">Ready</span></td>
+              <td><span class="pill pill-green">Enabled</span></td>
+              <td>HKD</td>
+              <td><span class="pill-conn">● Connected</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div><!-- /app-shell -->
+
+  <!-- Modal overlay — matches existing DisconnectModal.vue style (528px, centered text) -->
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:10;padding:20px;background:rgba(10,31,44,0.45)">
+    <div style="background:#fff;border-radius:12px;width:528px;max-width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.14);overflow:hidden">
+
+      <!-- Title (centered, 20px 500, #102532 — matches .disconnect-modal-title) -->
+      <div style="padding:32px 32px 0;text-align:center">
+        <div style="font-family:'Poppins';font-size:20px;font-weight:500;line-height:30px;color:#102532">
+          Your permissions need to be updated
+        </div>
+      </div>
+
+      <!-- Body (centered, 14px, #707070 — matches .disconnect-modal-content) -->
+      <div style="font-family:'Poppins';font-size:14px;font-weight:400;line-height:22px;color:#707070;text-align:center;padding:12px 36px 28px">
+        We couldn't verify your Meta permissions for this ad account. Please reconnect to continue. This won't affect your existing ad data.
+      </div>
+
+      <!-- Footer buttons (Cancel outline + primary, matches modal-box-footer) -->
+      <div style="display:flex;justify-content:center;gap:12px;padding:0 32px 32px">
+        <button class="btn" style="height:44px;padding:0 28px;border:1px solid #D9E3E6;color:#707070;background:#fff;border-radius:8px;font-size:14px;font-family:'Poppins'" onclick="showView('settings')">Cancel</button>
+        <button class="btn btn-primary" style="height:44px;padding:0 28px;font-size:14px;border-radius:8px" onclick="alert('Redirecting to Meta OAuth → /organization/:orgId/ad-manager/connect')">Reconnect</button>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /view-reconnect -->
+
+<!-- ============================================================
+     VIEW 1: SETTINGS → AD ACCOUNTS
+     Requirements covered: Req 2 (Meta permission badge), Req 5 (token expiry / Reconnect)
+     ============================================================ -->
+<div id="view-settings" class="page-wrap">
+  <div class="page-head">
+    <div>
+      <div class="page-title">Account Settings</div>
+      <div class="page-sub">管理你的帳號資訊、廣告帳戶連接及偏好設定</div>
+    </div>
+  </div>
+
+  <!-- Scenario bar -->
+  <div class="scenario-bar">
+    <strong>模擬狀態：</strong>
+    <button class="s-btn active" id="s-normal" onclick="setSettingsState('normal')">Token 有效 — can edit ad</button>
+    <button class="s-btn" id="s-expired" onclick="setSettingsState('expired')">Token 已過期 → Reconnect</button>
+    <button class="s-btn" id="s-analyze" onclick="setSettingsState('analyze')">Token 有效 — can only view ad</button>
+    <button class="s-btn" id="s-admin" onclick="setSettingsState('admin')">Admin 視圖</button>
+  </div>
+
+  <!-- Ad Accounts section -->
+  <div>
+    <div class="sec-label">Ad Accounts</div>
+    <div class="inner-card">
+      <div class="platform-row">
+        <div class="platform-name">
+          <!-- Facebook icon inline SVG -->
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="12" fill="#1877F2"/>
+            <path d="M16.5 12H13.5V10.5C13.5 9.672 13.672 9 14.5 9H16V6.5C15.412 6.346 14.712 6.25 14 6.25C11.515 6.25 10 7.765 10 10.5V12H7.5V15H10V21.75C10.826 21.913 11.674 22 12.5 22C13.326 22 14.174 21.913 15 21.75V15H17L17.5 12H16.5Z" fill="white"/>
+          </svg>
+          Facebook Ads
+        </div>
+        <button id="main-btn" class="btn btn-secondary" onclick="handleMainBtn()">Disconnect</button>
+      </div>
+      <div class="inner-divider"></div>
+      <div id="account-list-settings">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Privacy settings -->
+  <div class="sep" style="margin:0"></div>
+  <div>
+    <div class="sec-label">Privacy settings</div>
+    <div class="toggle-row">
+      <span class="toggle-label">Allow Medialens to contact me with offers, updates and other marketing communications.</span>
+      <button class="toggle on" onclick="this.classList.toggle('on')" aria-label="toggle privacy"></button>
+    </div>
+  </div>
+  <div class="sep" style="margin:0"></div>
+  <div>
+    <div class="sec-label">Demo settings</div>
+    <div class="toggle-row">
+      <span class="toggle-label">Show the demo mode bar on all demo-capable pages.</span>
+      <button class="toggle on" onclick="this.classList.toggle('on')" aria-label="toggle demo"></button>
+    </div>
+  </div>
+  <div class="sep" style="margin:0"></div>
+  <div>
+    <div class="sec-label">Timezone</div>
+    <div class="tz-row">
+      <span class="tz-text">(UTC+08:00) Beijing, Chongqing, Hong Kong, Urumqi</span>
+      <button class="btn-edit">Edit</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     VIEW 2: CAMPAIGNS LIST
+     Requirements covered: Req 4 (Pause disabled + tooltip for ANALYZE/CREATIVE),
+                           Req 5 (token expired → banner + disabled)
+     ============================================================ -->
+<div id="view-campaigns" class="page-wrap hidden">
+  <div class="page-head">
+    <div>
+      <div class="page-title">Campaigns</div>
+      <div class="page-sub" id="campaign-sub">
+        My Store &nbsp;·&nbsp; act_123456
+      </div>
+    </div>
+    <div class="row">
+      <button class="btn btn-secondary">Last 30 days ▾</button>
+      <button class="btn btn-outline">+ Create Campaign</button>
+    </div>
+  </div>
+
+  <!-- Scenario bar -->
+  <div class="scenario-bar">
+    <strong>模擬場景：</strong>
+    <button class="s-btn active" id="cs-advertise" onclick="setCampaignState('advertise')">ADVERTISE 用戶（正常操作）</button>
+    <button class="s-btn" id="cs-analyze" onclick="setCampaignState('analyze')">ANALYZE 用戶（只讀）</button>
+    <button class="s-btn" id="cs-expired" onclick="setCampaignState('expired')">Token 已過期</button>
+  </div>
+
+  <!-- Expired token banner (hidden by default) -->
+  <div id="campaign-banner" class="banner hidden">
+    <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" stroke="#FFC960" stroke-width="1.5"/><path d="M8 5v3.5" stroke="#FFC960" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11" r=".75" fill="#FFC960"/></svg>
+    <span>你的廣告帳戶授權需要更新，部分功能暫時無法使用。</span>
+    <button class="banner-link" onclick="showView('settings');setSettingsState('expired')">重新連接廣告帳戶</button>
+  </div>
+
+  <div class="card" style="padding:0;overflow:hidden">
+    <table class="table">
+      <thead>
+        <tr>
+          <th style="padding-left:20px">Campaign</th>
+          <th>狀態</th>
+          <th class="col-r">Spend</th>
+          <th class="col-r">ROAS</th>
+          <th class="col-r">Impressions</th>
+          <th class="col-r" style="padding-right:20px">操作</th>
+        </tr>
+      </thead>
+      <tbody id="campaign-tbody">
+        <!-- Populated by JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     VIEW 3: SETTINGS → USER ACCESS (Admin only)
+     Requirements covered: Req 3 (admin reads full-org Meta permissions)
+     ============================================================ -->
+<div id="view-userAccess" class="page-wrap hidden">
+  <div class="page-head">
+    <div>
+      <div class="page-title">User Access</div>
+      <div class="page-sub">
+        查看 Org 成員各廣告帳戶的 Meta 權限
+        <span class="badge b-manage" style="font-size:11px">Admin 視圖</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:#EEF6FF;border:1px solid #b0d9f7;border-radius:8px;padding:10px 14px;font-size:12px;color:#1465a4;display:flex;align-items:flex-start;gap:8px">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="7" cy="7" r="6" stroke="#23A9F6" stroke-width="1.3"/><path d="M7 6v4" stroke="#23A9F6" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="4.5" r=".6" fill="#23A9F6"/></svg>
+    <span>此頁面為只讀視圖。如需變更成員權限，請前往 <strong>Meta Business Manager</strong> 調整，成員重新連接後自動同步。</span>
+  </div>
+
+  <div class="card">
+    <!-- Ad Account: My Store -->
+    <div class="acc-group">
+      <div class="acc-group-title">
+        My Store
+        <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;color:#bbb;margin-left:6px">act_123456</span>
+      </div>
+      <div class="member-row">
+        <div class="uavatar">ZS</div>
+        <div style="flex:1">
+          <div class="member-name">張珊 <span style="font-size:11px;color:var(--muted);font-weight:400">（你）</span></div>
+          <div class="member-email">zhangshan@presslogic.com</div>
+        </div>
+        <div class="row" style="gap:6px">
+          <span class="badge b-advertise"><span class="dot dot-ok"></span>ADVERTISE</span>
+          <span class="badge b-ok"><span class="dot dot-ok"></span>Token 有效</span>
+        </div>
+      </div>
+      <div class="member-row">
+        <div class="uavatar" style="background:#e6fbeb;color:#2f9c0a">LM</div>
+        <div style="flex:1">
+          <div class="member-name">李明</div>
+          <div class="member-email">liming@presslogic.com</div>
+        </div>
+        <div class="row" style="gap:6px">
+          <span class="badge b-advertise"><span class="dot dot-ok"></span>ADVERTISE</span>
+          <span class="badge b-ok"><span class="dot dot-ok"></span>Token 有效</span>
+        </div>
+      </div>
+      <div class="member-row">
+        <div class="uavatar" style="background:#fff3cd;color:#b07d10">WF</div>
+        <div style="flex:1">
+          <div class="member-name">王芳</div>
+          <div class="member-email">wangfang@presslogic.com</div>
+        </div>
+        <div class="row" style="gap:6px">
+          <span class="badge b-analyze"><span class="dot dot-gray"></span>ANALYZE</span>
+          <span class="badge b-ok"><span class="dot dot-ok"></span>Token 有效</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ad Account: Brand Page Ads -->
+    <div class="acc-group">
+      <div class="acc-group-title">
+        Brand Page Ads
+        <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;color:#bbb;margin-left:6px">act_789012</span>
+      </div>
+      <div class="member-row">
+        <div class="uavatar">ZS</div>
+        <div style="flex:1">
+          <div class="member-name">張珊 <span style="font-size:11px;color:var(--muted);font-weight:400">（你）</span></div>
+          <div class="member-email">zhangshan@presslogic.com</div>
+        </div>
+        <div class="row" style="gap:6px">
+          <span class="badge b-analyze"><span class="dot dot-gray"></span>ANALYZE</span>
+          <span class="badge b-ok"><span class="dot dot-ok"></span>Token 有效</span>
+        </div>
+      </div>
+      <div class="member-row">
+        <div class="uavatar" style="background:#fde8e8;color:#c0392b">CG</div>
+        <div style="flex:1">
+          <div class="member-name">陳剛</div>
+          <div class="member-email">chengang@presslogic.com</div>
+        </div>
+        <div class="row" style="gap:6px">
+          <span class="badge b-advertise"><span class="dot dot-ok"></span>ADVERTISE</span>
+          <span class="badge b-expired"><span class="dot dot-exp"></span>Token Expired</span>
+        </div>
+      </div>
+      <div class="member-row">
+        <div class="uavatar" style="background:#f5f5f5;color:#999">XH</div>
+        <div style="flex:1">
+          <div class="member-name">徐昊</div>
+          <div class="member-email">xuhao@presslogic.com</div>
+        </div>
+        <div class="row" style="gap:6px">
+          <span class="badge b-analyze"><span class="dot dot-gray"></span>ANALYZE</span>
+          <span class="badge b-ok"><span class="dot dot-ok"></span>Token 有效</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <svg width="13" height="13" fill="none" viewBox="0 0 13 13" style="flex-shrink:0;margin-top:2px"><rect x="1" y="1" width="11" height="11" rx="3" stroke="#aaa" stroke-width="1.2"/><path d="M4.5 6.5h4M6.5 4.5v4" stroke="#aaa" stroke-width="1.2" stroke-linecap="round"/></svg>
+      權限資料在成員重新連接廣告帳戶時自動從 Meta 同步。如發現權限不符，請請成員重新連接帳戶。
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     VIEW 6: REQ 4 — AI Agent Pause with permission check
+     Three states: ADVERTISE (normal) / ANALYZE (disabled+tooltip) / expired (modal)
+     ============================================================ -->
+<div id="view-aiagent" class="hidden" style="display:flex;height:calc(100vh - 56px);background:#fff;font-family:'Poppins',sans-serif">
+
+  <!-- Left panel: presets -->
+  <div style="width:280px;flex-shrink:0;border-right:1px solid var(--border);padding:16px;overflow-y:auto;background:#fafafa">
+    <div style="font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.8px;margin-bottom:10px">CREATIVE BRIEFS</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">
+      <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer">
+        <div style="display:flex;gap:4px;margin-bottom:6px"><span style="background:#fff0e6;color:#e07320;font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px">TOFU</span><span style="background:#e8f4fd;color:#1a7abf;font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px">EDUCATION</span></div>
+        <div style="font-size:12px;font-weight:500;color:var(--title)">Acquisition · Education</div>
+      </div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer">
+        <div style="display:flex;gap:4px;margin-bottom:6px"><span style="background:#fff0e6;color:#e07320;font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px">TOFU</span><span style="background:#f0e8fd;color:#7c3aed;font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px">LIFESTYLE</span></div>
+        <div style="font-size:12px;font-weight:500;color:var(--title)">Acquisition · Lifestyle</div>
+      </div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer">
+        <div style="display:flex;gap:4px;margin-bottom:6px"><span style="background:#e6fbeb;color:#2f9c0a;font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px">MOFU</span><span style="background:#e8f4fd;color:#1a7abf;font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px">EDUCATION</span></div>
+        <div style="font-size:12px;font-weight:500;color:var(--title)">Interest · Education</div>
+      </div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer">
+        <div style="display:flex;gap:4px;margin-bottom:6px"><span style="background:#e6fbeb;color:#2f9c0a;font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px">MOFU</span><span style="background:#f0e8fd;color:#7c3aed;font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px">LIFESTYLE</span></div>
+        <div style="font-size:12px;font-weight:500;color:var(--title)">Interest · Lifestyle</div>
+      </div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer">
+        <div style="display:flex;gap:4px;margin-bottom:6px"><span style="background:#fde8e8;color:#c0392b;font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px">BOFU</span><span style="background:#e8f4fd;color:#1a7abf;font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px">EDUCATION</span></div>
+        <div style="font-size:12px;font-weight:500;color:var(--title)">Retargeting · Education</div>
+      </div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer">
+        <div style="display:flex;gap:4px;margin-bottom:6px"><span style="background:#fde8e8;color:#c0392b;font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px">BOFU</span><span style="background:#f0e8fd;color:#7c3aed;font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px">LIFESTYLE</span></div>
+        <div style="font-size:12px;font-weight:500;color:var(--title)">Retargeting · Lifestyle</div>
+      </div>
+    </div>
+
+    <div style="font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.8px;margin-bottom:10px">ACCOUNT INSIGHTS</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer"><div style="font-size:9px;font-weight:700;color:#c0392b;margin-bottom:4px">DIAGNOSE</div><div style="font-size:12px;font-weight:500;color:var(--title)">Weekly Performance Summary</div></div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer"><div style="font-size:9px;font-weight:700;color:#c0392b;margin-bottom:4px">DIAGNOSE</div><div style="font-size:12px;font-weight:500;color:var(--title)">Find Fatigued Ads</div></div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer"><div style="font-size:9px;font-weight:700;color:#e07320;margin-bottom:4px">OPTIMIZE</div><div style="font-size:12px;font-weight:500;color:var(--title)">Scale / Pause Recommendations</div></div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer"><div style="font-size:9px;font-weight:700;color:#e07320;margin-bottom:4px">OPTIMIZE</div><div style="font-size:12px;font-weight:500;color:var(--title)">Audience Overlap Check</div></div>
+    </div>
+  </div>
+
+  <!-- Right panel: chat -->
+  <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+
+    <!-- Chat header -->
+    <div style="padding:12px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:flex-end;align-items:center;gap:10px">
+      <span style="background:#f0f0f0;border-radius:20px;padding:6px 14px;font-size:13px;color:var(--title)">pause KOL-Kaki (Sales)</span>
+      <div style="width:32px;height:32px;border-radius:50%;background:#e0e0e0;display:grid;place-items:center">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="6" r="3" stroke="#666" stroke-width="1.3"/><path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="#666" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+
+    <!-- Scenario switcher -->
+    <div class="scenario-bar" style="margin:12px 20px 0;border-radius:8px">
+      <strong>权限状态：</strong>
+      <button class="s-btn active" id="aa-advertise" onclick="setAgentState('advertise')">ADVERTISE（正常）</button>
+      <button class="s-btn" id="aa-analyze" onclick="setAgentState('analyze')">ANALYZE（禁用）</button>
+      <button class="s-btn" id="aa-expired" onclick="setAgentState('expired')">Token 已过期</button>
+    </div>
+
+    <!-- Chat messages -->
+    <div style="flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:16px">
+
+      <!-- AI message -->
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#667eea,#23A9F6);display:grid;place-items:center;flex-shrink:0;margin-top:2px">
+          <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M7 1l1.5 4h4l-3.2 2.4 1.2 4L7 9 3.5 11.4l1.2-4L1.5 5h4z" fill="#fff"/></svg>
+        </div>
+        <div style="flex:1">
+          <p style="font-size:13px;color:var(--title);line-height:1.7;margin-bottom:10px">
+            I have prepared the proposal to pause the ad set <strong>KOL-Kaki (Sales)</strong>. Please confirm the action in the card below.
+          </p>
+          <p style="font-size:13px;font-weight:600;color:var(--title);margin-bottom:6px">Action Summary:</p>
+          <ul style="font-size:13px;color:var(--title);line-height:2;padding-left:18px;margin-bottom:14px">
+            <li><span style="font-weight:500">Entity:</span> <span style="color:var(--blue)">20260511 BA-CL-20251204-02-33 (C) KOL-Kaki (Sales) FB+IG_Target DMP exclude existing customer+30 days purchasers_Serum_1P</span></li>
+            <li><span style="font-weight:500">7-day Spend:</span> 856.31</li>
+            <li><span style="font-weight:500">7-day CTR:</span> 1.73%</li>
+            <li><span style="font-weight:500">Reason:</span> User requested pause via command.</li>
+          </ul>
+
+          <!-- Pause confirmation card -->
+          <div style="border:1px solid var(--border);border-radius:10px;padding:16px 18px;background:#fff;max-width:560px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+              <div style="font-size:14px;font-weight:600;color:var(--title)">Pause Ad?</div>
+              <button class="btn-ghost" style="font-size:16px;color:#aaa;line-height:1">×</button>
+            </div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:12px">You asked to pause the following ad(s). Review before applying.</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-family:monospace">1100755461041024</div>
+            <div style="background:#f8f8f8;border-radius:6px;padding:10px 12px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px">
+              <svg width="14" height="14" fill="none" viewBox="0 0 14 14" style="flex-shrink:0;margin-top:1px"><circle cx="7" cy="7" r="6" stroke="#23A9F6" stroke-width="1.3"/><path d="M7 5v3.5" stroke="#23A9F6" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="10" r=".5" fill="#23A9F6"/></svg>
+              <div>
+                <div style="font-size:12px;font-weight:500;color:var(--title)">20260511 BA-CL-20251204-02-33 (C) KOL-Kaki (Sales) FB+IG_Target DMP exclude existing customer+30 days purchasers_Serum_1P</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:3px">User requested pause</div>
+              </div>
+            </div>
+
+            <!-- Action buttons — state controlled by JS -->
+            <div style="display:flex;gap:10px;align-items:center" id="pause-action-btns">
+              <!-- populated by setAgentState() -->
+            </div>
+          </div>
+
+          <div style="margin-top:14px;font-size:13px;color:var(--muted)">Sources: Entities, Adset Analysis</div>
+          <div style="font-size:13px;color:var(--muted);font-style:italic;margin-top:2px">Confidence: High &nbsp;As of 2026-06-23 10:15 HKT</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:2px">Citations: 1</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Chat input -->
+    <div style="padding:12px 20px;border-top:1px solid var(--border)">
+      <div style="background:#f5f5f5;border-radius:24px;padding:10px 18px;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:13px;color:#bbb">Enter a prompt here</span>
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M14 8H2M9 3l5 5-5 5" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     VIEW 5: REQ 3 — User Access Ad Accounts tab (read-only)
+     Matches UserAccess.vue screenshot exactly:
+     Left settings sidebar + right User Access panel with tabs
+     CHANGE: Editor dropdown → Meta permission badge (read-only)
+     ============================================================ -->
+<div id="view-useraccess" class="hidden" style="display:flex;height:calc(100vh - 56px);background:#f5f5f5">
+
+  <!-- Settings left sidebar (matches screenshot) -->
+  <div style="width:240px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);padding:20px 0;overflow-y:auto">
+    <!-- User -->
+    <div style="padding:4px 20px 20px;border-bottom:1px solid var(--border);margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px">J</div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--title)">Julie li</div>
+          <div style="font-size:11px;color:var(--muted)">julie.li@presslogic.com</div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:13px;color:var(--muted);padding:8px 20px;cursor:pointer">My Account</div>
+    <div style="font-size:13px;color:var(--muted);padding:8px 20px;cursor:pointer">Ad Intelligence</div>
+    <div style="font-size:13px;color:var(--muted);padding:8px 20px;cursor:pointer">Article</div>
+    <div style="font-size:13px;color:var(--muted);padding:8px 20px;cursor:pointer">Verified Browsers</div>
+    <!-- Org section -->
+    <div style="margin-top:16px;padding:8px 20px 4px;border-top:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="width:28px;height:28px;border-radius:6px;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px">P</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--title)">PL - Hong Kong</div>
+          <div style="font-size:11px;color:var(--muted)"><span style="background:#fff3cd;color:#b07d10;border-radius:4px;padding:1px 5px;font-size:10px">Enterprise</span> 134 member</div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:13px;color:var(--muted);padding:8px 20px;cursor:pointer">Team Details</div>
+    <div style="font-size:13px;color:var(--blue);padding:8px 20px;font-weight:600;background:var(--blue-tint);cursor:pointer">Manage Team Users</div>
+    <div style="font-size:13px;color:var(--muted);padding:8px 20px;cursor:pointer">Quota and Usage</div>
+    <div style="font-size:13px;color:var(--muted);padding:8px 20px;cursor:pointer">Plans and billing</div>
+  </div>
+
+  <!-- Main content -->
+  <div style="flex:1;overflow-y:auto;padding:28px 36px;display:flex;flex-direction:column;gap:0">
+
+    <!-- Scenario bar -->
+    <div class="scenario-bar" style="margin-bottom:20px">
+      <strong>模擬成員：</strong>
+      <button class="s-btn active" id="ua-mixed" onclick="setUAUser('mixed')">Jason Fung（混合權限）</button>
+      <button class="s-btn" id="ua-none" onclick="setUAUser('none')">徐昊（未連接任何）</button>
+    </div>
+
+    <!-- Page header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="btn-ghost" style="color:var(--muted);font-size:14px;display:flex;align-items:center;gap:4px">← User Access</button>
+      </div>
+      <button class="btn btn-outline" style="height:34px;font-size:13px">Edit permission</button>
+    </div>
+
+    <!-- User info card -->
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:0">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+        <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;display:grid;place-items:center;font-weight:700;font-size:22px;flex-shrink:0">J</div>
+        <div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:18px;font-weight:700;color:var(--title)" id="ua-username">Jason Fung</span>
+            <span style="background:var(--blue-tint);color:var(--blue);font-size:12px;font-weight:500;padding:2px 10px;border-radius:20px">Manager ∨</span>
+          </div>
+          <div style="font-size:13px;color:var(--muted);margin-top:3px" id="ua-useremail">jason.fung@presslogic.com</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px">
+        <div style="padding:8px 16px;font-size:13px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px">
+          <svg width="13" height="13" fill="none" viewBox="0 0 14 14"><rect x="1" y="1" width="12" height="12" rx="3" stroke="currentColor" stroke-width="1.3"/></svg>Facebook Page
+        </div>
+        <div style="padding:8px 16px;font-size:13px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px">
+          <svg width="13" height="13" fill="none" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/></svg>Instagram
+        </div>
+        <div style="padding:8px 16px;font-size:13px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px">
+          <svg width="13" height="13" fill="none" viewBox="0 0 14 14"><path d="M7 2a5 5 0 1 0 0 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Threads
+        </div>
+        <div style="padding:8px 16px;font-size:13px;color:var(--blue);font-weight:600;cursor:pointer;border-bottom:2.5px solid var(--blue);margin-bottom:-2px;display:flex;align-items:center;gap:6px">
+          <svg width="13" height="13" fill="none" viewBox="0 0 14 14"><rect x="1" y="3" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 6h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Ad Accounts
+        </div>
+        <div style="padding:8px 16px;font-size:13px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px">
+          <svg width="13" height="13" fill="none" viewBox="0 0 14 14"><rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>Modules
+        </div>
+      </div>
+
+      <!-- Info note -->
+      <div style="background:#EEF6FF;border:1px solid #b0d9f7;border-radius:8px;padding:10px 14px;font-size:12px;color:#1465a4;display:flex;align-items:flex-start;gap:8px;margin-bottom:18px">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="7" cy="7" r="6" stroke="#23A9F6" stroke-width="1.3"/><path d="M7 6v4" stroke="#23A9F6" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="4.5" r=".6" fill="#23A9F6"/></svg>
+        Ad account permissions are read-only. To change a member's access, update it in Meta Business Manager and ask them to reconnect.
+      </div>
+
+      <!-- Ad account grid -->
+      <div id="ua-account-list" style="display:grid;grid-template-columns:1fr 1fr;gap:12px"></div>
+
+      <!-- Empty state -->
+      <div id="ua-empty" class="hidden" style="text-align:center;padding:32px 0;color:var(--muted);font-size:13px">
+        This member has not connected any ad accounts yet.
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Token Expired / Reconnect -->
+<div class="modal-overlay" id="modal-expired" onclick="closeModal('modal-expired')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div class="modal-title">Authorization Expired</div>
+      <button class="btn-ghost" onclick="closeModal('modal-expired')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;align-items:flex-start;gap:14px">
+        <div style="width:42px;height:42px;border-radius:50%;background:var(--warning-bg);display:grid;place-items:center;flex-shrink:0">
+          <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M10 18A8 8 0 1 0 10 2a8 8 0 0 0 0 16z" stroke="#FFC960" stroke-width="1.5"/><path d="M10 7v4" stroke="#FFC960" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="13.5" r=".75" fill="#FFC960"/></svg>
+        </div>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--title);margin-bottom:6px">Your Meta ad account authorization has expired</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.7">Please reconnect to refresh your permissions and continue. Your existing ad data will not be affected.</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('modal-expired')">Later</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-expired');showView('settings');setSettingsState('expired')">Reconnect Ad Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Member permissions (Admin view) -->
+<div class="modal-overlay" id="modal-members" onclick="closeModal('modal-members')">
+  <div class="modal-box modal-box-lg" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="modal-members-title">成員權限</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px" id="modal-members-sub"></div>
+      </div>
+      <button class="btn-ghost" onclick="closeModal('modal-members')">✕</button>
+    </div>
+    <div class="modal-body" style="padding-bottom:8px">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px">權限只讀。如需調整，請在 Meta Business Manager 修改後請成員重新連接。</div>
+      <table class="mem-table" id="modal-members-table"></table>
+    </div>
+    <div class="modal-foot" style="padding-top:8px">
+      <button class="btn btn-outline" onclick="closeModal('modal-members')">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Disconnect confirm -->
+<div class="modal-overlay" id="modal-disconnect" onclick="closeModal('modal-disconnect')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div class="modal-title">Disconnect Facebook Ads</div>
+      <button class="btn-ghost" onclick="closeModal('modal-disconnect')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:13px;color:var(--muted);line-height:1.7">
+        確定要解除連接嗎？<br>
+        解除後，你在本 Org 連結的廣告帳戶將無法同步數據。其他已連接此帳戶的成員不受影響。
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('modal-disconnect')">取消</button>
+      <button class="btn btn-primary" style="background:var(--danger);border-color:var(--danger)" onclick="closeModal('modal-disconnect')">確認解除</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ── State ──────────────────────────────────────────────────────
+var campaignState = 'advertise';
+
+// ── Org-level member data (mock) ───────────────────────────────
+var orgAccounts = [
+  {
+    id:'act_123456', name:'My Store', biz:'PressLogic',
+    members:[
+      {initials:'ZS',name:'張珊（你）',email:'zhangshan@presslogic.com',task:'ADVERTISE',taskClass:'b-advertise',tokenOk:true,avatarStyle:''},
+      {initials:'LM',name:'李明',email:'liming@presslogic.com',task:'MANAGE',taskClass:'b-manage',tokenOk:true,avatarStyle:'background:#e6fbeb;color:#2f9c0a'},
+      {initials:'WF',name:'王芳',email:'wangfang@presslogic.com',task:'ANALYZE',taskClass:'b-analyze',tokenOk:true,avatarStyle:'background:#fff3cd;color:#b07d10'},
+    ]
+  },
+  {
+    id:'act_234567', name:'ChatCommerce', biz:'Chatcommerz',
+    members:[
+      {initials:'LM',name:'李明',email:'liming@presslogic.com',task:'ADVERTISE',taskClass:'b-advertise',tokenOk:true,avatarStyle:'background:#e6fbeb;color:#2f9c0a'},
+      {initials:'CG',name:'陳剛',email:'chengang@presslogic.com',task:'MANAGE',taskClass:'b-manage',tokenOk:false,avatarStyle:'background:#fde8e8;color:#c0392b'},
+    ]
+  },
+  {
+    id:'act_789012', name:'Brand Page Ads', biz:'PressLogic Brand',
+    members:[
+      {initials:'CG',name:'陳剛',email:'chengang@presslogic.com',task:'ADVERTISE',taskClass:'b-advertise',tokenOk:false,avatarStyle:'background:#fde8e8;color:#c0392b'},
+      {initials:'XH',name:'徐昊',email:'xuhao@presslogic.com',task:'CREATIVE',taskClass:'b-creative',tokenOk:true,avatarStyle:'background:#f5f5f5;color:#999'},
+    ]
+  },
+];
+
+// ── View switching ─────────────────────────────────────────────
+function showView(v) {
+  ['settings','campaigns','userAccess','reconnect','aiagent','useraccess'].forEach(function(id) {
+    document.getElementById('view-'+id).classList.add('hidden');
+  });
+  document.getElementById('view-'+v).classList.remove('hidden');
+  document.querySelectorAll('.nav-tab').forEach(function(t,i) {
+    t.classList.remove('active');
+    if(['campaigns','settings','userAccess','reconnect','aiagent','useraccess'][i]===v) t.classList.add('active');
+  });
+}
+
+// ── AI Agent: pause permission states ─────────────────────────
+function setAgentState(s) {
+  ['advertise','analyze','expired'].forEach(function(k) {
+    var el = document.getElementById('aa-'+k);
+    if(el) el.classList.toggle('active', k===s);
+  });
+
+  var btns = document.getElementById('pause-action-btns');
+  var ANALYZE_TIP = '你的 Meta 权限（ANALYZE）不支持此操作。如需执行，请在 Meta Business Manager 申请 ADVERTISE 或 MANAGE 权限后重新连接。';
+
+  // "Review & Apply" base style matches screenshot: dark outlined button
+  var normalBtn = '<button class="btn" style="height:36px;font-size:13px;background:#fff;color:#102532;border:1.5px solid #102532;border-radius:8px" onclick="alert(\'Ad set paused successfully.\')">Review &amp; Apply</button>';
+  var cancelBtn = '<button class="btn btn-secondary" style="height:36px;font-size:13px">Cancel</button>';
+
+  if(s === 'advertise') {
+    btns.innerHTML = normalBtn + cancelBtn;
+
+  } else if(s === 'analyze') {
+    var ANALYZE_TIP = 'Your Meta permission (ANALYZE) does not allow this action. To perform it, request ADVERTISE or MANAGE access in Meta Business Manager and reconnect.';
+    btns.innerHTML = '<div class="tip-wrap">'
+      + '<button class="btn-sm-disabled" style="height:36px;font-size:13px;padding:0 16px;border-radius:8px">'
+        + '<svg width="12" height="12" fill="none" viewBox="0 0 12 12"><rect x="2" y="5.5" width="8" height="6" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 5.5V4a2 2 0 0 1 4 0v1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>'
+        + ' Review &amp; Apply</button>'
+      + '<span class="tip-box" style="width:260px;bottom:calc(100% + 8px)">'+ANALYZE_TIP+'</span>'
+      + '</div>'
+      + cancelBtn
+      + '<span class="badge b-analyze" style="margin-left:4px;font-size:11px"><span class="dot dot-gray"></span>ANALYZE</span>';
+
+  } else if(s === 'expired') {
+    // Button looks normal — frontend doesn't know token is expired until API call
+    btns.innerHTML = '<button class="btn" style="height:36px;font-size:13px;background:#fff;color:#102532;border:1.5px solid #102532;border-radius:8px" onclick="document.getElementById(\'modal-expired\').classList.add(\'open\')">Review &amp; Apply</button>'
+      + cancelBtn;
+  }
+}
+
+// init agent view
+setTimeout(function(){ setAgentState('advertise'); }, 0);
+
+// ── User Access: Ad Accounts read-only tab ─────────────────────
+var uaData = {
+  mixed: [
+    {name:'KEEPP',biz:'Beauty Advance Technology',task:'ADVERTISE',taskClass:'b-advertise',connected:true},
+    {name:'PL Client Boosting',biz:'PressLogic Girlstyle - BusinessFocus',task:'ADVERTISE',taskClass:'b-advertise',connected:true},
+    {name:'PressLogic Malaysia - General boosting',biz:'PressLogic Girlstyle - BusinessFocus',task:'ANALYZE',taskClass:'b-analyze',connected:true},
+    {name:'Singapore - General boosting (SSSG)',biz:'PressLogic HK',task:'ANALYZE',taskClass:'b-analyze',connected:true},
+  ],
+  none: [
+  ]
+};
+
+function setUAUser(key) {
+  ['mixed','none'].forEach(function(k) {
+    var el = document.getElementById('ua-'+k);
+    if(el) el.classList.toggle('active', k===key);
+  });
+  // update user info
+  var names = {mixed:'Jason Fung', none:'徐昊'};
+  var emails = {mixed:'jason.fung@presslogic.com', none:'xuhao@presslogic.com'};
+  document.getElementById('ua-username').textContent = names[key];
+  document.getElementById('ua-useremail').textContent = emails[key];
+
+  var list = document.getElementById('ua-account-list');
+  var empty = document.getElementById('ua-empty');
+  var accounts = uaData[key].filter(function(a){ return a.connected; });
+
+  if(!accounts.length) {
+    list.innerHTML = '';
+    list.classList.add('hidden');
+    empty.classList.remove('hidden');
+    return;
+  }
+  list.classList.remove('hidden');
+  empty.classList.add('hidden');
+
+  // badge dot class by task
+  function dotClass(tc) {
+    return tc==='b-analyze' ? 'dot-gray' : 'dot-ok';
+  }
+
+  list.innerHTML = accounts.map(function(a) {
+    var initial = a.name.charAt(0).toUpperCase();
+    var badge = '<span class="badge '+a.taskClass+'" style="font-size:12px">'
+      + '<span class="dot '+dotClass(a.taskClass)+'"></span>'+a.task+'</span>';
+
+    return '<div style="background:#f9f9f9;border:1px solid var(--border);border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:12px">'
+      + '<div style="width:36px;height:36px;border-radius:8px;background:#e8f4fd;display:grid;place-items:center;flex-shrink:0">'
+        + '<svg width="18" height="18" fill="none" viewBox="0 0 18 18"><rect x="1" y="4" width="16" height="11" rx="2.5" stroke="#5ba8d4" stroke-width="1.4"/><path d="M6 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" stroke="#5ba8d4" stroke-width="1.4"/><path d="M6 9h6" stroke="#5ba8d4" stroke-width="1.4" stroke-linecap="round"/></svg>'
+      + '</div>'
+      + '<div style="flex:1;min-width:0">'
+        + '<div style="font-size:13px;font-weight:600;color:var(--title);line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">'+a.name+'</div>'
+        + '<div style="font-size:11px;color:var(--muted);margin-top:2px">'+a.biz+'</div>'
+      + '</div>'
+      + '<div style="flex-shrink:0">'+badge+'</div>'
+      + '</div>';
+  }).join('');
+}
+
+// init UA
+setTimeout(function(){ setUAUser('mixed'); }, 0);
+
+// ── Settings: Ad Accounts ──────────────────────────────────────
+function renderAccountList(accounts) {
+  var list = document.getElementById('account-list-settings');
+  list.innerHTML = accounts.map(function(a) {
+    return '<div class="account-item"><div><span class="account-name">'+a.name+'</span> <span class="account-biz">('+a.biz+')</span></div>'+a.badge+'</div>';
+  }).join('');
+}
+
+function renderAdminAccountList() {
+  // Admin sees all org accounts; accounts where admin has no connection = No access
+  var adminHasAccess = { 'act_123456': true }; // admin (ZS) only connected My Store
+  var list = document.getElementById('account-list-settings');
+  list.innerHTML = orgAccounts.map(function(acc) {
+    var hasAccess = adminHasAccess[acc.id];
+    var badge = hasAccess
+      ? '<span class="badge b-advertise"><span class="dot dot-ok"></span>ADVERTISE</span>'
+      : '<span class="badge b-noaccess">No access</span>';
+    var viewBtn = '<button class="btn-members" onclick="openMembersModal(\''+acc.id+'\')">'
+      + '<svg width="12" height="12" fill="none" viewBox="0 0 12 12"><circle cx="4.5" cy="3.5" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M1 10c0-1.933 1.567-3.5 3.5-3.5S8 8.067 8 10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="9" cy="4" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M9 7.5c1.105 0 2 .895 2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>'
+      + ' 查看成員權限</button>';
+    return '<div class="admin-acc-item">'
+      + '<div class="admin-acc-left"><span class="admin-acc-name">'+acc.name+'</span><span class="admin-acc-id">'+acc.id+'</span></div>'
+      + '<div class="admin-acc-right">'+badge+viewBtn+'</div>'
+      + '</div>';
+  }).join('');
+}
+
+function setActiveSBtn(active) {
+  ['normal','expired','analyze','admin'].forEach(function(k) {
+    var el = document.getElementById('s-'+k);
+    if(el) el.classList.toggle('active', k===active);
+  });
+}
+
+function setSettingsState(s) {
+  setActiveSBtn(s);
+  var mainBtn = document.getElementById('main-btn');
+  if(s === 'normal') {
+    mainBtn.textContent = 'Disconnect';
+    mainBtn.className = 'btn btn-secondary';
+    mainBtn.onclick = handleMainBtn;
+    renderAccountList([
+      {name:'ChatCommerce',biz:'Chatcommerz',badge:'<span class="badge b-advertise"><span class="dot dot-ok"></span>ADVERTISE</span>'},
+      {name:'TopGlow 2',biz:'TopGlow 2',badge:'<span class="badge b-advertise"><span class="dot dot-ok"></span>ADVERTISE</span>'}
+    ]);
+  } else if(s === 'expired') {
+    mainBtn.innerHTML = '<svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M12 7A5 5 0 1 1 7 2" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/><path d="M12 2v3h-3" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Reconnect';
+    mainBtn.className = 'btn btn-primary';
+    mainBtn.onclick = function() { alert('跳轉至 /organization/:orgId/ad-manager/connect 重新授權 Meta'); };
+    renderAccountList([
+      {name:'ChatCommerce',biz:'Chatcommerz',badge:'<span class="badge b-expired"><span class="dot dot-exp"></span>Token Expired</span>'},
+      {name:'TopGlow 2',biz:'TopGlow 2',badge:'<span class="badge b-expired"><span class="dot dot-exp"></span>Token Expired</span>'}
+    ]);
+  } else if(s === 'analyze') {
+    mainBtn.textContent = 'Disconnect';
+    mainBtn.className = 'btn btn-secondary';
+    mainBtn.onclick = handleMainBtn;
+    renderAccountList([
+      {name:'ChatCommerce',biz:'Chatcommerz',badge:'<span class="badge b-analyze"><span class="dot dot-gray"></span>ANALYZE</span>'},
+      {name:'TopGlow 2',biz:'TopGlow 2',badge:'<span class="badge b-creative"><span class="dot dot-gray"></span>CREATIVE</span>'}
+    ]);
+  } else if(s === 'admin') {
+    mainBtn.textContent = 'Disconnect';
+    mainBtn.className = 'btn btn-secondary';
+    mainBtn.onclick = handleMainBtn;
+    renderAdminAccountList();
+  }
+}
+
+function handleMainBtn() {
+  document.getElementById('modal-disconnect').classList.add('open');
+}
+
+// ── Member permissions modal ────────────────────────────────────
+function openMembersModal(accId) {
+  var acc = orgAccounts.filter(function(a){ return a.id===accId; })[0];
+  if(!acc) return;
+  document.getElementById('modal-members-title').textContent = acc.name + ' — 成員權限';
+  document.getElementById('modal-members-sub').textContent = acc.id + '  ·  ' + acc.members.length + ' 位成員已連接';
+  var rows = acc.members.map(function(m) {
+    var tokenBadge = m.tokenOk
+      ? '<span class="badge b-ok" style="font-size:11px"><span class="dot dot-ok"></span>Token 有效</span>'
+      : '<span class="badge b-expired" style="font-size:11px"><span class="dot dot-exp"></span>已過期</span>';
+    return '<tr>'
+      + '<td style="width:34px"><div class="uavatar" style="'+m.avatarStyle+'">'+m.initials+'</div></td>'
+      + '<td style="padding-left:10px"><div style="font-size:13px;font-weight:500;color:var(--title)">'+m.name+'</div><div style="font-size:11px;color:var(--muted)">'+m.email+'</div></td>'
+      + '<td style="text-align:right;padding-right:4px"><div style="display:flex;align-items:center;gap:6px;justify-content:flex-end"><span class="badge '+m.taskClass+'">'+m.task+'</span>'+tokenBadge+'</div></td>'
+      + '</tr>';
+  }).join('');
+  document.getElementById('modal-members-table').innerHTML = rows;
+  document.getElementById('modal-members').classList.add('open');
+}
+
+// ── Campaigns ─────────────────────────────────────────────────
+var campaigns = [
+  {name:'Summer Sale 2026',status:'Active',statusClass:'b-ok',spend:'$8,420',roas:'3.2x',impressions:'1.2M',action:'pause'},
+  {name:'Brand Awareness Q2',status:'Paused',statusClass:'b-analyze',spend:'$3,100',roas:'1.8x',impressions:'580K',action:'resume'},
+  {name:'Retargeting — July',status:'Active',statusClass:'b-ok',spend:'$5,880',roas:'4.1x',impressions:'920K',action:'pause'},
+];
+
+function renderCampaigns(state) {
+  var ANALYZE_TIP = 'Your Meta permission (ANALYZE) does not allow this action. To proceed, request ADVERTISE or MANAGE access in Meta Business Manager and reconnect.';
+
+  var sub = document.getElementById('campaign-sub');
+  var banner = document.getElementById('campaign-banner');
+  banner.classList.add('hidden');
+
+  if(state === 'advertise') {
+    sub.innerHTML = 'My Store &nbsp;·&nbsp; act_123456 &nbsp;<span class="badge b-advertise" style="font-size:11px"><span class="dot dot-ok"></span>ADVERTISE</span>';
+  } else if(state === 'analyze') {
+    sub.innerHTML = 'My Store &nbsp;·&nbsp; act_123456 &nbsp;<span class="badge b-analyze" style="font-size:11px"><span class="dot dot-gray"></span>ANALYZE</span>';
+  } else if(state === 'expired') {
+    sub.innerHTML = 'My Store &nbsp;·&nbsp; act_123456 &nbsp;<span class="badge b-expired" style="font-size:11px"><span class="dot dot-exp"></span>Token Expired</span>';
+    banner.classList.remove('hidden');
+  }
+
+  var tbody = document.getElementById('campaign-tbody');
+  tbody.innerHTML = campaigns.map(function(c, i) {
+    var actionHtml;
+    var label = c.action === 'pause' ? 'Pause' : 'Resume';
+    var icon = c.action === 'pause'
+      ? '<svg width="11" height="11" fill="none" viewBox="0 0 11 11"><rect x="1.5" y="1" width="3" height="9" rx="1" fill="currentColor"/><rect x="6.5" y="1" width="3" height="9" rx="1" fill="currentColor"/></svg>'
+      : '<svg width="11" height="11" fill="none" viewBox="0 0 11 11"><path d="M2 1.5l8 4-8 4V1.5z" fill="currentColor"/></svg>';
+
+    if(state === 'advertise') {
+      actionHtml = '<button class="btn-sm" onclick="alert(\'執行操作: '+label+' Campaign '+i+'\')">' + icon + ' ' + label + '</button>';
+    } else if(state === 'analyze') {
+      actionHtml = '<div class="tip-wrap"><button class="btn-sm-disabled">'
+        + '<svg width="11" height="11" fill="none" viewBox="0 0 11 11"><rect x="2" y="5" width="7" height="5.5" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3.5 5V3.5a2 2 0 0 1 4 0V5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>'
+        + ' ' + label + '</button>'
+        + '<span class="tip-box">' + ANALYZE_TIP + '</span></div>';
+    } else if(state === 'expired') {
+      // Button looks normal — token expiry is only discovered on API call
+      actionHtml = '<button class="btn-sm" onclick="document.getElementById(\'modal-expired\').classList.add(\'open\')">' + icon + ' ' + label + '</button>';
+    }
+
+    var dot = (c.statusClass==='b-ok') ? 'dot-ok' : 'dot-gray';
+    return '<tr>'
+      + '<td style="padding-left:20px;font-weight:500;color:var(--title)">'+c.name+'</td>'
+      + '<td><span class="badge '+c.statusClass+'"><span class="dot '+dot+'"></span>'+c.status+'</span></td>'
+      + '<td class="col-r">'+c.spend+'</td>'
+      + '<td class="col-r">'+c.roas+'</td>'
+      + '<td class="col-r">'+c.impressions+'</td>'
+      + '<td class="col-r" style="padding-right:20px">'+actionHtml+'</td>'
+      + '</tr>';
+  }).join('');
+}
+
+function setCampaignState(s) {
+  campaignState = s;
+  ['advertise','analyze','expired'].forEach(function(k) {
+    var el = document.getElementById('cs-'+k);
+    if(el) el.classList.toggle('active', k===s);
+  });
+  renderCampaigns(s);
+}
+
+// ── Modal ──────────────────────────────────────────────────────
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// ── Init ───────────────────────────────────────────────────────
+setSettingsState('normal');
+renderCampaigns('advertise');
+showView('settings');
+</script>
+</body>
+</html>
