@@ -21,7 +21,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MediaLens — Competitor Analysis · AI Category Performance</title>
+<title>MediaLens — My Page · AI Category Performance</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -304,25 +304,41 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
 /* ===== POST MODAL ===== */
 .post-modal-overlay{position:fixed;inset:0;background:rgba(10,31,44,.45);z-index:200;display:none;align-items:center;justify-content:center;padding:24px;}
 .post-modal-overlay.open{display:flex;}
-.post-modal{width:92%;max-width:860px;max-height:88vh;background:#fff;border-radius:16px;box-shadow:0 12px 48px rgba(0,0,0,.18);display:flex;flex-direction:column;overflow:hidden;}
-.post-modal-hd{padding:16px 22px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-.post-modal-title{font-size:14px;font-weight:600;color:var(--text);}
+.post-modal{width:95%;max-width:1060px;max-height:90vh;background:#fff;border-radius:16px;box-shadow:0 12px 48px rgba(0,0,0,.18);display:flex;flex-direction:row;overflow:hidden;}
+.post-modal-left{width:210px;flex-shrink:0;background:#F7F9FB;border-right:1px solid var(--divider);padding:18px 16px;overflow-y:auto;display:flex;flex-direction:column;}
+.post-modal-right{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;}
+.post-modal-hd{padding:14px 20px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.post-modal-title{font-size:13.5px;font-weight:600;color:var(--text);}
 .post-modal-close{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);}
 .post-modal-close:hover{background:var(--bg);}
 .post-modal-body{flex:1;overflow-y:auto;}
+/* sidebar internals */
+.pm-section-label{font-size:9.5px;font-weight:700;color:var(--secondary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.pm-row{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:8px;}
+.pm-key{font-size:11.5px;color:var(--secondary);flex-shrink:0;}
+.pm-val{font-size:11.5px;color:var(--text);font-weight:600;text-align:right;}
+.pm-divider{border:none;border-top:1px solid var(--divider);margin:14px 0;}
+.pm-sum-key{font-size:11px;color:var(--secondary);margin-bottom:3px;}
+.pm-sum-val{font-size:13px;font-weight:700;color:var(--text);margin-bottom:11px;}
+.pm-sum-val.hi{color:var(--brand);font-size:15px;}
+/* post table */
 .post-tbl{width:100%;border-collapse:collapse;font-size:12px;}
-.post-tbl thead th{text-align:left;padding:10px 14px;background:#F7F9FB;font-size:10.5px;font-weight:600;color:var(--secondary);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--divider);white-space:nowrap;position:sticky;top:0;}
-.post-tbl td{padding:11px 14px;border-bottom:1px solid #F1F5F7;vertical-align:middle;}
+.post-tbl thead th{text-align:left;padding:10px 12px;background:#F7F9FB;font-size:10.5px;font-weight:600;color:var(--secondary);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--divider);white-space:nowrap;position:sticky;top:0;}
+.post-tbl thead th.metric-col{color:var(--brand);background:#EEF6FF;}
+.post-tbl td{padding:10px 12px;border-bottom:1px solid #F1F5F7;vertical-align:middle;}
 .post-tbl tr:last-child td{border-bottom:none;}
 .post-tbl tr:hover td{background:#fafcfe;}
 .post-thumb-cell{width:52px;height:44px;border-radius:6px;background:#E8EEF0;display:flex;align-items:center;justify-content:center;font-size:20px;}
-.post-name-cell{font-size:12.5px;color:var(--text);line-height:1.5;max-width:320px;}
+.post-name-cell{font-size:12px;color:var(--muted);line-height:1.5;max-width:280px;}
+.post-name-cell .post-caption{color:var(--text);font-size:12.5px;}
 .post-tag{display:inline-block;font-size:10px;font-weight:600;border-radius:5px;padding:2px 7px;margin-right:4px;margin-top:3px;}
 .post-tag.fmt{background:#E8F5FE;color:#1B82C4;}
 .post-tag.sub{background:#F0ECFF;color:#6B4BD8;}
 .post-num{font-size:12.5px;font-weight:600;color:var(--text);text-align:right;white-space:nowrap;}
+.post-num.metric-hi{color:var(--brand);}
 .post-delta{font-size:10px;font-weight:600;display:block;text-align:right;}
 .post-delta.up{color:var(--success);} .post-delta.down{color:var(--danger);}
+.post-bar{height:3px;background:var(--brand);border-radius:2px;margin-top:4px;opacity:.5;}
 
 /* ===== tooltip ===== */
 .has-tooltip{position:relative;cursor:help;}
@@ -606,22 +622,41 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
 <!-- POST MODAL -->
 <div class="post-modal-overlay" id="postModalOverlay" onclick="if(event.target===this)closePostModal()">
   <div class="post-modal">
-    <div class="post-modal-hd">
-      <div class="post-modal-title" id="postModalTitle">Posts</div>
-      <button class="post-modal-close" onclick="closePostModal()">✕</button>
+    <!-- LEFT SIDEBAR -->
+    <div class="post-modal-left">
+      <div class="pm-section-label">Filter</div>
+      <div id="pmFilterRows"></div>
+      <hr class="pm-divider">
+      <div class="pm-section-label">Posts Date Range</div>
+      <div class="pm-row"><span class="pm-key">Start Date</span><span class="pm-val">16 Jun 2026</span></div>
+      <div class="pm-row"><span class="pm-key">End Date</span><span class="pm-val">22 Jun 2026</span></div>
+      <div class="pm-row"><span class="pm-key">Weekdays</span><span class="pm-val">Any</span></div>
+      <div class="pm-row"><span class="pm-key">Hours</span><span class="pm-val">Any</span></div>
+      <hr class="pm-divider">
+      <div class="pm-section-label">Summary</div>
+      <div id="pmSummary"></div>
     </div>
-    <div class="post-modal-body">
-      <table class="post-tbl">
-        <thead><tr>
-          <th style="width:60px"></th>
-          <th>Post</th>
-          <th style="text-align:right">Engagements</th>
-          <th style="text-align:right">Avg Eng</th>
-          <th style="text-align:right">Video Views</th>
-          <th style="text-align:right">Δ 7d</th>
-        </tr></thead>
-        <tbody id="postModalBody"></tbody>
-      </table>
+    <!-- RIGHT CONTENT -->
+    <div class="post-modal-right">
+      <div class="post-modal-hd">
+        <div class="post-modal-title" id="postModalTitle">Posts</div>
+        <button class="post-modal-close" onclick="closePostModal()">✕</button>
+      </div>
+      <div class="post-modal-body">
+        <table class="post-tbl">
+          <thead><tr>
+            <th style="width:56px"></th>
+            <th>Post</th>
+            <th class="metric-col" id="pmMetricTh" style="text-align:right">Metric</th>
+            <th style="text-align:right">Engagements</th>
+            <th style="text-align:right">Reaches</th>
+            <th style="text-align:right">Clicks</th>
+            <th style="text-align:right">ER</th>
+            <th style="text-align:right">CTR</th>
+          </tr></thead>
+          <tbody id="postModalBody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
@@ -950,42 +985,121 @@ function backToMain(){
 
 /* ============ POST MODAL ============ */
 var POST_EMOJIS=['🍤','📍','🌅','🍸','🎤','💬','🚇','📸','🎬','🌿'];
-function openPostModal(catName, idx){
+var POST_AUTHORS=['Lazycat Chan','Johnny Chu','Chant Chiu','Kelly Wong','Marcus Lee'];
+var POST_CAPTIONS=[
+  'SpaceX (SPCX)上市起連升3天，今晚開市曾再狂漲17%，但隨即傳出...',
+  '【小股民千萬身家被盜】女股民乘飛機斷網5小時 竟遭偷走證券戶口900萬',
+  '旅遊乘飛機斷網5小時 竟遭偷走證券戶口900萬',
+  '英國疑推全球最狠「社媒令」！施紀賢宣布16歲以下將禁用社交媒體 16至17歲...',
+  '新股市場炙熱，投資要趁勢，究竟新股可以點炒？半新股如何捕捉有爆發潛力...',
+  '港樓冰火兩重天，豪宅不濟，但中價半新樓熱炒。「短炒天堂」西沙SIERRA SE...',
+  '5 things every HK foodie gets wrong about dim sum 🥟',
+  'Everyone is doing this right now 👀',
+  'This 60-second morning routine changed everything',
+  'Hong Kong\'s most underrated spots — full guide'
+];
+var POST_FMTS=['VIDEO','PHOTO','LINK','PHOTO','VIDEO','LINK'];
+
+function openPostModal(catName, idx, filterFormat, extra){
   var d=DATA[lens];
-  var parent=d.rows[idx]||d.rows[0];
-  /* build 5 mock posts for this category */
-  var captions=[
-    '5 things every HK foodie gets wrong about dim sum 🥟',
-    'Everyone in '+catName.split(' ')[0]+' is doing this right now 👀',
-    'This 60-second morning routine changed everything',
-    'Hong Kong\'s most underrated spots — full guide',
-    'Behind the scenes: our team at work ☕'
-  ];
-  var rows='';
-  for(var i=0;i<5;i++){
-    var eng=Math.round(parent.eng*(1-(i*0.18)));
-    var vv=Math.round(parent.vv*(1-(i*0.22)));
-    var d7=parent.d-(i*3);
-    var dcls=d7>0?'up':'down', darr=d7>0?'▲':'▼';
+  var parent=d.rows[idx]||d.rows.find(function(r){return r.n===catName;})||d.rows[0];
+  var metLbl=METRIC_LABEL[metric];
+  var isPct=metric==='er'||metric==='pageer'||metric==='ctr';
+
+  /* build mock posts */
+  var posts=[];
+  var n=6;
+  for(var i=0;i<n;i++){
+    var baseEng=Math.round(parent.eng*(1-i*0.14)*(0.92+Math.sin(i)*0.08));
+    var baseVv=Math.round(parent.vv*(1-i*0.18));
+    var fakeRow={eng:baseEng,posts:parent.posts,vv:baseVv,d:parent.d,mf:parent.mf};
+    var mv=metricVal(fakeRow,metric);
+    var reaches=Math.round(baseEng/0.0053); /* mock: ER~0.53% */
+    var clicks=Math.round(reaches*(0.072-i*0.008));
+    var er=(baseEng/reaches*100).toFixed(2);
+    var ctr=(clicks/reaches*100).toFixed(2);
     var sub=parent.sub?parent.sub[i%parent.sub.length][0]:'';
-    rows+='<tr>'+
-      '<td><div class="post-thumb-cell">'+POST_EMOJIS[i%10]+'</div></td>'+
-      '<td class="post-name-cell">'+captions[i]+
-        '<div style="margin-top:4px">'+
-          '<span class="post-tag fmt">VIDEO</span>'+
-          (sub?'<span class="post-tag sub">'+sub+'</span>':'')+
-        '</div>'+
-      '</td>'+
-      '<td><div class="post-num">'+fmtK(eng*parent.posts/10)+'</div></td>'+
-      '<td><div class="post-num">'+fmt(eng)+'</div></td>'+
-      '<td><div class="post-num">'+(vv>0?fmtK(vv*parent.posts/10):'—')+'</div></td>'+
-      '<td><div class="post-num"><span class="post-delta '+dcls+'">'+darr+Math.abs(d7)+'%</span></div></td>'+
-    '</tr>';
+    var d7=parent.d-(i*2);
+    posts.push({emoji:POST_EMOJIS[i%10],author:POST_AUTHORS[i%5],cap:POST_CAPTIONS[i%POST_CAPTIONS.length],
+      fmt:filterFormat||POST_FMTS[i%6],sub:sub,mv:mv,eng:baseEng,reaches:reaches,clicks:clicks,er:er,ctr:ctr,d7:d7});
   }
-  document.getElementById('postModalTitle').textContent='Posts · '+catName;
+  /* sort by active metric desc */
+  posts.sort(function(a,b){return b.mv-a.mv;});
+
+  /* totals for summary */
+  var totalEng=posts.reduce(function(s,p){return s+p.eng;},0);
+  var avgEng=Math.round(totalEng/posts.length);
+  var totalMv=posts.reduce(function(s,p){return s+p.mv;},0);
+  var avgMv=totalMv/posts.length;
+  var maxMv=posts[0].mv;
+
+  /* filter rows — only show active filters */
+  var lensKey=DATA[lens].label;
+  var filterHTML='';
+  if(extra&&extra.combo){
+    filterHTML+=
+      '<div class="pm-row"><span class="pm-key">'+extra.labelA+'</span><span class="pm-val">'+extra.combo[0]+'</span></div>'+
+      '<div class="pm-row"><span class="pm-key">'+extra.labelB+'</span><span class="pm-val">'+extra.combo[1]+'</span></div>';
+  } else {
+    filterHTML+='<div class="pm-row"><span class="pm-key">'+lensKey+'</span><span class="pm-val">'+catName+'</span></div>';
+    if(filterFormat) filterHTML+='<div class="pm-row"><span class="pm-key">Format</span><span class="pm-val">'+filterFormat+'</span></div>';
+  }
+  document.getElementById('pmFilterRows').innerHTML=filterHTML;
+
+  /* summary — skip metric line if it duplicates an existing fixed row:
+     aeng = Average Engagement (already shown), eng = Engagement (already shown) */
+  var showMetricInSum=(metric!=='aeng'&&metric!=='eng');
+  var sumHTML=
+    '<div class="pm-sum-key">Number of posts</div><div class="pm-sum-val">'+posts.length+'</div>'+
+    '<div class="pm-sum-key">Engagement</div><div class="pm-sum-val">'+fmtK(totalEng)+'</div>'+
+    '<div class="pm-sum-key">Average Engagement</div><div class="pm-sum-val">'+fmt(avgEng)+'</div>'+
+    (showMetricInSum?
+      '<div class="pm-sum-key" style="color:var(--brand);font-weight:600">'+metLbl+'</div>'+
+      '<div class="pm-sum-val hi">'+(isPct?avgMv.toFixed(2)+'%':fmt(avgMv))+'</div>'
+    :'');
+  document.getElementById('pmSummary').innerHTML=sumHTML;
+
+  /* metric col: hide when it duplicates an existing table column
+     aeng/eng → same as Engagements; er → ER col; ctr → CTR col */
+  var METRIC_REDUNDANT={aeng:true,eng:true,er:true,ctr:true};
+  var showMetricCol=!METRIC_REDUNDANT[metric];
+  document.getElementById('pmMetricTh').style.display=showMetricCol?'':'none';
+  document.getElementById('pmMetricTh').textContent=metLbl;
+
+  /* table rows */
+  var rows=posts.map(function(p){
+    var mvDisp=isPct?p.mv.toFixed(2)+'%':fmtK(p.mv);
+    var barW=maxMv>0?Math.round(p.mv/maxMv*100):0;
+    return '<tr>'+
+      '<td><div class="post-thumb-cell">'+p.emoji+'</div></td>'+
+      '<td class="post-name-cell"><span style="color:var(--secondary);font-size:11.5px">'+p.author+'</span><br>'+
+        '<span class="post-caption">'+p.cap+'</span>'+
+        (p.sub?'<div style="margin-top:3px"><span class="post-tag fmt">'+p.fmt+'</span><span class="post-tag sub">'+p.sub+'</span></div>':
+                '<div style="margin-top:3px"><span class="post-tag fmt">'+p.fmt+'</span></div>')+
+      '</td>'+
+      (showMetricCol?
+        '<td style="min-width:80px;display:table-cell"><div class="post-num">'+mvDisp+'</div></td>'
+        :'<td style="display:none"></td>')+
+      '<td><div class="post-num">'+fmtK(p.eng)+'</div></td>'+
+      '<td><div class="post-num">'+fmtK(p.reaches)+'</div></td>'+
+      '<td><div class="post-num">'+fmtK(p.clicks)+'</div></td>'+
+      '<td><div class="post-num">'+p.er+'%</div></td>'+
+      '<td><div class="post-num">'+p.ctr+'%</div></td>'+
+    '</tr>';
+  }).join('');
+
+  document.getElementById('postModalTitle').textContent=catName+(filterFormat?' · '+filterFormat:'')+' — Posts';
   document.getElementById('postModalBody').innerHTML=rows;
   document.getElementById('postModalOverlay').classList.add('open');
 }
+
+function openPostModalFiltered(catName, format){
+  var d=DATA[lens];
+  var idx=0;
+  for(var i=0;i<d.rows.length;i++){if(d.rows[i].n===catName){idx=i;break;}}
+  openPostModal(catName, idx, format);
+}
+
 function closePostModal(){
   document.getElementById('postModalOverlay').classList.remove('open');
 }
@@ -1001,7 +1115,13 @@ function comboMetricVal(baseV){
   if(metric==='nfr') return Math.round(baseV*4.2);
   return baseV;
 }
-function renderCombo(elId,data){
+function openComboPostModal(catA, catB, labelA, labelB){
+  var d=DATA[lens];
+  var idx=0;
+  for(var i=0;i<d.rows.length;i++){if(d.rows[i].n===catA||d.rows[i].n.indexOf(catA.split(' ')[0])===0){idx=i;break;}}
+  openPostModal(catA+' + '+catB, idx, null, {combo:[catA,catB],labelA:labelA,labelB:labelB});
+}
+function renderCombo(elId, data, labelA, labelB){
   var rows=data.slice().map(function(r){return {a:r.a,b:r.b,c:r.c,mv:comboMetricVal(r.v),d:r.d||0};})
                .sort(function(a,b){return b.mv-a.mv;});
   var max=rows[0].mv;
@@ -1015,7 +1135,10 @@ function renderCombo(elId,data){
     var dtext=r.d!==0
       ? '<span class="cbar-delta '+dcls+'">'+(r.d>0?'▲':'▼')+Math.abs(r.d)+'%</span>'
       : '<span class="cbar-delta" style="color:var(--secondary)">–</span>';
-    return '<div class="cbar-row"><div><div class="cbar-label" title="'+label+'">'+label+'</div>'+
+    var aEsc=r.a.replace(/'/g,"\\'"), bEsc=r.b.replace(/'/g,"\\'");
+    var laEsc=labelA.replace(/'/g,"\\'"), lbEsc=labelB.replace(/'/g,"\\'");
+    return '<div class="cbar-row" style="cursor:pointer" onclick="openComboPostModal(\''+aEsc+'\',\''+bEsc+'\',\''+laEsc+'\',\''+lbEsc+'\')" title="Click to see posts">'+
+      '<div><div class="cbar-label" title="'+label+'">'+label+'</div>'+
       '<div class="cbar-track"><div class="cbar-fill" style="width:'+w+'%;background:'+r.c+'"></div></div></div>'+
       '<div class="cbar-val">'+disp+' <span class="cbar-pct">('+share+')</span><br>'+dtext+'</div></div>';
   }).join('');
@@ -1027,8 +1150,10 @@ function renderCombos(){
   document.getElementById('comboTitle2').childNodes[0].nodeValue=c.c2.t+' ';
   document.getElementById('comboSub1').textContent='Best combinations by '+lbl+'.';
   document.getElementById('comboSub2').textContent='Best combinations by '+lbl+'.';
-  renderCombo('comboAd', comboLevel==='sub'?c.c1.sub:c.c1.main);
-  renderCombo('comboImg', comboLevel==='sub'?c.c2.sub:c.c2.main);
+  /* extract label pairs from title, e.g. "Content category × Ad category" */
+  var parts1=c.c1.t.split(' × '), parts2=c.c2.t.split(' × ');
+  renderCombo('comboAd',  comboLevel==='sub'?c.c1.sub:c.c1.main, parts1[0], parts1[1]);
+  renderCombo('comboImg', comboLevel==='sub'?c.c2.sub:c.c2.main, parts2[0], parts2[1]);
 }
 function setComboLevel(l){
   comboLevel=l;
@@ -1147,7 +1272,9 @@ function renderMatrix(){
     var b=document.createElement('div');b.className='bub';
     b.style.left=x+'%';b.style.bottom=y+'%';b.style.width=sz+'px';b.style.height=sz+'px';
     b.style.background=r.c;b.textContent=(i+1);
-    b.title=r.n+' — '+barValText(mv)+' '+METRIC_LABEL[metric]+' · '+r.posts+' posts';
+    b.title=r.n+' — '+barValText(mv)+' '+METRIC_LABEL[metric]+' · '+r.posts+' posts (click to see posts)';
+    b.style.cursor='pointer';
+    (function(rr,ii){b.onclick=function(){openPostModal(rr.n,ii);};})(r,i);
     sc.appendChild(b);
     leg+='<div class="sl-item"><span class="sl-num" style="background:'+r.c+'">'+(i+1)+'</span>'+r.n+'</div>';
   });
@@ -1173,7 +1300,8 @@ function renderFormatHeat(){
       var v=Math.round(base*FMULT[f]*(0.9+((i*7+ci)%5)*0.05));
       v=Math.max(28,Math.min(235,v));
       var dark=v>=120, col=heatColor(v);
-      return '<td><div class="hm-cell" style="background:'+col+';color:'+(dark?'#fff':'#5a6b75')+'">'+v+'</div></td>';
+      var catEsc=r.n.replace(/'/g,"\\'");
+      return '<td onclick="openPostModalFiltered(\''+catEsc+'\',\''+f+'\')" style="cursor:pointer" title="'+r.n+' × '+f+' — click to see posts"><div class="hm-cell" style="background:'+col+';color:'+(dark?'#fff':'#5a6b75')+'">'+v+'</div></td>';
     }).join('')+'</tr>';
   }).join('');
   document.getElementById('heatmap').innerHTML=head+body;
