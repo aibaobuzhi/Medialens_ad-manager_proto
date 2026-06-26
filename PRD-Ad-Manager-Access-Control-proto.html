@@ -779,7 +779,7 @@ body{font-family:'Poppins','Noto Sans HK',system-ui,sans-serif;background:#f5f5f
 <div class="modal-overlay" id="modal-expired" onclick="closeModal('modal-expired')">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-head">
-      <div class="modal-title">Authorization Expired</div>
+      <div class="modal-title">Action Not Available</div>
       <button class="btn-ghost" onclick="closeModal('modal-expired')">✕</button>
     </div>
     <div class="modal-body">
@@ -788,8 +788,8 @@ body{font-family:'Poppins','Noto Sans HK',system-ui,sans-serif;background:#f5f5f
           <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M10 18A8 8 0 1 0 10 2a8 8 0 0 0 0 16z" stroke="#FFC960" stroke-width="1.5"/><path d="M10 7v4" stroke="#FFC960" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="13.5" r=".75" fill="#FFC960"/></svg>
         </div>
         <div>
-          <div style="font-size:14px;font-weight:600;color:var(--title);margin-bottom:6px">Your Meta ad account authorization has expired</div>
-          <div style="font-size:13px;color:var(--muted);line-height:1.7">Please reconnect to refresh your permissions and continue. Your existing ad data will not be affected.</div>
+          <div style="font-size:14px;font-weight:600;color:var(--title);margin-bottom:6px">You don't have permission to perform this action</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.7">Your Meta authorization may have expired, or your current permission level does not support this operation. Please reconnect your ad account to refresh your permissions.</div>
         </div>
       </div>
     </div>
@@ -891,30 +891,16 @@ function setAgentState(s) {
   });
 
   var btns = document.getElementById('pause-action-btns');
-  var ANALYZE_TIP = '你的 Meta 权限（ANALYZE）不支持此操作。如需执行，请在 Meta Business Manager 申请 ADVERTISE 或 MANAGE 权限后重新连接。';
-
-  // "Review & Apply" base style matches screenshot: dark outlined button
-  var normalBtn = '<button class="btn" style="height:36px;font-size:13px;background:#fff;color:#102532;border:1.5px solid #102532;border-radius:8px" onclick="alert(\'Ad set paused successfully.\')">Review &amp; Apply</button>';
+  var openModal = "document.getElementById('modal-expired').classList.add('open')";
+  var permissionBtn = '<button class="btn" style="height:36px;font-size:13px;background:#fff;color:#102532;border:1.5px solid #102532;border-radius:8px" onclick="'+openModal+'">Review &amp; Apply</button>';
   var cancelBtn = '<button class="btn btn-secondary" style="height:36px;font-size:13px">Cancel</button>';
 
   if(s === 'advertise') {
-    btns.innerHTML = normalBtn + cancelBtn;
-
-  } else if(s === 'analyze') {
-    var ANALYZE_TIP = 'Your Meta permission (ANALYZE) does not allow this action. To perform it, request ADVERTISE or MANAGE access in Meta Business Manager and reconnect.';
-    btns.innerHTML = '<div class="tip-wrap">'
-      + '<button class="btn-sm-disabled" style="height:36px;font-size:13px;padding:0 16px;border-radius:8px">'
-        + '<svg width="12" height="12" fill="none" viewBox="0 0 12 12"><rect x="2" y="5.5" width="8" height="6" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 5.5V4a2 2 0 0 1 4 0v1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>'
-        + ' Review &amp; Apply</button>'
-      + '<span class="tip-box" style="width:260px;bottom:calc(100% + 8px)">'+ANALYZE_TIP+'</span>'
-      + '</div>'
-      + cancelBtn
-      + '<span class="badge b-analyze" style="margin-left:4px;font-size:11px"><span class="dot dot-gray"></span>ANALYZE</span>';
-
-  } else if(s === 'expired') {
-    // Button looks normal — frontend doesn't know token is expired until API call
-    btns.innerHTML = '<button class="btn" style="height:36px;font-size:13px;background:#fff;color:#102532;border:1.5px solid #102532;border-radius:8px" onclick="document.getElementById(\'modal-expired\').classList.add(\'open\')">Review &amp; Apply</button>'
+    btns.innerHTML = '<button class="btn" style="height:36px;font-size:13px;background:#fff;color:#102532;border:1.5px solid #102532;border-radius:8px" onclick="alert(\'Ad set paused successfully.\')">Review &amp; Apply</button>'
       + cancelBtn;
+  } else if(s === 'analyze' || s === 'expired') {
+    // Both cases: button looks normal, modal appears on click
+    btns.innerHTML = permissionBtn + cancelBtn;
   }
 }
 
