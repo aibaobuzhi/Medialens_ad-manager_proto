@@ -921,6 +921,58 @@ function setAgentState(s) {
 // init agent view
 setTimeout(function(){ setAgentState('advertise'); }, 0);
 
+// ── Req 3: User Access read-only tab ──────────────────────────
+var uaData = {
+  mixed: [
+    {name:'KEEPP',biz:'Beauty Advance Technology',task:'ADVERTISE',taskClass:'b-advertise',connected:true},
+    {name:'PL Client Boosting',biz:'PressLogic Girlstyle - BusinessFocus',task:'ADVERTISE',taskClass:'b-advertise',connected:true},
+    {name:'PressLogic Malaysia - General boosting',biz:'PressLogic Girlstyle - BusinessFocus',task:'ANALYZE',taskClass:'b-analyze',connected:true},
+    {name:'Singapore - General boosting (SSSG)',biz:'PressLogic HK',task:'ANALYZE',taskClass:'b-analyze',connected:true},
+  ],
+  none: []
+};
+
+function setUAUser(key) {
+  ['mixed','none'].forEach(function(k) {
+    var el = document.getElementById('ua-'+k);
+    if(el) el.classList.toggle('active', k===key);
+  });
+  var names = {mixed:'Jason Fung', none:'徐昊'};
+  var emails = {mixed:'jason.fung@presslogic.com', none:'xuhao@presslogic.com'};
+  document.getElementById('ua-username').textContent = names[key];
+  document.getElementById('ua-useremail').textContent = emails[key];
+
+  var list = document.getElementById('ua-account-list');
+  var empty = document.getElementById('ua-empty');
+  var accounts = uaData[key].filter(function(a){ return a.connected; });
+
+  if(!accounts.length) {
+    list.innerHTML = '';
+    list.classList.add('hidden');
+    empty.classList.remove('hidden');
+    return;
+  }
+  list.classList.remove('hidden');
+  empty.classList.add('hidden');
+
+  list.innerHTML = accounts.map(function(a) {
+    var dot = a.taskClass==='b-analyze' ? 'dot-gray' : 'dot-ok';
+    var badge = '<span class="badge '+a.taskClass+'" style="font-size:12px"><span class="dot '+dot+'"></span>'+a.task+'</span>';
+    return '<div style="background:#f9f9f9;border:1px solid var(--border);border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:12px">'
+      + '<div style="width:36px;height:36px;border-radius:8px;background:#e8f4fd;display:grid;place-items:center;flex-shrink:0">'
+        + '<svg width="18" height="18" fill="none" viewBox="0 0 18 18"><rect x="1" y="4" width="16" height="11" rx="2.5" stroke="#5ba8d4" stroke-width="1.4"/><path d="M6 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" stroke="#5ba8d4" stroke-width="1.4"/><path d="M6 9h6" stroke="#5ba8d4" stroke-width="1.4" stroke-linecap="round"/></svg>'
+      + '</div>'
+      + '<div style="flex:1;min-width:0">'
+        + '<div style="font-size:13px;font-weight:600;color:var(--title);line-height:1.4">'+a.name+'</div>'
+        + '<div style="font-size:11px;color:var(--muted);margin-top:2px">'+a.biz+'</div>'
+      + '</div>'
+      + '<div style="flex-shrink:0">'+badge+'</div>'
+      + '</div>';
+  }).join('');
+}
+
+setTimeout(function(){ setUAUser('mixed'); }, 0);
+
 // ── Settings: Ad Accounts ──────────────────────────────────────
 function renderAccountList(accounts) {
   var list = document.getElementById('account-list-settings');
