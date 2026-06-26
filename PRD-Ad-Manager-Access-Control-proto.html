@@ -873,13 +873,13 @@ var orgAccounts = [
 
 // ── View switching ─────────────────────────────────────────────
 function showView(v) {
-  ['settings','campaigns','userAccess','reconnect','aiagent','useraccess'].forEach(function(id) {
+  ['settings','reconnect','aiagent','useraccess'].forEach(function(id) {
     document.getElementById('view-'+id).classList.add('hidden');
   });
   document.getElementById('view-'+v).classList.remove('hidden');
   document.querySelectorAll('.nav-tab').forEach(function(t,i) {
     t.classList.remove('active');
-    if(['campaigns','settings','userAccess','reconnect','aiagent','useraccess'][i]===v) t.classList.add('active');
+    if(['settings','reconnect','useraccess','aiagent'][i]===v) t.classList.add('active');
   });
 }
 
