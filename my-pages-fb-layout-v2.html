@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediaLens — My Pages (Facebook)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brand-blue:#23A9F6; --brand-light-blue:#73DFFF; --brand-yellow:#FFBA33;
+  --brand-blue-tint:#EEF6FF; --brand-blue-subtle:#F1FCFF;
+  --title:#0A1F2C; --title-alt:#001983;
+  --text-primary:#102532; --text-regular:#707070; --text-secondary:#828282;
+  --text-placeholder:#CACACA; --text-disabled:#BDBDBD;
+  --surface-white:#FFFFFF; --surface-page:#F7F7F7;
+  --surface-disabled:#F5F5F5; --surface-ai:#F6F8FD;
+  --border:#D9E3E6; --divider:#E8EEF0; --unselected:#CACACA;
+  --danger:#FF3F41; --danger-light:#FFECEC;
+  --success:#52C41A; --success-light:#E6FBEB;
+  --warning:#FFC960; --warning-light:#FFF8EB;
+  --r-sm:6px; --r-md:8px; --r-card:12px; --r-tag:20px; --r-full:9999px;
+  --sp-xxs:4px; --sp-xs:8px; --sp-sm:12px; --sp-md:16px;
+  --sp-lg:20px; --sp-xl:24px; --sp-2xl:32px;
+  --fs-h2:28px; --lh-h2:36px;
+  --fs-title-lg:22px; --lh-title-lg:30px;
+  --fs-title:16px; --lh-title:24px;
+  --fs-title-sm:14px; --lh-title-sm:22px;
+  --fs-body:14px; --lh-body:22px;
+  --fs-small:12px; --lh-small:20px;
+  --nav-h:72px; --sidebar-w:220px;
+  --shadow-float:0 4px 16px rgba(0,0,0,0.08);
+  --shadow-modal:0 8px 32px rgba(0,0,0,0.12);
+  --font-en:'Poppins','Noto Sans HK',system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--font-en);font-size:var(--fs-body);line-height:var(--lh-body);color:var(--text-primary);background:var(--surface-page);-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;height:var(--nav-h);background:var(--brand-blue);display:flex;align-items:center;gap:var(--sp-lg);padding:0 clamp(var(--sp-md),3vw,var(--sp-2xl));color:#fff}
+.nav__logo{display:flex;align-items:center;gap:var(--sp-xs);font-size:var(--fs-title-lg);font-weight:600;white-space:nowrap}
+.nav__logo-icon{width:32px;height:32px;background:rgba(255,255,255,0.22);border-radius:50%;display:grid;place-items:center}
+.nav__right{margin-left:auto;display:flex;align-items:center;gap:var(--sp-sm)}
+.nav__avatar{width:36px;height:36px;border-radius:var(--r-full);background:rgba(255,255,255,0.22);color:#fff;display:grid;place-items:center;font-weight:600;font-size:var(--fs-body)}
+.nav__user{color:#fff;font-size:var(--fs-small)}
+
+/* LAYOUT */
+.layout{display:flex;min-height:calc(100vh - var(--nav-h))}
+.sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--surface-white);border-right:1px solid var(--border);padding:var(--sp-xl) 0}
+.sidebar__account{padding:var(--sp-md) var(--sp-lg) var(--sp-xl);border-bottom:1px solid var(--divider);margin-bottom:var(--sp-sm)}
+.sidebar__avatar{width:40px;height:40px;border-radius:var(--r-md);background:var(--brand-blue);color:#fff;display:grid;place-items:center;font-weight:700;font-size:var(--fs-title-sm);margin-bottom:var(--sp-xs)}
+.sidebar__name{font-weight:600;font-size:var(--fs-title-sm);color:var(--title)}
+.sidebar__role{font-size:var(--fs-small);color:var(--text-regular)}
+.nav-item{display:flex;align-items:center;gap:var(--sp-sm);padding:var(--sp-xs) var(--sp-lg);font-size:var(--fs-body);color:var(--text-regular);border:none;background:none;width:100%;text-align:left;border-radius:0;transition:background .15s,color .15s}
+.nav-item:hover{background:var(--brand-blue-tint);color:var(--brand-blue)}
+.nav-item.is-active{background:var(--brand-blue-tint);color:var(--brand-blue);font-weight:600;border-right:3px solid var(--brand-blue)}
+.nav-item svg{flex-shrink:0;opacity:.6}
+.nav-item.is-active svg{opacity:1}
+.content{flex:1;padding:var(--sp-xl);min-width:0}
+
+/* PAGE HEADER */
+.page-header{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-md);margin-bottom:var(--sp-xl)}
+.date-range{display:flex;align-items:center;gap:var(--sp-xs);background:var(--surface-white);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-xs) var(--sp-md);font-size:var(--fs-small);color:var(--text-regular)}
+.compare-badge{background:var(--brand-blue-tint);color:var(--brand-blue);font-size:var(--fs-small);padding:var(--sp-xxs) var(--sp-sm);border-radius:var(--r-tag);font-weight:500}
+
+/* GRID */
+.grid{display:grid;gap:var(--sp-md)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.row{margin-bottom:var(--sp-md)}
+
+/* CARD */
+.card{background:var(--surface-white);border:1px solid var(--border);border-radius:var(--r-card);padding:var(--sp-lg)}
+.card--highlight{border:2px solid var(--brand-blue);box-shadow:0 0 0 3px rgba(35,169,246,0.08)}
+
+/* KPI CARD */
+.kpi{display:flex;flex-direction:column;gap:var(--sp-xs)}
+.kpi__label{font-size:var(--fs-small);color:var(--text-regular);display:flex;align-items:center;gap:var(--sp-xxs)}
+.kpi__label svg{opacity:.5}
+.kpi__value{font-size:22px;font-weight:600;color:var(--title);line-height:1.2}
+.kpi__value--lg{font-size:28px}
+.kpi__date{font-size:var(--fs-small);color:var(--text-secondary);margin-left:var(--sp-xxs)}
+.kpi__delta{font-size:var(--fs-small);font-weight:500;display:flex;align-items:center;gap:2px}
+.kpi__delta--up{color:var(--success)}
+.kpi__delta--down{color:var(--danger)}
+.kpi__header{display:flex;align-items:flex-start;justify-content:space-between}
+.kpi__sparkline{height:48px;margin-top:var(--sp-xs)}
+
+/* DROPDOWN BUTTON */
+.dropdown-btn{display:flex;align-items:center;gap:var(--sp-xxs);background:var(--surface-white);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-xxs) var(--sp-sm);font-size:var(--fs-small);color:var(--text-primary);font-weight:500;position:relative}
+.dropdown-btn:hover{border-color:var(--brand-blue);color:var(--brand-blue)}
+.dropdown-menu{position:absolute;top:calc(100% + 4px);right:0;background:var(--surface-white);border:1px solid var(--border);border-radius:var(--r-md);box-shadow:var(--shadow-float);z-index:50;min-width:100px;overflow:hidden;display:none}
+.dropdown-menu.is-open{display:block}
+.dropdown-item{padding:var(--sp-xs) var(--sp-md);font-size:var(--fs-small);color:var(--text-primary);background:none;border:none;width:100%;text-align:left;cursor:pointer}
+.dropdown-item:hover{background:var(--brand-blue-tint);color:var(--brand-blue)}
+.dropdown-item.is-selected{color:var(--brand-blue);font-weight:600}
+
+/* DONUT CHART CARD */
+.fans-card{display:flex;flex-direction:column;gap:var(--sp-xs)}
+.fans-card__header{display:flex;align-items:flex-start;justify-content:space-between}
+.fans-card__kpi{display:flex;align-items:baseline;gap:var(--sp-xs)}
+.fans-card__num{font-size:22px;font-weight:600;color:var(--title);line-height:1.2}
+.fans-card__meta{font-size:var(--fs-small);color:var(--text-secondary)}
+.fans-card__label{font-size:var(--fs-small);color:var(--text-regular);display:flex;align-items:center;gap:var(--sp-xxs);margin-top:0}
+.fans-card__chart{display:flex;align-items:center;justify-content:center;gap:var(--sp-md);margin-top:var(--sp-sm)}
+.fans-card__legend{display:flex;flex-direction:column;gap:var(--sp-xs)}
+.legend-item{display:flex;align-items:center;gap:var(--sp-xs)}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.legend-item__pct{font-size:18px;font-weight:600;color:var(--title);line-height:1}
+.legend-item__name{font-size:var(--fs-small);color:var(--text-regular)}
+
+/* ABOUT CARD */
+.about-card{display:flex;flex-direction:column;gap:var(--sp-sm)}
+.about-card__img{width:100%;height:110px;object-fit:cover;border-radius:var(--r-md);background:linear-gradient(135deg,#0a1f5e 0%,#1a3a9e 50%,#0066cc 100%);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.about-card__name{font-weight:600;font-size:var(--fs-body);color:var(--title)}
+.about-card__ext{margin-left:auto;color:var(--text-regular)}
+
+/* POST TYPE DONUT */
+.type-donut{display:flex;align-items:center;justify-content:center;gap:var(--sp-md);margin-top:var(--sp-xs)}
+.type-legend{display:flex;flex-direction:column;gap:var(--sp-xxs)}
+.type-legend-item{display:flex;align-items:center;gap:var(--sp-xs);font-size:var(--fs-small);color:var(--text-regular)}
+.type-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* SPARKLINE SVG */
+.spark{width:100%;height:48px}
+
+/* PLATFORM TABS */
+.plat-tab{display:flex;align-items:center;gap:var(--sp-xs);padding:var(--sp-sm) var(--sp-lg);font-size:var(--fs-body);font-weight:500;color:var(--text-regular);background:none;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;cursor:pointer;transition:color .15s,border-color .15s}
+.plat-tab:hover{color:var(--text-primary)}
+.plat-tab.is-active{color:var(--brand-blue);border-bottom-color:var(--brand-blue);font-weight:600}
+
+/* SUB TABS */
+.sub-tab{padding:var(--sp-xs) var(--sp-md);font-size:var(--fs-small);font-weight:500;color:var(--text-regular);background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s}
+.sub-tab:hover{color:var(--text-primary)}
+.sub-tab.is-active{color:var(--brand-blue);border-bottom-color:var(--brand-blue);font-weight:600}
+
+/* INFO ICON */
+.info-icon{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;border:1px solid var(--unselected);color:var(--text-placeholder);font-size:9px;flex-shrink:0;cursor:help}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav__logo">
+    <div class="nav__logo-icon">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="rgba(255,255,255,0.6)"/><path d="M8 12l3 3 5-5" stroke="#23A9F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    MEDIA <span style="font-weight:400">LENS</span>
+  </div>
+  <div class="nav__right">
+    <div class="nav__avatar">J</div>
+    <span class="nav__user">Julie Li ∨</span>
+    <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/><path d="M12 8v4m0 4h.01" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar__account">
+      <div class="sidebar__avatar">P</div>
+      <div class="sidebar__name">PL – Hong Kong</div>
+      <div class="sidebar__role">Admin – Julie Li</div>
+    </div>
+    <button class="nav-item">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-item is-active">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      My Pages
+    </button>
+    <button class="nav-item">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Competitor Analysis
+    </button>
+    <button class="nav-item">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      Buzz (What's Viral?)
+    </button>
+    <button class="nav-item">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Leader Board
+    </button>
+    <button class="nav-item">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Social Listening
+    </button>
+    <button class="nav-item">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M22 12A10 10 0 1 1 12 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M22 2L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Social Pulses
+    </button>
+    <button class="nav-item">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Ad Manager
+    </button>
+    <button class="nav-item">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      Ad Intelligence
+    </button>
+    <button class="nav-item">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Report Scheduler
+    </button>
+    <button class="nav-item">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20A10 10 0 0112 2z" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9a2.5 2.5 0 015 0c0 2.5-2.5 3-2.5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg>
+      AIGC
+    </button>
+    <button class="nav-item">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M7 7h10M7 11h10M7 15h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Tag Management
+    </button>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="content">
+
+    <!-- Platform Tabs -->
+    <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:var(--sp-lg)">
+      <button class="plat-tab is-active" id="tab-fb" onclick="switchPlatform('fb')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+        Facebook
+      </button>
+      <button class="plat-tab" id="tab-ig" onclick="switchPlatform('ig')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        Instagram
+      </button>
+    </div>
+
+    <!-- FB PANEL -->
+    <div id="panel-fb">
+
+    <!-- Page header -->
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:var(--sp-sm)">
+        <span style="font-size:var(--fs-small);color:var(--text-regular)">BusinessFocus</span>
+        <span style="color:var(--border)">|</span>
+        <span class="compare-badge">vs Prior Period</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:var(--sp-sm)">
+        <div class="date-range">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Jun 1 – Jun 25, 2026
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 1: People Talking About | Posts | About -->
+    <div class="grid grid-3 row">
+      <!-- People Talking About -->
+      <div class="card kpi">
+        <div class="kpi__header">
+          <div>
+            <div style="font-size:28px;font-weight:600;color:var(--title)">260,798</div>
+            <div class="kpi__label">People Talking About <span class="info-icon">?</span></div>
+          </div>
+          <div class="kpi__delta kpi__delta--down">-8.92% ∨</div>
+        </div>
+        <svg class="spark" viewBox="0 0 200 48" preserveAspectRatio="none">
+          <defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#23A9F6" stop-opacity=".25"/><stop offset="100%" stop-color="#23A9F6" stop-opacity="0"/></linearGradient></defs>
+          <path d="M0,10 C20,8 40,28 60,30 C80,32 100,20 120,22 C140,24 160,38 180,36 C190,35 200,34 200,34 L200,48 L0,48 Z" fill="url(#g1)"/>
+          <path d="M0,10 C20,8 40,28 60,30 C80,32 100,20 120,22 C140,24 160,38 180,36 C190,35 200,34 200,34" fill="none" stroke="#23A9F6" stroke-width="1.5"/>
+        </svg>
+      </div>
+
+      <!-- Posts donut -->
+      <div class="card">
+        <div class="kpi__header" style="margin-bottom:var(--sp-xs)">
+          <div>
+            <div style="font-size:28px;font-weight:600;color:var(--title)">111</div>
+            <div class="kpi__label">Posts <span class="info-icon">?</span></div>
+          </div>
+          <div class="kpi__delta kpi__delta--down">-14.62% ∨</div>
+        </div>
+        <div class="type-donut">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <!-- Link 34.2% -->
+            <circle cx="40" cy="40" r="28" fill="none" stroke="#23A9F6" stroke-width="14"
+              stroke-dasharray="60.1 114.9" stroke-dashoffset="0" transform="rotate(-90 40 40)"/>
+            <!-- Photo 20.7% -->
+            <circle cx="40" cy="40" r="28" fill="none" stroke="#FF6B9D" stroke-width="14"
+              stroke-dasharray="36.4 138.6" stroke-dashoffset="-60.1" transform="rotate(-90 40 40)"/>
+            <!-- Video 6.3% -->
+            <circle cx="40" cy="40" r="28" fill="none" stroke="#52C41A" stroke-width="14"
+              stroke-dasharray="11.1 163.9" stroke-dashoffset="-96.5" transform="rotate(-90 40 40)"/>
+            <!-- Reels 0% -->
+            <!-- Status 38.7% -->
+            <circle cx="40" cy="40" r="28" fill="none" stroke="#7B61FF" stroke-width="14"
+              stroke-dasharray="68" stroke-dashoffset="-107.6" transform="rotate(-90 40 40)"/>
+          </svg>
+          <div class="type-legend">
+            <div class="type-legend-item"><span class="type-dot" style="background:#23A9F6"></span>Link <strong style="margin-left:auto;color:var(--text-primary)">34.2%</strong></div>
+            <div class="type-legend-item"><span class="type-dot" style="background:#FF6B9D"></span>Photo <strong style="margin-left:auto;color:var(--text-primary)">20.7%</strong></div>
+            <div class="type-legend-item"><span class="type-dot" style="background:#52C41A"></span>Video <strong style="margin-left:auto;color:var(--text-primary)">6.3%</strong></div>
+            <div class="type-legend-item"><span class="type-dot" style="background:#FFBA33"></span>Album <strong style="margin-left:auto;color:var(--text-primary)">0.0%</strong></div>
+            <div class="type-legend-item"><span class="type-dot" style="background:#73DFFF"></span>Reels <strong style="margin-left:auto;color:var(--text-primary)">0.0%</strong></div>
+            <div class="type-legend-item"><span class="type-dot" style="background:#7B61FF"></span>Status <strong style="margin-left:auto;color:var(--text-primary)">38.7%</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- About -->
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-sm)">
+          <span style="font-size:var(--fs-title-sm);font-weight:600;color:var(--title)">About</span>
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke="#828282" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="about-card__img">
+          <!-- Award banner placeholder -->
+          <div style="text-align:center;color:rgba(255,255,255,0.9);padding:var(--sp-md)">
+            <div style="font-size:10px;letter-spacing:2px;opacity:.7;margin-bottom:4px">OUTSTANDING ACHIEVEMENT</div>
+            <div style="font-size:16px;font-weight:700;letter-spacing:1px">SME AWARD</div>
+            <div style="font-size:10px;opacity:.8;margin-top:4px">中小企卓越成就獎 2026</div>
+          </div>
+        </div>
+        <div style="font-weight:600;font-size:var(--fs-body);color:var(--title);margin-top:var(--sp-xs)">BusinessFocus</div>
+      </div>
+    </div>
+
+    <!-- ROW 2: Comments Per Post | Page Impressions per people reached -->
+    <div class="grid grid-2 row" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="card kpi">
+        <div class="kpi__header">
+          <div>
+            <div style="font-size:28px;font-weight:600;color:var(--title)">43</div>
+            <div class="kpi__label">Comments Per Post <span class="info-icon">?</span></div>
+          </div>
+          <div class="kpi__delta kpi__delta--down">-40.17% ∨</div>
+        </div>
+      </div>
+      <div class="card kpi">
+        <div class="kpi__label" style="margin-bottom:var(--sp-xs)">Page Impressions per people reached <span class="info-icon">?</span></div>
+        <div style="font-size:28px;font-weight:600;color:var(--title)">2.89</div>
+      </div>
+      <div style="opacity:0"></div><!-- spacer -->
+    </div>
+
+    <!-- ROW 3: 4 KPI cards -->
+    <div class="grid grid-4 row">
+      <div class="card kpi">
+        <div class="kpi__header">
+          <div>
+            <div style="font-size:22px;font-weight:600;color:var(--title)">0</div>
+            <div class="kpi__label">Page Post Organic Impression <span class="info-icon">?</span></div>
+          </div>
+          <div style="font-size:var(--fs-small);color:var(--text-disabled)">0.00% —</div>
+        </div>
+        <svg class="spark" viewBox="0 0 160 48" preserveAspectRatio="none">
+          <path d="M0,40 L160,40" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 3"/>
+        </svg>
+      </div>
+      <div class="card kpi">
+        <div class="kpi__header">
+          <div>
+            <div style="font-size:22px;font-weight:600;color:var(--title)">6,730,331</div>
+            <div class="kpi__label">Page Post Impressions <span class="info-icon">?</span></div>
+          </div>
+          <div class="kpi__delta kpi__delta--down">-18.76% ∨</div>
+        </div>
+        <svg class="spark" viewBox="0 0 160 48" preserveAspectRatio="none">
+          <defs><linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#23A9F6" stop-opacity=".2"/><stop offset="100%" stop-color="#23A9F6" stop-opacity="0"/></linearGradient></defs>
+          <path d="M0,44 C20,42 40,20 60,18 C80,16 100,24 120,28 C130,30 140,36 160,38 L160,48 L0,48Z" fill="url(#g2)"/>
+          <path d="M0,44 C20,42 40,20 60,18 C80,16 100,24 120,28 C130,30 140,36 160,38" fill="none" stroke="#23A9F6" stroke-width="1.5"/>
+          <line x1="0" y1="32" x2="160" y2="32" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 3"/>
+        </svg>
+      </div>
+      <div class="card kpi">
+        <div class="kpi__header">
+          <div>
+            <div style="display:flex;align-items:baseline;gap:var(--sp-xs)">
+              <span style="font-size:22px;font-weight:600;color:var(--title)">348,485</span>
+              <span style="font-size:var(--fs-small);color:var(--text-secondary)">(25 Jun)</span>
+            </div>
+            <div class="kpi__label">Page Posts Reach <span class="info-icon">?</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:var(--sp-xxs)">
+            <div class="kpi__delta kpi__delta--down">-38.30% ∨</div>
+            <button class="dropdown-btn" style="font-size:11px;padding:2px 8px">Day ∨</button>
+          </div>
+        </div>
+        <svg class="spark" viewBox="0 0 160 48" preserveAspectRatio="none">
+          <defs><linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#23A9F6" stop-opacity=".2"/><stop offset="100%" stop-color="#23A9F6" stop-opacity="0"/></linearGradient></defs>
+          <path d="M0,30 C20,28 40,14 70,10 C90,8 110,20 130,24 C145,27 155,32 160,34 L160,48 L0,48Z" fill="url(#g3)"/>
+          <path d="M0,30 C20,28 40,14 70,10 C90,8 110,20 130,24 C145,27 155,32 160,34" fill="none" stroke="#23A9F6" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="card kpi">
+        <div class="kpi__header">
+          <div>
+            <div style="font-size:22px;font-weight:600;color:var(--title)">29,404</div>
+            <div class="kpi__label">Post Engagements <span class="info-icon">?</span></div>
+          </div>
+          <div class="kpi__delta kpi__delta--down">-26.12% ∨</div>
+        </div>
+        <svg class="spark" viewBox="0 0 160 48" preserveAspectRatio="none">
+          <defs><linearGradient id="g4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#23A9F6" stop-opacity=".2"/><stop offset="100%" stop-color="#23A9F6" stop-opacity="0"/></linearGradient></defs>
+          <path d="M0,36 C30,34 50,22 80,18 C100,16 120,28 140,30 C150,31 157,34 160,36 L160,48 L0,48Z" fill="url(#g4)"/>
+          <path d="M0,36 C30,34 50,22 80,18 C100,16 120,28 140,30 C150,31 157,34 160,36" fill="none" stroke="#23A9F6" stroke-width="1.5"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ROW 4: 4 KPI cards -->
+    <div class="grid grid-4 row">
+      <div class="card kpi">
+        <div class="kpi__header">
+          <div>
+            <div style="font-size:22px;font-weight:600;color:var(--title)">388,219</div>
+            <div class="kpi__label">Post Clicks <span class="info-icon">?</span></div>
+          </div>
+          <div class="kpi__delta kpi__delta--down">-26.80% ∨</div>
+        </div>
+        <svg class="spark" viewBox="0 0 160 48" preserveAspectRatio="none">
+          <defs><linearGradient id="g5" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#23A9F6" stop-opacity=".2"/><stop offset="100%" stop-color="#23A9F6" stop-opacity="0"/></linearGradient></defs>
+          <path d="M0,38 C25,36 45,20 75,16 C95,14 115,26 140,30 C152,32 158,36 160,38 L160,48 L0,48Z" fill="url(#g5)"/>
+          <path d="M0,38 C25,36 45,20 75,16 C95,14 115,26 140,30 C152,32 158,36 160,38" fill="none" stroke="#23A9F6" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="card kpi">
+        <div class="kpi__header">
+          <div>
+            <div style="font-size:22px;font-weight:600;color:var(--title)">0</div>
+            <div class="kpi__label">Page Organic Reaches <span class="info-icon">?</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:var(--sp-xxs)">
+            <div style="font-size:var(--fs-small);color:var(--text-disabled)">0.00% —</div>
+            <button class="dropdown-btn" style="font-size:11px;padding:2px 8px">Day ∨</button>
+          </div>
+        </div>
+        <svg class="spark" viewBox="0 0 160 48" preserveAspectRatio="none">
+          <path d="M0,40 L160,40" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 3"/>
+        </svg>
+      </div>
+      <div class="card kpi">
+        <div class="kpi__header">
+          <div>
+            <div style="display:flex;align-items:baseline;gap:var(--sp-xs)">
+              <span style="font-size:22px;font-weight:600;color:var(--title)">188,282</span>
+            </div>
+            <div class="kpi__label">Page Video Views <span class="info-icon">?</span></div>
+          </div>
+          <div class="kpi__delta kpi__delta--up">+52.62% ∧</div>
+        </div>
+        <svg class="spark" viewBox="0 0 160 48" preserveAspectRatio="none">
+          <defs><linearGradient id="g6" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#23A9F6" stop-opacity=".2"/><stop offset="100%" stop-color="#23A9F6" stop-opacity="0"/></linearGradient></defs>
+          <path d="M0,40 C30,38 50,34 80,20 C100,12 120,10 140,14 C152,17 158,22 160,24 L160,48 L0,48Z" fill="url(#g6)"/>
+          <path d="M0,40 C30,38 50,34 80,20 C100,12 120,10 140,14 C152,17 158,22 160,24" fill="none" stroke="#23A9F6" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="card kpi">
+        <div class="kpi__header">
+          <div>
+            <div style="display:flex;align-items:baseline;gap:var(--sp-xs)">
+              <span style="font-size:22px;font-weight:600;color:var(--title)">8,236</span>
+              <span style="font-size:var(--fs-small);color:var(--text-secondary)">(25 Jun)</span>
+            </div>
+            <div class="kpi__label">Page Unique Video Views <span class="info-icon">?</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:var(--sp-xxs)">
+            <div class="kpi__delta kpi__delta--down">-48.62% ∨</div>
+            <button class="dropdown-btn" style="font-size:11px;padding:2px 8px">Day ∨</button>
+          </div>
+        </div>
+        <svg class="spark" viewBox="0 0 160 48" preserveAspectRatio="none">
+          <defs><linearGradient id="g7" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#23A9F6" stop-opacity=".2"/><stop offset="100%" stop-color="#23A9F6" stop-opacity="0"/></linearGradient></defs>
+          <path d="M0,20 C20,18 40,30 70,34 C90,36 110,32 130,36 C145,38 155,42 160,44 L160,48 L0,48Z" fill="url(#g7)"/>
+          <path d="M0,20 C20,18 40,30 70,34 C90,36 110,32 130,36 C145,38 155,42 160,44" fill="none" stroke="#23A9F6" stroke-width="1.5"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         ROW 5 — NEW CARDS: Impressions Fans Distribution
+         ══════════════════════════════════════════════ -->
+    <div class="grid row" style="grid-template-columns:repeat(2,1fr)">
+
+      <!-- NEW CARD 1: Impressions Fans Distribution (post_media_view + is_from_followers) -->
+      <div class="card card--highlight fans-card">
+        <div class="fans-card__header">
+          <div>
+            <div class="fans-card__kpi">
+              <span class="fans-card__num">348,485</span>
+              <span class="fans-card__meta">(25 Jun)</span>
+              <span class="info-icon">?</span>
+            </div>
+            <div class="fans-card__label">
+              Impressions fans distribution <span class="info-icon">?</span>
+            </div>
+          </div>
+          <!-- Dropdown: post / page -->
+          <div style="position:relative">
+            <button class="dropdown-btn" id="btn1" onclick="toggleDropdown('menu1','btn1')">
+              post <svg width="10" height="10" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="dropdown-menu" id="menu1">
+              <button class="dropdown-item is-selected" onclick="selectItem('btn1','menu1','post')">post</button>
+              <button class="dropdown-item" onclick="selectItem('btn1','menu1','page')">page</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="fans-card__chart">
+          <!-- Donut SVG -->
+          <svg width="88" height="88" viewBox="0 0 88 88" style="flex-shrink:0">
+            <circle cx="44" cy="44" r="32" fill="none" stroke="#0A3A6E" stroke-width="16"
+              stroke-dasharray="200.96" stroke-dashoffset="0" transform="rotate(-90 44 44)"/>
+            <circle cx="44" cy="44" r="32" fill="none" stroke="#23A9F6" stroke-width="16"
+              stroke-dasharray="143.7 57.26" stroke-dashoffset="0" transform="rotate(-90 44 44)"/>
+          </svg>
+          <!-- Legend -->
+          <div class="fans-card__legend">
+            <div class="legend-item">
+              <span class="legend-dot" style="background:#23A9F6"></span>
+              <div>
+                <div class="legend-item__pct">71.5%</div>
+                <div class="legend-item__name">Followers</div>
+              </div>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background:#0A3A6E"></span>
+              <div>
+                <div class="legend-item__pct">28.5%</div>
+                <div class="legend-item__name">Non-followers</div>
+              </div>
+            </div>
+          </div>
+          <!-- color key: Followers=#23A9F6, Non-followers=#0A3A6E -->
+        </div>
+      </div>
+
+      <!-- NEW CARD 2: Organic vs Paid Distribution (post_media_view + is_from_ads) -->
+      <div class="card fans-card">
+        <div class="fans-card__header">
+          <div>
+            <div class="fans-card__kpi">
+              <span class="fans-card__num">348,485</span>
+              <span class="fans-card__meta">(25 Jun)</span>
+              <span class="info-icon">?</span>
+            </div>
+            <div class="fans-card__label">
+              Impressions paid distribution <span class="info-icon">?</span>
+            </div>
+          </div>
+          <!-- Dropdown: post / page -->
+          <div style="position:relative">
+            <button class="dropdown-btn" id="btn2" onclick="toggleDropdown('menu2','btn2')">
+              post <svg width="10" height="10" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="dropdown-menu" id="menu2">
+              <button class="dropdown-item is-selected" onclick="selectItem('btn2','menu2','post')">post</button>
+              <button class="dropdown-item" onclick="selectItem('btn2','menu2','page')">page</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="fans-card__chart">
+          <svg width="88" height="88" viewBox="0 0 88 88" style="flex-shrink:0">
+            <circle cx="44" cy="44" r="32" fill="none" stroke="#23A9F6" stroke-width="16"
+              stroke-dasharray="200.96" stroke-dashoffset="0" transform="rotate(-90 44 44)"/>
+            <circle cx="44" cy="44" r="32" fill="none" stroke="#0A3A6E" stroke-width="16"
+              stroke-dasharray="46.2 154.76" stroke-dashoffset="0" transform="rotate(-90 44 44)"/>
+          </svg>
+          <div class="fans-card__legend">
+            <div class="legend-item">
+              <span class="legend-dot" style="background:#0A3A6E"></span>
+              <div>
+                <div class="legend-item__pct">23.0%</div>
+                <div class="legend-item__name">Paid</div>
+              </div>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background:#23A9F6"></span>
+              <div>
+                <div class="legend-item__pct">77.0%</div>
+                <div class="legend-item__name">Organic</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Source note -->
+    <div style="font-size:var(--fs-small);color:var(--text-placeholder);text-align:right;margin-top:calc(-1 * var(--sp-sm))">
+      Impressions fans / paid distribution powered by <code style="background:var(--brand-blue-tint);color:var(--brand-blue);padding:1px 6px;border-radius:4px;font-size:10px">post_media_view · is_from_followers · is_from_ads</code>
+    </div>
+
+    </div><!-- /panel-fb -->
+
+    <!-- IG PANEL -->
+    <div id="panel-ig" style="display:none">
+
+      <!-- IG Profile Header -->
+      <div style="display:flex;align-items:flex-start;gap:var(--sp-xl);margin-bottom:var(--sp-xl);padding-bottom:var(--sp-lg);border-bottom:1px solid var(--divider)">
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <div style="width:64px;height:64px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:#cc2366;text-align:center;line-height:1.2">Girl<br>Style</div>
+        </div>
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:var(--sp-sm);margin-bottom:var(--sp-xxs)">
+            <span style="font-size:var(--fs-title);font-weight:600;color:var(--title)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E1306C" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#E1306C" stroke="none"/></svg>
+              GirlStyle 女生日常
+            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand-blue)" stroke-width="1.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+          </div>
+          <div style="font-size:var(--fs-small);color:var(--text-regular);margin-bottom:var(--sp-sm)">@girlstyle.mag</div>
+          <div style="display:flex;gap:var(--sp-xl);font-size:var(--fs-small)">
+            <span><strong style="color:var(--title)">36,400</strong> <span style="color:var(--text-regular)">Posts</span></span>
+            <span><strong style="color:var(--title)">485.3K</strong> <span style="color:var(--text-regular)">Followers</span></span>
+            <span><strong style="color:var(--title)">25.50%</strong> <span style="color:var(--text-regular)">Female, 25-34 y/o</span></span>
+            <span><strong style="color:var(--title)">200</strong> <span style="color:var(--text-regular)">Following</span></span>
+          </div>
+          <div style="display:flex;align-items:center;gap:var(--sp-sm);margin-top:var(--sp-xs);font-size:var(--fs-small);color:var(--text-regular)">
+            <span>📍 HK</span>
+            <span style="background:var(--surface-disabled);border-radius:var(--r-tag);padding:2px 10px">Publisher</span>
+            <span>Page Type <strong>Beauty, Luxury Goods, ...</strong></span>
+            <span style="color:var(--brand-blue)">Profile Interest</span>
+          </div>
+        </div>
+        <button style="background:var(--brand-blue);color:#fff;border:none;border-radius:var(--r-md);padding:var(--sp-xs) var(--sp-md);font-size:var(--fs-small);font-weight:500;display:flex;align-items:center;gap:var(--sp-xs);cursor:pointer">
+          ✦ AI Profile Analysis
+        </button>
+      </div>
+
+      <!-- IG Sub-tabs -->
+      <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:var(--sp-xl);overflow-x:auto">
+        <button class="sub-tab is-active">Overview</button>
+        <button class="sub-tab">Account</button>
+        <button class="sub-tab">Posts</button>
+        <button class="sub-tab">Followers Demographics</button>
+        <button class="sub-tab">Tags</button>
+        <button class="sub-tab">Top Posts</button>
+        <button class="sub-tab">Ad Library</button>
+        <button class="sub-tab">Hashtags</button>
+        <button class="sub-tab">Calendar</button>
+        <button class="sub-tab">Stories Analytics</button>
+      </div>
+
+      <!-- IG Overview label -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-lg)">
+        <span style="font-size:var(--fs-title);font-weight:600;color:var(--title)">Overview</span>
+        <div style="display:flex;align-items:center;gap:var(--sp-sm)">
+          <div class="date-range">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            2026-06-19 to 2026-06-25
+          </div>
+        </div>
+      </div>
+
+      <!-- IG Row 1: 4 KPI cards -->
+      <div class="grid grid-4 row" style="--spark-color:#E1306C">
+        <!-- New Followers -->
+        <div class="card kpi">
+          <div class="kpi__header">
+            <div>
+              <div style="font-size:22px;font-weight:600;color:var(--title)">245</div>
+              <div class="kpi__label">New Followers</div>
+            </div>
+          </div>
+          <svg class="spark" viewBox="0 0 160 48" preserveAspectRatio="none">
+            <defs><linearGradient id="ig1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E1306C" stop-opacity=".2"/><stop offset="100%" stop-color="#E1306C" stop-opacity="0"/></linearGradient></defs>
+            <path d="M0,44 L20,20 L30,30 L40,10 L50,35 L60,42 L70,15 L80,44 L90,38 L100,44 L110,20 L120,44 L140,44 L160,44 L160,48 L0,48Z" fill="url(#ig1)"/>
+            <path d="M0,44 L20,20 L30,30 L40,10 L50,35 L60,42 L70,15 L80,44 L90,38 L100,44 L110,20 L120,44 L140,44 L160,44" fill="none" stroke="#E1306C" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <!-- Video Views -->
+        <div class="card kpi">
+          <div class="kpi__header">
+            <div>
+              <div style="font-size:22px;font-weight:600;color:var(--title)">146,594</div>
+              <div class="kpi__label">Video Views</div>
+            </div>
+            <div class="kpi__delta kpi__delta--up">+526.74% ∧</div>
+          </div>
+          <svg class="spark" viewBox="0 0 160 48" preserveAspectRatio="none">
+            <defs><linearGradient id="ig2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E1306C" stop-opacity=".2"/><stop offset="100%" stop-color="#E1306C" stop-opacity="0"/></linearGradient></defs>
+            <path d="M0,44 C40,42 60,38 80,10 C90,4 100,8 120,14 C140,20 150,28 160,30 L160,48 L0,48Z" fill="url(#ig2)"/>
+            <path d="M0,44 C40,42 60,38 80,10 C90,4 100,8 120,14 C140,20 150,28 160,30" fill="none" stroke="#E1306C" stroke-width="1.5"/>
+            <line x1="0" y1="30" x2="160" y2="30" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 3"/>
+          </svg>
+        </div>
+        <!-- Account Reaches -->
+        <div class="card kpi">
+          <div class="kpi__header">
+            <div>
+              <div style="display:flex;align-items:baseline;gap:var(--sp-xs)">
+                <span style="font-size:22px;font-weight:600;color:var(--title)">407,571</span>
+                <span style="font-size:var(--fs-small);color:var(--text-secondary)">(25 Jun)</span>
+              </div>
+              <div class="kpi__label">Account Reaches</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:var(--sp-xxs)">
+              <div class="kpi__delta kpi__delta--up">+54.42% ∧</div>
+              <button class="dropdown-btn" style="font-size:11px;padding:2px 8px">Day ∨</button>
+            </div>
+          </div>
+          <svg class="spark" viewBox="0 0 160 48" preserveAspectRatio="none">
+            <defs><linearGradient id="ig3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E1306C" stop-opacity=".2"/><stop offset="100%" stop-color="#E1306C" stop-opacity="0"/></linearGradient></defs>
+            <path d="M0,20 C20,18 40,28 60,34 C80,38 100,30 120,20 C130,15 140,18 160,22 L160,48 L0,48Z" fill="url(#ig3)"/>
+            <path d="M0,20 C20,18 40,28 60,34 C80,38 100,30 120,20 C130,15 140,18 160,22" fill="none" stroke="#E1306C" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <!-- Account Views -->
+        <div class="card kpi">
+          <div class="kpi__header">
+            <div>
+              <div style="font-size:22px;font-weight:600;color:var(--title)">4,680,890</div>
+              <div class="kpi__label">Account Views</div>
+            </div>
+            <div class="kpi__delta kpi__delta--down">-18.89% ∨</div>
+          </div>
+          <svg class="spark" viewBox="0 0 160 48" preserveAspectRatio="none">
+            <defs><linearGradient id="ig4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E1306C" stop-opacity=".2"/><stop offset="100%" stop-color="#E1306C" stop-opacity="0"/></linearGradient></defs>
+            <path d="M0,10 C20,12 40,20 70,28 C90,32 110,26 140,34 C150,36 156,40 160,42 L160,48 L0,48Z" fill="url(#ig4)"/>
+            <path d="M0,10 C20,12 40,20 70,28 C90,32 110,26 140,34 C150,36 156,40 160,42" fill="none" stroke="#E1306C" stroke-width="1.5"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- IG Row 2: mixed cards -->
+      <div class="grid row" style="grid-template-columns:1fr 1fr 1fr 1fr">
+        <!-- Engagements -->
+        <div class="card kpi">
+          <div class="kpi__header">
+            <div>
+              <div style="font-size:22px;font-weight:600;color:var(--title)">103,891</div>
+              <div class="kpi__label">Engagements <span class="info-icon">?</span></div>
+            </div>
+            <div class="kpi__delta kpi__delta--down">-15.16% ∨</div>
+          </div>
+          <svg class="spark" viewBox="0 0 160 48" preserveAspectRatio="none">
+            <defs><linearGradient id="ig5" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E1306C" stop-opacity=".2"/><stop offset="100%" stop-color="#E1306C" stop-opacity="0"/></linearGradient></defs>
+            <path d="M0,14 C20,16 40,24 70,30 C90,34 110,28 130,32 C145,34 155,38 160,40 L160,48 L0,48Z" fill="url(#ig5)"/>
+            <path d="M0,14 C20,16 40,24 70,30 C90,34 110,28 130,32 C145,34 155,38 160,40" fill="none" stroke="#E1306C" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <!-- Post ER + Daily Reach ER stacked -->
+        <div class="card" style="display:flex;flex-direction:column;gap:var(--sp-md)">
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-xxs)">
+              <span class="kpi__label">Post ER <span class="info-icon">?</span></span>
+              <button class="dropdown-btn" style="font-size:11px;padding:2px 8px">Post ∨</button>
+            </div>
+            <div style="font-size:22px;font-weight:600;color:var(--title)">0.67%</div>
+            <div class="kpi__delta kpi__delta--down" style="margin-top:2px">-4.61% ∨</div>
+          </div>
+          <div style="border-top:1px solid var(--divider);padding-top:var(--sp-sm)">
+            <div class="kpi__label" style="margin-bottom:var(--sp-xxs)">Daily Reach Engagement Rate <span class="info-icon">?</span></div>
+            <div style="font-size:22px;font-weight:600;color:var(--title)">0.69%</div>
+            <div class="kpi__delta kpi__delta--up" style="margin-top:2px">+9.05% ∧</div>
+          </div>
+        </div>
+        <!-- Posts donut -->
+        <div class="card">
+          <div class="kpi__header" style="margin-bottom:var(--sp-xs)">
+            <div>
+              <div style="font-size:22px;font-weight:600;color:var(--title)">32</div>
+              <div class="kpi__label">Posts</div>
+            </div>
+            <div class="kpi__delta kpi__delta--down">-11.11% ∨</div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:var(--sp-md)">
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="28" fill="none" stroke="#FFBA33" stroke-width="13"
+                stroke-dasharray="143.7 31" stroke-dashoffset="0" transform="rotate(-90 40 40)"/>
+              <circle cx="40" cy="40" r="28" fill="none" stroke="#E1306C" stroke-width="13"
+                stroke-dasharray="11.1 163.9" stroke-dashoffset="-143.7" transform="rotate(-90 40 40)"/>
+              <circle cx="40" cy="40" r="28" fill="none" stroke="#52C41A" stroke-width="13"
+                stroke-dasharray="22.1 153.9" stroke-dashoffset="-154.8" transform="rotate(-90 40 40)"/>
+            </svg>
+            <div class="type-legend">
+              <div class="type-legend-item"><span class="type-dot" style="background:#E1306C"></span>Image <strong>6.3%</strong></div>
+              <div class="type-legend-item"><span class="type-dot" style="background:#52C41A"></span>Video <strong>12.5%</strong></div>
+              <div class="type-legend-item"><span class="type-dot" style="background:#FFBA33"></span>Album <strong>81.3%</strong></div>
+            </div>
+          </div>
+        </div>
+        <!-- Posts Reaches + NEW fans card -->
+        <div style="display:flex;flex-direction:column;gap:var(--sp-md)">
+          <div class="card kpi">
+            <div class="kpi__header">
+              <div>
+                <div style="font-size:22px;font-weight:600;color:var(--title)">2,163,634</div>
+                <div class="kpi__label">Posts Reaches</div>
+              </div>
+              <div class="kpi__delta kpi__delta--down">-22.20% ∨</div>
+            </div>
+            <svg class="spark" viewBox="0 0 160 48" preserveAspectRatio="none">
+              <defs><linearGradient id="ig6" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E1306C" stop-opacity=".2"/><stop offset="100%" stop-color="#E1306C" stop-opacity="0"/></linearGradient></defs>
+              <path d="M0,10 C20,12 50,20 80,26 C100,30 120,24 140,28 C152,30 158,34 160,36 L160,48 L0,48Z" fill="url(#ig6)"/>
+              <path d="M0,10 C20,12 50,20 80,26 C100,30 120,24 140,28 C152,30 158,34 160,36" fill="none" stroke="#E1306C" stroke-width="1.5"/>
+            </svg>
+          </div>
+
+          <!-- ★ NEW: Page fans reaches card (图2样式) -->
+          <div class="card card--highlight fans-card">
+            <div class="fans-card__header">
+              <div>
+                <div class="fans-card__kpi">
+                  <span class="fans-card__num" style="font-size:18px">3,260</span>
+                  <span class="info-icon">?</span>
+                </div>
+                <div class="fans-card__label">Page fans reaches</div>
+              </div>
+            </div>
+            <div class="fans-card__chart" style="margin-top:var(--sp-sm)">
+              <svg width="80" height="80" viewBox="0 0 80 80" style="flex-shrink:0">
+                <circle cx="40" cy="40" r="28" fill="none" stroke="#0A3A6E" stroke-width="13"
+                  stroke-dasharray="175.9" stroke-dashoffset="0" transform="rotate(-90 40 40)"/>
+                <circle cx="40" cy="40" r="28" fill="none" stroke="#23A9F6" stroke-width="13"
+                  stroke-dasharray="125.8 50.1" stroke-dashoffset="0" transform="rotate(-90 40 40)"/>
+              </svg>
+              <div class="fans-card__legend">
+                <div class="legend-item">
+                  <span class="legend-dot" style="background:#23A9F6"></span>
+                  <div>
+                    <div class="legend-item__pct">71.5%</div>
+                    <div class="legend-item__name">Followers</div>
+                  </div>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot" style="background:#0A3A6E"></span>
+                  <div>
+                    <div class="legend-item__pct">28.5%</div>
+                    <div class="legend-item__name">Non-followers</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IG Row 3 -->
+      <div class="grid row" style="grid-template-columns:1fr 1fr 1fr 1fr">
+        <div class="card kpi">
+          <div>
+            <div class="kpi__label" style="margin-bottom:var(--sp-xs)">Posts Per Day</div>
+            <div style="font-size:22px;font-weight:600;color:var(--title)">4.57</div>
+            <div class="kpi__delta kpi__delta--down" style="margin-top:2px">-11.11% ∨</div>
+          </div>
+          <div style="border-top:1px solid var(--divider);padding-top:var(--sp-sm);margin-top:var(--sp-sm)">
+            <div class="kpi__label" style="margin-bottom:var(--sp-xs)">Comments Per Post</div>
+            <div style="font-size:22px;font-weight:600;color:var(--title)">7.69</div>
+            <div class="kpi__delta kpi__delta--down" style="margin-top:2px">-90.20% ∨</div>
+          </div>
+        </div>
+        <div class="card kpi">
+          <div class="kpi__header">
+            <div>
+              <div style="font-size:22px;font-weight:600;color:var(--title)">246</div>
+              <div class="kpi__label">Comments</div>
+            </div>
+            <div class="kpi__delta kpi__delta--down">-91.29% ∨</div>
+          </div>
+          <svg class="spark" viewBox="0 0 160 48" preserveAspectRatio="none">
+            <defs><linearGradient id="ig7" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E1306C" stop-opacity=".2"/><stop offset="100%" stop-color="#E1306C" stop-opacity="0"/></linearGradient></defs>
+            <path d="M0,44 C30,42 50,16 70,8 C80,4 90,20 110,30 C130,38 148,42 160,44 L160,48 L0,48Z" fill="url(#ig7)"/>
+            <path d="M0,44 C30,42 50,16 70,8 C80,4 90,20 110,30 C130,38 148,42 160,44" fill="none" stroke="#E1306C" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div style="opacity:0"></div>
+        <!-- Saved -->
+        <div class="card kpi">
+          <div class="kpi__header">
+            <div>
+              <div style="font-size:22px;font-weight:600;color:var(--title)">11,642</div>
+              <div class="kpi__label">Saved</div>
+            </div>
+            <div class="kpi__delta kpi__delta--down">-22.36% ∨</div>
+          </div>
+          <svg class="spark" viewBox="0 0 160 48" preserveAspectRatio="none">
+            <defs><linearGradient id="ig8" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E1306C" stop-opacity=".2"/><stop offset="100%" stop-color="#E1306C" stop-opacity="0"/></linearGradient></defs>
+            <path d="M0,10 C20,12 40,20 70,26 C90,30 110,24 140,30 C152,32 158,38 160,40 L160,48 L0,48Z" fill="url(#ig8)"/>
+            <path d="M0,10 C20,12 40,20 70,26 C90,30 110,24 140,30 C152,32 158,38 160,40" fill="none" stroke="#E1306C" stroke-width="1.5"/>
+          </svg>
+        </div>
+      </div>
+
+    </div><!-- /panel-ig -->
+
+  </main>
+</div>
+
+<script>
+function toggleDropdown(menuId, btnId) {
+  const menu = document.getElementById(menuId);
+  const isOpen = menu.classList.contains('is-open');
+  // close all
+  document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('is-open'));
+  if (!isOpen) menu.classList.add('is-open');
+}
+
+function selectItem(btnId, menuId, value) {
+  const btn = document.getElementById(btnId);
+  btn.childNodes[0].textContent = value + ' ';
+  document.getElementById(menuId).classList.remove('is-open');
+  // Update data based on selection
+  if (btnId === 'btn1') updateFansCard(value);
+  if (btnId === 'btn2') updatePaidCard(value);
+}
+
+function updateFansCard(type) {
+  // Simulate different data for post vs page level
+  const data = {
+    post: { num: '348,485', followers: 71.5, nonFollowers: 28.5 },
+    page: { num: '6,730,331', followers: 68.2, nonFollowers: 31.8 }
+  };
+  const d = data[type];
+  // Update num (first fans-card__num)
+  document.querySelector('#btn1').closest('.fans-card').querySelector('.fans-card__num').textContent = d.num;
+  // Update donut - followers arc
+  const circle = document.querySelector('#btn1').closest('.fans-card').querySelectorAll('circle')[1];
+  const total = 200.96;
+  circle.setAttribute('stroke-dasharray', `${(d.followers/100*total).toFixed(1)} ${(total - d.followers/100*total).toFixed(1)}`);
+  // Update legend
+  const pcts = document.querySelector('#btn1').closest('.fans-card').querySelectorAll('.legend-item__pct');
+  pcts[0].textContent = d.followers + '%';
+  pcts[1].textContent = d.nonFollowers + '%';
+}
+
+function updatePaidCard(type) {
+  const data = {
+    post: { num: '348,485', paid: 23.0, organic: 77.0 },
+    page: { num: '6,730,331', paid: 18.4, organic: 81.6 }
+  };
+  const d = data[type];
+  const card = document.querySelector('#btn2').closest('.fans-card');
+  card.querySelector('.fans-card__num').textContent = d.num;
+  // circle[0] = organic (full ring, #23A9F6), circle[1] = paid arc (#0A3A6E)
+  const circle = card.querySelectorAll('circle')[1];
+  const total = 200.96;
+  circle.setAttribute('stroke-dasharray', `${(d.paid/100*total).toFixed(1)} ${(total - d.paid/100*total).toFixed(1)}`);
+  const pcts = card.querySelectorAll('.legend-item__pct');
+  pcts[0].textContent = d.paid + '%';   // Paid
+  pcts[1].textContent = d.organic + '%'; // Organic
+}
+
+function switchPlatform(p) {
+  document.getElementById('panel-fb').style.display = p === 'fb' ? '' : 'none';
+  document.getElementById('panel-ig').style.display = p === 'ig' ? '' : 'none';
+  document.getElementById('tab-fb').classList.toggle('is-active', p === 'fb');
+  document.getElementById('tab-ig').classList.toggle('is-active', p === 'ig');
+}
+
+// Close dropdowns on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('.dropdown-btn')) {
+    document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('is-open'));
+  }
+});
+</script>
+</body>
+</html>
