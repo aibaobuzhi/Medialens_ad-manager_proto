@@ -1,0 +1,2224 @@
+<!DOCTYPE html>
+<!--
+  MediaLens — Buzz × AI Creative Studio Prototype  (v2)
+  Flow:
+    1. Open AI panel via float button
+    2. Click "+" in input → pick Buzz posts → appear above input as reference chips
+    3. "@" to select product; upload image as extra reference
+    4. Agent: Marketing Agent (default) | Ad Advisor | Image Generation
+    5. Output: full post (formatted copy + image combined)
+    6. Hover generated image → Edit / Check Original → AI Generator page (4 tabs)
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediaLens — Buzz × AI Creative Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════ */
+:root {
+  --brand-blue:#23A9F6; --brand-light-blue:#73DFFF;
+  --brand-blue-tint:#EEF6FF; --brand-blue-subtle:#F1FCFF;
+  --title:#0A1F2C; --text-primary:#102532; --text-regular:#707070;
+  --text-secondary:#828282; --text-placeholder:#CACACA;
+  --surface-white:#FFFFFF; --surface-page:#F7F7F7; --surface-ai:#F6F8FD;
+  --border:#D9E3E6; --divider:#E8EEF0;
+  --danger:#FF3F41; --danger-light:#FFECEC;
+  --success:#52C41A; --success-light:#E6FBEB;
+  --warning:#FFC960; --warning-light:#FFF8EB;
+  --r-sm:6px; --r-md:8px; --r-card:12px; --r-tag:20px; --r-full:9999px;
+  --sp-xxs:4px; --sp-xs:8px; --sp-sm:12px; --sp-md:16px;
+  --sp-lg:20px; --sp-xl:24px; --sp-2xl:32px;
+  --fs-h2:28px; --fs-title:16px; --fs-title-sm:14px;
+  --fs-body:14px; --fs-small:12px; --fs-label:11px;
+  --lh-body:22px; --lh-small:20px;
+  --shadow-float:0 4px 16px rgba(0,0,0,.08);
+  --shadow-modal:0 8px 32px rgba(0,0,0,.16);
+  --overlay:rgba(10,31,44,.5);
+  --nav-h:72px; --sidebar-w:220px; --panel-w:440px;
+  --font-en:'Poppins','Noto Sans HK',system-ui,sans-serif;
+  --ai-orange:#F97316; --ai-orange-lt:#FFF7F0;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font-en);font-size:var(--fs-body);line-height:var(--lh-body);
+  color:var(--text-primary);background:var(--surface-page);-webkit-font-smoothing:antialiased;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;}
+svg{display:block;}
+
+/* ═══ NAV ═══ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:300;height:var(--nav-h);
+  background:var(--brand-blue);display:flex;align-items:center;
+  gap:var(--sp-lg);padding:0 clamp(var(--sp-md),4vw,var(--sp-2xl));color:#fff;}
+.nav__logo{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:700;}
+.nav__logo-icon{width:32px;height:32px;background:rgba(255,255,255,.2);border-radius:50%;
+  display:grid;place-items:center;font-size:14px;font-weight:700;flex-shrink:0;}
+.nav__right{margin-left:auto;display:flex;align-items:center;gap:var(--sp-sm);}
+.nav__user{font-size:12px;opacity:.88;}
+.nav__avatar{width:36px;height:36px;border-radius:var(--r-full);
+  background:rgba(255,255,255,.22);color:#fff;display:grid;place-items:center;font-weight:600;font-size:13px;}
+
+/* ═══ LAYOUT ═══ */
+.shell{display:flex;margin-top:var(--nav-h);min-height:calc(100vh - var(--nav-h));}
+.sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--surface-white);
+  border-right:1px solid var(--border);padding:var(--sp-md) 0;
+  position:sticky;top:var(--nav-h);height:calc(100vh - var(--nav-h));overflow-y:auto;}
+.sidebar__org{padding:var(--sp-sm) var(--sp-md) var(--sp-md);border-bottom:1px solid var(--divider);margin-bottom:var(--sp-xs);}
+.sidebar__av{width:32px;height:32px;border-radius:50%;background:var(--brand-blue);color:#fff;
+  display:grid;place-items:center;font-weight:600;font-size:13px;margin-bottom:var(--sp-xs);}
+.sidebar__name{font-weight:600;font-size:13px;color:var(--title);}
+.sidebar__sub{font-size:11px;color:var(--text-regular);margin-top:2px;}
+.nav-item{display:flex;align-items:center;gap:var(--sp-xs);padding:var(--sp-xs) var(--sp-md);
+  font-size:13px;color:var(--text-regular);width:100%;text-align:left;transition:background .15s,color .15s;}
+.nav-item:hover{background:var(--brand-blue-tint);color:var(--brand-blue);}
+.nav-item.active{background:var(--brand-blue-tint);color:var(--brand-blue);font-weight:600;}
+.nav-item__icon{width:18px;text-align:center;flex-shrink:0;}
+
+.content{flex:1;min-width:0;padding:var(--sp-xl);
+  transition:margin-right .3s cubic-bezier(.4,0,.2,1);}
+.content.panel-open{margin-right:var(--panel-w);}
+
+/* ═══ BUZZ PAGE ═══ */
+.page-tabs{display:flex;gap:4px;margin-bottom:var(--sp-md);}
+.ptab{padding:6px var(--sp-md);border-radius:var(--r-md);font-size:13px;font-weight:500;
+  color:var(--text-regular);transition:all .15s;}
+.ptab.active{background:var(--brand-blue);color:#fff;}
+.ptab:not(.active):hover{background:var(--divider);}
+.bdot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--brand-blue);margin-left:4px;vertical-align:2px;}
+
+.filter-bar{display:flex;align-items:center;gap:var(--sp-xs);flex-wrap:wrap;
+  padding:var(--sp-sm) var(--sp-md);background:var(--surface-white);
+  border:1px solid var(--border);border-radius:var(--r-md);margin-bottom:var(--sp-xs);}
+.fb{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;
+  border-radius:var(--r-tag);font-size:12px;font-weight:500;border:1px solid var(--border);
+  background:var(--surface-white);color:var(--text-primary);cursor:pointer;transition:all .15s;}
+.fb:hover,.fb.active{border-color:var(--brand-blue);color:var(--brand-blue);background:var(--brand-blue-tint);}
+.fb.purple{background:#F0F0FF;border-color:#C4B5FD;color:#6D28D9;}
+.fb.watch{background:#FFF8E7;border-color:#F59E0B;color:#B45309;}
+.fdiv{width:1px;height:20px;background:var(--border);}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;
+  border-radius:var(--r-tag);font-size:11px;background:var(--brand-blue-tint);color:var(--brand-blue);border:1px solid #B3DEFF;}
+
+.sort-row{display:flex;align-items:center;gap:var(--sp-md);margin-bottom:var(--sp-md);}
+.sort-lbl{font-size:12px;color:var(--text-regular);}
+.sort-btn{font-size:12px;color:var(--text-regular);padding:3px 8px;border-radius:var(--r-sm);transition:all .15s;}
+.sort-btn.active{color:var(--brand-blue);font-weight:600;}
+
+/* ═══ CREATIVE GRID ═══ */
+.creative-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:var(--sp-md);}
+.cc{background:var(--surface-white);border-radius:var(--r-card);border:1.5px solid var(--border);
+  overflow:hidden;transition:box-shadow .2s,border-color .2s;cursor:pointer;position:relative;}
+.cc:hover{box-shadow:var(--shadow-float);border-color:var(--brand-blue);}
+.cc.selectable:hover .cc-sel-hint{opacity:1;}
+.cc-sel-hint{position:absolute;top:var(--sp-xs);right:var(--sp-xs);
+  background:var(--brand-blue);color:#fff;font-size:10px;font-weight:600;
+  padding:2px 8px;border-radius:var(--r-tag);opacity:0;transition:opacity .2s;pointer-events:none;z-index:2;}
+.cc__badge{padding:5px var(--sp-sm);font-size:11px;font-weight:700;color:#fff;
+  display:flex;align-items:center;justify-content:space-between;}
+.b25{background:#22C55E;} .b10{background:#F59E0B;}
+.cc__head{padding:var(--sp-xs) var(--sp-sm);display:flex;align-items:center;gap:var(--sp-xs);}
+.pav{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff;}
+.pav-yr{background:#1A7A3B;} .pav-md{background:#0066B3;}
+.cc__name{font-size:12px;font-weight:600;color:var(--title);}
+.cc__date{font-size:11px;color:var(--text-regular);}
+.cc__tags{display:flex;flex-wrap:wrap;gap:4px;padding:0 var(--sp-sm) var(--sp-xs);}
+.ctag{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:var(--r-tag);font-size:10px;font-weight:600;}
+.ctag-of{background:#EFF6FF;color:#1D4ED8;}
+.ctag-bo{background:#FFF7ED;color:#C2410C;}
+.ctag-br{background:#F0FDF4;color:#166534;}
+.cc__img{width:100%;aspect-ratio:1/1;position:relative;overflow:hidden;}
+.cc__cap{font-size:11px;color:var(--text-primary);line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+  padding:var(--sp-xs) var(--sp-sm);}
+.show-more{font-size:11px;color:var(--brand-blue);cursor:pointer;padding:0 var(--sp-sm) var(--sp-xs);}
+.cc__stats{display:flex;gap:var(--sp-sm);padding:var(--sp-xs) var(--sp-sm);
+  border-top:1px solid var(--divider);flex-wrap:wrap;}
+.stat{font-size:11px;color:var(--text-regular);}
+
+/* poster mocks */
+.pm{width:100%;height:100%;position:relative;display:flex;align-items:flex-start;justify-content:center;padding:16px;}
+.pm-bg{position:absolute;inset:0;}
+.pm-content{position:relative;z-index:1;text-align:center;}
+
+/* ═══ AI FLOAT BUTTON ═══ */
+.ai-fab{position:fixed;bottom:var(--sp-2xl);right:var(--sp-2xl);z-index:500;
+  width:56px;height:56px;border-radius:16px;
+  background:var(--brand-blue);color:#fff;
+  display:grid;place-items:center;box-shadow:0 4px 20px rgba(35,169,246,.45);
+  cursor:pointer;border:3px solid #fff;transition:transform .2s,box-shadow .2s,opacity .3s;}
+.ai-fab:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(35,169,246,.55);}
+.ai-fab.hidden{opacity:0;pointer-events:none;}
+.fab-pulse{position:absolute;inset:-6px;border-radius:20px;
+  border:2px solid rgba(35,169,246,.35);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.7;}50%{transform:scale(1.18);opacity:0;}}
+
+/* ═══ AI PANEL ═══ */
+.ai-panel{position:fixed;right:0;top:var(--nav-h);bottom:0;
+  width:var(--panel-w);background:var(--surface-white);
+  border-left:1px solid var(--border);display:flex;flex-direction:column;z-index:450;
+  box-shadow:-4px 0 24px rgba(0,0,0,.08);
+  transform:translateX(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);}
+.ai-panel.open{transform:translateX(0);}
+
+.panel-head{padding:var(--sp-md) var(--sp-lg);border-bottom:1px solid var(--divider);
+  display:flex;align-items:center;gap:var(--sp-sm);flex-shrink:0;}
+.panel-head__icon{width:30px;height:30px;border-radius:var(--r-md);
+  background:linear-gradient(135deg,#F97316,#FBBF24);display:grid;place-items:center;
+  color:#fff;font-size:15px;flex-shrink:0;}
+.panel-head__title{font-size:15px;font-weight:600;color:var(--title);flex:1;}
+.panel-head__close{width:28px;height:28px;border-radius:var(--r-sm);color:var(--text-regular);
+  display:grid;place-items:center;transition:background .15s;}
+.panel-head__close:hover{background:var(--surface-page);}
+
+/* chat area */
+.chat-body{flex:1;overflow-y:auto;padding:var(--sp-md) var(--sp-lg);
+  display:flex;flex-direction:column;gap:var(--sp-md);}
+
+/* empty / welcome */
+.chat-welcome{text-align:center;padding:var(--sp-xl) 0 var(--sp-md);}
+.chat-welcome__icon{font-size:40px;margin-bottom:var(--sp-sm);}
+.chat-welcome__title{font-size:15px;font-weight:600;color:var(--title);margin-bottom:var(--sp-xs);}
+.chat-welcome__sub{font-size:12px;color:var(--text-regular);line-height:1.7;max-width:30ch;margin:0 auto;}
+.chat-tip{background:var(--surface-ai);border:1px solid #DBE6FF;border-radius:var(--r-md);padding:var(--sp-md);}
+.chat-tip__title{font-size:12px;font-weight:600;color:var(--brand-blue);margin-bottom:var(--sp-xs);}
+.chat-tip__list{font-size:11px;color:var(--text-regular);line-height:1.8;}
+
+/* brand card */
+.brand-mini{background:var(--surface-white);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-sm);}
+.brand-mini__name{font-size:12px;font-weight:600;color:var(--title);}
+.brand-mini__sub{font-size:11px;color:var(--text-regular);margin-top:2px;}
+.brand-mini__tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:var(--sp-xs);}
+.btag{font-size:10px;padding:2px 6px;border-radius:var(--r-tag);background:#F0FDF4;color:#166534;}
+
+/* chat messages */
+.msg{display:flex;flex-direction:column;gap:4px;}
+.msg--user{align-items:flex-end;}
+.msg--ai{align-items:flex-start;}
+.msg__bubble{max-width:88%;padding:var(--sp-xs) var(--sp-sm);border-radius:var(--r-md);font-size:13px;line-height:1.55;}
+.msg--user .msg__bubble{background:var(--brand-blue);color:#fff;border-radius:var(--r-md) 2px var(--r-md) var(--r-md);}
+.msg--ai .msg__bubble{background:var(--surface-ai);border:1px solid #DBE6FF;color:var(--text-primary);border-radius:2px var(--r-md) var(--r-md) var(--r-md);}
+.msg__time{font-size:10px;color:var(--text-placeholder);}
+.msg__refs{display:flex;gap:var(--sp-xs);margin-bottom:4px;}
+.msg-ref-thumb{width:48px;height:48px;border-radius:var(--r-md);overflow:hidden;border:1.5px solid rgba(255,255,255,.4);}
+
+/* generation plan */
+.gen-plan{border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;font-size:13px;}
+.gen-plan__head{display:flex;align-items:center;justify-content:space-between;
+  padding:var(--sp-xs) var(--sp-sm);background:var(--surface-page);border-bottom:1px solid var(--divider);}
+.gen-plan__head-title{font-size:12px;font-weight:600;}
+.badge-conf{background:var(--success-light);color:#166534;padding:2px 8px;border-radius:var(--r-tag);font-size:10px;font-weight:600;}
+.gen-plan__body{padding:var(--sp-sm);}
+.gen-plan__item-name{font-size:12px;font-weight:600;color:var(--title);display:flex;align-items:center;gap:6px;margin-bottom:var(--sp-xs);}
+.gen-meta{display:flex;align-items:center;gap:var(--sp-xs);flex-wrap:wrap;}
+.gmb{display:inline-flex;align-items:center;gap:4px;font-size:11px;
+  padding:2px 8px;border-radius:var(--r-sm);background:var(--surface-page);
+  border:1px solid var(--border);color:var(--text-regular);}
+.gen-plan__refs{display:flex;gap:4px;margin-top:var(--sp-xs);}
+.grt{width:34px;height:34px;border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--border);}
+.status-row{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--success);}
+.spinner{width:14px;height:14px;border:2px solid var(--success-light);border-top-color:var(--success);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── GENERATED POST (full copy + image combined) ── */
+.gen-post{border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;background:var(--surface-white);}
+.gen-post__header{display:flex;align-items:center;gap:var(--sp-xs);padding:var(--sp-sm);}
+.gen-post__av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#0d3320,#1a6640);
+  display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
+.gen-post__brand{font-size:13px;font-weight:600;color:var(--title);}
+.gen-post__meta{font-size:11px;color:var(--text-regular);}
+.gen-post__copy{padding:0 var(--sp-sm) var(--sp-sm);font-size:12px;line-height:1.65;color:var(--text-primary);}
+.gen-post__copy .highlight{color:var(--brand-blue);}
+.gen-post__img-wrap{position:relative;overflow:hidden;cursor:pointer;}
+.gen-post__img-wrap:hover .gen-post__img-hover{opacity:1;}
+.gen-post__img{width:100%;aspect-ratio:1/1;background:linear-gradient(160deg,#0a2218,#134526);position:relative;overflow:hidden;}
+.gen-post__img-hover{position:absolute;inset:0;background:rgba(10,31,44,.55);
+  display:flex;align-items:center;justify-content:center;gap:var(--sp-sm);
+  opacity:0;transition:opacity .2s;}
+.gen-img-btn{display:inline-flex;align-items:center;gap:4px;padding:7px 14px;
+  border-radius:var(--r-full);font-size:12px;font-weight:600;
+  border:1px solid rgba(255,255,255,.8);color:#fff;background:rgba(255,255,255,.12);
+  backdrop-filter:blur(4px);transition:all .15s;cursor:pointer;}
+.gen-img-btn:hover{background:rgba(255,255,255,.28);}
+.gen-img-btn.primary{background:var(--brand-blue);border-color:var(--brand-blue);}
+.gen-post__img-label{padding:var(--sp-xs) var(--sp-sm);background:var(--surface-page);
+  font-size:11px;color:var(--text-regular);display:flex;align-items:center;gap:4px;border-top:1px solid var(--divider);}
+.gen-post__actions{display:flex;gap:var(--sp-xs);padding:var(--sp-xs) var(--sp-sm) var(--sp-sm);flex-wrap:wrap;}
+
+/* ai typing */
+.typing{display:flex;align-items:center;gap:4px;padding:var(--sp-xs) var(--sp-sm);}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--brand-blue);opacity:.4;animation:blink 1.2s infinite;}
+.typing span:nth-child(2){animation-delay:.2s;}
+.typing span:nth-child(3){animation-delay:.4s;}
+@keyframes blink{0%,80%,100%{opacity:.4;}40%{opacity:1;}}
+
+/* ═══ INPUT FOOT ═══ */
+.panel-foot{padding:var(--sp-sm) var(--sp-lg) var(--sp-md);border-top:1px solid var(--divider);flex-shrink:0;}
+
+/* reference chips above input */
+.ref-strip{display:flex;gap:var(--sp-xs);flex-wrap:wrap;margin-bottom:var(--sp-xs);}
+.ref-chip{display:inline-flex;align-items:center;gap:5px;
+  padding:3px 8px 3px 4px;border-radius:var(--r-tag);
+  background:var(--brand-blue-tint);border:1px solid #B3DEFF;font-size:11px;color:var(--brand-blue);}
+.ref-chip__thumb{width:20px;height:20px;border-radius:4px;overflow:hidden;flex-shrink:0;}
+.ref-chip__x{width:14px;height:14px;border-radius:50%;background:rgba(35,169,246,.2);
+  display:grid;place-items:center;cursor:pointer;font-size:9px;margin-left:2px;}
+.ref-chip__x:hover{background:rgba(35,169,246,.4);}
+.img-chip{display:inline-flex;align-items:center;gap:5px;
+  padding:3px 8px 3px 4px;border-radius:var(--r-tag);
+  background:#FFF7F0;border:1px solid #FED7AA;font-size:11px;color:#C2410C;}
+
+.prompt-wrap{border:1.5px solid var(--border);border-radius:var(--r-md);overflow:hidden;
+  transition:border-color .15s;}
+.prompt-wrap.focused{border-color:var(--brand-blue);}
+.prompt-wrap.has-text{border-color:var(--ai-orange);}
+.prompt-ta{width:100%;padding:var(--sp-sm);font-family:inherit;font-size:13px;
+  color:var(--text-primary);background:var(--surface-white);border:none;resize:none;
+  min-height:68px;outline:none;line-height:1.55;}
+.prompt-ta::placeholder{color:var(--text-placeholder);}
+
+/* mention/upload auto-suggest */
+.mention-dropdown{position:absolute;bottom:calc(100% + 6px);left:0;right:0;
+  background:var(--surface-white);border:1px solid var(--border);
+  border-radius:var(--r-md);box-shadow:var(--shadow-float);overflow:hidden;z-index:20;}
+.mention-item{display:flex;align-items:center;gap:var(--sp-sm);padding:var(--sp-sm) var(--sp-md);cursor:pointer;transition:background .12s;}
+.mention-item:hover,.mention-item.active{background:var(--brand-blue-tint);}
+.mention-item__icon{width:30px;height:30px;border-radius:var(--r-md);display:grid;place-items:center;font-size:15px;background:var(--surface-page);flex-shrink:0;}
+.mention-item__name{font-size:13px;font-weight:600;color:var(--title);}
+.mention-item__sub{font-size:11px;color:var(--text-regular);}
+
+.prompt-bar{display:flex;align-items:center;gap:var(--sp-xs);padding:var(--sp-xs) var(--sp-sm);
+  background:var(--surface-page);border-top:1px solid var(--divider);}
+.pbar-btn{width:28px;height:28px;border-radius:var(--r-md);display:grid;place-items:center;
+  color:var(--text-regular);transition:background .15s,color .15s;flex-shrink:0;}
+.pbar-btn:hover{background:var(--divider);color:var(--title);}
+.pbar-btn.plus{background:var(--brand-blue-tint);color:var(--brand-blue);border:1px solid #B3DEFF;}
+.pbar-btn.plus:hover{background:var(--brand-blue);color:#fff;}
+
+/* agent selector */
+.agent-sel{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;
+  border-radius:var(--r-md);font-size:12px;font-weight:500;
+  background:var(--surface-white);border:1px solid var(--border);color:var(--text-primary);
+  cursor:pointer;transition:all .15s;position:relative;}
+.agent-sel:hover,.agent-sel.open{border-color:var(--ai-orange);color:var(--ai-orange);}
+.agent-dd{position:fixed;
+  background:var(--surface-white);border:1px solid var(--border);
+  border-radius:var(--r-md);box-shadow:var(--shadow-float);overflow:hidden;
+  min-width:220px;z-index:460;}
+.agent-opt{display:flex;align-items:center;gap:var(--sp-sm);padding:var(--sp-sm) var(--sp-md);cursor:pointer;transition:background .12s;}
+.agent-opt:hover{background:var(--brand-blue-tint);}
+.agent-opt.sel{background:var(--ai-orange-lt);}
+.agent-opt__av{width:32px;height:32px;border-radius:var(--r-md);display:grid;place-items:center;font-size:16px;flex-shrink:0;}
+.agent-opt__name{font-size:12px;font-weight:600;color:var(--title);}
+.agent-opt__sub{font-size:11px;color:var(--text-regular);}
+
+/* platform selector */
+.platform-sel{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;
+  border-radius:var(--r-md);font-size:12px;font-weight:500;
+  background:var(--surface-white);border:1px solid var(--border);color:var(--text-primary);
+  cursor:pointer;transition:all .15s;position:relative;white-space:nowrap;}
+.platform-sel:hover,.platform-sel.open{border-color:var(--brand-blue);color:var(--brand-blue);}
+.platform-dd{position:fixed;
+  background:var(--surface-white);border:1px solid var(--border);
+  border-radius:var(--r-md);box-shadow:var(--shadow-float);overflow:hidden;
+  min-width:230px;z-index:460;max-height:320px;overflow-y:auto;}
+.plat-group-label{font-size:10px;font-weight:700;color:var(--text-placeholder);
+  text-transform:uppercase;letter-spacing:.5px;padding:var(--sp-xs) var(--sp-md) 2px;
+  background:var(--surface-page);}
+.plat-opt{display:flex;align-items:center;justify-content:space-between;
+  padding:8px var(--sp-md);cursor:pointer;transition:background .12s;gap:var(--sp-md);}
+.plat-opt:hover{background:var(--brand-blue-tint);}
+.plat-opt.sel{background:#EFF6FF;}
+.plat-opt__name{font-size:12px;font-weight:500;color:var(--title);}
+.plat-opt.sel .plat-opt__name{color:var(--brand-blue);font-weight:600;}
+.plat-ratio{font-size:10px;color:var(--text-regular);background:var(--surface-page);
+  border:1px solid var(--border);padding:1px 6px;border-radius:3px;flex-shrink:0;}
+.plat-opt.sel .plat-ratio{background:var(--brand-blue-tint);border-color:#B3DEFF;color:var(--brand-blue);}
+.platform-badge{font-size:10px;color:var(--text-regular);margin-left:3px;opacity:.7;}
+.hidden{display:none!important;}
+
+.char-ct{font-size:10px;color:var(--text-placeholder);margin-left:auto;}
+.send-btn{width:30px;height:30px;border-radius:50%;background:var(--text-placeholder);
+  color:#fff;display:grid;place-items:center;transition:background .15s;flex-shrink:0;}
+.send-btn.ready{background:var(--ai-orange);}
+.send-btn.ready:hover{background:#ea6c0a;}
+
+/* ═══ ADD REFERENCE MODAL ═══ */
+.picker-overlay{position:fixed;inset:0;background:var(--overlay);z-index:600;
+  display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s;}
+.picker-overlay.open{opacity:1;pointer-events:auto;}
+.picker-sheet{background:var(--surface-white);border-radius:var(--r-card) var(--r-card) 0 0;
+  width:100%;display:flex;flex-direction:column;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}
+.picker-overlay.open .picker-sheet{transform:translateY(0);}
+.picker-head{padding:var(--sp-md) var(--sp-lg);border-bottom:1px solid var(--divider);
+  display:flex;align-items:center;gap:var(--sp-md);}
+.picker-head__title{font-size:15px;font-weight:600;color:var(--title);flex:1;}
+.picker-head__close{width:28px;height:28px;border-radius:var(--r-sm);color:var(--text-regular);
+  display:grid;place-items:center;transition:background .15s;}
+.picker-head__close:hover{background:var(--surface-page);}
+
+/* reference slot cards */
+.ref-slots{display:flex;flex-direction:column;gap:var(--sp-sm);padding:var(--sp-lg);}
+.ref-slot{display:flex;align-items:center;gap:var(--sp-md);
+  border:1.5px dashed var(--border);border-radius:var(--r-card);
+  padding:var(--sp-md) var(--sp-lg);cursor:pointer;
+  background:var(--surface-white);transition:all .18s;min-height:80px;}
+.ref-slot:hover{border-color:var(--brand-blue);background:var(--brand-blue-tint);}
+.ref-slot.filled{border-style:solid;border-color:var(--brand-blue);background:var(--brand-blue-subtle);}
+.ref-slot__icon{width:44px;height:44px;border-radius:var(--r-md);
+  background:var(--surface-page);border:1px solid var(--border);
+  display:grid;place-items:center;flex-shrink:0;transition:background .18s;}
+.ref-slot:hover .ref-slot__icon{background:rgba(35,169,246,.1);border-color:var(--brand-blue);}
+.ref-slot.filled .ref-slot__icon{background:var(--brand-blue);border-color:var(--brand-blue);}
+.ref-slot__body{flex:1;}
+.ref-slot__title{font-size:13px;font-weight:600;color:var(--title);}
+.ref-slot__sub{font-size:11px;color:var(--text-regular);margin-top:2px;}
+.ref-slot.filled .ref-slot__title{color:var(--brand-blue);}
+.ref-slot__arrow{color:var(--text-placeholder);transition:color .15s;}
+.ref-slot:hover .ref-slot__arrow{color:var(--brand-blue);}
+.ref-slot.filled .ref-slot__arrow{color:var(--brand-blue);}
+
+/* post selection mode banner */
+.select-mode-bar{position:fixed;top:var(--nav-h);left:0;right:0;z-index:550;
+  background:var(--brand-blue);color:#fff;padding:var(--sp-sm) var(--sp-xl);
+  display:flex;align-items:center;gap:var(--sp-md);font-size:13px;
+  transform:translateY(-100%);transition:transform .25s;}
+.select-mode-bar.active{transform:translateY(0);}
+.select-mode-bar__done{background:#fff;color:var(--brand-blue);padding:5px 16px;
+  border-radius:var(--r-tag);font-size:12px;font-weight:700;margin-left:auto;cursor:pointer;}
+/* buzz cards selectable glow */
+.cc.select-mode{cursor:crosshair;}
+.cc.select-mode:hover{border-color:var(--brand-blue);box-shadow:0 0 0 3px rgba(35,169,246,.18);}
+.cc.buzz-selected{border:2px solid var(--brand-blue);box-shadow:0 0 0 3px rgba(35,169,246,.18);}
+.cc.buzz-selected .cc-sel-badge{display:flex;}
+.cc-sel-badge{display:none;position:absolute;top:var(--sp-xs);right:var(--sp-xs);
+  width:22px;height:22px;border-radius:50%;background:var(--brand-blue);
+  align-items:center;justify-content:center;z-index:2;}
+
+/* ═══ BUTTONS ═══ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-xs);
+  font-size:13px;font-weight:500;padding:var(--sp-xs) var(--sp-md);border-radius:var(--r-md);
+  border:1px solid transparent;transition:all .15s;cursor:pointer;}
+.btn-pri{background:var(--brand-blue);color:#fff;border-color:var(--brand-blue);}
+.btn-pri:hover{background:#1b9bea;}
+.btn-out{background:var(--surface-white);color:var(--brand-blue);border-color:var(--brand-blue);}
+.btn-out:hover{background:var(--brand-blue-tint);}
+.btn-sec{background:var(--surface-white);color:var(--text-regular);border-color:var(--border);}
+.btn-sec:hover{background:var(--surface-page);}
+.btn-org{background:var(--ai-orange);color:#fff;border-color:var(--ai-orange);}
+.btn-org:hover{background:#ea6c0a;}
+
+/* ═══ AI GENERATOR PAGE ═══ */
+#gen-page{display:none;position:fixed;inset:0;background:var(--surface-page);z-index:700;}
+#gen-page.on{display:block;}
+.gp-nav{height:var(--nav-h);background:var(--brand-blue);display:flex;align-items:center;
+  gap:var(--sp-md);padding:0 var(--sp-2xl);color:#fff;position:sticky;top:0;z-index:10;}
+.gp-nav__back{display:flex;align-items:center;gap:5px;font-size:14px;font-weight:500;opacity:.85;cursor:pointer;transition:opacity .15s;}
+.gp-nav__back:hover{opacity:1;}
+.gp-layout{display:grid;grid-template-columns:210px 1fr 272px;height:calc(100vh - var(--nav-h));overflow:hidden;}
+
+/* Left nav */
+.gp-leftnav{background:var(--surface-white);border-right:1px solid var(--border);overflow-y:auto;padding:var(--sp-sm) 0;display:flex;flex-direction:column;}
+.gp-nav-group{padding:var(--sp-sm) 0;}
+.gp-nav-group + .gp-nav-group{border-top:1px solid var(--divider);margin-top:4px;padding-top:var(--sp-sm);}
+.gp-nav-label{font-size:10px;font-weight:700;color:var(--text-regular);letter-spacing:.6px;text-transform:uppercase;padding:2px var(--sp-md) var(--sp-xs);}
+.gp-navitem{display:flex;align-items:center;gap:10px;padding:9px var(--sp-md);cursor:pointer;transition:background .15s;border-left:3px solid transparent;position:relative;}
+.gp-navitem:hover{background:var(--surface-page);}
+.gp-navitem.active{background:var(--brand-blue-tint);border-left-color:var(--brand-blue);}
+.gp-navitem__icon{width:30px;height:30px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.gp-navitem__info{flex:1;min-width:0;}
+.gp-navitem__label{font-size:12px;font-weight:600;color:var(--text-primary);line-height:1.2;}
+.gp-navitem.active .gp-navitem__label{color:var(--brand-blue);}
+.gp-navitem__sub{font-size:10px;color:var(--text-regular);margin-top:2px;}
+.gp-navitem__count{background:var(--brand-blue);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;flex-shrink:0;min-width:20px;text-align:center;}
+.gp-dest-row{display:flex;align-items:center;gap:7px;padding:7px var(--sp-md);font-size:11px;color:var(--text-regular);}
+.gp-dest-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* Center main */
+.gp-main{overflow-y:auto;padding:var(--sp-xl);background:var(--surface-page);}
+.gp-main-pane{display:none;}
+.gp-main-pane.active{display:block;}
+.gp-pane-head{display:flex;align-items:flex-start;gap:var(--sp-md);margin-bottom:var(--sp-lg);}
+.gp-pane-title{font-size:16px;font-weight:700;color:var(--title);}
+.gp-pane-sub{font-size:12px;color:var(--text-regular);margin-top:3px;}
+.gen-canvas{background:var(--surface-white);border:1px solid var(--border);border-radius:var(--r-card);overflow:hidden;margin-bottom:var(--sp-md);}
+.gen-canvas:last-child{margin-bottom:0;}
+.gen-canvas__label{display:flex;align-items:center;gap:var(--sp-xs);padding:var(--sp-sm) var(--sp-md);border-bottom:1px solid var(--divider);font-size:12px;font-weight:600;color:var(--text-primary);}
+.gen-toolbar{display:flex;align-items:center;gap:var(--sp-xs);padding:var(--sp-sm) var(--sp-md);border-bottom:1px solid var(--divider);flex-wrap:wrap;}
+.tbtn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:var(--r-sm);font-size:12px;border:1px solid var(--border);background:var(--surface-white);color:var(--text-regular);cursor:pointer;transition:all .15s;}
+.tbtn:hover,.tbtn.active{border-color:var(--brand-blue);color:var(--brand-blue);background:var(--brand-blue-tint);}
+.gen-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:var(--sp-md);padding:var(--sp-md);}
+.gi{border-radius:var(--r-md);overflow:hidden;border:1.5px solid var(--border);cursor:pointer;transition:all .2s;}
+.gi:hover{box-shadow:var(--shadow-float);border-color:var(--brand-blue);}
+.gi.sel{border-color:var(--brand-blue);border-width:2px;}
+.gi__img{aspect-ratio:1/1;overflow:hidden;}
+.gi__foot{padding:6px 8px;background:var(--surface-page);font-size:10px;color:var(--text-regular);display:flex;gap:4px;align-items:center;}
+.score{background:#FFF3E0;color:#E65100;padding:1px 5px;border-radius:3px;font-weight:700;font-size:10px;}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:var(--sp-md);padding:var(--sp-md);}
+.vi{border-radius:var(--r-md);overflow:hidden;border:1px solid var(--border);}
+.vi__thumb{aspect-ratio:9/16;background:linear-gradient(160deg,#1e2d4a,#0d1c33);display:flex;align-items:center;justify-content:center;position:relative;}
+.play{width:40px;height:40px;background:rgba(255,255,255,.18);border-radius:50%;display:grid;place-items:center;backdrop-filter:blur(4px);}
+.vdur{position:absolute;bottom:6px;right:8px;background:rgba(0,0,0,.6);color:#fff;font-size:10px;padding:2px 5px;border-radius:3px;}
+
+/* Ad Creative pane */
+.adc-list{display:flex;flex-direction:column;gap:var(--sp-md);}
+.adc-card{background:var(--surface-white);border:1px solid var(--border);border-radius:var(--r-card);overflow:hidden;}
+.adc-card__top{display:flex;}
+.adc-card__img{width:180px;flex-shrink:0;position:relative;}
+.adc-card__fields{flex:1;padding:var(--sp-md);display:flex;flex-direction:column;gap:var(--sp-sm);}
+.adc-field__label{font-size:10px;font-weight:700;color:var(--text-regular);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;}
+.adc-field__val{font-size:12px;color:var(--text-primary);background:var(--surface-page);border:1px dashed var(--border);border-radius:var(--r-sm);padding:5px 8px;line-height:1.5;cursor:text;}
+.adc-field__val:focus{outline:none;border-color:var(--brand-blue);border-style:solid;background:#fff;}
+.adc-cta-row{display:flex;gap:6px;flex-wrap:wrap;}
+.adc-cta-chip{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--brand-blue);color:#fff;cursor:pointer;}
+.adc-cta-chip.alt{background:var(--surface-page);color:var(--text-regular);border:1px solid var(--border);}
+.adc-score-pill{font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;}
+.adc-card__foot{display:flex;gap:var(--sp-xs);padding:var(--sp-sm) var(--sp-md);border-top:1px solid var(--divider);background:var(--surface-page);align-items:center;}
+
+/* AI Post pane */
+.post-fmt-bar{display:flex;gap:4px;margin-bottom:var(--sp-md);}
+.post-fmt-btn{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--border);background:var(--surface-white);color:var(--text-regular);cursor:pointer;transition:all .15s;}
+.post-fmt-btn.active{background:var(--brand-blue);color:#fff;border-color:var(--brand-blue);}
+.post-list{display:flex;flex-direction:column;gap:var(--sp-md);}
+.post-card{background:var(--surface-white);border:1px solid var(--border);border-radius:var(--r-card);overflow:hidden;}
+.post-card__header{display:flex;align-items:center;gap:var(--sp-sm);padding:var(--sp-sm) var(--sp-md);}
+.post-card__av{width:32px;height:32px;border-radius:50%;background:var(--brand-blue);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;}
+.post-card__brand{font-size:12px;font-weight:600;color:var(--title);}
+.post-card__meta{font-size:10px;color:var(--text-regular);}
+.post-card__copy{font-size:12px;color:var(--text-primary);line-height:1.7;padding:0 var(--sp-md) var(--sp-sm);}
+.post-card__foot{display:flex;align-items:center;gap:var(--sp-sm);padding:var(--sp-xs) var(--sp-md);background:var(--surface-page);font-size:10px;color:var(--text-regular);border-top:1px solid var(--divider);}
+.post-card__actions{display:flex;gap:var(--sp-xs);padding:var(--sp-xs) var(--sp-md) var(--sp-sm);border-top:1px solid var(--divider);}
+
+/* sidebar */
+.gp-sidebar{background:var(--surface-white);border-left:1px solid var(--border);overflow-y:auto;padding:var(--sp-md);display:flex;flex-direction:column;gap:var(--sp-md);}
+.gp-card{background:var(--surface-white);border:1px solid var(--border);border-radius:var(--r-card);padding:var(--sp-md);}
+.gp-card__title{font-size:13px;font-weight:600;color:var(--title);margin-bottom:var(--sp-sm);}
+.gp-ref{display:flex;gap:var(--sp-xs);align-items:center;}
+.gp-ref-img{width:72px;height:72px;border-radius:var(--r-md);overflow:hidden;border:2px solid var(--brand-blue);flex-shrink:0;}
+.gp-ref-info{font-size:11px;color:var(--text-regular);}
+.gp-ref-brand{font-size:12px;font-weight:600;color:var(--title);}
+.prompt-box{border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-sm);font-size:12px;color:var(--text-primary);background:var(--surface-ai);line-height:1.6;}
+.gp-actions{display:flex;flex-direction:column;gap:var(--sp-xs);}
+.gp-actions .btn{width:100%;justify-content:center;font-size:13px;}
+.cscore{background:#E0F2FE;color:#0369A1;padding:2px 7px;border-radius:var(--r-sm);font-size:10px;font-weight:600;}
+.iscore{background:#FFF3E0;color:#E65100;padding:2px 7px;border-radius:var(--r-sm);font-size:10px;font-weight:600;}
+.cstrip{display:flex;gap:var(--sp-sm);padding:var(--sp-md);overflow-x:auto;}
+.cframe{flex-shrink:0;width:150px;border-radius:var(--r-md);overflow:hidden;border:1px solid var(--border);}
+.cframe__img{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;padding:16px;}
+.cframe__num{padding:4px 8px;font-size:10px;text-align:center;color:var(--text-regular);background:var(--surface-page);}
+
+/* ── Creative Agent output: image/video grid only ── */
+.creative-out{border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;}
+.creative-out__grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--divider);}
+.creative-out__item{position:relative;cursor:pointer;overflow:hidden;}
+.creative-out__item:hover .gen-post__img-hover{opacity:1;}
+.creative-out__label{padding:6px var(--sp-sm);background:var(--surface-page);font-size:10px;color:var(--text-regular);display:flex;align-items:center;gap:4px;}
+.creative-out__actions{display:flex;gap:var(--sp-xs);padding:var(--sp-xs) var(--sp-sm) var(--sp-sm);flex-wrap:wrap;background:var(--surface-white);}
+
+/* ── Ad Creative Agent output: image + ad fields ── */
+.ad-creative-out{border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;background:var(--surface-white);}
+.ad-creative-out__img{position:relative;cursor:pointer;}
+.ad-creative-out__img:hover .gen-post__img-hover{opacity:1;}
+.ad-fields{padding:var(--sp-sm) var(--sp-md);display:flex;flex-direction:column;gap:var(--sp-xs);}
+.ad-field{display:flex;flex-direction:column;gap:3px;}
+.ad-field__label{font-size:10px;font-weight:600;color:var(--text-regular);text-transform:uppercase;letter-spacing:.4px;}
+.ad-field__val{font-size:12px;color:var(--text-primary);background:var(--surface-page);border:1px solid var(--border);border-radius:var(--r-sm);padding:5px 8px;line-height:1.5;}
+.ad-field__val.editable{border-style:dashed;cursor:text;}
+.ad-field__val.editable:focus{outline:none;border-color:var(--brand-blue);border-style:solid;background:#fff;}
+.ad-cta-row{display:flex;gap:var(--sp-xs);align-items:center;flex-wrap:wrap;}
+.ad-cta-chip{padding:4px 12px;border-radius:var(--r-tag);font-size:11px;font-weight:600;background:var(--brand-blue);color:#fff;cursor:pointer;}
+.ad-cta-chip.alt{background:var(--surface-page);color:var(--text-regular);border:1px solid var(--border);}
+.ad-creative-out__actions{display:flex;gap:var(--sp-xs);padding:var(--sp-xs) var(--sp-md) var(--sp-md);flex-wrap:wrap;border-top:1px solid var(--divider);}
+
+/* tip rows */
+.chat-tip__list{font-size:12px;color:var(--text-regular);display:flex;flex-direction:column;gap:6px;}
+.tip-row{display:flex;align-items:center;gap:8px;}
+.tip-key{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:20px;
+  padding:0 5px;border-radius:4px;font-size:11px;font-weight:700;
+  background:var(--surface-page);border:1px solid var(--border);color:var(--text-primary);flex-shrink:0;}
+
+/* setup prompt (onboarding) */
+.setup-prompt{display:flex;align-items:center;gap:var(--sp-sm);
+  padding:var(--sp-sm) var(--sp-md);border:1px dashed var(--border);border-radius:var(--r-md);
+  cursor:pointer;transition:border-color .15s,background .15s;}
+.setup-prompt:hover{border-color:var(--brand-blue);background:var(--brand-blue-tint);}
+.setup-prompt__dot{width:8px;height:8px;border-radius:50%;background:var(--warning);flex-shrink:0;}
+.setup-prompt__label{font-size:12px;color:var(--text-regular);}
+.setup-prompt__action{font-size:12px;font-weight:600;color:var(--brand-blue);}
+
+/* welcome (remove icon spacing) */
+.chat-welcome{text-align:center;padding:var(--sp-lg) 0 var(--sp-md);}
+.chat-welcome__title{font-size:15px;font-weight:600;color:var(--title);margin-bottom:var(--sp-xs);}
+.chat-welcome__sub{font-size:12px;color:var(--text-regular);line-height:1.7;max-width:32ch;margin:0 auto;}
+.chat-tip__title{font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:var(--sp-sm);}
+
+/* ── Left nav AI Generator module ── */
+.nav-section-label{font-size:10px;font-weight:700;color:var(--text-placeholder);
+  letter-spacing:.6px;text-transform:uppercase;padding:var(--sp-sm) var(--sp-md) 4px;
+  margin-top:var(--sp-xs);}
+.nav-ai-gen{border-top:1px solid var(--divider);margin-top:var(--sp-sm);padding-top:var(--sp-sm);}
+.nav-ai-gen__item{display:flex;align-items:center;gap:8px;padding:7px var(--sp-md);
+  font-size:12px;font-weight:500;color:var(--text-primary);cursor:pointer;
+  transition:background .15s;border-radius:0;}
+.nav-ai-gen__item:hover{background:var(--brand-blue-tint);color:var(--brand-blue);}
+.nav-ai-gen__icon{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;}
+.nav-ai-gen__count{margin-left:auto;font-size:10px;color:var(--text-placeholder);}
+.nav-ai-thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;
+  padding:4px var(--sp-md) var(--sp-sm);cursor:pointer;}
+.nav-ai-thumb{border-radius:4px;overflow:hidden;aspect-ratio:1/1;}
+.nav-ai-more{font-size:11px;color:var(--brand-blue);padding:0 var(--sp-md) var(--sp-sm);cursor:pointer;}
+.nav-ai-more:hover{text-decoration:underline;}
+
+/* ── Panel: state classes ── */
+.panel-head__title-wrap{display:flex;align-items:center;gap:6px;flex:1;min-width:0;}
+.panel-mode-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;flex-shrink:0;}
+
+/* ── Ad Advisor panel UI ── */
+#welcomeAdvisor{display:none;flex-direction:column;height:100%;}
+#welcomeAdvisor.visible{display:flex;}
+.aa-chart-mock{flex-shrink:0;height:200px;background:var(--surface-white);
+  border:1px solid var(--border);border-radius:var(--r-md);margin-bottom:var(--sp-md);
+  overflow:hidden;position:relative;}
+.aa-chart-mock__blur{width:100%;height:100%;display:flex;flex-direction:column;gap:12px;padding:20px;
+  filter:blur(6px);pointer-events:none;user-select:none;}
+.aa-chart-bar{height:10px;border-radius:5px;background:linear-gradient(90deg,#3B82F6,#8B5CF6);}
+.aa-chart-bar.red{background:linear-gradient(90deg,#F87171,#EF4444);}
+.aa-prompts{display:flex;flex-direction:column;gap:var(--sp-xs);margin-bottom:var(--sp-md);}
+.aa-prompt-card{display:flex;align-items:center;gap:var(--sp-sm);
+  background:var(--surface-page);border:1px solid var(--border);border-radius:var(--r-md);
+  padding:var(--sp-sm) var(--sp-md);cursor:pointer;transition:border-color .15s,background .15s;}
+.aa-prompt-card:hover{border-color:var(--brand-blue);background:var(--brand-blue-tint);}
+.aa-prompt-card__icon{width:30px;height:30px;border-radius:var(--r-sm);background:var(--surface-white);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.aa-prompt-card__text{font-size:12px;color:var(--text-primary);line-height:1.45;}
+
+/* Ad Advisor bottom bar */
+.aa-foot{border-top:1px solid var(--divider);padding:var(--sp-xs) var(--sp-sm);}
+.aa-ctx-chips{display:flex;gap:5px;flex-wrap:wrap;padding:6px 0 4px;}
+.aa-ctx-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;
+  background:var(--surface-page);border:1px solid var(--border);border-radius:var(--r-sm);
+  padding:3px 8px;color:var(--text-primary);}
+.aa-ctx-chip__x{color:var(--text-placeholder);cursor:pointer;font-size:10px;line-height:1;}
+.aa-ctx-chip__x:hover{color:var(--danger);}
+.aa-input-row{display:flex;align-items:center;gap:var(--sp-sm);padding:4px 0;}
+.aa-input-plus{width:28px;height:28px;border-radius:var(--r-md);background:var(--surface-page);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;cursor:pointer;color:var(--text-regular);}
+.aa-input-plus:hover{background:var(--brand-blue-tint);border-color:var(--brand-blue);color:var(--brand-blue);}
+.aa-input-field{flex:1;font-size:13px;color:var(--text-placeholder);background:none;caret-color:var(--brand-blue);}
+.aa-input-field:focus{outline:none;color:var(--text-primary);}
+.aa-send-btn{width:30px;height:30px;border-radius:50%;background:var(--text-placeholder);
+  color:#fff;display:grid;place-items:center;flex-shrink:0;transition:background .15s;}
+.aa-send-btn.ready{background:var(--ai-orange);}
+.aa-disclaimer{font-size:10px;color:var(--text-placeholder);text-align:center;padding:4px 0 2px;}
+
+/* ── Panel: blank (Auto) state ── */
+#welcomeBlank{display:none;flex:1;}
+#welcomeBlank.visible{display:block;}
+
+/* ── Panel head: dynamic title ── */
+.panel-state-img .panel-head__title{display:none;}
+</style>
+</head>
+<body>
+
+<!-- ═══ TOP NAV ═══ -->
+<nav class="nav">
+  <div class="nav__logo">
+    <div class="nav__logo-icon">M</div>
+    MEDIA<span style="font-weight:400;opacity:.9">LENS</span>
+  </div>
+  <div class="nav__right">
+    <span class="nav__user">PL – Hong Kong</span>
+    <div class="nav__avatar">JL</div>
+  </div>
+</nav>
+
+<!-- ═══ MAIN SHELL ═══ -->
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar__org">
+      <div class="sidebar__av">P</div>
+      <div class="sidebar__name">PL – Hong Kong</div>
+      <div class="sidebar__sub">Admin · Julie-Free-Connect 1 Page</div>
+    </div>
+    <button class="nav-item">Dashboard</button>
+    <button class="nav-item">My Pages</button>
+    <button class="nav-item">Competitor Analysis</button>
+    <button class="nav-item active">Buzz (Market Insights)</button>
+    <button class="nav-item">Leader Board</button>
+    <button class="nav-item">Social Listening</button>
+    <button class="nav-item">Social Pulses</button>
+    <button class="nav-item">Ad Manager</button>
+    <button class="nav-item">Ad Intelligence</button>
+    <button class="nav-item">Report Scheduler</button>
+    <button class="nav-item">AIGC</button>
+
+    <!-- AI Generator module -->
+    <div class="nav-ai-gen">
+      <div class="nav-section-label">AI Generator</div>
+      <div class="nav-ai-gen__item" onclick="openGenPage()">
+        <div class="nav-ai-gen__icon" style="background:#EFF6FF;">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x=".5" y=".5" width="4.5" height="4.5" rx="1" fill="#3B82F6"/><rect x="7" y=".5" width="4.5" height="4.5" rx="1" fill="#3B82F6" opacity=".5"/><rect x=".5" y="7" width="4.5" height="4.5" rx="1" fill="#3B82F6" opacity=".4"/><rect x="7" y="7" width="4.5" height="4.5" rx="1" fill="#3B82F6" opacity=".25"/></svg>
+        </div>
+        AI Assets
+        <span class="nav-ai-gen__count">7</span>
+      </div>
+      <div class="nav-ai-gen__item" onclick="openGenPage()">
+        <div class="nav-ai-gen__icon" style="background:#FFF7ED;">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x=".5" y="2" width="11" height="8" rx="1.5" stroke="#F97316" stroke-width="1.1"/><path d="M3 5.5h4M3 7.5h2.5" stroke="#F97316" stroke-width="1" stroke-linecap="round"/><rect x="8" y="4" width="2.5" height="4" rx=".8" fill="#F97316" opacity=".6"/></svg>
+        </div>
+        AI Ad Creative
+        <span class="nav-ai-gen__count">2</span>
+      </div>
+      <div class="nav-ai-gen__item" onclick="openGenPage()">
+        <div class="nav-ai-gen__icon" style="background:#F0FDF4;">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="1.5" stroke="#22C55E" stroke-width="1.1"/><path d="M3.5 4h5M3.5 6.5h3.5M3.5 9h2" stroke="#22C55E" stroke-width="1" stroke-linecap="round"/></svg>
+        </div>
+        AI Post
+        <span class="nav-ai-gen__count">1</span>
+      </div>
+      <!-- Recent thumbnails -->
+      <div class="nav-ai-thumbs" onclick="openGenPage()">
+        <div class="nav-ai-thumb" style="background:linear-gradient(135deg,#0a2218,#134526);"></div>
+        <div class="nav-ai-thumb" style="background:linear-gradient(135deg,#1a0533,#3b0f6e);"></div>
+        <div class="nav-ai-thumb" style="background:linear-gradient(135deg,#3a1a0a,#5a2a10);"></div>
+      </div>
+      <div class="nav-ai-more" onclick="openGenPage()">View all generated content →</div>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content" id="mainContent">
+
+    <div class="page-tabs">
+      <button class="ptab active">Posts</button>
+      <button class="ptab">Keywords</button>
+      <button class="ptab">Topics<span class="bdot"></span></button>
+      <button class="ptab">LIHKG</button>
+    </div>
+
+    <!-- Filter row 1 -->
+    <div class="filter-bar" style="margin-bottom:var(--sp-xs)">
+      <span style="font-size:12px;color:var(--text-regular);">What's Viral</span>
+      <button class="fb watch">My Watchlists
+        <span style="background:var(--brand-blue);color:#fff;font-size:10px;padding:1px 6px;border-radius:var(--r-tag);">Dr.Once – Hair</span>
+        ▾</button>
+    </div>
+
+    <!-- Filter row 2 -->
+    <div class="filter-bar" style="margin-bottom:var(--sp-xs)">
+      <button class="fb active">Top 25% Engagements ▾</button>
+      <button class="fb active">Last 28 days ▾</button>
+      <button class="fb">Chatbot</button>
+      <div class="fdiv"></div>
+      <button class="fb purple">Boosted ▾</button>
+      <button class="fb">Post Type ▾</button>
+      <button class="fb">AI category ▾</button>
+      <button class="fb">Keywords ▾</button>
+    </div>
+
+    <!-- Filter chips -->
+    <div class="filter-bar" style="margin-bottom:var(--sp-md)">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:var(--text-regular)"><path d="M2 4h10M4 7h6M6 10h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <span class="chip">Kérastase ✕</span>
+      <span class="chip">Aveda ✕</span>
+      <span class="chip">Apivita ✕</span>
+      <span class="chip">(+22 pages)... ✕</span>
+      <span class="chip" style="background:#F0F0FF;color:#6D28D9;border-color:#C4B5FD;">Boosted Post ✕</span>
+      <button class="btn btn-sec" style="margin-left:auto;font-size:12px;padding:3px 10px;">Clear All</button>
+      <button class="btn btn-pri" style="font-size:12px;padding:3px 10px;">Apply</button>
+    </div>
+
+    <!-- Sort row -->
+    <div class="sort-row">
+      <span class="sort-lbl">Sort By</span>
+      <button class="sort-btn active">Date</button>
+      <button class="sort-btn">Likes</button>
+      <button class="sort-btn">Views</button>
+      <button class="sort-btn">Comments</button>
+      <button class="sort-btn">Engagements</button>
+    </div>
+
+    <!-- Creative Grid -->
+    <div class="creative-grid">
+
+      <!-- Card 1: Yves Rocher Top 25% -->
+      <div class="cc" id="bcard-0">
+        <div class="cc__badge b25">Top 25%</div>
+        <div class="cc__head">
+          <div class="pav pav-yr">YR</div>
+          <div><div class="cc__name">Yves Rocher Hong Kong</div><div class="cc__date">16 Jun 2026 17:30</div></div>
+        </div>
+        <div class="cc__tags">
+          <span class="ctag ctag-of">Official</span><span class="ctag ctag-bo">Boosted</span><span class="ctag ctag-br">Yves Rocher</span>
+        </div>
+        <div class="cc__img">
+          <div style="width:100%;height:100%;background:linear-gradient(160deg,#b8922e,#7a5520);display:flex;align-items:center;justify-content:center;">
+            <div style="text-align:center;padding:20px;position:relative;z-index:1;">
+              <div style="font-size:17px;font-weight:700;color:#fff;line-height:1.3;margin-bottom:4px;text-shadow:0 1px 4px rgba(0,0,0,.3);">30+升級護膚智慧</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.85);margin-bottom:12px;">幹細胞活顏高效護理</div>
+              <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-start;">
+                <div style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:5px 9px;font-size:9px;color:#fff;font-weight:600;">極致提升<br><span style="opacity:.75;font-size:8px;">細胞再生力</span></div>
+                <div style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:5px 9px;font-size:9px;color:#fff;font-weight:600;">精準修正<br><span style="opacity:.75;font-size:8px;">老化痕跡</span></div>
+                <div style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:5px 9px;font-size:9px;color:#fff;font-weight:600;">高效喚醒<br><span style="opacity:.75;font-size:8px;">年輕光澤</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cc__cap">30+升級護膚智慧 | 幹細胞活顏高效護理 🌟不論 30+ 定 40+，當你學識護膚嘅智慧💡，就唔使再盲目追求絕齡，都可以展現出當下最好嘅黃金狀態✨！</div>
+        <div class="show-more">Show More...</div>
+        <div class="cc__stats">
+          <span class="stat">👍 225</span><span class="stat">❤️ 2</span><span class="stat">↗ 6</span><span class="stat">💬 3</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Moist Diane -->
+      <div class="cc" id="bcard-1">
+        <div class="cc__badge b10">Top 10%</div>
+        <div class="cc__head">
+          <div class="pav pav-md">MD</div>
+          <div><div class="cc__name">Moist Diane HK</div><div class="cc__date">03 Jun 2026 10:00</div></div>
+        </div>
+        <div class="cc__tags">
+          <span class="ctag ctag-of">Official</span><span class="ctag ctag-bo">Boosted</span><span class="ctag ctag-br">Moist Diane</span>
+        </div>
+        <div class="cc__img">
+          <div style="width:100%;height:100%;background:#f5f0e8;display:flex;align-items:center;justify-content:center;">
+            <div style="text-align:center;">
+              <div style="font-family:Georgia,serif;font-size:30px;font-style:italic;font-weight:700;color:#1a1a1a;line-height:1.1;">Moist,<br>Diane</div>
+            </div>
+          </div>
+        </div>
+        <div class="cc__cap">Moist Diane 全新祈「神の沐浴露」降臨 🌿植萃持香沐浴露系列完美實現 3-in-1 神級功效...</div>
+        <div class="show-more">Show More...</div>
+        <div class="cc__stats"><span class="stat">👍 596</span><span class="stat">❤️ 170</span><span class="stat">↗ 39</span></div>
+      </div>
+
+      <!-- Card 3: Yves Rocher grooming -->
+      <div class="cc" id="bcard-2">
+        <div class="cc__badge b10">Top 10%</div>
+        <div class="cc__head">
+          <div class="pav pav-yr">YR</div>
+          <div><div class="cc__name">Yves Rocher Hong Kong</div><div class="cc__date">02 Jun 2026 19:00</div></div>
+        </div>
+        <div class="cc__tags">
+          <span class="ctag ctag-of">Official</span><span class="ctag ctag-bo">Boosted</span><span class="ctag ctag-br">Yves Rocher</span>
+        </div>
+        <div class="cc__img">
+          <div style="width:100%;height:100%;background:linear-gradient(160deg,#1a3a2a,#0d3320);display:flex;align-items:center;justify-content:center;padding:20px;">
+            <div style="text-align:center;">
+              <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:12px;">他的專屬 Grooming 時光</div>
+              <div style="display:flex;gap:8px;justify-content:center;">
+                <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                  <div style="width:28px;height:44px;background:rgba(255,255,255,.15);border-radius:4px;"></div>
+                  <div style="font-size:8px;color:rgba(255,255,255,.6);">洗髮乳</div>
+                </div>
+                <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                  <div style="width:28px;height:44px;background:rgba(255,255,255,.12);border-radius:4px;"></div>
+                  <div style="font-size:8px;color:rgba(255,255,255,.6);">護髮素</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cc__cap">每日奔波發跡碌，默默揮老成家园父，即便係超人老爸爸。都需要你一停一停，好好享受屬于自己的放鬆時光☀️</div>
+        <div class="cc__stats"><span class="stat">👍 303</span><span class="stat">❤️ 2</span><span class="stat">💬 2</span><span class="stat">↗ 5</span></div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="cc" id="bcard-3">
+        <div class="cc__badge b10">Top 10%</div>
+        <div class="cc__head">
+          <div class="pav pav-yr">YR</div>
+          <div><div class="cc__name">Yves Rocher Hong Kong</div><div class="cc__date">01 Jun 2026 12:00</div></div>
+        </div>
+        <div class="cc__tags">
+          <span class="ctag ctag-of">Official</span><span class="ctag ctag-bo">Boosted</span><span class="ctag ctag-br">Yves Rocher</span>
+        </div>
+        <div class="cc__img">
+          <div style="width:100%;height:100%;background:linear-gradient(160deg,#2a4a1a,#1a3a0a);display:flex;align-items:center;justify-content:center;padding:20px;">
+            <div style="text-align:center;">
+              <div style="font-size:11px;color:rgba(255,255,255,.7);margin-bottom:8px;">淨化洗髮系列</div>
+              <div style="width:50px;height:75px;background:rgba(255,255,255,.12);border-radius:6px;margin:0 auto 8px;border:1px solid rgba(255,255,255,.2);"></div>
+              <div style="font-size:10px;color:rgba(255,255,255,.6);">你最近頭皮狀態係偵？</div>
+            </div>
+          </div>
+        </div>
+        <div class="cc__cap">頭皮都Emo😰？ 情緒護護，頭皮都有「情緒」，會叫「皮」氣😤</div>
+        <div class="cc__stats"><span class="stat">👍 474</span><span class="stat">❤️ 6</span><span class="stat">💬 7</span><span class="stat">↗ 7</span></div>
+      </div>
+
+    </div><!-- /creative-grid -->
+    <div style="height:80px;"></div>
+  </main>
+
+</div><!-- /shell -->
+
+<!-- ═══ AI FLOAT BUTTON ═══ -->
+<button class="ai-fab" id="aiFAB" onclick="openPanel()" title="AI Creative Studio">
+  <div class="fab-pulse"></div>
+  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+    <!-- large centre star -->
+    <path d="M14 4 L15.2 11.5 L22 12 L15.2 13.5 L14 21 L12.8 13.5 L6 12 L12.8 11.5 Z" fill="#fff"/>
+    <!-- small top-right star -->
+    <path d="M21 5 L21.7 8.2 L24.5 8.5 L21.7 9 L21 12 L20.3 9 L17.5 8.5 L20.3 8.2 Z" fill="rgba(255,255,255,.75)"/>
+    <!-- tiny bottom-left dot -->
+    <circle cx="8" cy="20" r="1.5" fill="rgba(255,255,255,.6)"/>
+  </svg>
+</button>
+
+<!-- ═══ AI PANEL ═══ -->
+<aside class="ai-panel" id="aiPanel">
+  <div class="panel-head" id="panelHead">
+    <div class="panel-head__icon" id="panelHeadIcon" style="background:var(--brand-blue);border-radius:var(--r-md);">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M9 2 L10 7.5 L15.5 8 L10 9 L9 14.5 L8 9 L2.5 8 L8 7.5 Z" fill="#fff"/>
+        <path d="M14 2 L14.5 4.2 L16.5 4.5 L14.5 4.8 L14 7 L13.5 4.8 L11.5 4.5 L13.5 4.2 Z" fill="rgba(255,255,255,.8)"/>
+        <circle cx="4.5" cy="13" r="1" fill="rgba(255,255,255,.65)"/>
+      </svg>
+    </div>
+    <span class="panel-head__title" id="panelTitle">AI Creative Studio</span>
+    <button class="panel-head__close" onclick="closePanel()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8"/></svg>
+    </button>
+  </div>
+
+  <!-- CHAT BODY -->
+  <div class="chat-body" id="chatBody">
+
+    <!-- Welcome state -->
+    <div id="welcomeState">
+      <div class="chat-welcome">
+        <div class="chat-welcome__title">AI Creative Studio</div>
+        <div class="chat-welcome__sub">Describe what you want to create. The agent will understand your intent and generate copy, image, or a full post.</div>
+      </div>
+      <div class="chat-tip" style="margin-bottom:var(--sp-md);">
+        <div class="chat-tip__title">How to use</div>
+        <div class="chat-tip__list">
+          <span class="tip-row"><span class="tip-key">+</span> Pick reference posts from Buzz</span>
+          <span class="tip-row"><span class="tip-key">@</span> Mention your brand, product, or uploaded asset</span>
+          <span class="tip-row"><span class="tip-key"><svg width="11" height="11" viewBox="0 0 11 11" fill="none" style="display:inline;vertical-align:-1px"><rect x=".5" y="1.5" width="10" height="8" rx="1.2" stroke="currentColor" stroke-width="1.1"/><circle cx="3.5" cy="5" r=".9" fill="currentColor"/><path d="M.5 8l2.5-2.5 1.5 1.5 1.5-1.5L8.5 8" stroke="currentColor" stroke-width="1"/></svg></span> Upload an image as reference</span>
+          <span class="tip-row"><span class="tip-key">Agent</span> Switch agent to match your intent</span>
+        </div>
+      </div>
+      <!-- Brand setup prompt -->
+      <div class="setup-prompt" onclick="goToSetup()">
+        <div class="setup-prompt__dot"></div>
+        <div class="setup-prompt__text">
+          <div class="setup-prompt__label">No brand set</div>
+          <div class="setup-prompt__action">Set your brand first &rarr;</div>
+        </div>
+      </div>
+      <div class="setup-prompt" style="margin-top:var(--sp-xs);" onclick="goToSetup()">
+        <div class="setup-prompt__dot"></div>
+        <div class="setup-prompt__text">
+          <div class="setup-prompt__label">No product set</div>
+          <div class="setup-prompt__action">Set your product &rarr;</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Blank state (Auto mode) -->
+    <div id="welcomeBlank"></div>
+
+    <!-- Ad Advisor state -->
+    <div id="welcomeAdvisor">
+      <div class="aa-chart-mock">
+        <div class="aa-chart-mock__blur">
+          <div class="aa-chart-bar" style="width:75%;opacity:.8;"></div>
+          <div class="aa-chart-bar red" style="width:90%;opacity:.7;"></div>
+          <div class="aa-chart-bar" style="width:55%;opacity:.9;"></div>
+          <div class="aa-chart-bar red" style="width:40%;opacity:.6;"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;">
+            <div style="height:8px;border-radius:4px;background:#D1D5DB;"></div>
+            <div style="height:8px;border-radius:4px;background:#D1D5DB;width:60%;"></div>
+            <div style="height:8px;border-radius:4px;background:#D1D5DB;width:80%;"></div>
+            <div style="height:8px;border-radius:4px;background:#D1D5DB;width:45%;"></div>
+          </div>
+        </div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+          <div style="background:rgba(255,255,255,.8);border-radius:var(--r-md);padding:6px 12px;font-size:11px;color:var(--text-regular);backdrop-filter:blur(2px);">Performance overview</div>
+        </div>
+      </div>
+      <div class="aa-prompts">
+        <div class="aa-prompt-card" onclick="fillAdvisorPrompt(this)">
+          <div class="aa-prompt-card__icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="10" rx="1.5" stroke="#3B82F6" stroke-width="1.2"/><path d="M3 9l2-3 2 2 2-3 2 3" stroke="#3B82F6" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="aa-prompt-card__text">Summarize top KPIs and flag any anomalies this period.</div>
+        </div>
+        <div class="aa-prompt-card" onclick="fillAdvisorPrompt(this)">
+          <div class="aa-prompt-card__icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 2v10M3 2l5 4-5 4" stroke="#F97316" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="aa-prompt-card__text">Which campaigns should I scale, hold, or pause?</div>
+        </div>
+        <div class="aa-prompt-card" onclick="fillAdvisorPrompt(this)">
+          <div class="aa-prompt-card__icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#8B5CF6" stroke-width="1.2"/><path d="M7 7L7 2A5 5 0 0112 7Z" fill="#8B5CF6" opacity=".4"/><path d="M7 7L2.5 4.5A5 5 0 007 2Z" fill="#8B5CF6" opacity=".7"/></svg>
+          </div>
+          <div class="aa-prompt-card__text">Is my TOFU / MOFU / BOFU budget split optimized?</div>
+        </div>
+        <div class="aa-prompt-card" onclick="fillAdvisorPrompt(this)">
+          <div class="aa-prompt-card__icon" style="background:var(--surface-page);border:1px solid var(--border);">
+          </div>
+          <div class="aa-prompt-card__text">Which top CTR ads share common patterns?</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conversation (hidden initially) -->
+    <div id="conversation" class="hidden"></div>
+
+  </div><!-- /chat-body -->
+
+  <!-- INPUT FOOT: Creative Studio (default) -->
+  <div class="panel-foot" id="panelFootCreative">
+    <!-- Reference chips (above input) -->
+    <div class="ref-strip" id="refStrip" style="display:none;"></div>
+
+    <!-- Prompt wrap -->
+    <div class="prompt-wrap" id="promptWrap" style="position:relative;">
+      <div id="mentionDrop" class="mention-dropdown hidden">
+        <div class="mention-item active" onclick="selectProduct('Dr.Once – Hair · 醫美級防脫髮爆水修護')">
+          <div class="mention-item__icon">💊</div>
+          <div>
+            <div class="mention-item__name">Dr.Once – Hair</div>
+            <div class="mention-item__sub">醫美級防脫髮爆水修護</div>
+          </div>
+        </div>
+        <div class="mention-item" onclick="selectProduct('Dr.Once – Scalp · 頭皮護理精華')">
+          <div class="mention-item__icon">🌿</div>
+          <div>
+            <div class="mention-item__name">Dr.Once – Scalp</div>
+            <div class="mention-item__sub">頭皮護理精華</div>
+          </div>
+        </div>
+        <div class="mention-item" onclick="selectProduct('Dr.Once – Treatment · 深層修護髮膜')">
+          <div class="mention-item__icon">✨</div>
+          <div>
+            <div class="mention-item__name">Dr.Once – Treatment</div>
+            <div class="mention-item__sub">深層修護髮膜</div>
+          </div>
+        </div>
+      </div>
+      <textarea class="prompt-ta" id="promptTA"
+        placeholder="Describe your idea… Use @ to select a product"
+        rows="3"
+        oninput="onPromptInput(event)"
+        onfocus="this.closest('.prompt-wrap').classList.add('focused')"
+        onblur="setTimeout(()=>{this.closest('.prompt-wrap').classList.remove('focused')},150)"></textarea>
+      <div class="prompt-bar">
+        <!-- + button -->
+        <button class="pbar-btn plus" title="Add reference from Buzz" onclick="openPicker()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <!-- image upload -->
+        <button class="pbar-btn" title="Upload reference image" onclick="triggerUpload()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="5" cy="6" r="1.2" fill="currentColor"/><path d="M1 10l3-3 2 2 2-2 3 3" stroke="currentColor" stroke-width="1.2"/></svg>
+        </button>
+        <!-- agent select -->
+        <div class="agent-sel" id="agentSel" onclick="toggleAgentDD()">
+          <span id="agentName">Auto</span>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.4"/></svg>
+        </div>
+        <!-- platform selector -->
+        <div class="platform-sel" id="platformSel" onclick="togglePlatformDD()">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><rect x=".5" y="1.5" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3.5 9.5v1M7.5 9.5v1M2 10.5h7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <span id="platformName">Auto</span><span class="platform-badge" id="platformBadge"></span>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.4"/></svg>
+        </div>
+        <span class="char-ct" id="charCt">0 / 4000</span>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1.5 11.5L11.5 6.5L1.5 1.5V5.5L8.5 6.5L1.5 7.5V11.5Z" fill="#fff"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INPUT FOOT: Ad Advisor -->
+  <div class="aa-foot hidden" id="panelFootAdvisor">
+    <div class="aa-ctx-chips">
+      <div class="aa-ctx-chip">
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><rect x=".5" y=".5" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M2.5 3.5h6M2.5 5.5h4M2.5 7.5h3" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
+        Ad Account: ChatCommerce
+        <span class="aa-ctx-chip__x" onclick="this.closest('.aa-ctx-chip').remove()">✕</span>
+      </div>
+      <div class="aa-ctx-chip">
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><rect x=".5" y=".5" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M2.5 3.5h6M2.5 5.5h4M2.5 7.5h3" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
+        Page: Performance
+        <span class="aa-ctx-chip__x" onclick="this.closest('.aa-ctx-chip').remove()">✕</span>
+      </div>
+    </div>
+    <div class="aa-input-row">
+      <div class="aa-input-plus">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </div>
+      <input id="aaInput" class="aa-input-field" placeholder="Enter a prompt here" oninput="updateAaSend()"/>
+      <button class="aa-send-btn" id="aaSendBtn">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1.5 11.5L11.5 6.5L1.5 1.5V5.5L8.5 6.5L1.5 7.5V11.5Z" fill="#fff"/></svg>
+      </button>
+    </div>
+    <div class="aa-disclaimer">MediaLens AI can make mistakes. Consider checking important information.</div>
+  </div>
+
+</aside>
+
+<!-- ═══ SELECT MODE BANNER (shown over Buzz while picking posts) ═══ -->
+<div class="select-mode-bar" id="selectModeBar">
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#fff" stroke-width="1.5"/><path d="M5 8l2.5 2.5 3.5-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+  Click posts to select as reference
+  <span id="selectModeCount" style="background:rgba(255,255,255,.2);padding:2px 10px;border-radius:var(--r-tag);font-size:12px;">0 selected</span>
+  <button class="select-mode-bar__done" onclick="doneSelectingPosts()">Done</button>
+</div>
+
+<!-- ═══ ADD REFERENCE MODAL ═══ -->
+<div class="picker-overlay" id="pickerOverlay" onclick="closePicker(event)">
+  <div class="picker-sheet" onclick="event.stopPropagation()">
+    <div class="picker-head">
+      <div class="picker-head__title">Add Reference</div>
+      <button class="picker-head__close" onclick="closePickerSheet()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8"/></svg>
+      </button>
+    </div>
+    <div class="ref-slots">
+
+      <!-- Slot 1: Reference posts -->
+      <div class="ref-slot" id="slot-posts" onclick="startSelectPosts()">
+        <div class="ref-slot__icon" id="slot-posts-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <rect x="2" y="3" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.4"/>
+            <circle cx="6.5" cy="8.5" r="1.5" fill="currentColor"/>
+            <path d="M2 14l4-4 3 3 3-3.5 6 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="ref-slot__body">
+          <div class="ref-slot__title" id="slot-posts-title">Click to select reference posts</div>
+          <div class="ref-slot__sub" id="slot-posts-sub">Choose posts from Buzz as visual reference</div>
+        </div>
+        <div class="ref-slot__arrow">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+
+      <!-- Slot 2: Brand & Product -->
+      <div class="ref-slot" id="slot-brand" onclick="goToBrandSetup()">
+        <div class="ref-slot__icon" id="slot-brand-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 2l2.4 5 5.6.8-4 3.9.95 5.5L10 14.5l-4.95 2.7.95-5.5-4-3.9 5.6-.8L10 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="ref-slot__body">
+          <div class="ref-slot__title" id="slot-brand-title">Click to select Brand &amp; Product</div>
+          <div class="ref-slot__sub" id="slot-brand-sub">Link your brand profile and product to this session</div>
+        </div>
+        <div class="ref-slot__arrow">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+
+      <!-- Slot 3: Upload image -->
+      <div class="ref-slot" id="slot-upload" onclick="triggerUpload()">
+        <div class="ref-slot__icon" id="slot-upload-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 13V4M6 7l4-4 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M3 15h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="ref-slot__body">
+          <div class="ref-slot__title" id="slot-upload-title">Upload image as reference</div>
+          <div class="ref-slot__sub" id="slot-upload-sub">Use your own image to guide generation</div>
+        </div>
+        <div class="ref-slot__arrow">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══ AI GENERATOR PAGE ═══ -->
+<div id="gen-page">
+  <nav class="gp-nav">
+    <div class="gp-nav__back" onclick="closeGenPage()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8l4 4" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+      Back to Buzz
+    </div>
+    <span style="opacity:.4;margin:0 4px;">/</span>
+    <span style="font-size:16px;font-weight:600;">AI Generator</span>
+    <div style="margin-left:auto;display:flex;gap:var(--sp-sm);">
+      <button class="btn" style="background:rgba(255,255,255,.12);color:#fff;">Save Draft</button>
+      <button class="btn" style="background:#fff;color:var(--brand-blue);font-weight:600;">Export</button>
+    </div>
+  </nav>
+
+  <div class="gp-layout">
+
+    <!-- ── Left navigator ── -->
+    <div class="gp-leftnav">
+      <div class="gp-nav-group">
+        <div class="gp-nav-label">Generated</div>
+
+        <!-- AI Assets -->
+        <div class="gp-navitem active" onclick="switchGenNav(this,'pane-assets')">
+          <div class="gp-navitem__icon" style="background:#EFF6FF;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <rect x="1" y="1" width="6.5" height="6.5" rx="1.5" fill="#3B82F6"/>
+              <rect x="8.5" y="1" width="6.5" height="6.5" rx="1.5" fill="#3B82F6" opacity=".5"/>
+              <rect x="1" y="8.5" width="6.5" height="6.5" rx="1.5" fill="#3B82F6" opacity=".4"/>
+              <rect x="8.5" y="8.5" width="6.5" height="6.5" rx="1.5" fill="#3B82F6" opacity=".25"/>
+            </svg>
+          </div>
+          <div class="gp-navitem__info">
+            <div class="gp-navitem__label">AI Assets</div>
+            <div class="gp-navitem__sub">Images &amp; Videos</div>
+          </div>
+          <div class="gp-navitem__count">7</div>
+        </div>
+
+        <!-- AI Ad Creative -->
+        <div class="gp-navitem" onclick="switchGenNav(this,'pane-adcreative')">
+          <div class="gp-navitem__icon" style="background:#FFF7ED;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <rect x="1" y="3.5" width="14" height="9" rx="2" stroke="#F97316" stroke-width="1.4"/>
+              <path d="M4 7.5h5M4 10h3" stroke="#F97316" stroke-width="1.2" stroke-linecap="round"/>
+              <rect x="10.5" y="5.5" width="3" height="5" rx="1.2" fill="#F97316" opacity=".75"/>
+            </svg>
+          </div>
+          <div class="gp-navitem__info">
+            <div class="gp-navitem__label">AI Ad Creative</div>
+            <div class="gp-navitem__sub">For Meta Ads</div>
+          </div>
+          <div class="gp-navitem__count">2</div>
+        </div>
+
+        <!-- AI Post -->
+        <div class="gp-navitem" onclick="switchGenNav(this,'pane-post')">
+          <div class="gp-navitem__icon" style="background:#F0FDF4;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <rect x="2" y="1.5" width="12" height="13" rx="2" stroke="#22C55E" stroke-width="1.4"/>
+              <path d="M5 5.5h6M5 8.5h4M5 11.5h2.5" stroke="#22C55E" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="gp-navitem__info">
+            <div class="gp-navitem__label">AI Post</div>
+            <div class="gp-navitem__sub">Feed · Story · Reels</div>
+          </div>
+          <div class="gp-navitem__count">1</div>
+        </div>
+      </div>
+
+      <div class="gp-nav-group">
+        <div class="gp-nav-label">Destination</div>
+        <div class="gp-dest-row">
+          <div class="gp-dest-dot" style="background:#F97316;"></div>
+          Meta Ad Manager
+        </div>
+        <div class="gp-dest-row">
+          <div class="gp-dest-dot" style="background:#22C55E;"></div>
+          Meta Post Publishing
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Center main ── -->
+    <div class="gp-main">
+
+      <!-- Pane: AI Assets -->
+      <div id="pane-assets" class="gp-main-pane active">
+        <div class="gp-pane-head">
+          <div>
+            <div class="gp-pane-title">AI Assets</div>
+            <div class="gp-pane-sub">AI-generated image and video assets — use across Ad Creative or Post</div>
+          </div>
+        </div>
+
+        <div class="gen-canvas">
+          <div class="gen-toolbar">
+            <span style="font-size:12px;font-weight:600;color:var(--text-primary);">Images</span>
+            <div style="width:1px;height:14px;background:var(--border);margin:0 2px;"></div>
+            <button class="tbtn active">All</button>
+            <button class="tbtn">1:1</button>
+            <button class="tbtn">4:5</button>
+            <button class="tbtn">16:9</button>
+            <div style="flex:1"></div>
+            <button class="tbtn">+ Generate More</button>
+            <button class="tbtn">Download All</button>
+          </div>
+          <div class="gen-gallery">
+            <div class="gi sel">
+              <div class="gi__img" style="background:linear-gradient(160deg,#0a2218,#134526);">
+                <div style="width:100%;aspect-ratio:1/1;display:flex;flex-direction:column;justify-content:space-between;padding:20px;">
+                  <div><div style="font-size:16px;font-weight:700;color:#fff;line-height:1.3;">醫美級<br>防脫髮爆水修護</div><div style="font-size:11px;color:rgba(255,255,255,.75);margin-top:4px;">dr.once 專業護理</div></div>
+                  <div style="display:flex;flex-direction:column;gap:4px;">
+                    <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:4px 8px;font-size:9px;color:#fff;font-weight:600;">頭髮提升 · 回復密度</div>
+                    <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:4px 8px;font-size:9px;color:#fff;font-weight:600;">減少洗髮時落髮</div>
+                  </div>
+                  <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.85);">dr.once</div>
+                </div>
+              </div>
+              <div class="gi__foot"><span class="score">92</span>1:1 · GPT-image-2<span style="margin-left:auto;color:var(--brand-blue);cursor:pointer;">Edit</span></div>
+            </div>
+            <div class="gi">
+              <div class="gi__img" style="background:linear-gradient(145deg,#1a0533,#3b0f6e);aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;padding:16px;">
+                <div style="text-align:center;"><div style="font-size:14px;font-weight:700;color:#fff;line-height:1.3;">強韌髮根<br>無懼脫落</div><div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:6px;">dr.once</div></div>
+              </div>
+              <div class="gi__foot"><span class="score">88</span>1:1 · Variation 2<span style="margin-left:auto;color:var(--brand-blue);cursor:pointer;">Edit</span></div>
+            </div>
+            <div class="gi">
+              <div class="gi__img" style="background:linear-gradient(160deg,#3a1a0a,#5a2a10);aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;">
+                <div style="text-align:center;padding:16px;"><div style="font-size:10px;font-weight:700;color:#FFD700;letter-spacing:1px;">MEDICAL GRADE</div><div style="font-size:14px;font-weight:700;color:#fff;margin-top:4px;">防脫髮療程</div></div>
+              </div>
+              <div class="gi__foot"><span class="score">85</span>1:1 · Variation 3<span style="margin-left:auto;color:var(--brand-blue);cursor:pointer;">Edit</span></div>
+            </div>
+            <div class="gi">
+              <div class="gi__img" style="background:linear-gradient(135deg,#f5f0e8,#e8dcc8);aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;">
+                <div style="text-align:center;padding:16px;"><div style="font-size:9px;letter-spacing:2px;color:#8B6914;text-transform:uppercase;margin-bottom:4px;">dr.once</div><div style="font-size:13px;font-weight:700;color:#2a1a0a;">醫美級<br>爆水修護</div></div>
+              </div>
+              <div class="gi__foot"><span class="score">81</span>1:1 · Light theme<span style="margin-left:auto;color:var(--brand-blue);cursor:pointer;">Edit</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="gen-canvas">
+          <div class="gen-toolbar">
+            <span style="font-size:12px;font-weight:600;color:var(--text-primary);">Videos</span>
+            <div style="width:1px;height:14px;background:var(--border);margin:0 2px;"></div>
+            <button class="tbtn active">All</button>
+            <button class="tbtn">9:16</button>
+            <button class="tbtn">1:1</button>
+            <div style="flex:1"></div>
+            <button class="tbtn">+ Generate Video</button>
+          </div>
+          <div class="vgrid">
+            <div class="vi"><div class="vi__thumb"><div class="play"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M5 3l9 5-9 5V3z" fill="#fff"/></svg></div><div style="position:absolute;top:8px;left:8px;font-size:8px;color:rgba(255,255,255,.8);background:rgba(0,0,0,.3);padding:2px 5px;border-radius:2px;">dr.once</div><div class="vdur">0:15</div></div><div class="gi__foot"><span class="score">90</span>9:16 · Reel style</div></div>
+            <div class="vi"><div class="vi__thumb" style="background:linear-gradient(160deg,#0d3320,#1a5a35)"><div class="play"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M5 3l9 5-9 5V3z" fill="#fff"/></svg></div><div class="vdur">0:30</div></div><div class="gi__foot"><span class="score">86</span>9:16 · Product focus</div></div>
+            <div class="vi"><div class="vi__thumb" style="background:linear-gradient(160deg,#1a0a3a,#2d1260)"><div class="play"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M5 3l9 5-9 5V3z" fill="#fff"/></svg></div><div class="vdur">0:15</div></div><div class="gi__foot"><span class="score">82</span>1:1 · Feed style</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pane: AI Ad Creative -->
+      <div id="pane-adcreative" class="gp-main-pane">
+        <div class="gp-pane-head">
+          <div>
+            <div class="gp-pane-title">AI Ad Creative</div>
+            <div class="gp-pane-sub">Image + headline, description &amp; CTA — ready to push to Meta Ad Manager</div>
+          </div>
+          <button class="btn btn-pri" style="margin-left:auto;font-size:12px;padding:6px 14px;">+ Generate More</button>
+        </div>
+        <div class="adc-list">
+
+          <div class="adc-card">
+            <div class="adc-card__top">
+              <div class="adc-card__img" style="height:230px;background:linear-gradient(160deg,#0a2218,#134526);position:relative;">
+                <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:20px;">
+                  <div style="font-size:15px;font-weight:700;color:#fff;line-height:1.35;">醫美級<br>防脫髮爆水修護</div>
+                  <div style="display:flex;flex-direction:column;gap:4px;">
+                    <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:4px 8px;font-size:9px;color:#fff;font-weight:600;">頭髮提升 · 回復密度</div>
+                  </div>
+                  <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.85);">dr.once</div>
+                </div>
+                <div style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.5);color:#fff;font-size:9px;padding:2px 6px;border-radius:3px;font-weight:600;">1:1</div>
+              </div>
+              <div class="adc-card__fields">
+                <div>
+                  <div class="adc-field__label">Headline</div>
+                  <div class="adc-field__val" contenteditable="true">醫美級防脫髮爆水修護 — dr.once 專業護理系列</div>
+                </div>
+                <div>
+                  <div class="adc-field__label">Primary Text</div>
+                  <div class="adc-field__val" contenteditable="true" style="min-height:56px;">不論頭髮稀疏定脫落，dr.once 醫美級成分深層滋養髮根，強化髮絲，讓你重現豐盈健康頭髮。限時體驗套裝，即日起至7月31日。</div>
+                </div>
+                <div>
+                  <div class="adc-field__label">Call to Action</div>
+                  <div class="adc-cta-row">
+                    <div class="adc-cta-chip">Shop Now</div>
+                    <div class="adc-cta-chip alt">Learn More</div>
+                    <div class="adc-cta-chip alt">Get Offer</div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;margin-top:auto;padding-top:var(--sp-xs);">
+                  <span class="adc-score-pill" style="background:#FFF3E0;color:#E65100;">Image 92</span>
+                  <span class="adc-score-pill" style="background:#E0F2FE;color:#0369A1;">Copy 91</span>
+                </div>
+              </div>
+            </div>
+            <div class="adc-card__foot">
+              <button class="btn btn-sec" style="font-size:11px;padding:4px 10px;">Regenerate</button>
+              <button class="btn btn-out" style="font-size:11px;padding:4px 10px;">Edit Creative</button>
+              <button class="btn btn-pri" style="font-size:11px;padding:4px 10px;margin-left:auto;">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="margin-right:3px;"><path d="M2 6h8M6 2l4 4-4 4" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Send to Ad Manager
+              </button>
+            </div>
+          </div>
+
+          <div class="adc-card">
+            <div class="adc-card__top">
+              <div class="adc-card__img" style="height:230px;background:linear-gradient(145deg,#1a0533,#3b0f6e);position:relative;">
+                <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:20px;">
+                  <div style="font-size:15px;font-weight:700;color:#fff;line-height:1.35;">強韌髮根<br>無懼脫落</div>
+                  <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.8);">dr.once · Advanced Hair</div>
+                </div>
+                <div style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.5);color:#fff;font-size:9px;padding:2px 6px;border-radius:3px;font-weight:600;">1:1</div>
+              </div>
+              <div class="adc-card__fields">
+                <div>
+                  <div class="adc-field__label">Headline</div>
+                  <div class="adc-field__val" contenteditable="true">強韌髮根，減少脫落 — dr.once Advanced Hair</div>
+                </div>
+                <div>
+                  <div class="adc-field__label">Primary Text</div>
+                  <div class="adc-field__val" contenteditable="true" style="min-height:56px;">每日一步，配合 dr.once 專業護理系列，深層修護受損髮絲，重建頭髮防護力，告別脫髮煩惱。</div>
+                </div>
+                <div>
+                  <div class="adc-field__label">Call to Action</div>
+                  <div class="adc-cta-row">
+                    <div class="adc-cta-chip">Learn More</div>
+                    <div class="adc-cta-chip alt">Shop Now</div>
+                    <div class="adc-cta-chip alt">Get Offer</div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;margin-top:auto;padding-top:var(--sp-xs);">
+                  <span class="adc-score-pill" style="background:#FFF3E0;color:#E65100;">Image 85</span>
+                  <span class="adc-score-pill" style="background:#E0F2FE;color:#0369A1;">Copy 88</span>
+                </div>
+              </div>
+            </div>
+            <div class="adc-card__foot">
+              <button class="btn btn-sec" style="font-size:11px;padding:4px 10px;">Regenerate</button>
+              <button class="btn btn-out" style="font-size:11px;padding:4px 10px;">Edit Creative</button>
+              <button class="btn btn-pri" style="font-size:11px;padding:4px 10px;margin-left:auto;">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="margin-right:3px;"><path d="M2 6h8M6 2l4 4-4 4" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Send to Ad Manager
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Pane: AI Post -->
+      <div id="pane-post" class="gp-main-pane">
+        <div class="gp-pane-head">
+          <div>
+            <div class="gp-pane-title">AI Post</div>
+            <div class="gp-pane-sub">Ready-to-publish posts — can use AI Ad Creative as the visual</div>
+          </div>
+          <button class="btn btn-pri" style="margin-left:auto;font-size:12px;padding:6px 14px;">+ Generate More</button>
+        </div>
+        <div class="post-fmt-bar">
+          <button class="post-fmt-btn active" onclick="switchPostFmt(this)">Feed</button>
+          <button class="post-fmt-btn" onclick="switchPostFmt(this)">Story</button>
+          <button class="post-fmt-btn" onclick="switchPostFmt(this)">Reels</button>
+          <button class="post-fmt-btn" onclick="switchPostFmt(this)">Carousel</button>
+        </div>
+        <div class="post-list">
+          <div class="post-card">
+            <div class="post-card__header">
+              <div class="post-card__av">dr</div>
+              <div>
+                <div class="post-card__brand">Dr.Once – Hair</div>
+                <div class="post-card__meta">Facebook Page · Feed Post</div>
+              </div>
+              <div style="margin-left:auto;">
+                <span class="score" style="font-size:10px;">Score 91</span>
+              </div>
+            </div>
+            <div class="post-card__copy">
+              <strong>醫美級防脫髮爆水修護智慧 | dr.once 專業護理系列</strong><br><br>
+              不論頭髮稀疏定脫落，當你識用醫美級護髮智慧，就唔使再擔心每日洗頭時的脫髮困擾，都可以重現當下最豐盈嘅健康頭髮狀態！<br><br>
+              #DrOnce #防脫髮 #爆水修護 #醫美護髮 #HairCare
+            </div>
+            <div style="width:100%;aspect-ratio:1/1;overflow:hidden;background:linear-gradient(160deg,#0a2218,#134526);">
+              <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:28px;">
+                <div><div style="font-size:22px;font-weight:700;color:#fff;line-height:1.3;">醫美級 防脫髮<br>爆水修護</div><div style="font-size:12px;color:rgba(255,255,255,.7);margin-top:6px;">dr.once 專業護理</div></div>
+                <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.85);">dr.once</div>
+              </div>
+            </div>
+            <div class="post-card__foot">
+              <div style="width:8px;height:8px;border-radius:50%;background:#F97316;flex-shrink:0;"></div>
+              Using AI Ad Creative #1
+              <span style="margin-left:auto;">GPT-image-2 · 1:1</span>
+            </div>
+            <div class="post-card__actions">
+              <button class="btn btn-sec" style="font-size:11px;padding:4px 10px;">Use Different Creative</button>
+              <button class="btn btn-out" style="font-size:11px;padding:4px 10px;">Edit Post</button>
+              <button class="btn btn-pri" style="font-size:11px;padding:4px 10px;margin-left:auto;">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="margin-right:3px;"><path d="M2 6h8M6 2l4 4-4 4" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Publish Post
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Right sidebar ── -->
+    <div class="gp-sidebar">
+      <div class="gp-card">
+        <div class="gp-card__title">Reference Post</div>
+        <div class="gp-ref">
+          <div class="gp-ref-img">
+            <div style="width:100%;height:100%;background:linear-gradient(135deg,#b8922e,#7a5520);display:flex;align-items:center;justify-content:center;">
+              <div style="text-align:center;padding:6px;"><div style="font-size:8px;font-weight:700;color:#fff;">YVES ROCHER</div><div style="font-size:7px;color:rgba(255,255,255,.7);margin-top:2px;">30+護膚智慧</div></div>
+            </div>
+          </div>
+          <div class="gp-ref-info"><div class="gp-ref-brand">Yves Rocher HK</div><div>Top 25% Engagements</div><div>225 Likes · 6 Shares</div></div>
+        </div>
+      </div>
+      <div class="gp-card">
+        <div class="gp-card__title">Brand Profile</div>
+        <div style="font-size:13px;font-weight:600;color:var(--title);">Dr.Once – Hair</div>
+        <div style="font-size:11px;color:var(--text-regular);margin-top:2px;margin-bottom:var(--sp-xs);">醫美級防脫髮爆水修護</div>
+        <button class="btn btn-sec" style="font-size:11px;padding:3px 10px;width:100%;justify-content:center;">Edit Brand Profile</button>
+      </div>
+      <div class="gp-card">
+        <div class="gp-card__title">Prompt Used</div>
+        <div class="prompt-box">完全複製參考 creative 的視覺構圖，替換品牌 @Dr.Once – Hair，重寫文案，突出防脫髮爆水修護效果，語氣輕鬆貼地</div>
+        <button class="btn btn-sec" style="font-size:11px;padding:3px 10px;width:100%;justify-content:center;margin-top:var(--sp-xs);">Edit Prompt</button>
+      </div>
+      <div class="gp-card">
+        <div class="gp-card__title">Actions</div>
+        <div class="gp-actions">
+          <button class="btn btn-pri">Use as Ad Creative</button>
+          <button class="btn btn-out" style="border-color:#F97316;color:#F97316;">Send to Ad Manager</button>
+          <button class="btn btn-sec">Download</button>
+          <button class="btn btn-sec">Save to Library</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ── State ── */
+let panelOpen = false;
+let pickerOpen = false;
+let selectedPosts = [];
+let selectedBrand = null;
+let uploadedImgs = [];
+let hasConversation = false;
+let agentDDOpen = false;
+let mentionOpen = false;
+let mentionBuffer = '';
+
+const POSTS_DATA = [
+  {id:0, label:'Yves Rocher HK', sub:'Top 25% · 16 Jun', bg:'linear-gradient(135deg,#b8922e,#7a5520)', initials:'YR'},
+  {id:1, label:'Moist Diane HK', sub:'Top 10% · 03 Jun', bg:'linear-gradient(135deg,#f5f0e8,#e8dcc8)', initials:'MD', dark:true},
+  {id:2, label:'Yves Rocher HK', sub:'Top 10% · 02 Jun', bg:'linear-gradient(135deg,#1a3a2a,#0d3320)', initials:'YR'},
+  {id:3, label:'Yves Rocher HK', sub:'Top 10% · 01 Jun', bg:'linear-gradient(135deg,#2a4a1a,#1a3a0a)', initials:'YR'},
+];
+
+/* ── Panel ── */
+function openPanel() {
+  panelOpen = true;
+  document.getElementById('aiPanel').classList.add('open');
+  document.getElementById('aiFAB').classList.add('hidden');
+  document.getElementById('mainContent').classList.add('panel-open');
+}
+function closePanel() {
+  panelOpen = false;
+  document.getElementById('aiPanel').classList.remove('open');
+  document.getElementById('aiFAB').classList.remove('hidden');
+  document.getElementById('mainContent').classList.remove('panel-open');
+}
+
+/* ── Add Reference Modal ── */
+function openPicker() {
+  syncSlotStates();
+  document.getElementById('pickerOverlay').classList.add('open');
+  pickerOpen = true;
+}
+function closePickerSheet() {
+  document.getElementById('pickerOverlay').classList.remove('open');
+  pickerOpen = false;
+}
+function closePicker(e) {
+  if (e && e.target !== document.getElementById('pickerOverlay')) return;
+  closePickerSheet();
+}
+
+/* keep slot visuals in sync with state */
+function syncSlotStates() {
+  // Slot 1: posts
+  const hasPosts = selectedPosts.length > 0;
+  const s1 = document.getElementById('slot-posts');
+  s1.classList.toggle('filled', hasPosts);
+  document.getElementById('slot-posts-icon').style.color = hasPosts ? '#fff' : '';
+  document.getElementById('slot-posts-title').textContent = hasPosts
+    ? selectedPosts.map(p => p.label).join(', ')
+    : 'Click to select reference posts';
+  document.getElementById('slot-posts-sub').textContent = hasPosts
+    ? selectedPosts.length + ' post' + (selectedPosts.length > 1 ? 's' : '') + ' selected — click to change'
+    : 'Choose posts from Buzz as visual reference';
+
+  // Slot 2: brand
+  const hasBrand = !!selectedBrand;
+  const s2 = document.getElementById('slot-brand');
+  s2.classList.toggle('filled', hasBrand);
+  document.getElementById('slot-brand-title').textContent = hasBrand
+    ? selectedBrand
+    : 'Click to select Brand & Product';
+  document.getElementById('slot-brand-sub').textContent = hasBrand
+    ? 'Brand & product linked — click to change'
+    : 'Link your brand profile and product to this session';
+
+  // Slot 3: upload
+  const hasUpload = uploadedImgs.length > 0;
+  const s3 = document.getElementById('slot-upload');
+  s3.classList.toggle('filled', hasUpload);
+  document.getElementById('slot-upload-title').textContent = hasUpload
+    ? uploadedImgs[0]
+    : 'Upload image as reference';
+  document.getElementById('slot-upload-sub').textContent = hasUpload
+    ? 'Image attached — click to replace'
+    : 'Use your own image to guide generation';
+}
+
+/* Slot 1: close modal → enter select mode on Buzz grid */
+function startSelectPosts() {
+  closePickerSheet();
+  enterSelectMode();
+}
+
+/* Select mode: show top banner, make cards clickable */
+let selectMode = false;
+function enterSelectMode() {
+  selectMode = true;
+  document.getElementById('selectModeBar').classList.add('active');
+  document.querySelectorAll('.cc').forEach(card => {
+    card.classList.add('select-mode');
+    card.onclick = function() { toggleBuzzCard(this); };
+  });
+  updateSelectModeCount();
+}
+function exitSelectMode() {
+  selectMode = false;
+  document.getElementById('selectModeBar').classList.remove('active');
+  document.querySelectorAll('.cc').forEach(card => {
+    card.classList.remove('select-mode');
+    card.onclick = null;
+  });
+}
+function toggleBuzzCard(el) {
+  const id = parseInt(el.id.replace('bcard-', ''));
+  const post = POSTS_DATA.find(p => p.id === id);
+  const idx = selectedPosts.findIndex(s => s.id === id);
+  if (idx >= 0) {
+    selectedPosts.splice(idx, 1);
+    el.classList.remove('buzz-selected');
+  } else {
+    if (selectedPosts.length >= 3) return;
+    selectedPosts.push(post);
+    el.classList.add('buzz-selected');
+  }
+  updateSelectModeCount();
+}
+function updateSelectModeCount() {
+  document.getElementById('selectModeCount').textContent = selectedPosts.length + ' selected';
+}
+function doneSelectingPosts() {
+  exitSelectMode();
+  renderRefStrip();
+  updateSendBtn();
+  // reopen the modal so user can continue
+  openPicker();
+}
+
+/* Slot 2: go to brand setup page */
+function goToBrandSetup() {
+  closePickerSheet();
+  // store intent to reopen modal on return (simulated with sessionStorage)
+  sessionStorage.setItem('returnToPicker', '1');
+  window.location.href = 'file:///Users/julie.li/Documents/Medialens/prototypes/ai-generator-brand-setup.html';
+}
+
+/* Slot 3: upload */
+function triggerUpload() {
+  if (uploadedImgs.length < 2) {
+    uploadedImgs.push('ref-image.jpg');
+    renderRefStrip();
+    updateSendBtn();
+  }
+  syncSlotStates();
+}
+
+/* ── Reference strip ── */
+function renderRefStrip() {
+  const strip = document.getElementById('refStrip');
+  if (selectedPosts.length === 0 && uploadedImgs.length === 0) {
+    strip.style.display = 'none';
+    strip.innerHTML = '';
+    return;
+  }
+  strip.style.display = 'flex';
+  strip.innerHTML = '';
+  selectedPosts.forEach(p => {
+    strip.innerHTML += `
+      <div class="ref-chip">
+        <div class="ref-chip__thumb" style="background:${p.bg};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:${p.dark?'#333':'#fff'};">${p.initials}</div>
+        ${p.label}
+        <div class="ref-chip__x" onclick="removeRef(${p.id})">✕</div>
+      </div>`;
+  });
+  uploadedImgs.forEach((img, i) => {
+    strip.innerHTML += `
+      <div class="img-chip">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="4" cy="4.5" r="1" fill="currentColor"/><path d="M1 9l2.5-2.5 1.5 1.5 2-2L9 9" stroke="currentColor" stroke-width="1"/></svg>
+        ${img}
+        <div class="ref-chip__x" onclick="removeUpload(${i})">✕</div>
+      </div>`;
+  });
+}
+function removeRef(id) {
+  selectedPosts = selectedPosts.filter(s => s.id !== id);
+  renderRefStrip();
+  updateSendBtn();
+}
+function removeUpload(i) {
+  uploadedImgs.splice(i, 1);
+  renderRefStrip();
+  updateSendBtn();
+}
+
+/* ── Agent dropdown ── */
+function toggleAgentDD() {
+  agentDDOpen = !agentDDOpen;
+  const dd = document.getElementById('agentDD');
+  dd.classList.toggle('hidden', !agentDDOpen);
+  document.getElementById('agentSel').classList.toggle('open', agentDDOpen);
+  if (agentDDOpen) {
+    const rect = document.getElementById('agentSel').getBoundingClientRect();
+    dd.style.bottom = (window.innerHeight - rect.top + 6) + 'px';
+    dd.style.left = rect.left + 'px';
+    closePlatformDD();
+  }
+}
+function closeAgentDD() {
+  agentDDOpen = false;
+  document.getElementById('agentDD').classList.add('hidden');
+  document.getElementById('agentSel').classList.remove('open');
+}
+let currentAgent = 'Auto';
+let currentAgentMode = 'auto';
+
+function setAgent(name, mode) {
+  currentAgent = name;
+  currentAgentMode = mode || 'auto';
+  document.getElementById('agentName').textContent = name;
+  document.querySelectorAll('.agent-opt').forEach(o => o.classList.remove('sel'));
+  const modeToOptId = {
+    'auto': 'agopt-auto', 'image-video': 'agopt-imgvid',
+    'ad-advisor': 'agopt-advisor', 'campaign-insights': 'agopt-insights',
+    'meta-publish': 'agopt-publish', 'meta-ad-editor': 'agopt-adeditor',
+    'meta-ad-publish': 'agopt-adpublish'
+  };
+  const optEl = document.getElementById(modeToOptId[currentAgentMode]);
+  if (optEl) optEl.classList.add('sel');
+  applyPanelState(currentAgentMode);
+}
+
+function applyPanelState(mode) {
+  const welcome = document.getElementById('welcomeState');
+  const blank = document.getElementById('welcomeBlank');
+  const advisor = document.getElementById('welcomeAdvisor');
+  const footCreative = document.getElementById('panelFootCreative');
+  const footAdvisor = document.getElementById('panelFootAdvisor');
+  const platformSel = document.getElementById('platformSel');
+  const title = document.getElementById('panelTitle');
+  const icon = document.getElementById('panelHeadIcon');
+
+  // reset all welcome states
+  welcome.classList.add('hidden');
+  advisor.classList.remove('visible');
+  blank.classList.remove('visible');
+
+  if (mode === 'image-video') {
+    welcome.classList.remove('hidden');
+    footCreative.classList.remove('hidden');
+    footAdvisor.classList.add('hidden');
+    platformSel.style.display = '';
+    title.textContent = 'AI Creative Studio';
+    icon.style.background = 'var(--brand-blue)';
+  } else if (mode === 'ad-advisor') {
+    advisor.classList.add('visible');
+    footCreative.classList.add('hidden');
+    footAdvisor.classList.remove('hidden');
+    platformSel.style.display = 'none';
+    title.textContent = 'AI Ad Advisor';
+    icon.style.background = '#2563EB';
+  } else {
+    // auto + all others → blank
+    blank.classList.add('visible');
+    footCreative.classList.remove('hidden');
+    footAdvisor.classList.add('hidden');
+    platformSel.style.display = 'none';
+    const titles = {
+      'auto': 'AI Creative Studio',
+      'campaign-insights': 'Campaign Insights',
+      'meta-publish': 'Meta Content Publish',
+      'meta-ad-editor': 'Meta Ad Editor',
+      'meta-ad-publish': 'Meta Ad Publish'
+    };
+    title.textContent = titles[mode] || 'AI Creative Studio';
+    icon.style.background = 'var(--brand-blue)';
+  }
+}
+
+function fillAdvisorPrompt(card) {
+  const text = card.querySelector('.aa-prompt-card__text').textContent;
+  const input = document.getElementById('aaInput');
+  input.value = text;
+  input.focus();
+  updateAaSend();
+}
+function updateAaSend() {
+  const ready = document.getElementById('aaInput').value.trim().length > 0;
+  document.getElementById('aaSendBtn').classList.toggle('ready', ready);
+}
+
+/* ── Platform selector ── */
+let platformDDOpen = false;
+let currentPlatformId = 'plat-auto';
+function togglePlatformDD() {
+  platformDDOpen = !platformDDOpen;
+  const dd = document.getElementById('platformDD');
+  dd.classList.toggle('hidden', !platformDDOpen);
+  document.getElementById('platformSel').classList.toggle('open', platformDDOpen);
+  if (platformDDOpen) {
+    const rect = document.getElementById('platformSel').getBoundingClientRect();
+    dd.style.bottom = (window.innerHeight - rect.top + 6) + 'px';
+    dd.style.right = (window.innerWidth - rect.right) + 'px';
+    closeAgentDD();
+  }
+}
+function closePlatformDD() {
+  platformDDOpen = false;
+  document.getElementById('platformDD').classList.add('hidden');
+  document.getElementById('platformSel').classList.remove('open');
+}
+function setPlatform(name, ratio, optId) {
+  currentPlatformId = optId;
+  document.getElementById('platformName').textContent = name;
+  document.getElementById('platformBadge').textContent = ratio ? ratio : '';
+  document.querySelectorAll('.plat-opt').forEach(o => o.classList.remove('sel'));
+  document.getElementById(optId).classList.add('sel');
+  closePlatformDD();
+}
+function goToSetup() {
+  window.location.href = 'file:///Users/julie.li/Documents/Medialens/prototypes/ai-generator-brand-setup.html';
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#agentSel')) closeAgentDD();
+  if (!e.target.closest('#platformSel')) closePlatformDD();
+  if (!e.target.closest('#promptWrap')) closeMentionDD();
+});
+
+/* ── @mention ── */
+function onPromptInput(e) {
+  const ta = e.target;
+  const val = ta.value;
+  const charCt = document.getElementById('charCt');
+  charCt.textContent = val.length + ' / 4000';
+  updateSendBtn();
+
+  // detect @
+  const cur = ta.selectionStart;
+  const before = val.slice(0, cur);
+  const atMatch = before.match(/@(\w*)$/);
+  if (atMatch) {
+    mentionBuffer = atMatch[1];
+    openMentionDD();
+  } else {
+    closeMentionDD();
+  }
+
+  document.getElementById('promptWrap').classList.toggle('has-text', val.length > 0);
+}
+function openMentionDD() {
+  mentionOpen = true;
+  document.getElementById('mentionDrop').classList.remove('hidden');
+}
+function closeMentionDD() {
+  mentionOpen = false;
+  document.getElementById('mentionDrop').classList.add('hidden');
+}
+function selectProduct(product) {
+  const ta = document.getElementById('promptTA');
+  const val = ta.value;
+  const cur = ta.selectionStart;
+  const before = val.slice(0, cur);
+  const replaced = before.replace(/@\w*$/, '@' + product + ' ');
+  ta.value = replaced + val.slice(cur);
+  closeMentionDD();
+  ta.focus();
+  ta.selectionStart = ta.selectionEnd = replaced.length;
+  updateSendBtn();
+  document.getElementById('promptWrap').classList.add('has-text');
+}
+
+/* ── Send button ── */
+function updateSendBtn() {
+  const ta = document.getElementById('promptTA');
+  const ready = ta.value.trim().length > 0 || selectedPosts.length > 0;
+  document.getElementById('sendBtn').classList.toggle('ready', ready);
+}
+
+/* ── Send & generate conversation ── */
+function clearRefs() {
+  selectedPosts = [];
+  uploadedImgs = [];
+  renderRefStrip();
+  updateSendBtn();
+}
+function sendMessage() {
+  const ta = document.getElementById('promptTA');
+  const prompt = ta.value.trim();
+  if (!prompt && selectedPosts.length === 0) return;
+
+  // Hide welcome
+  document.getElementById('welcomeState').classList.add('hidden');
+  const conv = document.getElementById('conversation');
+  conv.classList.remove('hidden');
+
+  // Build user message with ref thumbs above
+  const refHTML = selectedPosts.map(p => `
+    <div class="msg-ref-thumb" style="background:${p.bg};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:${p.dark?'#333':'#fff'};">${p.initials}</div>`).join('');
+  const uploadHTML = uploadedImgs.map(u => `
+    <div class="msg-ref-thumb" style="background:#FFF3E0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#C2410C;">IMG</div>`).join('');
+
+  const displayPrompt = prompt || '完全複製參考 creative 的視覺構圖，替換品牌 @Dr.Once – Hair，重寫文案，突出防脫髮爆水修護效果，語氣輕鬆貼地';
+
+  conv.innerHTML += `
+    <div class="msg msg--user">
+      ${(refHTML || uploadHTML) ? `<div class="msg__refs">${refHTML}${uploadHTML}</div>` : ''}
+      <div class="msg__bubble">${displayPrompt}</div>
+      <div class="msg__time">Just now</div>
+    </div>`;
+
+  // Typing indicator
+  conv.innerHTML += `<div class="msg msg--ai" id="typingMsg"><div class="msg__bubble"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
+
+  ta.value = '';
+  document.getElementById('charCt').textContent = '0 / 4000';
+  updateSendBtn();
+  document.getElementById('promptWrap').classList.remove('has-text');
+  clearRefs();
+
+  const cb = document.getElementById('chatBody');
+  cb.scrollTop = cb.scrollHeight;
+
+  const agent = currentAgent;
+
+  // Plan label and meta vary by agent
+  const planMeta = {
+    'Creative Agent':    { label: 'dr.once 品牌 Creative 圖像生成', badge: '⭐ 20', agent: 'Creative Agent', model: 'GPT-image-2', ratio: '1:1 · High' },
+    'Ad Creative Agent': { label: 'dr.once 廣告 Creative + Ad Copy 生成', badge: '⭐ 35', agent: 'Ad Creative Agent', model: 'GPT-image-2', ratio: '1:1 · High' },
+  };
+  const pm = planMeta[agent] || { label: 'dr.once 品牌海報完整貼文生成', badge: '⭐ 40', agent: 'Marketing Agent', model: 'GPT-image-2', ratio: '1:1 · High' };
+
+  setTimeout(() => {
+    const typingMsg = document.getElementById('typingMsg');
+    if (typingMsg) typingMsg.remove();
+
+    const refPreviews = selectedPosts.map(p => `
+      <div class="grt" style="background:${p.bg};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:${p.dark?'#333':'#fff'};">${p.initials}</div>`).join('');
+
+    conv.innerHTML += `
+      <div class="gen-plan">
+        <div class="gen-plan__head">
+          <span class="gen-plan__head-title">Generation plan</span>
+          <div style="display:flex;align-items:center;gap:var(--sp-xs);">
+            <span class="badge-conf">Confirmed</span>
+            <span style="font-size:11px;color:var(--text-regular);">≋ 1 item</span>
+          </div>
+        </div>
+        <div class="gen-plan__body">
+          <div class="gen-plan__item-name">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect width="13" height="13" rx="2.5" fill="var(--border)"/><path d="M3 6.5h7M3 4h7M3 9h4" stroke="currentColor" stroke-width="1.1"/></svg>
+            ${pm.label}
+            <span style="margin-left:auto;background:var(--danger-light);color:var(--danger);font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;">${pm.badge}</span>
+          </div>
+          <div class="gen-meta">
+            <span class="gmb">${pm.agent}</span>
+            <span class="gmb">${pm.model}</span>
+            <span class="gmb">${pm.ratio}</span>
+          </div>
+          ${refPreviews ? `<div class="gen-plan__refs">${refPreviews}</div>` : ''}
+        </div>
+      </div>
+      <div class="status-row"><div class="spinner"></div>Execution started…</div>`;
+
+    cb.scrollTop = cb.scrollHeight;
+
+    setTimeout(() => {
+      document.querySelector('.status-row').remove();
+
+      // ── Shared image block (reused in all branches) ──
+      const imgBlock = `
+        <div class="gen-post__img">
+          <div style="width:100%;height:100%;position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:24px;background:linear-gradient(160deg,#0a2218 0%,#134526 60%,#0d3320 100%);">
+            <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 40% 60%,rgba(255,220,150,.18) 0%,transparent 65%);"></div>
+            <div style="position:relative;">
+              <div style="font-size:20px;font-weight:700;color:#fff;line-height:1.3;">醫美級 防脫髮<br>爆水修護</div>
+              <div style="font-size:12px;color:rgba(255,255,255,.75);margin-top:6px;">dr.once 專業護理</div>
+            </div>
+            <div style="position:relative;display:flex;flex-direction:column;gap:6px;align-items:flex-start;">
+              <div style="background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.28);border-radius:7px;padding:6px 10px;font-size:10px;color:#fff;font-weight:600;">頭髮提升 · 回復頭髮密度</div>
+              <div style="background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.28);border-radius:7px;padding:6px 10px;font-size:10px;color:#fff;font-weight:600;">減少洗髮時 · 導入修復療程</div>
+            </div>
+            <div style="position:relative;font-size:13px;font-weight:700;color:rgba(255,255,255,.9);">dr.once
+              <span style="margin-left:6px;font-size:10px;font-weight:400;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);padding:2px 8px;border-radius:4px;">專業護理</span>
+            </div>
+          </div>
+          <div class="gen-post__img-hover">
+            <button class="gen-img-btn primary" onclick="openGenPage()">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 11l3.5-3.5 1.5 1.5 3.5-5.5" stroke="#fff" stroke-width="1.4"/></svg>
+              Edit
+            </button>
+            <button class="gen-img-btn" onclick="openGenPage()">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="#fff" stroke-width="1.4"/><circle cx="6.5" cy="6.5" r="2" fill="#fff"/></svg>
+              Check Original
+            </button>
+          </div>
+        </div>`;
+
+      if (agent === 'Creative Agent') {
+        // ── Creative Agent: image / video grid only ──
+        conv.innerHTML += `
+          <div class="msg msg--ai">
+            <div class="msg__bubble" style="max-width:100%;width:100%;padding:0;background:transparent;border:none;">
+              <div style="font-size:12px;color:var(--text-regular);padding:var(--sp-xs) var(--sp-sm) var(--sp-xs);">已為你生成 2 款 dr.once Creative 視覺素材，可直接用於貼文或廣告。</div>
+            </div>
+          </div>
+          <div class="creative-out">
+            <div class="creative-out__grid">
+              <div class="creative-out__item" onclick="openGenPage()" style="height:180px;">
+                ${imgBlock}
+              </div>
+              <div class="creative-out__item" onclick="openGenPage()" style="height:180px;">
+                <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:20px;background:linear-gradient(145deg,#1a0533 0%,#3b0f6e 100%);">
+                  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 60% 40%,rgba(180,120,255,.22) 0%,transparent 60%);"></div>
+                  <div style="position:relative;font-size:18px;font-weight:700;color:#fff;line-height:1.3;">強韌髮根<br>無懼脫落</div>
+                  <div style="position:relative;font-size:11px;color:rgba(255,255,255,.7);">dr.once · Advanced Hair</div>
+                </div>
+                <div class="gen-post__img-hover">
+                  <button class="gen-img-btn primary" onclick="openGenPage()">
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 11l3.5-3.5 1.5 1.5 3.5-5.5" stroke="#fff" stroke-width="1.4"/></svg>
+                    Edit
+                  </button>
+                  <button class="gen-img-btn" onclick="openGenPage()">
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="#fff" stroke-width="1.4"/><circle cx="6.5" cy="6.5" r="2" fill="#fff"/></svg>
+                    Check Original
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="creative-out__label">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1l1 2.2 2.4.35-1.75 1.7.41 2.4L6 6.5 3.84 7.65l.41-2.4L2.5 3.55l2.4-.35L6 1z" fill="#F59E0B"/></svg>
+              AI Generated · GPT-image-2 · 1:1 · 2 variants
+              <span style="margin-left:auto;color:var(--brand-blue);cursor:pointer;" onclick="openGenPage()">Open in Generator →</span>
+            </div>
+            <div class="creative-out__actions">
+              <button class="btn btn-out" style="font-size:11px;padding:4px 10px;" onclick="openGenPage()">Edit in Generator</button>
+              <button class="btn btn-sec" style="font-size:11px;padding:4px 10px;">Try Video</button>
+              <button class="btn btn-sec" style="font-size:11px;padding:4px 10px;">Regenerate</button>
+              <button class="btn btn-pri" style="font-size:11px;padding:4px 10px;margin-left:auto;">Use Creative</button>
+            </div>
+          </div>`;
+
+      } else if (agent === 'Ad Creative Agent') {
+        // ── Ad Creative Agent: image + structured ad fields ──
+        conv.innerHTML += `
+          <div class="msg msg--ai">
+            <div class="msg__bubble" style="max-width:100%;width:100%;padding:0;background:transparent;border:none;">
+              <div style="font-size:12px;color:var(--text-regular);padding:var(--sp-xs) var(--sp-sm) var(--sp-xs);">已生成廣告素材及配套廣告文案，可直接用於 Meta 廣告投放。</div>
+            </div>
+          </div>
+          <div class="ad-creative-out">
+            <div class="ad-creative-out__img" onclick="openGenPage()" style="height:200px;">
+              ${imgBlock}
+            </div>
+            <div class="gen-post__img-label" style="border-bottom:1px solid var(--divider);">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1l1 2.2 2.4.35-1.75 1.7.41 2.4L6 6.5 3.84 7.65l.41-2.4L2.5 3.55l2.4-.35L6 1z" fill="#F59E0B"/></svg>
+              AI Generated · GPT-image-2 · 1:1
+              <span style="margin-left:auto;color:var(--brand-blue);cursor:pointer;" onclick="openGenPage()">Open in Generator →</span>
+            </div>
+            <div class="ad-fields">
+              <div class="ad-field">
+                <div class="ad-field__label">Headline</div>
+                <div class="ad-field__val editable" contenteditable="true">醫美級防脫髮爆水修護 — dr.once 專業護理系列</div>
+              </div>
+              <div class="ad-field">
+                <div class="ad-field__label">Primary Text</div>
+                <div class="ad-field__val editable" contenteditable="true" style="min-height:56px;">不論頭髮稀疏定脫落，dr.once 醫美級成分深層滋養髮根，強化髮絲，讓你重現豐盈健康頭髮。限時體驗套裝，即日起至7月31日。</div>
+              </div>
+              <div class="ad-field">
+                <div class="ad-field__label">Call to Action</div>
+                <div class="ad-cta-row">
+                  <div class="ad-cta-chip">Shop Now</div>
+                  <div class="ad-cta-chip alt">Learn More</div>
+                  <div class="ad-cta-chip alt">Get Offer</div>
+                  <div class="ad-cta-chip alt">Sign Up</div>
+                </div>
+              </div>
+            </div>
+            <div class="ad-creative-out__actions">
+              <button class="btn btn-out" style="font-size:11px;padding:4px 10px;" onclick="openGenPage()">Edit Creative</button>
+              <button class="btn btn-sec" style="font-size:11px;padding:4px 10px;">Regenerate</button>
+              <button class="btn btn-pri" style="font-size:11px;padding:4px 10px;margin-left:auto;">Send to Ad Manager</button>
+            </div>
+          </div>`;
+
+      } else {
+        // ── Default: full post (copy + image) ──
+        conv.innerHTML += `
+          <div class="msg msg--ai">
+            <div class="msg__bubble" style="max-width:100%;width:100%;padding:0;background:transparent;border:none;">
+              <div style="font-size:12px;color:var(--text-regular);padding:var(--sp-xs) var(--sp-sm) var(--sp-xs);">已為你生成一篇完整 dr.once 品牌貼文，包含文案與視覺。視覺完全複刻參考 creative 的沙龍構圖，文案替換為防脫髮爆水修護主題，品牌更新為 dr.once。</div>
+            </div>
+          </div>
+
+          <div class="gen-post">
+            <div class="gen-post__header">
+              <div class="gen-post__av">dr</div>
+              <div>
+                <div class="gen-post__brand">Dr.Once – Hair</div>
+                <div class="gen-post__meta">Sponsored · Hong Kong</div>
+              </div>
+            </div>
+            <div class="gen-post__copy">
+              <strong>醫美級防脫髮爆水修護智慧 | dr.once 專業護理系列</strong><br><br>
+              不論頭髮稀疏定脫落，當你識用醫美級護髮智慧，就唔使再擔心每日洗頭時的脫髮困擾，都可以重現當下最豐盈嘅健康頭髮狀態！<br><br>
+              dr.once 深諳現代人對頭髮健康嘅追求，透過醫美級成分科研，成功發揮「防脫髮 · 爆水修護」—— 深層滋養髮根、強化髮絲、鎖住水份，並將專業護理力量引入全新「防脫髮爆水修護系列」。<br><br>
+              <strong>[限時優惠]</strong> 防脫髮爆水修護體驗套裝<br>
+              醫美級成分：蘊含2倍濃縮防脫因子 + 爆水修護技術，強韌髮根、減少脫髮<br>
+              頭皮護理：深層清潔 + 舒緩頭皮，回復健康頭皮環境<br><br>
+              了解更多或立即選購：<span class="highlight">dronce.hk/hair-care</span><br><br>
+              優惠期：即日至7月31日<br><br>
+              #DrOnce #防脫髮 #爆水修護 #醫美護髮 #頭髮健康 #HairCare #DrOnceHK #專業護理
+            </div>
+            <div class="gen-post__img-wrap" onclick="openGenPage()">
+              ${imgBlock}
+              <div class="gen-post__img-label">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1l1 2.2 2.4.35-1.75 1.7.41 2.4L6 6.5 3.84 7.65l.41-2.4L2.5 3.55l2.4-.35L6 1z" fill="#F59E0B"/></svg>
+                AI Generated · GPT-image-2 · 1:1
+                <span style="margin-left:auto;color:var(--brand-blue);cursor:pointer;" onclick="openGenPage()">Open in Generator →</span>
+              </div>
+            </div>
+            <div class="gen-post__actions">
+              <button class="btn btn-out" style="font-size:11px;padding:4px 10px;" onclick="openGenPage()">Edit in Generator</button>
+              <button class="btn btn-sec" style="font-size:11px;padding:4px 10px;">Regenerate</button>
+              <button class="btn btn-sec" style="font-size:11px;padding:4px 10px;">Try Video</button>
+              <button class="btn btn-pri" style="font-size:11px;padding:4px 10px;margin-left:auto;">Use This Post</button>
+            </div>
+          </div>`;
+      }
+
+      cb.scrollTop = cb.scrollHeight;
+      hasConversation = true;
+    }, 2200);
+  }, 1400);
+}
+
+/* ── Generator page ── */
+function openGenPage() {
+  document.getElementById('gen-page').classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+function closeGenPage() {
+  document.getElementById('gen-page').classList.remove('on');
+  document.body.style.overflow = '';
+}
+function switchGenNav(item, paneId) {
+  document.querySelectorAll('.gp-navitem').forEach(n => n.classList.remove('active'));
+  item.classList.add('active');
+  document.querySelectorAll('.gp-main-pane').forEach(p => p.classList.remove('active'));
+  const pane = document.getElementById(paneId);
+  if (pane) pane.classList.add('active');
+}
+function switchPostFmt(btn) {
+  btn.closest('.post-fmt-bar').querySelectorAll('.post-fmt-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+/* ── Init: apply default agent state on load ── */
+applyPanelState('auto');
+
+/* ── Click outside to close pickers ── */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (pickerOpen) { document.getElementById('pickerOverlay').classList.remove('open'); pickerOpen = false; }
+    if (document.getElementById('gen-page').classList.contains('on')) closeGenPage();
+  }
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) sendMessage();
+});
+</script>
+
+<!-- Agent dropdown — lifted to body to escape ai-panel transform -->
+<div class="agent-dd hidden" id="agentDD" onclick="event.stopPropagation()">
+  <div style="font-size:10px;font-weight:600;color:var(--text-placeholder);text-transform:uppercase;letter-spacing:.5px;padding:var(--sp-xs) var(--sp-md) 2px;">Select Agent</div>
+  <div class="agent-opt sel" id="agopt-auto" onclick="setAgent('Auto','auto'); closeAgentDD()">
+    <div class="agent-opt__av" style="background:#F0FDF4;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1l1.2 2.4 2.6.38-1.9 1.85.45 2.6L7 7.1 4.65 8.23l.45-2.6L3.2 3.78l2.6-.38L7 1z" fill="#16A34A"/></svg></div>
+    <div><div class="agent-opt__name">Auto</div><div class="agent-opt__sub">Routes to the best agent for your intent</div></div>
+  </div>
+  <div class="agent-opt" id="agopt-imgvid" onclick="setAgent('Image/Video Gen','image-video'); closeAgentDD()">
+    <div class="agent-opt__av" style="background:#FFF0F9;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="2" width="11" height="10" rx="1.5" stroke="#DB2777" stroke-width="1.3"/><circle cx="4.5" cy="5.5" r="1.2" fill="#DB2777"/><path d="M1.5 10.5l3.5-3.5 2 2 2.5-3 2.5 3.5" stroke="#DB2777" stroke-width="1.1" stroke-linecap="round"/></svg></div>
+    <div><div class="agent-opt__name">Image/Video Gen agent</div><div class="agent-opt__sub">Generate image or video creative assets</div></div>
+  </div>
+  <div class="agent-opt" id="agopt-advisor" onclick="setAgent('Ad Advisor','ad-advisor'); closeAgentDD()">
+    <div class="agent-opt__av" style="background:#EFF6FF;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#2563EB" stroke-width="1.3"/><path d="M7 4v3.5l2 1.5" stroke="#2563EB" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+    <div><div class="agent-opt__name">Ad Advisor</div><div class="agent-opt__sub">Ad strategy &amp; performance recommendations</div></div>
+  </div>
+  <div class="agent-opt" id="agopt-insights" onclick="setAgent('Campaign Insights','campaign-insights'); closeAgentDD()">
+    <div class="agent-opt__av" style="background:#F0F9FF;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 10l2.5-4 2 2.5 2-5 2.5 6.5" stroke="#0284C7" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div><div class="agent-opt__name">Campaign Insights agent</div><div class="agent-opt__sub">Get insights and analysis on your campaigns</div></div>
+  </div>
+  <div style="height:1px;background:var(--divider);margin:4px 0;"></div>
+  <div class="agent-opt" id="agopt-publish" onclick="setAgent('Meta Content Publish','meta-publish'); closeAgentDD()">
+    <div class="agent-opt__av" style="background:#FDF4FF;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v7M4 6l3 3 3-3" stroke="#9333EA" stroke-width="1.4" stroke-linecap="round"/><path d="M2 11h10" stroke="#9333EA" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+    <div><div class="agent-opt__name">Meta content publish agent</div><div class="agent-opt__sub">Schedule &amp; publish posts to Meta pages</div></div>
+  </div>
+  <div class="agent-opt" id="agopt-adeditor" onclick="setAgent('Meta Ad Editor','meta-ad-editor'); closeAgentDD()">
+    <div class="agent-opt__av" style="background:#FFFBEB;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="10" rx="1.5" stroke="#D97706" stroke-width="1.3"/><path d="M3 5h8M3 7h5M3 9h6" stroke="#D97706" stroke-width="1.1" stroke-linecap="round"/></svg></div>
+    <div><div class="agent-opt__name">Meta ad editor agent</div><div class="agent-opt__sub">Edit and optimise existing Meta ads</div></div>
+  </div>
+  <div class="agent-opt" id="agopt-adpublish" onclick="setAgent('Meta Ad Publish','meta-ad-publish'); closeAgentDD()">
+    <div class="agent-opt__av" style="background:#FDF4FF;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l4 4 6-7" stroke="#9333EA" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+    <div><div class="agent-opt__name">Meta ad publish agent</div><div class="agent-opt__sub">Review &amp; publish ads to Ad Manager</div></div>
+  </div>
+</div>
+
+<!-- Platform dropdown — lifted to body to escape ai-panel transform -->
+<div class="platform-dd hidden" id="platformDD" onclick="event.stopPropagation()">
+  <div class="plat-opt sel" id="plat-auto" onclick="setPlatform('Auto','','plat-auto')"><span class="plat-opt__name">Auto</span><span class="plat-ratio">Best fit</span></div>
+  <div style="height:1px;background:var(--divider);"></div>
+  <div class="plat-group-label">Facebook</div>
+  <div class="plat-opt" id="plat-fb-feed" onclick="setPlatform('Facebook Feed','1:1','plat-fb-feed')"><span class="plat-opt__name">Facebook Feed</span><span class="plat-ratio">1:1 · 1080×1080</span></div>
+  <div style="height:1px;background:var(--divider);"></div>
+  <div class="plat-group-label">Instagram</div>
+  <div class="plat-opt" id="plat-ig-feed-sq" onclick="setPlatform('Instagram Feed','1:1','plat-ig-feed-sq')"><span class="plat-opt__name">Instagram Feed</span><span class="plat-ratio">1:1 · 1080×1080</span></div>
+  <div class="plat-opt" id="plat-ig-feed-pt" onclick="setPlatform('Instagram Feed','4:5','plat-ig-feed-pt')"><span class="plat-opt__name">Instagram Feed (Portrait)</span><span class="plat-ratio">4:5 · 1080×1350</span></div>
+  <div class="plat-opt" id="plat-ig-story" onclick="setPlatform('Instagram Stories','9:16','plat-ig-story')"><span class="plat-opt__name">Instagram Stories</span><span class="plat-ratio">9:16 · 1080×1920</span></div>
+  <div class="plat-opt" id="plat-ig-reels" onclick="setPlatform('Instagram Reels','9:16','plat-ig-reels')"><span class="plat-opt__name">Instagram Reels</span><span class="plat-ratio">9:16 · 1080×1920</span></div>
+  <div style="height:1px;background:var(--divider);"></div>
+  <div class="plat-group-label">Other</div>
+  <div class="plat-opt" id="plat-web" onclick="setPlatform('Web','16:9','plat-web')"><span class="plat-opt__name">Web (Landscape)</span><span class="plat-ratio">16:9</span></div>
+  <div class="plat-opt" id="plat-yt" onclick="setPlatform('YouTube','16:9','plat-yt')"><span class="plat-opt__name">YouTube (Landscape)</span><span class="plat-ratio">16:9</span></div>
+</div>
+
+</body>
+</html>
