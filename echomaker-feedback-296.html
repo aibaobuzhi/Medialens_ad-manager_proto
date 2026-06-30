@@ -267,7 +267,7 @@ table{border-collapse:collapse;width:100%}
                   <span class="badge badge--verified">✓ Verified</span>
                   <div style="margin-left:auto;display:flex;gap:8px;">
                     <button class="kol-field__edit" onclick="document.getElementById('modal-change-phone').removeAttribute('hidden')">Edit</button>
-                    <button class="kol-field__edit" onclick="document.getElementById('modal-change-record').removeAttribute('hidden')">Change record</button>
+                    <button onclick="document.getElementById('modal-change-record').removeAttribute('hidden')" style="background:none;border:none;font-size:12px;color:var(--text-3);cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:0;">Change record</button>
                   </div>
                 </div>
               </div>
@@ -322,7 +322,7 @@ table{border-collapse:collapse;width:100%}
     <div class="modal__head"><span class="modal__title">Edit Contact Number</span><button class="modal__close" onclick="this.closest('.overlay').setAttribute('hidden','')">✕</button></div>
     <div class="modal__body">
       <div class="field"><label class="field__label">New Phone Number</label><input class="input" value="85263606717"/></div>
-      <div class="alert alert--warning">After saving, the KOL will need to re-verify with the new number. Status will be set to <strong>Verifying</strong> until they complete verification.</div>
+      <p style="font-size:13px;color:#92400E;background:var(--warning-light);border:1px solid #FDE68A;border-radius:var(--r-md);padding:10px 14px;line-height:1.6;">After saving, the KOL will need to re-verify with the new number. Status will be set to <strong>Verifying</strong> until they complete verification.</p>
     </div>
     <div class="modal__foot">
       <button class="btn btn--ghost" onclick="this.closest('.overlay').setAttribute('hidden','')">Cancel</button>
