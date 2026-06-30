@@ -405,98 +405,256 @@ table{border-collapse:collapse;width:100%}
 
 <!-- ══ SCREEN 2 — KOL Registration ══ -->
 <div id="s2" class="screen" style="background:#f3f4f6;min-height:calc(100vh - 41px);">
-  <div style="max-width:680px;margin:0 auto;padding:32px 20px;width:100%;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="background:var(--pink);width:36px;height:36px;border-radius:8px;display:grid;place-items:center;"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#fff" stroke-width="1.8"/><path d="M6.5 10C6.5 7.5 8 6 10 6s3.5 1.5 3.5 4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><circle cx="10" cy="13" r="1.5" fill="#fff"/></svg></div>
-        <span style="font-weight:700;font-size:16px;">ECHO<span style="color:var(--pink);">MAKER</span></span>
+  <div style="max-width:760px;margin:0 auto;padding:32px 20px;width:100%;">
+
+    <!-- Echomaker logo -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px;">
+      <div style="background:var(--pink);width:36px;height:36px;border-radius:8px;display:grid;place-items:center;">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#fff" stroke-width="1.8"/><path d="M6.5 10C6.5 7.5 8 6 10 6s3.5 1.5 3.5 4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><circle cx="10" cy="13" r="1.5" fill="#fff"/></svg>
       </div>
-      <button class="btn btn--outline btn--sm">My Enrolments</button>
+      <span style="font-weight:700;font-size:16px;">ECHO<span style="color:var(--pink);">MAKER</span></span>
+      <button class="btn btn--outline btn--sm" style="margin-left:auto;">My Enrolments</button>
     </div>
 
-    <div class="card">
-      <div class="card__head"><span class="card__title">Account Info</span></div>
-      <div class="card__body stack">
-        <p class="text-sm text-muted">We'll only use this info to personalise your experience on EchoMaker.</p>
+    <!-- ★ Sub-tabs ★ -->
+    <div style="display:flex;border-bottom:2px solid var(--border);margin-bottom:24px;background:#fff;border-radius:var(--r-lg) var(--r-lg) 0 0;overflow:hidden;">
+      <button id="reg-tab-account" onclick="switchRegTab('account')"
+        style="flex:1;padding:14px 20px;font-size:14px;font-weight:600;background:none;border:0;border-bottom:3px solid var(--pink);color:var(--pink);cursor:pointer;transition:all .15s;">
+        Account Info
+      </button>
+      <button id="reg-tab-register" onclick="switchRegTab('register')"
+        style="flex:1;padding:14px 20px;font-size:14px;font-weight:500;background:none;border:0;border-bottom:3px solid transparent;color:var(--text-2);cursor:pointer;transition:all .15s;">
+        Registration
+      </button>
+    </div>
 
-        <!-- Occupation ★ NEW optional field — default: Prefer not to say ★ -->
-        <div style="padding:10px 0;border-bottom:1px solid var(--divider);">
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <div>
-              <div class="text-sm text-muted">Occupation <span style="font-size:11px;color:var(--text-3);">(Optional)</span></div>
-              <div class="font-medium" style="margin-top:2px;" id="occ-display">Prefer not to say</div>
+    <!-- ── Tab 1: Account Info ── -->
+    <div id="reg-panel-account">
+      <div class="card">
+        <div class="card__head"><span class="card__title">Account Info</span></div>
+        <div class="card__body stack">
+          <p class="text-sm text-muted">We'll only use this info to personalise your experience on EchoMaker.</p>
+
+          <div style="padding:10px 0;border-bottom:1px solid var(--divider);">
+            <div class="text-sm text-muted" style="margin-bottom:2px;">Full name</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div class="font-medium">JulietestProd</div><button class="btn--pink-text">Edit</button>
             </div>
-            <button class="btn--pink-text" onclick="toggleOccEdit()">Edit</button>
           </div>
-          <div id="occ-edit" hidden style="margin-top:12px;" class="stack">
-            <div class="field">
-              <label class="field__label">Select your occupation</label>
+
+          <div style="padding:10px 0;border-bottom:1px solid var(--divider);">
+            <div class="text-sm text-muted" style="margin-bottom:2px;">Contact number</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div class="font-medium">+86 15920092955 (Verified)</div>
+              <button class="btn btn--outline btn--sm" style="border-radius:var(--r-md);">Change</button>
+            </div>
+          </div>
+
+          <!-- Occupation — default Prefer not to say -->
+          <div style="padding:10px 0;border-bottom:1px solid var(--divider);">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div class="text-sm text-muted">Occupation <span style="font-size:11px;color:var(--text-3);">(Optional)</span></div>
+                <div class="font-medium" style="margin-top:2px;" id="occ-display">Prefer not to say</div>
+              </div>
+              <button class="btn--pink-text" onclick="toggleOccEdit()">Edit</button>
+            </div>
+            <div id="occ-edit" hidden style="margin-top:12px;" class="stack">
               <select class="select" onchange="document.getElementById('occ-display').textContent=this.value">
                 <option>Prefer not to say</option>
+                <option>Freelance</option>
                 <option>Employed</option>
-                <option>Self-employed / Freelance</option>
-                <option>Student</option>
+                <option>Students</option>
                 <option>Homemaker</option>
                 <option>Retired</option>
                 <option>Unemployed</option>
               </select>
+              <div class="row" style="justify-content:flex-end;">
+                <button class="btn btn--ghost btn--sm" onclick="toggleOccEdit()">Cancel</button>
+                <button class="btn btn--pink btn--sm" onclick="toggleOccEdit()">Save</button>
+              </div>
             </div>
-            <div class="row" style="justify-content:flex-end;">
-              <button class="btn btn--ghost btn--sm" onclick="toggleOccEdit()">Cancel</button>
-              <button class="btn btn--pink btn--sm" onclick="toggleOccEdit()">Save</button>
-            </div>
-          </div>
-          <div style="margin-top:8px;background:var(--pink-light);border:1px dashed var(--pink-border);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--pink);">★ Default is "Prefer not to say" when KOL skips this field.</div>
-        </div>
-
-        <!-- Parenting — ★ Children birth year ★ -->
-        <div style="padding:10px 0;">
-          <div class="text-sm text-muted" style="margin-bottom:10px;">Do you have any children?</div>
-          <div class="row" style="gap:20px;margin-bottom:14px;">
-            <label class="radio-wrap"><div class="radio-custom" id="r-no"></div><span class="font-medium">No</span></label>
-            <label class="radio-wrap" onclick="document.getElementById('r-no').classList.remove('checked');document.getElementById('r-yes').classList.add('checked');document.getElementById('children-section').style.display='block'">
-              <div class="radio-custom checked" id="r-yes"></div><span class="font-medium">Yes</span>
-            </label>
+            <div style="margin-top:8px;background:var(--pink-light);border:1px dashed var(--pink-border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--pink);">★ Default is "Prefer not to say" when KOL skips this field.</div>
           </div>
 
-          <div id="children-section">
-            <div class="field" style="margin-bottom:14px;">
-              <label class="field__label">How many children do you have?</label>
-              <input class="input" style="max-width:100px;" value="2" type="number" min="1" max="10" oninput="updateChildrenYears(this.value)"/>
+          <!-- Children + birth year -->
+          <div style="padding:10px 0;">
+            <div class="text-sm text-muted" style="margin-bottom:8px;">Do you have any children?</div>
+            <div class="row" style="gap:20px;margin-bottom:12px;">
+              <label class="radio-wrap"><div class="radio-custom" id="ai-r-no"></div><span class="font-medium">No</span></label>
+              <label class="radio-wrap" onclick="toggleAIChildren(true)">
+                <div class="radio-custom checked" id="ai-r-yes"></div><span class="font-medium">Yes</span>
+              </label>
             </div>
-
-            <!-- ★ Birth year per child ★ -->
-            <div style="border:1px solid var(--pink-border);border-radius:var(--r-md);padding:14px;background:var(--pink-light);">
-              <div style="font-size:12px;color:var(--pink);font-weight:600;margin-bottom:10px;">★ New: Birth Year per Child</div>
-              <div id="birth-year-fields" class="stack" style="gap:8px;">
-                <div class="field">
-                  <label class="field__label">Birth year of Child 1</label>
-                  <input class="input" style="max-width:160px;" placeholder="e.g. 2018" value="2018"/>
-                </div>
-                <div class="field">
-                  <label class="field__label">Birth year of Child 2</label>
-                  <input class="input" style="max-width:160px;" placeholder="e.g. 2021" value="2021"/>
+            <div id="ai-children-section">
+              <div class="field" style="margin-bottom:10px;">
+                <label class="field__label">How many children do you have?</label>
+                <input class="input" style="max-width:100px;" value="2" type="number" min="1" max="10" oninput="updateAIChildYears(this.value)"/>
+              </div>
+              <div style="border:1px solid var(--pink-border);border-radius:var(--r-md);padding:12px;background:var(--pink-light);">
+                <div style="font-size:12px;color:var(--pink);font-weight:600;margin-bottom:8px;">★ New: Birth Year per Child</div>
+                <div id="ai-birth-year-fields" class="stack" style="gap:8px;">
+                  <div class="field"><label class="field__label">Birth year of Child 1</label><input class="input" style="max-width:160px;" value="2018"/></div>
+                  <div class="field"><label class="field__label">Birth year of Child 2</label><input class="input" style="max-width:160px;" value="2021"/></div>
                 </div>
               </div>
-              <div style="margin-top:10px;font-size:12px;color:var(--text-2);">Enter YYYY for each child. Helps match parenting-category campaigns by child age.</div>
             </div>
-          </div>
-
-          <div class="row" style="justify-content:flex-end;margin-top:14px;">
-            <button class="btn btn--ghost btn--sm">Cancel</button>
-            <button class="btn btn--pink btn--sm">Save</button>
+            <div class="row" style="justify-content:flex-end;margin-top:12px;">
+              <button class="btn btn--ghost btn--sm">Cancel</button>
+              <button class="btn btn--pink btn--sm">Save</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- ── Tab 2: Registration (KOL-facing signup form) ── -->
+    <div id="reg-panel-register" hidden>
+
+      <!-- Step indicator -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:32px;">
+        <!-- Step 1: Verification (done) -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#10B981;display:grid;place-items:center;">
+            <svg width="16" height="16" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12l5 5L19 7"/></svg>
+          </div>
+          <span style="font-size:12px;color:#10B981;font-weight:500;">Verification</span>
+        </div>
+        <div style="width:60px;height:2px;background:#10B981;margin-bottom:18px;"></div>
+        <!-- Step 2: Profile (active) -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--pink);display:grid;place-items:center;">
+            <span style="color:#fff;font-weight:700;font-size:14px;">2</span>
+          </div>
+          <span style="font-size:12px;color:var(--pink);font-weight:600;">Profile</span>
+        </div>
+        <div style="width:60px;height:2px;background:var(--border);margin-bottom:18px;"></div>
+        <!-- Step 3: Connection -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--border);display:grid;place-items:center;">
+            <span style="color:var(--text-3);font-weight:700;font-size:14px;">3</span>
+          </div>
+          <span style="font-size:12px;color:var(--text-3);">Connection</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__body stack" style="gap:20px;">
+
+          <!-- Country -->
+          <div class="field">
+            <label class="field__label" style="font-size:14px;font-weight:500;color:var(--text-1);">Country/Region <span style="color:var(--danger);">*</span></label>
+            <select class="select"><option>Please select</option><option selected>Hong Kong</option><option>Macau</option><option>Taiwan</option></select>
+            <span style="font-size:12px;color:var(--text-2);">Your country or region influences the content you see and determines the currency used. Once saved, it can't be changed again.</span>
+          </div>
+
+          <!-- Email -->
+          <div class="field">
+            <label class="field__label" style="font-size:14px;font-weight:500;color:var(--text-1);">Email address</label>
+            <input class="input" placeholder="Please enter"/>
+          </div>
+
+          <hr style="border:none;border-top:1px solid var(--border);"/>
+
+          <!-- ★ Occupation — radio buttons, optional ★ -->
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span style="font-size:14px;font-weight:500;color:var(--text-1);">Occupation</span>
+              <span style="font-size:12px;color:var(--text-3);background:#f3f4f6;padding:2px 8px;border-radius:var(--r-full);">optional</span>
+              <div style="margin-left:auto;background:var(--pink-light);border:1px dashed var(--pink-border);border-radius:6px;padding:3px 8px;font-size:11px;color:var(--pink);">★ New field</div>
+            </div>
+            <div style="border:1.5px solid var(--border);border-radius:var(--r-md);padding:16px;display:flex;gap:28px;flex-wrap:wrap;" id="reg-occ-box">
+              <label class="radio-wrap" onclick="selectRegOcc(this,'Freelance')">
+                <div class="radio-custom" id="rocc-freelance"></div><span style="font-size:14px;">Freelance</span>
+              </label>
+              <label class="radio-wrap" onclick="selectRegOcc(this,'Employed')">
+                <div class="radio-custom" id="rocc-employed"></div><span style="font-size:14px;">Employed</span>
+              </label>
+              <label class="radio-wrap" onclick="selectRegOcc(this,'Students')">
+                <div class="radio-custom" id="rocc-students"></div><span style="font-size:14px;">Students</span>
+              </label>
+              <label class="radio-wrap" onclick="selectRegOcc(this,'Homemaker')">
+                <div class="radio-custom" id="rocc-homemaker"></div><span style="font-size:14px;">Homemaker</span>
+              </label>
+            </div>
+            <div style="margin-top:6px;font-size:12px;color:var(--text-3);">Leave blank to default to "Prefer not to say".</div>
+          </div>
+
+          <!-- ★ Children section — with birth year ★ -->
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span style="font-size:14px;font-weight:500;color:var(--text-1);">Do you have children?</span>
+              <div style="margin-left:auto;background:var(--pink-light);border:1px dashed var(--pink-border);border-radius:6px;padding:3px 8px;font-size:11px;color:var(--pink);">★ Birth year added</div>
+            </div>
+            <div style="border:1.5px solid var(--border);border-radius:var(--r-md);padding:16px;" id="reg-children-box">
+              <div style="display:flex;gap:28px;margin-bottom:14px;">
+                <label class="radio-wrap" onclick="toggleRegChildren(false)">
+                  <div class="radio-custom" id="rc-no"></div><span style="font-size:14px;">No</span>
+                </label>
+                <label class="radio-wrap" onclick="toggleRegChildren(true)">
+                  <div class="radio-custom checked" id="rc-yes"></div>
+                  <span style="font-size:14px;">If yes, how many children do you have?</span>
+                </label>
+              </div>
+
+              <div id="reg-children-detail">
+                <!-- Count input -->
+                <input class="input" style="max-width:120px;margin-bottom:14px;" type="number" value="2" min="1" max="10" oninput="updateRegChildYears(this.value)"/>
+
+                <!-- ★ Birth year fields ★ -->
+                <div id="reg-birth-year-fields" class="stack" style="gap:10px;">
+                  <div class="field">
+                    <label class="field__label">Birth year of Child 1</label>
+                    <input class="input" style="max-width:180px;border:1.5px solid var(--border);" placeholder="e.g. 2018"/>
+                  </div>
+                  <div class="field">
+                    <label class="field__label">Birth year of Child 2</label>
+                    <input class="input" style="max-width:180px;border:1.5px solid var(--border);" placeholder="e.g. 2021"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pets section (existing, for context) -->
+          <div>
+            <div style="font-size:14px;font-weight:500;color:var(--text-1);margin-bottom:10px;">Do you have pets?</div>
+            <div style="display:flex;gap:28px;margin-bottom:10px;">
+              <label class="radio-wrap" onclick="togglePets(false)">
+                <div class="radio-custom checked" id="rp-no"></div><span style="font-size:14px;">No</span>
+              </label>
+              <label class="radio-wrap" onclick="togglePets(true)">
+                <div class="radio-custom" id="rp-yes"></div><span style="font-size:14px;">If yes, what kinds of pets do you have?</span>
+              </label>
+            </div>
+            <div id="reg-pets-types" hidden style="display:flex;gap:16px;padding-left:8px;">
+              <label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;">
+                <input type="checkbox" style="accent-color:var(--pink);width:15px;height:15px;"/> Dogs
+              </label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;">
+                <input type="checkbox" style="accent-color:var(--pink);width:15px;height:15px;"/> Cats
+              </label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;">
+                <input type="checkbox" style="accent-color:var(--pink);width:15px;height:15px;"/> Others
+              </label>
+            </div>
+          </div>
+
+          <!-- Continue button -->
+          <button class="btn btn--pink" style="width:100%;border-radius:var(--r-full);padding:14px;font-size:15px;font-weight:600;margin-top:8px;">Continue</button>
+        </div>
+      </div>
+    </div><!-- /reg-panel-register -->
 
     <div class="alert alert--info" style="margin-top:16px;">
       <div>
-        <strong>Changes:</strong><br>
-        1. <strong>Occupation</strong> — optional field; default value = "Prefer not to say" when not filled.<br>
-        2. <strong>Children Birth Year</strong> — label format is now "Birth year of Child 1", "Birth year of Child 2" etc.
+        <strong>Changes in this screen:</strong><br>
+        1. <strong>Two subtabs</strong> — Account Info (existing edit view) + Registration (KOL-facing signup flow).<br>
+        2. <strong>Occupation</strong> — radio buttons (Freelance / Employed / Students / Homemaker); optional; blank defaults to "Prefer not to say".<br>
+        3. <strong>Children Birth Year</strong> — selecting "Yes" + entering count reveals per-child "Birth year of Child N" inputs.
       </div>
     </div>
+
   </div>
 </div>
 
@@ -1305,9 +1463,76 @@ function updateBonusPreview() {
       : `Total payout: <strong>HKD ${base}.00</strong> (No extra bonus)`;
 }
 
+function switchRegTab(tab) {
+  const isAccount = tab === 'account';
+  document.getElementById('reg-panel-account').hidden = !isAccount;
+  document.getElementById('reg-panel-register').hidden = isAccount;
+  const tA = document.getElementById('reg-tab-account');
+  const tR = document.getElementById('reg-tab-register');
+  tA.style.borderBottomColor = isAccount ? 'var(--pink)' : 'transparent';
+  tA.style.color = isAccount ? 'var(--pink)' : 'var(--text-2)';
+  tA.style.fontWeight = isAccount ? '600' : '500';
+  tR.style.borderBottomColor = isAccount ? 'transparent' : 'var(--pink)';
+  tR.style.color = isAccount ? 'var(--text-2)' : 'var(--pink)';
+  tR.style.fontWeight = isAccount ? '500' : '600';
+}
+
 function toggleOccEdit() {
   const ed = document.getElementById('occ-edit');
   ed.hidden = !ed.hidden;
+}
+
+function selectRegOcc(el, val) {
+  ['rocc-freelance','rocc-employed','rocc-students','rocc-homemaker'].forEach(id => {
+    document.getElementById(id).classList.remove('checked');
+  });
+  const key = 'rocc-' + val.toLowerCase();
+  const el2 = document.getElementById(key);
+  if (el2) el2.classList.add('checked');
+}
+
+function toggleRegChildren(show) {
+  document.getElementById('rc-no').classList.toggle('checked', !show);
+  document.getElementById('rc-yes').classList.toggle('checked', show);
+  document.getElementById('reg-children-detail').hidden = !show;
+}
+
+function updateRegChildYears(val) {
+  const n = Math.min(parseInt(val)||0, 10);
+  const c = document.getElementById('reg-birth-year-fields');
+  c.innerHTML = '';
+  for (let i = 1; i <= n; i++) {
+    const d = document.createElement('div');
+    d.className = 'field';
+    d.innerHTML = `<label class="field__label">Birth year of Child ${i}</label><input class="input" style="max-width:180px;border:1.5px solid var(--border);" placeholder="e.g. ${2017+i}"/>`;
+    c.appendChild(d);
+  }
+}
+
+function togglePets(show) {
+  document.getElementById('rp-no').classList.toggle('checked', !show);
+  document.getElementById('rp-yes').classList.toggle('checked', show);
+  const el = document.getElementById('reg-pets-types');
+  el.hidden = !show;
+  el.style.display = show ? 'flex' : 'none';
+}
+
+function toggleAIChildren(show) {
+  document.getElementById('ai-r-no').classList.toggle('checked', !show);
+  document.getElementById('ai-r-yes').classList.toggle('checked', show);
+  document.getElementById('ai-children-section').hidden = !show;
+}
+
+function updateAIChildYears(val) {
+  const n = Math.min(parseInt(val)||0, 10);
+  const c = document.getElementById('ai-birth-year-fields');
+  c.innerHTML = '';
+  for (let i = 1; i <= n; i++) {
+    const d = document.createElement('div');
+    d.className = 'field';
+    d.innerHTML = `<label class="field__label">Birth year of Child ${i}</label><input class="input" style="max-width:160px;" placeholder="e.g. ${2017+i}"/>`;
+    c.appendChild(d);
+  }
 }
 
 function toggleQType(cardId, toggleId, mcId, oeId) {
