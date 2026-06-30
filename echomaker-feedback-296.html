@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Echomaker — Feedback 29/6 Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pink:#FF0080; --pink-hover:#e6006e; --pink-light:#fff0f7; --pink-border:#ffc0df;
+  --dark-sidebar:#111827; --sidebar-w:64px;
+  --bg:#F5F5F5; --surface:#FFFFFF; --border:#E5E7EB; --divider:#F3F4F6;
+  --text-1:#111827; --text-2:#6B7280; --text-3:#9CA3AF;
+  --success:#10B981; --success-light:#D1FAE5;
+  --warning:#F59E0B; --warning-light:#FEF3C7;
+  --danger:#EF4444; --danger-light:#FEE2E2;
+  --info:#3B82F6; --info-light:#DBEAFE;
+  --r-sm:6px; --r-md:8px; --r-lg:12px; --r-full:9999px;
+  --shadow-md:0 4px 16px rgba(0,0,0,.10);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.14);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.5;color:var(--text-1);background:var(--bg)}
+button{font-family:inherit;cursor:pointer}
+input,textarea,select{font-family:inherit}
+table{border-collapse:collapse;width:100%}
+
+/* Proto nav */
+.proto-nav{position:sticky;top:0;z-index:300;background:#fff;border-bottom:1px solid var(--border);padding:0 16px;display:flex;align-items:center;gap:2px;overflow-x:auto}
+.proto-nav__label{font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-right:8px;white-space:nowrap}
+.proto-tab{padding:10px 12px;font-size:12px;font-weight:500;color:var(--text-2);background:none;border:0;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s}
+.proto-tab.active{color:var(--pink);border-bottom-color:var(--pink)}
+.proto-tab:hover:not(.active){color:var(--text-1)}
+
+/* Screen */
+.screen{display:none}
+.screen.active{display:flex}
+
+/* App shell */
+.app{display:flex;min-height:calc(100vh - 41px)}
+.sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--dark-sidebar);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px}
+.sidebar__logo{width:36px;height:36px;margin-bottom:8px;background:var(--pink);border-radius:8px;display:grid;place-items:center}
+.sidebar__icon{width:40px;height:40px;border-radius:8px;display:grid;place-items:center;color:rgba(255,255,255,.45);background:none;border:0;cursor:pointer;position:relative;transition:background .15s,color .15s}
+.sidebar__icon.active{color:#fff}
+.sidebar__icon.active::before{content:'';position:absolute;left:-2px;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--pink);border-radius:0 3px 3px 0}
+.sidebar__icon:hover:not(.active){background:rgba(255,255,255,.06);color:rgba(255,255,255,.75)}
+.sidebar__bottom{margin-top:auto}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{height:52px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:8px;flex-shrink:0}
+.breadcrumb{font-size:13px;color:var(--text-2);display:flex;align-items:center;gap:6px}
+.breadcrumb a{color:var(--text-2);text-decoration:none}
+.breadcrumb__sep{color:var(--text-3)}
+.breadcrumb__current{color:var(--text-1);font-weight:500}
+.topbar__right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.avatar{width:30px;height:30px;border-radius:var(--r-full);background:var(--pink);color:#fff;font-size:12px;font-weight:600;display:grid;place-items:center}
+.content{flex:1;padding:24px;overflow-y:auto}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:500;line-height:1;padding:8px 16px;border-radius:var(--r-full);border:1px solid transparent;cursor:pointer;transition:background .15s;white-space:nowrap}
+.btn--pink{background:var(--pink);color:#fff;border-color:var(--pink)}
+.btn--pink:hover{background:var(--pink-hover);border-color:var(--pink-hover)}
+.btn--outline{background:#fff;color:var(--pink);border-color:var(--pink)}
+.btn--outline:hover{background:var(--pink-light)}
+.btn--ghost{background:none;color:var(--text-2);border-color:var(--border)}
+.btn--ghost:hover{background:var(--divider)}
+.btn--sm{font-size:12px;padding:5px 12px}
+.btn--pink-text{background:none;border:none;color:var(--pink);font-size:13px;font-weight:500;cursor:pointer;padding:0}
+.btn--pink-text:hover{text-decoration:underline}
+
+/* Card */
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg)}
+.card__head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card__title{font-size:14px;font-weight:600;color:var(--text-1)}
+.card__body{padding:20px}
+
+/* Page tabs */
+.page-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px}
+.page-tab{padding:10px 20px;font-size:14px;font-weight:500;color:var(--text-2);background:none;border:0;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-1px;transition:color .15s,border-color .15s}
+.page-tab.active{color:var(--pink);border-bottom-color:var(--pink)}
+
+/* Form */
+.field{display:flex;flex-direction:column;gap:6px}
+.field__label{font-size:13px;color:var(--text-2)}
+.input,.select,.textarea{width:100%;padding:8px 12px;font-family:inherit;font-size:14px;color:var(--text-1);background:#fff;border:1px solid var(--border);border-radius:var(--r-md);transition:border-color .15s}
+.input:focus,.select:focus,.textarea:focus{outline:none;border-color:var(--pink)}
+.input::placeholder,.textarea::placeholder{color:var(--text-3)}
+.textarea{resize:vertical;min-height:80px}
+.input--sm{height:32px;padding:4px 10px;font-size:13px}
+.input:disabled,.select:disabled{background:#f9fafb;color:var(--text-3)}
+
+/* Toggle */
+.toggle-wrap{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-2)}
+.toggle{position:relative;width:36px;height:20px;background:var(--border);border-radius:var(--r-full);cursor:pointer;transition:background .2s;border:none;flex-shrink:0}
+.toggle.on{background:var(--pink)}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle.on::after{transform:translateX(16px)}
+
+/* Radio */
+.radio-wrap{display:flex;align-items:center;gap:8px;cursor:pointer}
+.radio-custom{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:#fff;flex-shrink:0;display:grid;place-items:center;transition:border-color .15s}
+.radio-custom.checked{border-color:var(--pink)}
+.radio-custom.checked::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--pink)}
+
+/* Table */
+.table-wrap{overflow-x:auto}
+.table th{text-align:left;font-size:12px;font-weight:500;color:var(--text-2);padding:10px 14px;border-bottom:1px solid var(--border);white-space:nowrap;background:#fff}
+.table td{padding:12px 14px;border-bottom:1px solid var(--divider);vertical-align:middle;font-size:13px}
+.table tbody tr:hover{background:#fafafa}
+.table tbody tr:last-child td{border-bottom:0}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:var(--r-full);font-size:12px;font-weight:500}
+.badge--completed{background:var(--info-light);color:var(--info)}
+.badge--verified{background:var(--success-light);color:#059669;font-weight:600}
+.badge--verifying{background:var(--warning-light);color:#d97706;font-weight:600}
+.badge--rejected{background:var(--pink-light);color:var(--pink)}
+.badge--requested{background:var(--warning-light);color:var(--warning)}
+.badge--paid{background:var(--success-light);color:var(--success)}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+
+/* Action menu */
+.action-menu-wrap{position:relative;display:inline-block}
+.action-menu{position:absolute;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-md);min-width:160px;z-index:50;overflow:hidden}
+.action-menu[hidden]{display:none}
+.action-item{display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;font-size:13px;color:var(--text-1);background:none;border:0;cursor:pointer;text-align:left;transition:background .12s}
+.action-item:hover{background:var(--divider)}
+.action-item.pink{color:var(--pink);font-weight:500;border-top:1px solid var(--border)}
+
+/* Modal */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;z-index:200;padding:20px}
+.overlay[hidden]{display:none}
+.modal{background:#fff;border-radius:var(--r-lg);box-shadow:var(--shadow-lg);width:min(90vw,480px);max-height:88vh;display:flex;flex-direction:column;overflow:hidden}
+.modal--lg{width:min(90vw,640px)}
+.modal--xl{width:min(90vw,760px)}
+.modal__head{padding:20px 24px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.modal__title{font-size:16px;font-weight:600}
+.modal__close{background:none;border:0;font-size:20px;color:var(--text-2);cursor:pointer;width:28px;height:28px;border-radius:var(--r-sm);display:grid;place-items:center}
+.modal__close:hover{background:var(--divider)}
+.modal__body{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:16px}
+.modal__foot{padding:16px 24px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+
+/* KOL fields */
+.kol-fields{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.kol-field{padding:14px 0;border-bottom:1px solid var(--divider)}
+.kol-field:nth-child(odd){padding-right:32px}
+.kol-field:nth-child(even){padding-left:32px;border-left:1px solid var(--divider)}
+.kol-field__key{font-size:12px;color:var(--text-2);margin-bottom:4px}
+.kol-field__val{font-size:14px;color:var(--text-1);font-weight:500;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.kol-field__edit{background:none;border:none;color:var(--pink);font-size:13px;font-weight:500;cursor:pointer}
+.kol-field__edit:hover{text-decoration:underline}
+
+/* Audit log table */
+.log-table{width:100%;font-size:13px}
+.log-table th{text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--text-3);padding:8px 12px;border-bottom:1px solid var(--border)}
+.log-table td{padding:10px 12px;border-bottom:1px solid var(--divider);vertical-align:middle}
+.log-table tbody tr:last-child td{border-bottom:0}
+.log-row--current{background:#f0fdf4}
+
+/* Q-card */
+.q-card{border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 20px;display:flex;flex-direction:column;gap:12px}
+.q-card__head{display:flex;align-items:center;justify-content:space-between}
+.q-card__title{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.q-mode-options{display:flex;flex-direction:column;gap:8px}
+.q-option-row{display:flex;align-items:center;gap:8px}
+.q-option-row .input{flex:1}
+.open-ended-hint{background:#f9fafb;border:1px dashed var(--border);border-radius:var(--r-md);padding:12px;font-size:13px;color:var(--text-2);text-align:center}
+
+/* Export field list */
+.export-field-list{display:flex;flex-direction:column;gap:6px}
+.export-field{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--r-md);border:1px solid var(--border);background:#fff}
+.export-field.new{border-color:var(--pink-border);background:var(--pink-light)}
+.export-field__checkbox{width:16px;height:16px;border-radius:3px;border:2px solid var(--border);background:#fff;flex-shrink:0;display:grid;place-items:center;cursor:pointer}
+.export-field__checkbox.checked{background:var(--pink);border-color:var(--pink)}
+.export-field__checkbox.checked::after{content:'✓';color:#fff;font-size:10px;font-weight:700}
+.export-field__name{font-size:13px;font-weight:500;flex:1}
+.new-badge{font-size:11px;background:var(--pink);color:#fff;padding:1px 6px;border-radius:var(--r-full);font-weight:600}
+
+/* Alert */
+.alert{display:flex;align-items:flex-start;gap:10px;padding:12px 16px;border-radius:var(--r-md);font-size:13px}
+.alert--warning{background:var(--warning-light);color:#92400E;border:1px solid #FDE68A}
+.alert--info{background:var(--info-light);color:#1E40AF;border:1px solid #BFDBFE}
+.alert--success{background:var(--success-light);color:#065F46;border:1px solid #A7F3D0}
+
+/* Search */
+.search-box{position:relative}
+.search-box .input{padding-left:32px}
+.search-box__icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-3);font-size:14px}
+
+/* KOL avatar */
+.kol-avatar{width:32px;height:32px;border-radius:50%;background:var(--divider);flex-shrink:0;display:grid;place-items:center;font-size:11px;font-weight:600;color:var(--text-2)}
+
+/* Utils */
+.row{display:flex;align-items:center;gap:10px}
+.stack{display:flex;flex-direction:column;gap:12px}
+.text-pink{color:var(--pink)}
+.text-muted{color:var(--text-2)}
+.text-sm{font-size:12px}
+.font-medium{font-weight:500}
+.font-semibold{font-weight:600}
+.page-title{font-size:22px;font-weight:700;color:var(--text-1);margin-bottom:20px}
+.divider{border:none;border-top:1px solid var(--border);margin:16px 0}
+</style>
+</head>
+<body>
+
+<nav class="proto-nav">
+  <span class="proto-nav__label">Screens</span>
+  <button class="proto-tab active" onclick="showScreen('s1',this)">① KOL Phone — Change Record</button>
+  <button class="proto-tab" onclick="showScreen('s2',this)">② KOL Registration</button>
+  <button class="proto-tab" onclick="showScreen('s3',this)">③ Campaign KOL — Extra Bonus %</button>
+  <button class="proto-tab" onclick="showScreen('s4',this)">④ Campaign Questions</button>
+  <button class="proto-tab" onclick="showScreen('s5',this)">⑤ KOL List Export CSV</button>
+  <button class="proto-tab" onclick="showScreen('s6',this)">⑥ Finance Module</button>
+  <button class="proto-tab" onclick="showScreen('s7',this)">⑦ Activity Log</button>
+</nav>
+
+
+<!-- ══ SCREEN 1 — KOL Detail: Change Record ══ -->
+<div id="s1" class="screen active">
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar__logo"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#fff" stroke-width="1.8"/><path d="M6.5 10C6.5 7.5 8 6 10 6s3.5 1.5 3.5 4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><circle cx="10" cy="13" r="1.5" fill="#fff"/></svg></div>
+      <button class="sidebar__icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button>
+      <button class="sidebar__icon active"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 2a5 5 0 1 1 0 10A5 5 0 0 1 12 2zM4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></button>
+      <button class="sidebar__icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg></button>
+    </aside>
+    <div class="main">
+      <div class="topbar">
+        <div class="breadcrumb"><a href="#">KOL Module</a><span class="breadcrumb__sep">/</span><a href="#">KOL Detail</a><span class="breadcrumb__sep">/</span><span class="breadcrumb__current">Base Info</span></div>
+        <div class="topbar__right"><span class="text-muted text-sm">julie li</span><div class="avatar">J</div></div>
+      </div>
+      <div class="content">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;">
+          <button class="btn btn--ghost btn--sm">← Back</button>
+          <div style="width:52px;height:52px;border-radius:50%;background:#e5e7eb;display:grid;place-items:center;font-weight:700;font-size:18px;color:#6b7280;">T</div>
+          <div>
+            <div style="font-size:18px;font-weight:700;">Twoheartsonehome</div>
+            <div class="row" style="gap:6px;margin-top:4px;">
+              <span class="text-muted text-sm">@two_asone1002</span>
+              <span style="background:#f0fdf4;color:#16a34a;font-size:12px;padding:1px 8px;border-radius:20px;">Hong Kong</span>
+              <span style="background:#f3f4f6;color:#6b7280;font-size:12px;padding:1px 8px;border-radius:20px;">Students</span>
+            </div>
+          </div>
+          <span class="text-muted text-sm" style="margin-left:auto;">Joined: 2026-06-28</span>
+        </div>
+
+        <div class="page-tabs">
+          <button class="page-tab active">Base Info</button>
+          <button class="page-tab">Previous Campaign</button>
+          <button class="page-tab">Payment</button>
+        </div>
+
+        <div class="card">
+          <div class="card__body" style="padding:0;">
+            <div class="kol-fields">
+              <div class="kol-field">
+                <div class="kol-field__key">English Full Name</div>
+                <div class="kol-field__val">Twoheartsonehome<button class="kol-field__edit" style="margin-left:auto;">Edit</button></div>
+              </div>
+
+              <!-- ★ Contact Number — Change Record ★ -->
+              <div class="kol-field" style="background:#fff8fc;">
+                <div class="kol-field__key">Contact Number</div>
+                <div class="kol-field__val">
+                  85263606717
+                  <span class="badge badge--verified">✓ Verified</span>
+                  <div style="margin-left:auto;display:flex;gap:8px;">
+                    <button class="kol-field__edit" onclick="document.getElementById('modal-change-phone').removeAttribute('hidden')">Edit</button>
+                    <button class="kol-field__edit" onclick="document.getElementById('modal-change-record').removeAttribute('hidden')">Change record</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="kol-field">
+                <div class="kol-field__key">E-mail address</div>
+                <div class="kol-field__val">twoheartsonehome88@gmail.com</div>
+              </div>
+              <div class="kol-field">
+                <div class="kol-field__key">Account Name</div>
+                <div class="kol-field__val">@two_asone1002</div>
+              </div>
+              <div class="kol-field">
+                <div class="kol-field__key">Date of birth</div>
+                <div class="kol-field__val">08/2005<button class="kol-field__edit" style="margin-left:auto;">Edit</button></div>
+              </div>
+              <div class="kol-field">
+                <div class="kol-field__key">Age</div>
+                <div class="kol-field__val">20</div>
+              </div>
+              <div class="kol-field">
+                <div class="kol-field__key">Country/Cities</div>
+                <div class="kol-field__val">Hong Kong<button class="kol-field__edit" style="margin-left:auto;">Edit</button></div>
+              </div>
+              <div class="kol-field">
+                <div class="kol-field__key">Gender</div>
+                <div class="kol-field__val">Female<button class="kol-field__edit" style="margin-left:auto;">Edit</button></div>
+              </div>
+              <div class="kol-field">
+                <div class="kol-field__key">Occupation</div>
+                <div class="kol-field__val">Students<button class="kol-field__edit" style="margin-left:auto;">Edit</button></div>
+              </div>
+              <div class="kol-field">
+                <div class="kol-field__key">Parenting</div>
+                <div class="kol-field__val">No<button class="kol-field__edit" style="margin-left:auto;">Edit</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert--info" style="margin-top:16px;">
+          <div><strong>New:</strong> "Change record" button replaces "Remove &amp; Re-verify". Click it to view the full audit log of phone number changes and verification events.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Edit Phone -->
+<div class="overlay" id="modal-change-phone" hidden>
+  <div class="modal">
+    <div class="modal__head"><span class="modal__title">Edit Contact Number</span><button class="modal__close" onclick="this.closest('.overlay').setAttribute('hidden','')">✕</button></div>
+    <div class="modal__body">
+      <div class="field"><label class="field__label">New Phone Number</label><input class="input" value="85263606717"/></div>
+      <div class="alert alert--warning">Saving will set status to <strong>Verifying</strong>. A verification SMS will be sent to the new number.</div>
+    </div>
+    <div class="modal__foot">
+      <button class="btn btn--ghost" onclick="this.closest('.overlay').setAttribute('hidden','')">Cancel</button>
+      <button class="btn btn--pink" onclick="alert('Phone updated. Status → Verifying.');this.closest('.overlay').setAttribute('hidden','')">Save &amp; Send Verification</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Change Record (Audit Log) -->
+<div class="overlay" id="modal-change-record" hidden>
+  <div class="modal modal--xl">
+    <div class="modal__head">
+      <div>
+        <div class="modal__title">Change Record — Contact Number</div>
+        <div style="font-size:13px;color:var(--text-2);margin-top:2px;">Twoheartsonehome · 85263606717</div>
+      </div>
+      <button class="modal__close" onclick="this.closest('.overlay').setAttribute('hidden','')">✕</button>
+    </div>
+    <div class="modal__body" style="padding:0;">
+      <table class="log-table">
+        <thead>
+          <tr>
+            <th>Event</th>
+            <th>Phone Number</th>
+            <th>Verify Status</th>
+            <th>Operator / Actor</th>
+            <th>Date &amp; Time</th>
+            <th>Note</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Current verified state -->
+          <tr class="log-row--current">
+            <td><span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;">✓ Verified</span></td>
+            <td style="font-weight:500;">85263606717</td>
+            <td><span class="badge badge--verified">Verified</span></td>
+            <td style="color:var(--text-2);">KOL (self)</td>
+            <td style="color:var(--text-2);font-size:12px;">2026-06-28 14:32:05</td>
+            <td style="color:var(--text-2);font-size:12px;">KOL completed SMS verification</td>
+          </tr>
+          <!-- Admin changed record -->
+          <tr>
+            <td><span style="background:#fef3c7;color:#92400e;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;">Changed</span></td>
+            <td style="font-weight:500;">85263606717</td>
+            <td><span class="badge badge--verifying">Verifying</span></td>
+            <td style="color:var(--text-2);">Admin · julie.li</td>
+            <td style="color:var(--text-2);font-size:12px;">2026-06-28 11:05:41</td>
+            <td style="color:var(--text-2);font-size:12px;">Admin updated number; verification SMS sent</td>
+          </tr>
+          <!-- Previous number — verification failed -->
+          <tr>
+            <td><span style="background:#fee2e2;color:#991b1b;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;">Removed</span></td>
+            <td style="font-weight:500;text-decoration:line-through;color:var(--text-3);">85261234567</td>
+            <td><span style="background:#f3f4f6;color:#6b7280;font-size:12px;font-weight:500;padding:2px 8px;border-radius:20px;">—</span></td>
+            <td style="color:var(--text-2);">Admin · sarah.wong</td>
+            <td style="color:var(--text-2);font-size:12px;">2026-06-25 09:17:22</td>
+            <td style="color:var(--text-2);font-size:12px;">Old number removed — MI connection failure reported</td>
+          </tr>
+          <!-- Original registration -->
+          <tr>
+            <td><span style="background:var(--info-light);color:#1e40af;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;">Registered</span></td>
+            <td style="font-weight:500;">85261234567</td>
+            <td><span class="badge badge--verified">Verified</span></td>
+            <td style="color:var(--text-2);">KOL (self)</td>
+            <td style="color:var(--text-2);font-size:12px;">2026-05-10 16:44:00</td>
+            <td style="color:var(--text-2);font-size:12px;">Initial registration verification</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal__foot" style="justify-content:space-between;align-items:center;">
+      <div style="font-size:12px;color:var(--text-2);">
+        Verify Status: <span class="badge badge--verified" style="margin:0 4px;">Verified</span> = SMS confirmed by KOL &nbsp;|&nbsp; <span class="badge badge--verifying" style="margin:0 4px;">Verifying</span> = awaiting KOL confirmation
+      </div>
+      <button class="btn btn--ghost" onclick="this.closest('.overlay').setAttribute('hidden','')">Close</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ SCREEN 2 — KOL Registration ══ -->
+<div id="s2" class="screen" style="background:#f3f4f6;min-height:calc(100vh - 41px);">
+  <div style="max-width:680px;margin:0 auto;padding:32px 20px;width:100%;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="background:var(--pink);width:36px;height:36px;border-radius:8px;display:grid;place-items:center;"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#fff" stroke-width="1.8"/><path d="M6.5 10C6.5 7.5 8 6 10 6s3.5 1.5 3.5 4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><circle cx="10" cy="13" r="1.5" fill="#fff"/></svg></div>
+        <span style="font-weight:700;font-size:16px;">ECHO<span style="color:var(--pink);">MAKER</span></span>
+      </div>
+      <button class="btn btn--outline btn--sm">My Enrolments</button>
+    </div>
+
+    <div class="card">
+      <div class="card__head"><span class="card__title">Account Info</span></div>
+      <div class="card__body stack">
+        <p class="text-sm text-muted">We'll only use this info to personalise your experience on EchoMaker.</p>
+
+        <!-- Occupation ★ NEW optional field — default: Prefer not to say ★ -->
+        <div style="padding:10px 0;border-bottom:1px solid var(--divider);">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div class="text-sm text-muted">Occupation <span style="font-size:11px;color:var(--text-3);">(Optional)</span></div>
+              <div class="font-medium" style="margin-top:2px;" id="occ-display">Prefer not to say</div>
+            </div>
+            <button class="btn--pink-text" onclick="toggleOccEdit()">Edit</button>
+          </div>
+          <div id="occ-edit" hidden style="margin-top:12px;" class="stack">
+            <div class="field">
+              <label class="field__label">Select your occupation</label>
+              <select class="select" onchange="document.getElementById('occ-display').textContent=this.value">
+                <option>Prefer not to say</option>
+                <option>Employed</option>
+                <option>Self-employed / Freelance</option>
+                <option>Student</option>
+                <option>Homemaker</option>
+                <option>Retired</option>
+                <option>Unemployed</option>
+              </select>
+            </div>
+            <div class="row" style="justify-content:flex-end;">
+              <button class="btn btn--ghost btn--sm" onclick="toggleOccEdit()">Cancel</button>
+              <button class="btn btn--pink btn--sm" onclick="toggleOccEdit()">Save</button>
+            </div>
+          </div>
+          <div style="margin-top:8px;background:var(--pink-light);border:1px dashed var(--pink-border);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--pink);">★ Default is "Prefer not to say" when KOL skips this field.</div>
+        </div>
+
+        <!-- Parenting — ★ Children birth year ★ -->
+        <div style="padding:10px 0;">
+          <div class="text-sm text-muted" style="margin-bottom:10px;">Do you have any children?</div>
+          <div class="row" style="gap:20px;margin-bottom:14px;">
+            <label class="radio-wrap"><div class="radio-custom" id="r-no"></div><span class="font-medium">No</span></label>
+            <label class="radio-wrap" onclick="document.getElementById('r-no').classList.remove('checked');document.getElementById('r-yes').classList.add('checked');document.getElementById('children-section').style.display='block'">
+              <div class="radio-custom checked" id="r-yes"></div><span class="font-medium">Yes</span>
+            </label>
+          </div>
+
+          <div id="children-section">
+            <div class="field" style="margin-bottom:14px;">
+              <label class="field__label">How many children do you have?</label>
+              <input class="input" style="max-width:100px;" value="2" type="number" min="1" max="10" oninput="updateChildrenYears(this.value)"/>
+            </div>
+
+            <!-- ★ Birth year per child ★ -->
+            <div style="border:1px solid var(--pink-border);border-radius:var(--r-md);padding:14px;background:var(--pink-light);">
+              <div style="font-size:12px;color:var(--pink);font-weight:600;margin-bottom:10px;">★ New: Birth Year per Child</div>
+              <div id="birth-year-fields" class="stack" style="gap:8px;">
+                <div class="field">
+                  <label class="field__label">Birth year of Child 1</label>
+                  <input class="input" style="max-width:160px;" placeholder="e.g. 2018" value="2018"/>
+                </div>
+                <div class="field">
+                  <label class="field__label">Birth year of Child 2</label>
+                  <input class="input" style="max-width:160px;" placeholder="e.g. 2021" value="2021"/>
+                </div>
+              </div>
+              <div style="margin-top:10px;font-size:12px;color:var(--text-2);">Enter YYYY for each child. Helps match parenting-category campaigns by child age.</div>
+            </div>
+          </div>
+
+          <div class="row" style="justify-content:flex-end;margin-top:14px;">
+            <button class="btn btn--ghost btn--sm">Cancel</button>
+            <button class="btn btn--pink btn--sm">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert--info" style="margin-top:16px;">
+      <div>
+        <strong>Changes:</strong><br>
+        1. <strong>Occupation</strong> — optional field; default value = "Prefer not to say" when not filled.<br>
+        2. <strong>Children Birth Year</strong> — label format is now "Birth year of Child 1", "Birth year of Child 2" etc.
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ SCREEN 3 — Campaign KOL: Extra Bonus % ══ -->
+<div id="s3" class="screen">
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar__logo"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#fff" stroke-width="1.8"/><path d="M6.5 10C6.5 7.5 8 6 10 6s3.5 1.5 3.5 4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><circle cx="10" cy="13" r="1.5" fill="#fff"/></svg></div>
+      <button class="sidebar__icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button>
+      <button class="sidebar__icon active"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg></button>
+    </aside>
+    <div class="main">
+      <div class="topbar">
+        <div class="breadcrumb"><a href="#">Campaign Module</a><span class="breadcrumb__sep">/</span><span class="breadcrumb__current">Campaign Detail</span></div>
+        <div class="topbar__right">
+          <button class="btn btn--outline btn--sm">✦ Start AI Selection</button>
+          <button class="btn btn--outline btn--sm">↑ Export</button>
+          <button class="btn btn--pink btn--sm">Share KOL List</button>
+          <div class="avatar">J</div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="row" style="margin-bottom:20px;">
+          <button class="btn btn--ghost btn--sm">←</button>
+          <h1 style="font-size:18px;font-weight:700;">[Copy]测试 campaign 请勿报名</h1>
+          <span class="badge badge--completed"><span class="dot" style="background:var(--info);"></span> Completed</span>
+        </div>
+
+        <div class="page-tabs">
+          <button class="page-tab">Campaign</button>
+          <button class="page-tab active">KOL</button>
+        </div>
+
+        <div class="row" style="margin-bottom:16px;">
+          <div class="search-box" style="max-width:300px;flex:1;">
+            <span class="search-box__icon">🔍</span>
+            <input class="input input--sm" placeholder="Enter keywords to search KOL" style="padding-left:30px;"/>
+          </div>
+        </div>
+
+        <div class="card" style="overflow:hidden;position:relative;">
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th style="width:40px;"><input type="checkbox" id="chk-all" onchange="toggleAllKOL(this)"/></th>
+                  <th>Status ▾</th>
+                  <th>Influencer</th>
+                  <th>FB Followers ⇅</th>
+                  <th>IG Followers ⇅</th>
+                  <th>Threads Followers ⇅</th>
+                  <th style="color:var(--pink);background:#fff8fc;">Extra Bonus % ⇅</th>
+                  <th>Age ⇅</th>
+                  <th>Gender</th>
+                  <th>Avg. Engagements</th>
+                  <th>ER ⇅</th>
+                  <th>Application Date ⇅</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr id="kol-row-1">
+                  <td><input type="checkbox" class="kol-chk" onchange="updateBulkBar()"/></td>
+                  <td><span class="badge badge--completed">Completed</span></td>
+                  <td><div class="row" style="gap:8px;"><div class="kol-avatar" style="overflow:hidden;background:#d1d5db;"><img src="https://i.pravatar.cc/32?u=jk" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/></div><span class="font-medium">JK_test</span></div></td>
+                  <td>0<br><span class="text-sm text-muted">移除 IG 连接</span></td>
+                  <td>2<br><span class="text-sm text-muted">shine_vvvi</span></td>
+                  <td>1<br><span class="text-sm text-muted">shine_vvvi</span></td>
+                  <td style="background:#fff8fc;"><span style="color:var(--pink);font-weight:700;font-size:15px;">+10%</span></td>
+                  <td>46</td><td>Male</td><td>0</td><td>0%</td><td>2025-10-30</td>
+                  <td>
+                    <div class="action-menu-wrap">
+                      <button class="btn btn--ghost btn--sm" style="padding:4px 8px;" onclick="toggleMenu('m1')">⋮</button>
+                      <div class="action-menu" id="m1" hidden>
+                        <button class="action-item">✏ Add Tags</button>
+                        <button class="action-item">✏ Edit Post Link</button>
+                        <button class="action-item pink" onclick="openBonusModal('JK_test','10');toggleMenu('m1')">✏ Edit extra bonus</button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr id="kol-row-2">
+                  <td><input type="checkbox" class="kol-chk" onchange="updateBulkBar()"/></td>
+                  <td><span class="badge badge--completed">Completed</span></td>
+                  <td><div class="row" style="gap:8px;"><div class="kol-avatar">SL</div><span class="font-medium">sarah_lifestyle</span></div></td>
+                  <td>1.2K</td><td>8.5K<br><span class="text-sm text-muted">@sarah_ls</span></td><td>340</td>
+                  <td style="background:#fff8fc;color:var(--text-3);">—</td>
+                  <td>29</td><td>Female</td><td>320</td><td>3.8%</td><td>2025-10-28</td>
+                  <td>
+                    <div class="action-menu-wrap">
+                      <button class="btn btn--ghost btn--sm" style="padding:4px 8px;" onclick="toggleMenu('m2')">⋮</button>
+                      <div class="action-menu" id="m2" hidden>
+                        <button class="action-item">✏ Add Tags</button>
+                        <button class="action-item">✏ Edit Post Link</button>
+                        <button class="action-item pink" onclick="openBonusModal('sarah_lifestyle','0');toggleMenu('m2')">✏ Edit extra bonus</button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr id="kol-row-3">
+                  <td><input type="checkbox" class="kol-chk" onchange="updateBulkBar()"/></td>
+                  <td><span class="badge badge--requested">Applied</span></td>
+                  <td><div class="row" style="gap:8px;"><div class="kol-avatar">MK</div><span class="font-medium">mk_foodie_hk</span></div></td>
+                  <td>560</td><td>12.4K<br><span class="text-sm text-muted">@mk_foodie</span></td><td>890</td>
+                  <td style="background:#fff8fc;color:var(--text-3);">—</td>
+                  <td>33</td><td>Female</td><td>480</td><td>3.9%</td><td>2025-10-27</td>
+                  <td>
+                    <div class="action-menu-wrap">
+                      <button class="btn btn--ghost btn--sm" style="padding:4px 8px;" onclick="toggleMenu('m3')">⋮</button>
+                      <div class="action-menu" id="m3" hidden>
+                        <button class="action-item">✏ Add Tags</button>
+                        <button class="action-item">✏ Edit Post Link</button>
+                        <button class="action-item pink" onclick="openBonusModal('mk_foodie_hk','0');toggleMenu('m3')">✏ Edit extra bonus</button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ★ Bulk action bar — appears when rows selected ★ -->
+        <div id="bulk-bar" hidden style="position:fixed;bottom:0;left:64px;right:0;background:#fff;border-top:1px solid var(--border);box-shadow:0 -4px 16px rgba(0,0,0,.08);padding:14px 28px;display:flex;align-items:center;gap:10px;z-index:100;">
+          <span id="bulk-count" style="font-size:13px;font-weight:600;color:var(--text-1);min-width:80px;">1 Selected</span>
+          <button class="btn btn--outline btn--sm">Share KOL List</button>
+          <button class="btn btn--outline btn--sm">Change Status</button>
+          <button class="btn btn--outline btn--sm">Add Tags</button>
+          <button class="btn--pink-text" style="margin-left:4px;" onclick="document.getElementById('bulk-bar').setAttribute('hidden','');document.querySelectorAll('.kol-chk').forEach(c=>c.checked=false);document.getElementById('chk-all').checked=false;">Cancel</button>
+          <div style="flex:1;"></div>
+          <button class="btn btn--pink btn--sm" onclick="document.getElementById('modal-bulk-bonus').removeAttribute('hidden')" style="border-radius:var(--r-md);">Edit extra bonus</button>
+        </div>
+
+        <div class="alert alert--info" style="margin-top:16px;">
+          <div><strong>Extra Bonus %</strong> — set per-KOL via ⋮ → Edit extra bonus, or select multiple KOLs and use the bulk bar at the bottom to set the same % for all selected at once.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Edit Extra Bonus % -->
+<div class="overlay" id="modal-bonus" hidden>
+  <div class="modal">
+    <div class="modal__head">
+      <span class="modal__title" id="bonus-modal-title">Edit Extra Bonus — JK_test</span>
+      <button class="modal__close" onclick="this.closest('.overlay').setAttribute('hidden','')">✕</button>
+    </div>
+    <div class="modal__body">
+      <div class="field">
+        <label class="field__label">Campaign Base Reward</label>
+        <input class="input" value="HKD 200" disabled/>
+      </div>
+      <div class="field">
+        <label class="field__label">Extra Bonus (%)</label>
+        <div class="row">
+          <input class="input" id="bonus-pct-input" value="10" type="number" min="0" max="100" style="max-width:100px;" oninput="updateBonusPreview()"/>
+          <span style="font-size:18px;font-weight:700;color:var(--text-2);">%</span>
+        </div>
+        <span class="text-sm text-muted">Set 0 to remove the extra bonus for this KOL.</span>
+      </div>
+      <div id="bonus-preview" style="background:var(--info-light);border-radius:var(--r-md);padding:10px 14px;font-size:13px;color:#1e40af;">
+        Total payout: <strong>HKD 220</strong> (Base HKD 200 + 10% = HKD 20)
+      </div>
+      <div class="field">
+        <label class="field__label">Internal note</label>
+        <textarea class="textarea" placeholder="e.g. Top performer incentive">Top performer — Q3 incentive</textarea>
+      </div>
+    </div>
+    <div class="modal__foot">
+      <button class="btn btn--ghost" onclick="this.closest('.overlay').setAttribute('hidden','')">Cancel</button>
+      <button class="btn btn--pink" onclick="alert('Extra bonus saved.');this.closest('.overlay').setAttribute('hidden','')">Save</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal: Bulk Edit Extra Bonus -->
+<div class="overlay" id="modal-bulk-bonus" hidden>
+  <div class="modal">
+    <div class="modal__head">
+      <span class="modal__title">Edit Extra Bonus — Bulk</span>
+      <button class="modal__close" onclick="this.closest('.overlay').setAttribute('hidden','')">✕</button>
+    </div>
+    <div class="modal__body">
+      <div class="alert alert--info">Apply the same Extra Bonus % to all selected KOLs. This will overwrite any existing individual bonus settings.</div>
+      <div style="background:var(--divider);border-radius:var(--r-md);padding:10px 14px;font-size:13px;color:var(--text-2);">
+        Selected KOLs: <strong id="bulk-kol-names">JK_test, sarah_lifestyle</strong>
+      </div>
+      <div class="field">
+        <label class="field__label">Extra Bonus (%) — apply to all selected</label>
+        <div class="row">
+          <input class="input" id="bulk-bonus-pct" value="10" type="number" min="0" max="100" style="max-width:100px;" oninput="updateBulkPreview()"/>
+          <span style="font-size:18px;font-weight:700;color:var(--text-2);">%</span>
+        </div>
+        <span class="text-sm text-muted">Set 0 to remove extra bonus from all selected KOLs.</span>
+      </div>
+      <div id="bulk-bonus-preview" style="background:var(--info-light);border-radius:var(--r-md);padding:10px 14px;font-size:13px;color:#1e40af;">
+        Each selected KOL: Base HKD 200 + <strong>10%</strong> = <strong>HKD 220.00</strong>
+      </div>
+    </div>
+    <div class="modal__foot">
+      <button class="btn btn--ghost" onclick="this.closest('.overlay').setAttribute('hidden','')">Cancel</button>
+      <button class="btn btn--pink" onclick="alert('Bulk extra bonus saved for selected KOLs.');this.closest('.overlay').setAttribute('hidden','');document.getElementById('bulk-bar').setAttribute('hidden','');document.querySelectorAll(\'.kol-chk\').forEach(c=>c.checked=false);">Save for All Selected</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 4 — Campaign Questions ══ -->
+<div id="s4" class="screen">
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar__logo"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#fff" stroke-width="1.8"/><path d="M6.5 10C6.5 7.5 8 6 10 6s3.5 1.5 3.5 4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><circle cx="10" cy="13" r="1.5" fill="#fff"/></svg></div>
+      <button class="sidebar__icon active"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg></button>
+    </aside>
+    <div class="main">
+      <div class="topbar">
+        <div class="breadcrumb"><a href="#">Campaign Module</a><span class="breadcrumb__sep">/</span><span class="breadcrumb__current">Create Campaign</span></div>
+        <div class="topbar__right"><div class="avatar">J</div></div>
+      </div>
+      <div class="content">
+        <div style="max-width:720px;">
+          <h1 class="page-title">Create Campaign</h1>
+          <div style="padding:14px 18px;background:#f9fafb;border:1px solid var(--border);border-radius:var(--r-lg);font-size:13px;color:var(--text-2);margin-bottom:16px;">↑ Campaign Info, Requirements, Rewards … (no changes to existing fields)</div>
+
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card__head">
+              <span class="card__title">Customised Questions</span>
+              <button class="btn btn--outline btn--sm" onclick="addQuestion()">+ Add</button>
+            </div>
+            <div class="card__body stack" id="questions-container">
+
+              <!-- Q1: Multiple Choice (existing) -->
+              <div class="q-card" id="q1">
+                <div class="q-card__head">
+                  <div class="q-card__title"><span style="color:var(--text-2);">🗑</span> Question 1</div>
+                  <div class="toggle-wrap"><span>Multiple Choice</span><button class="toggle on" id="tq1" onclick="toggleQType('q1','tq1','mc1','oe1')"></button></div>
+                </div>
+                <input class="input" value="Which platform do you mainly use?"/>
+                <div id="mc1" class="q-mode-options">
+                  <div class="q-option-row"><div class="radio-custom"></div><input class="input" value="Instagram"/><button style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;">✕</button></div>
+                  <div class="q-option-row"><div class="radio-custom"></div><input class="input" value="Facebook"/><button style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;">✕</button></div>
+                  <button class="btn--pink-text" style="font-size:13px;display:flex;align-items:center;gap:4px;"><span style="width:18px;height:18px;border:2px solid var(--pink);border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;">+</span> Add option</button>
+                </div>
+                <div id="oe1" hidden class="open-ended-hint">KOL types a free-text answer — no options needed.<br><br><input style="width:260px;padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;" placeholder="KOL will type their answer here…" disabled/></div>
+              </div>
+
+              <!-- Q2: Open-ended ★ NEW ★ -->
+              <div class="q-card" id="q2" style="border-color:var(--pink-border);background:var(--pink-light);">
+                <div style="font-size:11px;font-weight:600;color:var(--pink);margin-bottom:4px;">★ New: Toggle OFF = Open-ended</div>
+                <div class="q-card__head">
+                  <div class="q-card__title"><span style="color:var(--text-2);">🗑</span> Question 2</div>
+                  <div class="toggle-wrap"><span>Multiple Choice</span><button class="toggle" id="tq2" onclick="toggleQType('q2','tq2','mc2','oe2')"></button></div>
+                </div>
+                <input class="input" value="Tell us why you want to join this campaign."/>
+                <div id="mc2" hidden class="q-mode-options"></div>
+                <div id="oe2" class="open-ended-hint">KOL types a free-text answer — no options needed.<br><br><input style="width:260px;padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;" placeholder="KOL will type their answer here…" disabled/></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert--info" style="margin-bottom:16px;">
+            <div><strong>Toggle ON</strong> = Multiple Choice (existing). <strong>Toggle OFF</strong> = Open-ended free text — KOL types any response, no options required.</div>
+          </div>
+          <div class="row" style="justify-content:flex-end;gap:10px;">
+            <button class="btn btn--ghost">Save Draft</button>
+            <button class="btn btn--pink">Publish Campaign</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ SCREEN 5 — KOL List Export CSV ══ -->
+<div id="s5" class="screen">
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar__logo"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#fff" stroke-width="1.8"/><path d="M6.5 10C6.5 7.5 8 6 10 6s3.5 1.5 3.5 4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><circle cx="10" cy="13" r="1.5" fill="#fff"/></svg></div>
+      <button class="sidebar__icon active"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 2a5 5 0 1 1 0 10A5 5 0 0 1 12 2zM4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></button>
+    </aside>
+    <div class="main">
+      <div class="topbar">
+        <div class="breadcrumb"><a href="#">KOL Module</a><span class="breadcrumb__sep">/</span><span class="breadcrumb__current">KOL List</span></div>
+        <div class="topbar__right">
+          <button class="btn btn--pink btn--sm" onclick="document.getElementById('modal-export').removeAttribute('hidden')">↑ Export CSV</button>
+          <div class="avatar">J</div>
+        </div>
+      </div>
+      <div class="content">
+        <h1 class="page-title">KOL List</h1>
+        <div class="card" style="overflow:hidden;">
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th><input type="checkbox"/></th>
+                  <th>KOL</th>
+                  <th>IG Username</th>
+                  <th style="color:var(--pink);">IGID <span class="new-badge">NEW</span></th>
+                  <th>Occupation</th>
+                  <th>Parenting</th>
+                  <th>Pets</th>
+                  <th style="color:var(--pink);">Pet Type <span class="new-badge">NEW</span></th>
+                  <th>Country</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><input type="checkbox" checked/></td>
+                  <td class="font-medium">JulietestProd</td>
+                  <td>@julietestprod</td>
+                  <td style="color:var(--text-2);font-size:12px;">17841400008460016</td>
+                  <td>Employed</td><td>No</td><td>Yes</td><td>Cat</td><td>Hong Kong</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"/></td>
+                  <td class="font-medium">sarah_lifestyle</td>
+                  <td>@sarah_ls</td>
+                  <td style="color:var(--text-2);font-size:12px;">17841400012345678</td>
+                  <td>Freelance</td><td>Yes</td><td>No</td><td style="color:var(--text-3);">—</td><td>Hong Kong</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="alert alert--info" style="margin-top:16px;">
+          <div><strong>2 new export fields:</strong> IGID (Instagram numeric ID for Meta API) + Pet Type (species detail).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Export field selector -->
+<div class="overlay" id="modal-export" hidden>
+  <div class="modal modal--lg">
+    <div class="modal__head"><span class="modal__title">Export KOL List — Select Fields</span><button class="modal__close" onclick="this.closest('.overlay').setAttribute('hidden','')">✕</button></div>
+    <div class="modal__body">
+      <div class="export-field-list">
+        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">KOL Username</span></div>
+        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">IG Username</span></div>
+        <div class="export-field new"><div class="export-field__checkbox checked"></div><span class="export-field__name">IGID (Instagram Numeric ID)</span><span class="new-badge">NEW</span></div>
+        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Occupation</span></div>
+        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Parenting</span></div>
+        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Pets (Yes / No)</span></div>
+        <div class="export-field new"><div class="export-field__checkbox checked"></div><span class="export-field__name">Pet Type (species detail)</span><span class="new-badge">NEW</span></div>
+        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Country / Cities</span></div>
+        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Campaign KOL Tag</span></div>
+        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">KOL Tags</span></div>
+        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Application Date</span></div>
+        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Post Link</span></div>
+      </div>
+    </div>
+    <div class="modal__foot">
+      <button class="btn btn--ghost" onclick="this.closest('.overlay').setAttribute('hidden','')">Cancel</button>
+      <button class="btn btn--pink" onclick="alert('CSV exported.');this.closest('.overlay').setAttribute('hidden','')">↓ Export CSV</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ SCREEN 6 — Finance Module ══ -->
+<div id="s6" class="screen">
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar__logo"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#fff" stroke-width="1.8"/><path d="M6.5 10C6.5 7.5 8 6 10 6s3.5 1.5 3.5 4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><circle cx="10" cy="13" r="1.5" fill="#fff"/></svg></div>
+      <button class="sidebar__icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button>
+      <button class="sidebar__icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 2a5 5 0 1 1 0 10A5 5 0 0 1 12 2zM4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></button>
+      <button class="sidebar__icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg></button>
+      <button class="sidebar__icon active"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg></button>
+    </aside>
+    <div class="main">
+      <div class="topbar">
+        <div class="breadcrumb"><span class="breadcrumb__current">Finance Module</span></div>
+        <div class="topbar__right">
+          <button class="btn btn--pink btn--sm" onclick="document.getElementById('modal-finance-export').removeAttribute('hidden')">↑ Data Export</button>
+          <span class="text-muted text-sm">julie li</span>
+          <div class="avatar">J</div>
+        </div>
+      </div>
+      <div class="content">
+        <h1 class="page-title">Finance Module</h1>
+
+        <!-- Filter row -->
+        <div class="row" style="margin-bottom:16px;gap:8px;">
+          <div class="search-box" style="max-width:260px;flex:1;">
+            <span class="search-box__icon">🔍</span>
+            <input class="input input--sm" placeholder="Enter KOL name and search" style="padding-left:30px;"/>
+          </div>
+          <select class="select input--sm" style="max-width:120px;">
+            <option>Status ▾</option>
+            <option>Paid</option>
+            <option>Requested</option>
+            <option>Rejected</option>
+          </select>
+        </div>
+
+        <div class="card" style="overflow:hidden;">
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th><input type="checkbox"/></th>
+                  <th>Status</th>
+                  <th>KOL</th>
+                  <th>Bank Account Number</th>
+                  <th>Bank Name</th>
+                  <th>Bank Account Name</th>
+                  <th>Bank Code</th>
+                  <th>Base Reward</th>
+                  <!-- ★ NEW ★ -->
+                  <th style="color:var(--pink);">Extra Bonus % <span class="new-badge">NEW</span></th>
+                  <!-- ★ NEW: amount reflects bonus ★ -->
+                  <th style="color:var(--pink);">Total Amount <span class="new-badge">NEW</span></th>
+                  <th>Currency</th>
+                  <th>Payee's Email</th>
+                  <th>Request Date</th>
+                  <th>Paid Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><input type="checkbox"/></td>
+                  <td><span class="badge badge--rejected">Rejected</span></td>
+                  <td class="font-medium">jingkai</td>
+                  <td class="text-sm">1234567890123</td>
+                  <td class="text-sm">Credit Agricole Co.</td>
+                  <td>jingkai</td>
+                  <td>005</td>
+                  <td>1.00</td>
+                  <td style="color:var(--text-3);">—</td>
+                  <td class="font-medium">1.00</td>
+                  <td>HKD</td>
+                  <td class="text-sm text-muted">jingkai@gmail.com</td>
+                  <td class="text-sm text-muted">2025-09-19</td>
+                  <td class="text-sm text-muted">—</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"/></td>
+                  <td><span class="badge badge--rejected">Rejected</span></td>
+                  <td class="font-medium">JK_test</td>
+                  <td class="text-sm">1234678765432</td>
+                  <td class="text-sm">Coutts &amp; Co. Ltd.</td>
+                  <td>Jingkai</td>
+                  <td>205</td>
+                  <td>200.00</td>
+                  <!-- 10% extra bonus -->
+                  <td style="color:var(--pink);font-weight:600;">+10%</td>
+                  <td class="font-medium" style="color:var(--pink);">220.00</td>
+                  <td>HKD</td>
+                  <td class="text-sm text-muted">jk@gmail.com</td>
+                  <td class="text-sm text-muted">2025-09-19</td>
+                  <td class="text-sm text-muted">—</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"/></td>
+                  <td><span class="badge badge--requested">Requested</span></td>
+                  <td class="font-medium">JulietestProd</td>
+                  <td class="text-sm">1234567890l2d</td>
+                  <td class="text-sm">Bank Of China (HK)</td>
+                  <td>Julie Li</td>
+                  <td>012</td>
+                  <td>100.00</td>
+                  <td style="color:var(--text-3);">—</td>
+                  <td class="font-medium">100.00</td>
+                  <td>HKD</td>
+                  <td class="text-sm text-muted">julie.li@press.com</td>
+                  <td class="text-sm text-muted">2025-09-20</td>
+                  <td class="text-sm text-muted">—</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"/></td>
+                  <td><span class="badge badge--requested">Requested</span></td>
+                  <td class="font-medium">jingkai</td>
+                  <td class="text-sm">1234567890123</td>
+                  <td class="text-sm">Credit Agricole Co.</td>
+                  <td>jingkai</td>
+                  <td>005</td>
+                  <td>100.00</td>
+                  <td style="color:var(--text-3);">—</td>
+                  <td class="font-medium">100.00</td>
+                  <td>HKD</td>
+                  <td class="text-sm text-muted">jingkai@gmail.com</td>
+                  <td class="text-sm text-muted">2025-09-21</td>
+                  <td class="text-sm text-muted">—</td>
+                </tr>
+                <!-- ★ Paid row with extra bonus ★ -->
+                <tr style="background:#f0fdf4;">
+                  <td><input type="checkbox"/></td>
+                  <td><span class="badge badge--paid">Paid</span></td>
+                  <td class="font-medium">jingkai</td>
+                  <td class="text-sm">1234567890123</td>
+                  <td class="text-sm">Credit Agricole Co.</td>
+                  <td>jingkai</td>
+                  <td>005</td>
+                  <td>1.00</td>
+                  <td style="color:var(--text-3);">—</td>
+                  <td class="font-medium">1.00</td>
+                  <td>HKD</td>
+                  <td class="text-sm text-muted">jingkai@gmail.com</td>
+                  <td class="text-sm text-muted">2025-09-19</td>
+                  <td class="text-sm" style="color:var(--success);font-weight:500;">2025-09-23</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="alert alert--info" style="margin-top:16px;">
+          <div>
+            <strong>Extra Bonus % in Finance:</strong> When a KOL has an Extra Bonus set on their campaign (Screen ③), the Finance Module automatically calculates <strong>Total Amount = Base Reward × (1 + Bonus%)</strong>. Example: JK_test base HKD 200 + 10% = <strong>HKD 220</strong>. The exported CSV includes both columns.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Finance Export -->
+<div class="overlay" id="modal-finance-export" hidden>
+  <div class="modal modal--lg">
+    <div class="modal__head"><span class="modal__title">Finance Data Export — Select Fields</span><button class="modal__close" onclick="this.closest('.overlay').setAttribute('hidden','')">✕</button></div>
+    <div class="modal__body">
+      <div class="export-field-list">
+        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Status</span></div>
+        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">KOL</span></div>
+        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Bank Account Number</span></div>
+        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Bank Name</span></div>
+        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Bank Account Name</span></div>
+        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Bank Code</span></div>
+        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Base Reward</span></div>
+        <div class="export-field new"><div class="export-field__checkbox checked"></div><span class="export-field__name">Extra Bonus %</span><span class="new-badge">NEW</span></div>
+        <div class="export-field new"><div class="export-field__checkbox checked"></div><span class="export-field__name">Total Amount (Base × (1 + Bonus%))</span><span class="new-badge">NEW</span></div>
+        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Currency</span></div>
+        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Payee's Email Address</span></div>
+        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Request Date</span></div>
+        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Paid Date</span></div>
+      </div>
+    </div>
+    <div class="modal__foot">
+      <button class="btn btn--ghost" onclick="this.closest('.overlay').setAttribute('hidden','')">Cancel</button>
+      <button class="btn btn--pink" onclick="alert('Finance CSV exported.');this.closest('.overlay').setAttribute('hidden','')">↓ Export CSV</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ SCREEN 7 — Activity Log ══ -->
+<div id="s7" class="screen">
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar__logo"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#fff" stroke-width="1.8"/><path d="M6.5 10C6.5 7.5 8 6 10 6s3.5 1.5 3.5 4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><circle cx="10" cy="13" r="1.5" fill="#fff"/></svg></div>
+      <button class="sidebar__icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button>
+      <button class="sidebar__icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 2a5 5 0 1 1 0 10A5 5 0 0 1 12 2zM4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></button>
+      <button class="sidebar__icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg></button>
+      <button class="sidebar__icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg></button>
+      <button class="sidebar__icon sidebar__bottom active"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 1 1 4.93 19.07 10 10 0 0 1 19.07 4.93z"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg></button>
+    </aside>
+    <div class="main">
+      <!-- Topbar -->
+      <div class="topbar">
+        <div class="breadcrumb"><a href="#">Settings</a><span class="breadcrumb__sep">/</span><span class="breadcrumb__current">Activity Log</span></div>
+        <div class="topbar__right"><span class="text-muted text-sm">julie li</span><div class="avatar">J</div></div>
+      </div>
+
+      <!-- Settings layout: left nav + content -->
+      <div style="display:flex;flex:1;min-height:0;">
+        <!-- Settings sidebar -->
+        <nav style="width:220px;flex-shrink:0;border-right:1px solid var(--border);background:#fff;padding:20px 0;">
+          <button style="display:block;width:100%;text-align:left;padding:10px 20px;font-size:14px;color:var(--text-2);background:none;border:0;cursor:pointer;border-radius:0;">Tag Management</button>
+          <button style="display:block;width:100%;text-align:left;padding:10px 20px;font-size:14px;color:var(--pink);background:var(--pink-light);border:0;cursor:pointer;font-weight:500;border-radius:0;">Activity Log</button>
+          <button style="display:block;width:100%;text-align:left;padding:10px 20px;font-size:14px;color:var(--text-2);background:none;border:0;cursor:pointer;border-radius:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Campaign Report Man...</button>
+        </nav>
+
+        <!-- Activity log content -->
+        <div class="content" style="flex:1;overflow-y:auto;">
+          <h1 style="font-size:22px;font-weight:700;margin-bottom:20px;">Activity Log</h1>
+
+          <!-- Filters -->
+          <div class="row" style="margin-bottom:18px;gap:8px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-2);">
+              Object Type
+              <button class="btn btn--ghost btn--sm" style="border-radius:var(--r-full);gap:4px;">All <span style="color:var(--pink);">▾</span></button>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-2);">
+              Action
+              <button class="btn btn--ghost btn--sm" style="border-radius:var(--r-full);gap:4px;">All <span style="color:var(--pink);">▾</span></button>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-2);">
+              User
+              <button class="btn btn--ghost btn--sm" style="border-radius:var(--r-full);gap:4px;color:var(--pink);">Anyone <span>▾</span></button>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-2);">
+              Date <span style="width:14px;height:14px;border:1px solid var(--border);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;">?</span>
+              <button class="btn btn--ghost btn--sm" style="border-radius:var(--r-full);gap:4px;color:var(--pink);">Last 7 day <span>▾</span></button>
+            </div>
+            <div style="margin-left:auto;">
+              <button class="btn--pink-text" style="display:flex;align-items:center;gap:4px;font-size:13px;">↺ Clear filters</button>
+            </div>
+          </div>
+
+          <!-- Table -->
+          <div class="card" style="overflow:hidden;">
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Object Type</th>
+                    <th>Object Name</th>
+                    <th>Action</th>
+                    <th>Value Before</th>
+                    <th>Value After</th>
+                    <th>User</th>
+                    <th style="white-space:nowrap;">Date ⇅</th>
+                  </tr>
+                </thead>
+                <tbody>
+
+                  <!-- ★ NEW: Extra bonus change ★ -->
+                  <tr style="background:#fff8fc;">
+                    <td style="font-weight:600;">Campaign</td>
+                    <td style="color:var(--text-2);">[Copy]测试 campaign…</td>
+                    <td>
+                      <span style="background:var(--pink-light);color:var(--pink);font-size:12px;font-weight:600;padding:2px 10px;border-radius:var(--r-full);">Edit Extra Bonus</span>
+                      <span class="new-badge" style="margin-left:4px;">NEW</span>
+                    </td>
+                    <td style="color:var(--text-2);">0%</td>
+                    <td style="color:var(--pink);font-weight:600;">+10%</td>
+                    <td>
+                      <div style="font-weight:500;">julie li</div>
+                      <div style="font-size:12px;color:var(--text-3);">julie.li@presslogic.com</div>
+                    </td>
+                    <td style="color:var(--text-2);font-size:13px;white-space:nowrap;">2026-06-30</td>
+                  </tr>
+
+                  <!-- ★ NEW: KOL phone change ★ -->
+                  <tr style="background:#f0fdf4;">
+                    <td style="font-weight:600;">KOL</td>
+                    <td style="color:var(--text-2);">Twoheartsonehome</td>
+                    <td>
+                      <span style="background:#d1fae5;color:#065f46;font-size:12px;font-weight:600;padding:2px 10px;border-radius:var(--r-full);">Edit</span>
+                      <span class="new-badge" style="margin-left:4px;">NEW</span>
+                    </td>
+                    <td style="color:var(--text-2);font-size:13px;">85261234567</td>
+                    <td style="font-weight:500;font-size:13px;">85263606717</td>
+                    <td>
+                      <div style="font-weight:500;">julie li</div>
+                      <div style="font-size:12px;color:var(--text-3);">julie.li@presslogic.com</div>
+                    </td>
+                    <td style="color:var(--text-2);font-size:13px;white-space:nowrap;">2026-06-30</td>
+                  </tr>
+
+                  <!-- Existing rows (reference) -->
+                  <tr>
+                    <td style="font-weight:600;">Campaign</td>
+                    <td style="color:var(--text-2);">Testing_女性衛生...</td>
+                    <td><span style="background:var(--info-light);color:var(--info);font-size:12px;font-weight:600;padding:2px 10px;border-radius:var(--r-full);">Export</span></td>
+                    <td style="color:var(--text-3);">N/A</td>
+                    <td style="color:var(--text-3);">N/A</td>
+                    <td>
+                      <div style="font-weight:500;">julie li</div>
+                      <div style="font-size:12px;color:var(--text-3);">julie.li@presslogic.com</div>
+                    </td>
+                    <td style="color:var(--text-2);font-size:13px;white-space:nowrap;">2026-06-30</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight:600;">Settings</td>
+                    <td style="color:var(--text-2);">kol Beauty</td>
+                    <td><span style="background:var(--success-light);color:#065f46;font-size:12px;font-weight:600;padding:2px 10px;border-radius:var(--r-full);">Create</span></td>
+                    <td style="color:var(--text-3);">N/A</td>
+                    <td style="font-size:13px;color:var(--text-2);">Color: #FF5CC4<br>Name: Beauty</td>
+                    <td>
+                      <div style="font-weight:500;">Michelle Cheung</div>
+                      <div style="font-size:12px;color:var(--text-3);">Michelle.cheung@pr...</div>
+                    </td>
+                    <td style="color:var(--text-2);font-size:13px;white-space:nowrap;">2026-06-29</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight:600;">Campaign</td>
+                    <td style="color:var(--text-2);">Wong Hau Ting</td>
+                    <td><span style="background:var(--warning-light);color:#92400e;font-size:12px;font-weight:600;padding:2px 10px;border-radius:var(--r-full);">Edit</span></td>
+                    <td style="color:var(--text-2);font-size:13px;">Enrolled</td>
+                    <td style="color:var(--text-2);font-size:13px;">Confirmed by Clie...</td>
+                    <td>
+                      <div style="font-weight:500;">Fiona Cheung</div>
+                      <div style="font-size:12px;color:var(--text-3);">fiona.cheung@echo...</div>
+                    </td>
+                    <td style="color:var(--text-2);font-size:13px;white-space:nowrap;">2026-06-29</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight:600;">KOL</td>
+                    <td style="color:var(--text-2);">Data Export</td>
+                    <td><span style="background:var(--info-light);color:var(--info);font-size:12px;font-weight:600;padding:2px 10px;border-radius:var(--r-full);">Export</span></td>
+                    <td style="color:var(--text-3);">N/A</td>
+                    <td style="color:var(--text-3);">N/A</td>
+                    <td>
+                      <div style="font-weight:500;">Fiona Cheung</div>
+                      <div style="font-size:12px;color:var(--text-3);">fiona.cheung@echo...</div>
+                    </td>
+                    <td style="color:var(--text-2);font-size:13px;white-space:nowrap;">2026-06-29</td>
+                  </tr>
+
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Pagination -->
+          <div class="row" style="justify-content:center;margin-top:20px;gap:4px;">
+            <button class="btn btn--ghost btn--sm" style="width:30px;height:30px;padding:0;border-radius:var(--r-md);">‹</button>
+            <button class="btn btn--pink btn--sm" style="width:30px;height:30px;padding:0;border-radius:var(--r-md);">1</button>
+            <button class="btn btn--ghost btn--sm" style="width:30px;height:30px;padding:0;border-radius:var(--r-md);">›</button>
+          </div>
+
+          <div class="alert alert--info" style="margin-top:16px;">
+            <div>
+              <strong>2 new Activity Log event types (highlighted):</strong><br>
+              1. <strong>Edit Extra Bonus</strong> — Object Type: Campaign. Logs who changed a KOL's extra bonus %, Value Before → Value After (e.g. 0% → +10%).<br>
+              2. <strong>KOL phone number change</strong> — Object Type: KOL. Logs who changed the phone, Value Before = old number, Value After = new number.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showScreen(id, el) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.proto-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.action-menu').forEach(m => m.setAttribute('hidden',''));
+  // hide bulk bar when switching screens
+  const bar = document.getElementById('bulk-bar');
+  if (bar) bar.setAttribute('hidden','');
+}
+
+function toggleAllKOL(master) {
+  document.querySelectorAll('.kol-chk').forEach(c => c.checked = master.checked);
+  updateBulkBar();
+}
+
+function updateBulkBar() {
+  const checked = document.querySelectorAll('.kol-chk:checked');
+  const bar = document.getElementById('bulk-bar');
+  const countEl = document.getElementById('bulk-count');
+  const namesEl = document.getElementById('bulk-kol-names');
+  if (checked.length > 0) {
+    bar.removeAttribute('hidden');
+    bar.style.display = 'flex';
+    countEl.textContent = checked.length + ' Selected';
+    // collect names from checked rows
+    const names = Array.from(checked).map(c => {
+      const row = c.closest('tr');
+      const nameEl = row ? row.querySelector('.font-medium') : null;
+      return nameEl ? nameEl.textContent.trim() : '';
+    }).filter(Boolean);
+    if (namesEl) namesEl.textContent = names.join(', ');
+  } else {
+    bar.setAttribute('hidden','');
+  }
+}
+
+function updateBulkPreview() {
+  const pct = parseFloat(document.getElementById('bulk-bonus-pct').value) || 0;
+  const base = 200;
+  const total = base * (1 + pct / 100);
+  document.getElementById('bulk-bonus-preview').innerHTML =
+    pct > 0
+      ? `Each selected KOL: Base HKD ${base} + <strong>${pct}%</strong> = <strong>HKD ${total.toFixed(2)}</strong>`
+      : `Each selected KOL: Base HKD ${base}.00 (No extra bonus)`;
+}
+
+function toggleMenu(id) {
+  const m = document.getElementById(id);
+  document.querySelectorAll('.action-menu').forEach(x => { if(x.id!==id) x.setAttribute('hidden',''); });
+  m.hidden ? m.removeAttribute('hidden') : m.setAttribute('hidden','');
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.action-menu-wrap'))
+    document.querySelectorAll('.action-menu').forEach(m => m.setAttribute('hidden',''));
+});
+
+function openBonusModal(name, pct) {
+  document.getElementById('bonus-modal-title').textContent = 'Edit Extra Bonus — ' + name;
+  document.getElementById('bonus-pct-input').value = pct;
+  updateBonusPreview();
+  document.getElementById('modal-bonus').removeAttribute('hidden');
+}
+
+function updateBonusPreview() {
+  const pct = parseFloat(document.getElementById('bonus-pct-input').value) || 0;
+  const base = 200;
+  const bonus = Math.round(base * pct / 100 * 100) / 100;
+  const total = base + bonus;
+  document.getElementById('bonus-preview').innerHTML =
+    pct > 0
+      ? `Total payout: <strong>HKD ${total.toFixed(2)}</strong> (Base HKD ${base} + ${pct}% = HKD ${bonus.toFixed(2)})`
+      : `Total payout: <strong>HKD ${base}.00</strong> (No extra bonus)`;
+}
+
+function toggleOccEdit() {
+  const ed = document.getElementById('occ-edit');
+  ed.hidden = !ed.hidden;
+}
+
+function toggleQType(cardId, toggleId, mcId, oeId) {
+  const tog = document.getElementById(toggleId);
+  tog.classList.toggle('on');
+  const isMC = tog.classList.contains('on');
+  document.getElementById(mcId).hidden = !isMC;
+  document.getElementById(oeId).hidden = isMC;
+}
+
+let qCount = 2;
+function addQuestion() {
+  qCount++;
+  const n = qCount;
+  const c = document.getElementById('questions-container');
+  const div = document.createElement('div');
+  div.className = 'q-card'; div.id = `q${n}`;
+  div.innerHTML = `
+    <div class="q-card__head">
+      <div class="q-card__title"><span style="color:var(--text-2);">🗑</span> Question ${n}</div>
+      <div class="toggle-wrap"><span>Multiple Choice</span><button class="toggle on" id="tq${n}" onclick="toggleQType('q${n}','tq${n}','mc${n}','oe${n}')"></button></div>
+    </div>
+    <input class="input" placeholder="Enter question text…"/>
+    <div id="mc${n}" class="q-mode-options">
+      <div class="q-option-row"><div class="radio-custom"></div><input class="input" placeholder="Option A"/><button style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;">✕</button></div>
+      <button class="btn--pink-text" style="font-size:13px;display:flex;align-items:center;gap:4px;"><span style="width:18px;height:18px;border:2px solid var(--pink);border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;">+</span> Add option</button>
+    </div>
+    <div id="oe${n}" hidden class="open-ended-hint">KOL types a free-text answer — no options needed.</div>
+  `;
+  c.appendChild(div);
+}
+
+function updateChildrenYears(val) {
+  const n = Math.min(parseInt(val)||0, 10);
+  const c = document.getElementById('birth-year-fields');
+  c.innerHTML = '';
+  for(let i=1;i<=n;i++){
+    const d = document.createElement('div');
+    d.className = 'field';
+    d.innerHTML = `<label class="field__label">Birth year of Child ${i}</label><input class="input" style="max-width:160px;" placeholder="e.g. ${2018+i-1}"/>`;
+    c.appendChild(d);
+  }
+}
+</script>
+</body>
+</html>
