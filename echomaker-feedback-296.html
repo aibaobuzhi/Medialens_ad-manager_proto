@@ -142,7 +142,7 @@ table{border-collapse:collapse;width:100%}
 
 /* KOL fields */
 .kol-fields{display:grid;grid-template-columns:1fr 1fr;gap:0}
-.kol-field{padding:14px 0;border-bottom:1px solid var(--divider)}
+.kol-field{padding:14px 0;border-bottom:1px solid var(--divider);min-width:0}
 .kol-field:nth-child(odd){padding-right:32px}
 .kol-field:nth-child(even){padding-left:32px;border-left:1px solid var(--divider)}
 .kol-field__key{font-size:12px;color:var(--text-2);margin-bottom:4px}
@@ -260,15 +260,15 @@ table{border-collapse:collapse;width:100%}
               </div>
 
               <!-- ★ Contact Number — Change Record ★ -->
-              <div class="kol-field" style="background:#fff8fc;">
+              <div class="kol-field">
                 <div class="kol-field__key">Contact Number</div>
                 <div class="kol-field__val">
                   85263606717
                   <span class="badge badge--verified">✓ Verified</span>
-                  <div style="margin-left:auto;display:flex;gap:8px;">
-                    <button class="kol-field__edit" onclick="document.getElementById('modal-change-phone').removeAttribute('hidden')">Edit</button>
-                    <button onclick="document.getElementById('modal-change-record').removeAttribute('hidden')" style="background:none;border:none;font-size:12px;color:var(--text-3);cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:0;">Change record</button>
-                  </div>
+                  <button class="kol-field__edit" style="margin-left:auto;" onclick="document.getElementById('modal-change-phone').removeAttribute('hidden')">Edit</button>
+                </div>
+                <div style="margin-top:4px;">
+                  <button onclick="document.getElementById('modal-change-record').removeAttribute('hidden')" style="background:none;border:none;font-size:12px;color:var(--text-3);cursor:pointer;padding:0;">log</button>
                 </div>
               </div>
 
