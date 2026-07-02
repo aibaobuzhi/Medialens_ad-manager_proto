@@ -1412,6 +1412,10 @@ svg{display:block;}
         <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="margin-right:4px;"><rect x="1.5" y="1" width="10" height="11" rx="1.5" stroke="#fff" stroke-width="1.2"/><path d="M4 4.5h5M4 7h3.5M4 9.5h2" stroke="#fff" stroke-width="1" stroke-linecap="round"/></svg>
         Create Post with AI
       </button>
+      <button class="btn" style="background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.4);" onclick="enterGenSelMode('content-ai')">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="margin-right:4px;"><circle cx="6.5" cy="6.5" r="5" stroke="#fff" stroke-width="1.2"/><path d="M4.5 6.5h4M6.5 4.5v4" stroke="#fff" stroke-width="1.1" stroke-linecap="round"/></svg>
+        Create Content with AI
+      </button>
       <button class="btn" style="background:#fff;color:var(--brand-blue);font-weight:600;" onclick="downloadSelected()">Download</button>
     </div>
   </nav>
@@ -2501,7 +2505,15 @@ Post format: [Feed / Story / Reels]
 Caption language: [繁體中文 / English]
 Tone: [輕鬆貼地 / 專業 / 幽默]
 Key message: [main selling point or CTA]
-Include hashtags: [yes / no]`
+Include hashtags: [yes / no]`,
+
+  'content-ai': `Help me build a campaign content:
+Objective: [Branding / Sales / Traffic / Leads / Awareness]
+Brand name: [Brand name]
+Product name: [Product name]
+Product details: [sellable bullet, discount offer]
+Target Audience: [Gender: All, Age: 18-65+, Region: Hong Kong]
+Landing page: [URL]`
 };
 
 function toggleAssetCard(card) {
@@ -2531,7 +2543,8 @@ function enterGenSelMode(mode) {
   document.querySelectorAll('.asset-card').forEach(c => c.classList.remove('selected'));
   const labels = {
     'ad-creative-ai': 'Select 1 image or video for Ad Creative',
-    'post-ai': 'Select 1 image or video for Post'
+    'post-ai': 'Select 1 image or video for Post',
+    'content-ai': 'Select 1 image or video for Campaign Content'
   };
   document.getElementById('genSelLabel').textContent = labels[mode] || 'Select assets';
   document.getElementById('genSelBar').classList.add('active');
