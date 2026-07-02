@@ -2044,7 +2044,24 @@ table{border-collapse:collapse;width:100%}
                 </thead>
                 <tbody>
 
-                  <!-- ★ NEW: Extra bonus change ★ -->
+                  <!-- ★ NEW: KOL Extra Bonus change (KOL Module) ★ -->
+                  <tr style="background:#fff8fc;">
+                    <td style="font-weight:600;">KOL</td>
+                    <td style="color:var(--text-2);">Twoheartsonehome</td>
+                    <td>
+                      <span style="background:var(--pink-light);color:var(--pink);font-size:12px;font-weight:600;padding:2px 10px;border-radius:var(--r-full);">Edit Extra Bonus</span>
+                      <span class="new-badge" style="margin-left:4px;">NEW</span>
+                    </td>
+                    <td style="color:var(--text-2);">HKD 0</td>
+                    <td style="color:var(--pink);font-weight:600;">+HKD 20</td>
+                    <td>
+                      <div style="font-weight:500;">julie li</div>
+                      <div style="font-size:12px;color:var(--text-3);">julie.li@presslogic.com</div>
+                    </td>
+                    <td style="color:var(--text-2);font-size:13px;white-space:nowrap;">2026-07-02</td>
+                  </tr>
+
+                  <!-- ★ NEW: Campaign KOL Extra bonus change ★ -->
                   <tr style="background:#fff8fc;">
                     <td style="font-weight:600;">Campaign</td>
                     <td style="color:var(--text-2);">[Copy]测试 campaign…</td>
@@ -2142,9 +2159,10 @@ table{border-collapse:collapse;width:100%}
 
           <div class="alert alert--info" style="margin-top:16px;">
             <div>
-              <strong>2 new Activity Log event types (highlighted):</strong><br>
-              1. <strong>Edit Extra Bonus</strong> — Object Type: Campaign. Logs who changed a KOL's extra bonus %, Value Before → Value After (e.g. 0% → +10%).<br>
-              2. <strong>KOL phone number change</strong> — Object Type: KOL. Logs who changed the phone, Value Before = old number, Value After = new number.
+              <strong>3 new Activity Log event types (highlighted):</strong><br>
+              1. <strong>Edit Extra Bonus (KOL)</strong> — Object Type: KOL. Logs who changed a KOL's Extra Bonus from KOL Module → KOL List. Value Before/After = raw set value (e.g. HKD 0 → +HKD 20).<br>
+              2. <strong>Edit Extra Bonus (Campaign)</strong> — Object Type: Campaign. Logs who changed a KOL's Extra Bonus within a Campaign. Value Before/After = raw set value (e.g. 0% → +10%).<br>
+              3. <strong>KOL phone number change</strong> — Object Type: KOL. Logs who changed the phone, Value Before = old number, Value After = new number.
             </div>
           </div>
         </div>
