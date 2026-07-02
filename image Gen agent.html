@@ -1180,16 +1180,31 @@ svg{display:block;}
 
     <!-- Welcome state -->
     <div id="welcomeState">
-      <div class="chat-welcome">
-        <div class="chat-welcome__title">AI Creative Studio</div>
-        <div class="chat-welcome__sub">Describe what you want to create. The agent will understand your intent and generate copy, image, or a full post.</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <div style="width:38px;height:38px;border-radius:50%;background:var(--brand-blue);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;">JL</div>
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--text-primary);line-height:1.3;">How can I help you today?</div>
+          <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">Image Gen agent · AI Creative Studio</div>
+        </div>
       </div>
-      <div class="chat-tip" style="margin-bottom:var(--sp-md);">
-        <div class="chat-tip__title">How to use</div>
-        <div class="chat-tip__list">
-          <span class="tip-row"><span class="tip-key">+</span> Pick reference posts, upload images or videos</span>
-          <span class="tip-row"><span class="tip-key"><svg width="11" height="11" viewBox="0 0 11 11" fill="none" style="display:inline;vertical-align:-1px"><rect x=".5" y="1.5" width="10" height="8" rx="1.2" stroke="currentColor" stroke-width="1.1"/><circle cx="3.5" cy="5" r=".9" fill="currentColor"/><path d="M.5 8l2.5-2.5 1.5 1.5 1.5-1.5L8.5 8" stroke="currentColor" stroke-width="1"/></svg></span> Set output ratio (Auto, 1:1, 4:5, 9:16…)</span>
-          <span class="tip-row"><span class="tip-key">Agent</span> Switch to Auto or Ad Advisor</span>
+      <div class="aa-prompts" style="gap:8px;">
+        <div class="aa-prompt-card" onclick="fillImgGenPrompt('campaign-content')">
+          <div class="aa-prompt-card__icon" style="background:#EFF6FF;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="2" width="11" height="10" rx="1.5" stroke="#2563EB" stroke-width="1.2"/><path d="M4 5.5h6M4 7.5h4" stroke="#2563EB" stroke-width="1" stroke-linecap="round"/></svg>
+          </div>
+          <div class="aa-prompt-card__text">Help me generate a campaign content</div>
+        </div>
+        <div class="aa-prompt-card" onclick="fillImgGenPrompt('image-gen')">
+          <div class="aa-prompt-card__icon" style="background:#FFF7ED;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="1.5" width="11" height="11" rx="1.5" stroke="#F97316" stroke-width="1.2"/><circle cx="5" cy="5" r="1.2" fill="#F97316" opacity=".7"/><path d="M1.5 9.5l3-3 2 2 2-2 3 3" stroke="#F97316" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="aa-prompt-card__text">Generate product images for social media</div>
+        </div>
+        <div class="aa-prompt-card" onclick="fillImgGenPrompt('ad-creative')">
+          <div class="aa-prompt-card__icon" style="background:#F0FDF4;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="8" rx="1.5" stroke="#22C55E" stroke-width="1.2"/><path d="M4 6.5h3M4 8.5h2" stroke="#22C55E" stroke-width="1" stroke-linecap="round"/><rect x="9" y="5" width="2.5" height="4" rx=".8" fill="#22C55E" opacity=".6"/></svg>
+          </div>
+          <div class="aa-prompt-card__text">Create an ad creative from reference posts</div>
         </div>
       </div>
     </div>
@@ -1943,6 +1958,43 @@ function fillAdvisorPrompt(card) {
   input.value = text;
   input.focus();
   updateAaSend();
+}
+
+const IMG_GEN_PROMPTS = {
+  'campaign-content': `Help me generate a campaign content:
+Objective: [Branding / Sales / Traffic / Leads / Awareness]
+Brand name: [Brand name]
+Product name: [Product name]
+Product details: [sellable bullet, discount offer]
+Target Audience: [Gender: All, Age: 18-65+, Region: Hong Kong]
+Landing page: [URL]`,
+  'image-gen': `Generate product images for social media:
+Style: [clean / lifestyle / minimalist / bold]
+Background: [white / outdoor / studio / abstract]
+Format: [1:1 Feed / 9:16 Story / 4:5 Portrait]
+Brand colour: [hex or description]
+Key message: [tagline or CTA text to overlay]`,
+  'ad-creative': `Create an ad creative from reference posts:
+Brand name: [Brand name]
+Objective: [Awareness / Traffic / Leads / Sales]
+Format: [Feed Square / Story / Carousel]
+Tone: [Professional / Playful / Urgent]
+CTA: [Shop Now / Learn More / Contact Us]`
+};
+
+function fillImgGenPrompt(key) {
+  const preset = IMG_GEN_PROMPTS[key] || '';
+  const ta = document.getElementById('promptTA');
+  ta.value = preset;
+  document.getElementById('charCt').textContent = preset.length + ' / 4000';
+  document.getElementById('promptWrap').classList.add('has-text');
+  updateSendBtn();
+  // Hide welcome state so the textarea gets focus
+  document.getElementById('welcomeState').classList.add('hidden');
+  ta.focus();
+  // Place cursor at first bracket for easy editing
+  const first = preset.indexOf('[');
+  if (first >= 0) { ta.setSelectionRange(first, preset.indexOf(']', first) + 1); }
 }
 function updateAaSend() {
   const ready = document.getElementById('aaInput').value.trim().length > 0;
