@@ -1866,7 +1866,12 @@ function toggleAgentDD() {
   dd.classList.toggle('hidden', !agentDDOpen);
   document.getElementById('agentSel').classList.toggle('open', agentDDOpen);
   if (agentDDOpen) {
-    const rect = document.getElementById('agentSel').getBoundingClientRect();
+    // Anchor to whichever trigger is on screen: AI Agent full page → aaAgentBtn, else panel selector
+    const onAiAgentPage = document.getElementById('aiAgentPage').classList.contains('on');
+    const anchor = onAiAgentPage
+      ? document.getElementById('aaAgentBtn')
+      : document.getElementById('agentSel');
+    const rect = anchor.getBoundingClientRect();
     dd.style.bottom = (window.innerHeight - rect.top + 6) + 'px';
     dd.style.left = rect.left + 'px';
     closePlatformDD();
@@ -1884,6 +1889,9 @@ function setAgent(name, mode) {
   currentAgent = name;
   currentAgentMode = mode || 'auto';
   document.getElementById('agentName').textContent = name;
+  // Keep the AI Agent full-page selector label in sync
+  const aaLabel = document.getElementById('aaAgentLabel');
+  if (aaLabel) aaLabel.textContent = name;
   document.querySelectorAll('.agent-opt').forEach(o => o.classList.remove('sel'));
   const modeToOptId = {
     'auto': 'agopt-auto',
@@ -2033,7 +2041,7 @@ function goToSetup() {
   window.location.href = 'file:///Users/julie.li/Documents/Medialens/prototypes/ai-generator-brand-setup.html';
 }
 document.addEventListener('click', e => {
-  if (!e.target.closest('#agentSel')) closeAgentDD();
+  if (!e.target.closest('#agentSel') && !e.target.closest('#aaAgentBtn')) closeAgentDD();
   if (!e.target.closest('#platformSel')) closePlatformDD();
   if (!e.target.closest('#promptWrap')) closeMentionDD();
 });
@@ -2668,6 +2676,8 @@ function openAiAgentPage() {
   document.getElementById('navAiAgent').classList.add('active');
   const page = document.getElementById('aiAgentPage');
   page.classList.add('on');
+  // Hide the floating AI bubble on the AI Agent full page
+  document.getElementById('aiFAB').classList.add('hidden');
   // Neutralise mainContent padding so overlay fills edge-to-edge
   document.getElementById('mainContent').style.padding = '0';
   // Render demo cards into the AI Agent page if not yet rendered
@@ -2676,6 +2686,8 @@ function openAiAgentPage() {
 
 function closeAiAgentPage() {
   document.getElementById('aiAgentPage').classList.remove('on');
+  // Restore the floating AI bubble when leaving the AI Agent page
+  document.getElementById('aiFAB').classList.remove('hidden');
   document.getElementById('mainContent').style.padding = '';
   // Restore Buzz as active
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
