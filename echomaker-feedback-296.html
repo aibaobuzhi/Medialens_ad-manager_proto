@@ -333,9 +333,50 @@ table{border-collapse:collapse;width:100%}
                 <div class="kol-field__key">Occupation</div>
                 <div class="kol-field__val">Students<button class="kol-field__edit" style="margin-left:auto;">Edit</button></div>
               </div>
-              <div class="kol-field">
+              <!-- ★ Parenting — inline edit with birth years ★ -->
+              <div class="kol-field" id="parenting-field" style="flex-direction:column;align-items:stretch;">
                 <div class="kol-field__key">Parenting</div>
-                <div class="kol-field__val">No<button class="kol-field__edit" style="margin-left:auto;">Edit</button></div>
+                <!-- View mode -->
+                <div id="parenting-view" class="kol-field__val" style="align-items:center;">
+                  <span id="parenting-display">Yes · 2 children <span class="child-age-tag" style="margin-left:4px;">Ages: 8, 5</span></span>
+                  <button class="kol-field__edit" style="margin-left:auto;" onclick="openParentingEdit()">Edit</button>
+                </div>
+                <!-- Edit mode (hidden by default) -->
+                <div id="parenting-edit" style="display:none;background:var(--bg);border:1px solid var(--pink-border);border-radius:var(--r-md);padding:14px 16px;margin-top:8px;">
+                  <div style="display:flex;align-items:center;gap:20px;margin-bottom:12px;">
+                    <label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;font-weight:500;">
+                      <input type="radio" name="parenting-radio" id="parenting-no" value="no" style="accent-color:var(--pink);width:16px;height:16px;" onchange="onParentingToggle('no')"/>
+                      No
+                    </label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;font-weight:500;">
+                      <input type="radio" name="parenting-radio" id="parenting-yes" value="yes" checked style="accent-color:var(--pink);width:16px;height:16px;" onchange="onParentingToggle('yes')"/>
+                      Yes
+                    </label>
+                  </div>
+                  <div id="parenting-children-section">
+                    <div style="font-size:13px;color:var(--text-2);margin-bottom:10px;">If yes, how many children do you have?
+                      <input id="parenting-count" type="number" min="1" max="5" value="2" class="input" style="width:60px;display:inline-block;margin-left:8px;padding:4px 8px;font-size:13px;" oninput="updateParentingBirthYears()"/>
+                    </div>
+                    <div id="parenting-birth-years" style="display:flex;flex-direction:column;gap:8px;">
+                      <div style="display:flex;align-items:center;gap:10px;">
+                        <label style="font-size:13px;color:var(--text-1);min-width:130px;">Birth year of Child 1</label>
+                        <input class="input" style="max-width:120px;" value="2018" data-err="parenting-err-1" oninput="updateParentingAge(this)"/>
+                        <span class="child-age-tag">Age 8</span>
+                        <span id="parenting-err-1" style="display:none;font-size:12px;color:#ef4444;"></span>
+                      </div>
+                      <div style="display:flex;align-items:center;gap:10px;">
+                        <label style="font-size:13px;color:var(--text-1);min-width:130px;">Birth year of Child 2</label>
+                        <input class="input" style="max-width:120px;" value="2021" data-err="parenting-err-2" oninput="updateParentingAge(this)"/>
+                        <span class="child-age-tag">Age 5</span>
+                        <span id="parenting-err-2" style="display:none;font-size:12px;color:#ef4444;"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:8px;margin-top:14px;">
+                    <button class="btn btn--ghost btn--sm" onclick="closeParentingEdit()">Cancel</button>
+                    <button class="btn btn--pink btn--sm" onclick="saveParenting()">Save</button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -2651,6 +2692,75 @@ function unlinkAccount(platform, handle) {
     setTimeout(function(){ toast.remove(); }, 2500);
   };
   document.getElementById('modal-unlink-account').removeAttribute('hidden');
+}
+
+// ── Parenting inline edit ──────────────────────────────────────
+function openParentingEdit() {
+  var isYes = document.getElementById('parenting-display').textContent.trim().startsWith('Yes');
+  document.getElementById(isYes ? 'parenting-yes' : 'parenting-no').checked = true;
+  document.getElementById('parenting-children-section').style.display = isYes ? '' : 'none';
+  document.getElementById('parenting-view').style.display = 'none';
+  document.getElementById('parenting-edit').style.display = '';
+}
+
+function closeParentingEdit() {
+  document.getElementById('parenting-view').style.display = '';
+  document.getElementById('parenting-edit').style.display = 'none';
+}
+
+function onParentingToggle(val) {
+  document.getElementById('parenting-children-section').style.display = val === 'yes' ? '' : 'none';
+}
+
+function updateParentingBirthYears() {
+  var count = parseInt(document.getElementById('parenting-count').value) || 1;
+  count = Math.min(Math.max(count, 1), 5);
+  var container = document.getElementById('parenting-birth-years');
+  var existing = container.querySelectorAll('div');
+  // Add missing rows
+  for (var i = existing.length + 1; i <= count; i++) {
+    var errId = 'parenting-err-' + i;
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:10px;';
+    row.innerHTML = '<label style="font-size:13px;color:var(--text-1);min-width:130px;">Birth year of Child ' + i + '</label>' +
+      '<input class="input" style="max-width:120px;" data-err="' + errId + '" oninput="updateParentingAge(this)"/>' +
+      '<span class="child-age-tag" style="display:none;">—</span>' +
+      '<span id="' + errId + '" style="display:none;font-size:12px;color:#ef4444;"></span>';
+    container.appendChild(row);
+  }
+  // Remove extra rows
+  var rows = container.querySelectorAll('div');
+  for (var j = rows.length; j > count; j--) {
+    container.removeChild(rows[j - 1]);
+  }
+}
+
+function updateParentingAge(input) {
+  var y = validateBirthYear(input);
+  var tag = input.nextElementSibling;
+  if (typeof y === 'number') { tag.textContent = 'Age ' + (2026 - y); tag.style.display = ''; }
+  else { tag.style.display = 'none'; }
+}
+
+function saveParenting() {
+  var isYes = document.getElementById('parenting-yes').checked;
+  var displayEl = document.getElementById('parenting-display');
+  if (!isYes) {
+    displayEl.innerHTML = 'No';
+  } else {
+    var inputs = document.getElementById('parenting-birth-years').querySelectorAll('input');
+    var ages = [];
+    var valid = true;
+    inputs.forEach(function(inp) {
+      var y = validateBirthYear(inp);
+      if (y === 'invalid') { valid = false; }
+      else if (typeof y === 'number') { ages.push(2026 - y); }
+    });
+    if (!valid) return;
+    var ageStr = ages.length ? ages.join(', ') : '—';
+    displayEl.innerHTML = 'Yes · ' + inputs.length + ' children <span class="child-age-tag" style="margin-left:4px;">Ages: ' + ageStr + '</span>';
+  }
+  closeParentingEdit();
 }
 </script>
 </body>
