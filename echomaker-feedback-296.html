@@ -101,6 +101,9 @@ table{border-collapse:collapse;width:100%}
 .radio-custom{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:#fff;flex-shrink:0;display:grid;place-items:center;transition:border-color .15s}
 .radio-custom.checked{border-color:var(--pink)}
 .radio-custom.checked::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--pink)}
+.option-icon{width:16px;height:16px;border:2px solid var(--border);background:#fff;flex-shrink:0;}
+.option-icon[data-shape="check"]{border-radius:3px;}
+.option-icon[data-shape="radio"]{border-radius:50%;}
 
 /* Table */
 .table-wrap{overflow-x:auto}
@@ -114,6 +117,7 @@ table{border-collapse:collapse;width:100%}
 .badge--completed{background:var(--info-light);color:var(--info)}
 .badge--verified{background:var(--success-light);color:#059669;font-weight:600}
 .badge--verifying{background:var(--warning-light);color:#d97706;font-weight:600}
+.child-age-tag{background:var(--pink-light);color:var(--pink);font-size:12px;font-weight:600;padding:2px 10px;border-radius:var(--r-full);border:1px solid var(--pink-border);white-space:nowrap;}
 .badge--rejected{background:var(--pink-light);color:var(--pink)}
 .badge--requested{background:var(--warning-light);color:var(--warning)}
 .badge--paid{background:var(--success-light);color:var(--success)}
@@ -206,19 +210,28 @@ table{border-collapse:collapse;width:100%}
 
 <nav class="proto-nav">
   <span class="proto-nav__label">Screens</span>
-  <button class="proto-tab active" onclick="showScreen('s1',this)">① KOL Phone — Change Record</button>
-  <button class="proto-tab" onclick="showScreen('s2',this)">② KOL Registration</button>
-  <button class="proto-tab" onclick="showScreen('s3',this)">③ Campaign KOL — Extra Bonus %</button>
-  <button class="proto-tab" onclick="showScreen('s4',this)">④ Campaign Questions</button>
-  <button class="proto-tab" onclick="showScreen('s5',this)">⑤ KOL List Export CSV</button>
-  <button class="proto-tab" onclick="showScreen('s6',this)">⑥ Finance Module</button>
-  <button class="proto-tab" onclick="showScreen('s7',this)">⑦ Activity Log</button>
+  <button class="proto-tab active" onclick="showScreen('s1',this)">① [Admin] KOL Phone — Change Record</button>
+  <button class="proto-tab" onclick="showScreen('s2',this)">② [Client Portal] KOL Registration</button>
+  <button class="proto-tab" onclick="showScreen('s3',this)">③ [Admin] Campaign KOL — Extra Bonus</button>
+  <button class="proto-tab" onclick="showScreen('s4',this)">④ [Admin] Campaign — Extra Bonus &amp; Questions</button>
+  <button class="proto-tab" onclick="showScreen('s8',this)">⑤ [Client Portal] KOL Confirm Campaign Registration</button>
+  <button class="proto-tab" onclick="showScreen('s5',this)">⑥ [Admin] KOL List Export CSV</button>
+  <button class="proto-tab" onclick="showScreen('s6',this)">⑦ [Admin] Finance Module</button>
+  <button class="proto-tab" onclick="showScreen('s7',this)">⑧ [Admin] Activity Log</button>
 </nav>
 
 
 <!-- ══ SCREEN 1 — KOL Detail: Change Record ══ -->
-<div id="s1" class="screen active">
-  <div class="app">
+<div id="s1" class="screen active" style="flex-direction:column;">
+
+  <!-- View switcher -->
+  <div style="background:#fff;border-bottom:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;gap:8px;position:sticky;top:41px;z-index:100;flex-shrink:0;">
+    <span style="font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-right:4px;">View:</span>
+    <button id="s1-admin-tab" onclick="s1ShowView('admin')" style="padding:5px 14px;border-radius:20px;border:1px solid var(--pink);background:var(--pink);color:#fff;font-size:12px;font-weight:600;cursor:pointer;">Admin Portal</button>
+    <button id="s1-client-tab" onclick="s1ShowView('client')" style="padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:#fff;color:var(--text-2);font-size:12px;font-weight:500;cursor:pointer;">Client Portal</button>
+  </div>
+
+  <div id="s1-admin-view" class="app">
     <aside class="sidebar">
       <div class="sidebar__logo"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#fff" stroke-width="1.8"/><path d="M6.5 10C6.5 7.5 8 6 10 6s3.5 1.5 3.5 4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><circle cx="10" cy="13" r="1.5" fill="#fff"/></svg></div>
       <button class="sidebar__icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button>
@@ -282,8 +295,8 @@ table{border-collapse:collapse;width:100%}
               <div class="kol-field">
                 <div class="kol-field__key">Contact Number</div>
                 <div class="kol-field__val">
-                  85263606717
-                  <span class="badge badge--verified">✓ Verified</span>
+                  <span id="kol-phone-number">85263606717</span>
+                  <span id="kol-phone-badge" class="badge badge--verified">✓ Verified</span>
                   <button class="kol-field__edit" style="margin-left:auto;" onclick="document.getElementById('modal-change-phone').removeAttribute('hidden')">Edit</button>
                 </div>
                 <div style="margin-top:4px;">
@@ -382,19 +395,272 @@ table{border-collapse:collapse;width:100%}
       </div>
     </div>
   </div>
-</div>
+
+  <!-- ══ CLIENT PORTAL VIEW ══ -->
+  <div id="s1-client-view" style="display:none;width:100%;flex:1;">
+
+    <!-- Step nav -->
+    <div style="background:#f9fafb;border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:0;">
+      <button id="cp-step-btn-1" onclick="cpShowStep(1)" style="display:flex;align-items:center;gap:6px;padding:6px 16px;border-radius:20px 0 0 20px;border:1px solid var(--border);background:var(--pink);color:#fff;font-size:12px;font-weight:600;cursor:pointer;border-right:none;">① Phone Changed Alert</button>
+      <button id="cp-step-btn-2" onclick="cpShowStep(2)" style="display:flex;align-items:center;gap:6px;padding:6px 16px;border-radius:0;border:1px solid var(--border);background:#fff;color:var(--text-2);font-size:12px;font-weight:500;cursor:pointer;border-right:none;">② Verify New Number</button>
+      <button id="cp-step-btn-3" onclick="cpShowStep(3)" style="display:flex;align-items:center;gap:6px;padding:6px 16px;border-radius:0 20px 20px 0;border:1px solid var(--border);background:#fff;color:var(--text-2);font-size:12px;font-weight:500;cursor:pointer;">③ Enter OTP</button>
+    </div>
+
+    <!-- Step 1: Phone changed alert on community portal -->
+    <div id="cp-step-1" style="position:relative;min-height:calc(100vh - 110px);overflow:hidden;">
+      <!-- Blurred background: simplified community portal -->
+      <div style="filter:blur(3px) brightness(.85);pointer-events:none;user-select:none;">
+        <!-- Nav -->
+        <div style="background:#fff;padding:12px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;">
+          <div style="font-size:18px;font-weight:900;letter-spacing:-0.5px;"><span style="color:var(--pink);">ECHO</span><span style="font-size:14px;vertical-align:middle;">🎵</span><br><span style="font-size:14px;font-weight:700;letter-spacing:1px;">MAKER</span></div>
+          <div style="display:flex;gap:10px;">
+            <button style="border:1px solid var(--pink);color:var(--pink);background:#fff;border-radius:20px;padding:6px 18px;font-size:13px;font-weight:600;cursor:pointer;">Login</button>
+            <button style="background:var(--pink);color:#fff;border:none;border-radius:20px;padding:6px 18px;font-size:13px;font-weight:600;cursor:pointer;">Sign up</button>
+          </div>
+        </div>
+        <!-- Hero banner (geometric) -->
+        <div style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);padding:40px 32px;text-align:center;position:relative;overflow:hidden;min-height:140px;">
+          <!-- Geometric shapes as background decoration -->
+          <div style="position:absolute;inset:0;opacity:.3;display:grid;grid-template-columns:repeat(8,1fr);gap:2px;">
+            <div style="background:#FF0080;border-radius:4px;"></div><div style="background:#00D4AA;border-radius:4px;"></div><div style="background:#FFE500;border-radius:4px;"></div><div style="background:#FF0080;border-radius:50%;"></div><div style="background:#00D4AA;border-radius:4px;"></div><div style="background:#FFE500;border-radius:50%;"></div><div style="background:#FF0080;border-radius:4px;"></div><div style="background:#00D4AA;border-radius:4px;"></div>
+          </div>
+          <h2 style="color:#fff;font-size:22px;font-weight:700;position:relative;">Welcome Everyone to Join EchoMaker!</h2>
+          <div style="position:relative;margin-top:16px;display:flex;background:#fff;border-radius:40px;overflow:hidden;max-width:500px;margin:16px auto 0;">
+            <input style="flex:1;border:none;padding:10px 20px;font-size:14px;outline:none;" placeholder="Search Campaigns" readonly/>
+            <button style="background:var(--pink);color:#fff;border:none;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;">🔍 Search</button>
+          </div>
+        </div>
+        <!-- Cards row -->
+        <div style="padding:20px 32px;">
+          <div style="font-size:16px;font-weight:700;margin-bottom:12px;">What's New</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+            <div style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.1);"><div style="background:#e5e7eb;height:100px;display:grid;place-items:center;font-size:11px;color:#9ca3af;">Campaign Image</div><div style="padding:10px;"><div style="font-size:12px;color:#6b7280;">大型機構</div><div style="font-size:13px;font-weight:600;margin:4px 0;">【招募】全城挑戰！熱...</div><div style="font-size:11px;color:#9ca3af;">Deadline 17/06/2026</div></div></div>
+            <div style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.1);"><div style="background:#e5e7eb;height:100px;display:grid;place-items:center;font-size:11px;color:#9ca3af;">Campaign Image</div><div style="padding:10px;"><div style="font-size:12px;color:#6b7280;">大型機構</div><div style="font-size:13px;font-weight:600;margin:4px 0;">【緊急招募手勢舞高手...</div><div style="font-size:11px;color:#9ca3af;">Deadline 12/06/2026</div></div></div>
+            <div style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.1);"><div style="background:#e5e7eb;height:100px;display:grid;place-items:center;font-size:11px;color:#9ca3af;">Campaign Image</div><div style="padding:10px;"><div style="font-size:12px;color:#6b7280;">油站</div><div style="font-size:13px;font-weight:600;margin:4px 0;">油站打卡世界盃主題...</div><div style="font-size:11px;color:#9ca3af;">Deadline 17/06/2026</div></div></div>
+            <div style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.1);"><div style="background:#e5e7eb;height:100px;display:grid;place-items:center;font-size:11px;color:#9ca3af;">Campaign Image</div><div style="padding:10px;"><div style="font-size:12px;color:#6b7280;">大圓</div><div style="font-size:13px;font-weight:600;margin:4px 0;">毛孩有「牌」玩！寵...</div><div style="font-size:11px;color:#9ca3af;">Deadline 09/06/2026</div></div></div>
+          </div>
+        </div>
+      </div>
+      <!-- Alert modal overlay -->
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;">
+        <div style="background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.35);width:min(90vw,440px);padding:32px;text-align:center;">
+          <div style="width:52px;height:52px;background:var(--warning-light);border-radius:50%;display:grid;place-items:center;margin:0 auto 16px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div style="font-size:17px;font-weight:700;color:#111;margin-bottom:8px;">Phone Number Updated</div>
+          <div style="font-size:13px;color:#6b7280;line-height:1.6;margin-bottom:20px;">Your contact number has been changed by an administrator. Your old number is no longer valid for login.</div>
+          <div style="background:#f9fafb;border-radius:10px;padding:14px 16px;text-align:left;margin-bottom:20px;display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:12px;color:#9ca3af;">Old number</span>
+              <span style="font-size:13px;font-weight:500;color:#6b7280;text-decoration:line-through;">+852 6360 6717</span>
+            </div>
+            <div style="height:1px;background:#e5e7eb;"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:12px;color:#9ca3af;">New number</span>
+              <span style="font-size:13px;font-weight:600;color:#111;">+852 6356 4705</span>
+            </div>
+          </div>
+          <div style="font-size:13px;color:#6b7280;margin-bottom:20px;">Please verify your new number to continue using EchoMaker.</div>
+          <button onclick="cpShowStep(2)" style="width:100%;background:var(--pink);color:#fff;border:none;border-radius:40px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;">Verify Now →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Verify New Number (login page variant) -->
+    <div id="cp-step-2" style="display:none;display:none;min-height:calc(100vh - 110px);">
+      <div style="display:flex;min-height:calc(100vh - 110px);">
+        <!-- Left: geometric art panel -->
+        <div style="width:45%;flex-shrink:0;background:#111;overflow:hidden;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(5,1fr);gap:3px;padding:3px;">
+          <div style="background:#FF0080;border-radius:50%;margin:8px;"></div>
+          <div style="background:#FF0080;border-radius:4px;display:grid;place-items:center;"><div style="width:60%;height:60%;border:4px solid #fff;border-radius:4px;"></div></div>
+          <div style="background:#00D4AA;position:relative;overflow:hidden;"><div style="position:absolute;bottom:0;right:0;width:150%;height:150%;background:#FFE500;border-radius:50%;transform:translate(30%,30%);"></div></div>
+          <div style="background:#FF0080;position:relative;overflow:hidden;"><div style="position:absolute;top:0;left:0;width:150%;height:150%;background:#00D4AA;clip-path:polygon(0 0,100% 0,0 100%);"></div></div>
+          <div style="background:#00D4AA;display:flex;align-items:center;justify-content:center;gap:4px;padding:8px;"><div style="width:30%;aspect-ratio:1;background:#fff;border-radius:6px;"></div><div style="width:30%;aspect-ratio:1;background:#FF0080;border-radius:6px;"></div><div style="width:30%;aspect-ratio:1;background:#fff;border-radius:6px;"></div></div>
+          <div style="background:#111827;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:12px;"><div style="aspect-ratio:1;background:#FFE500;border-radius:50%;"></div><div style="aspect-ratio:1;background:#FFE500;border-radius:50%;"></div><div style="aspect-ratio:1;background:#FFE500;border-radius:50%;"></div><div style="aspect-ratio:1;background:#FFE500;border-radius:50%;"></div><div style="aspect-ratio:1;background:#FFE500;border-radius:50%;"></div><div style="aspect-ratio:1;background:#FFE500;border-radius:50%;"></div><div style="aspect-ratio:1;background:#FFE500;border-radius:50%;"></div><div style="aspect-ratio:1;background:#FFE500;border-radius:50%;"></div><div style="aspect-ratio:1;background:#FFE500;border-radius:50%;"></div></div>
+          <div style="background:#111827;padding:10px;display:flex;align-items:flex-end;justify-content:center;"><div style="width:60%;border:3px solid #00D4AA;border-top:none;border-radius:0 0 40px 40px;height:60%;"></div></div>
+          <div style="background:#FF0080;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;"><div style="background:#fff;"></div><div style="background:#FF0080;"></div><div style="background:#FF0080;"></div><div style="background:#fff;"></div></div>
+          <div style="background:#00D4AA;position:relative;overflow:hidden;"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;"><div style="width:80%;height:80%;border:4px solid #111;border-radius:6px;display:grid;place-items:center;"><div style="width:50%;height:50%;background:#FFE500;border-radius:3px;"></div></div></div></div>
+          <div style="background:#FF0080;display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;padding:8px;"><div style="width:70%;height:14%;background:#FFE500;border-radius:20px;"></div><div style="width:70%;height:14%;background:#FFE500;border-radius:20px;"></div></div>
+          <div style="background:#FFE500;position:relative;overflow:hidden;"><div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:100%;height:100%;background:#00D4AA;border-radius:50% 50% 0 0;"></div></div>
+          <div style="background:#111827;display:flex;align-items:flex-end;justify-content:space-evenly;padding:6px;"><div style="width:22%;background:#00D4AA;border-radius:20px 20px 0 0;height:40%;"></div><div style="width:22%;background:#00D4AA;border-radius:20px 20px 0 0;height:70%;"></div><div style="width:22%;background:#00D4AA;border-radius:20px 20px 0 0;height:55%;"></div></div>
+          <div style="background:#00D4AA;position:relative;overflow:hidden;"><div style="position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:#FFE500;border-radius:50%;"></div></div>
+          <div style="background:#FF0080;display:flex;align-items:center;justify-content:center;padding:8px;"><div style="width:70%;height:70%;border-radius:50%;border:6px solid #fff;"></div></div>
+          <div style="background:#FFE500;position:relative;overflow:hidden;"><div style="position:absolute;bottom:-20%;right:-20%;width:120%;height:120%;background:#00D4AA;border-radius:50%;"></div></div>
+        </div>
+        <!-- Right: form -->
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;background:#fff;">
+          <!-- Logo -->
+          <div style="margin-bottom:24px;text-align:center;">
+            <div style="font-size:26px;font-weight:900;line-height:1;"><span style="color:var(--pink);">ECHO</span><span style="font-size:16px;vertical-align:middle;">🎵</span><br><span style="font-size:16px;letter-spacing:2px;color:#111;">MAKER</span></div>
+          </div>
+          <div style="width:100%;max-width:340px;">
+            <h2 style="font-size:18px;font-weight:700;color:#111;text-align:center;margin-bottom:24px;">Verify New Number</h2>
+            <!-- Old number (non-editable, struck out info) -->
+            <div style="background:#f9fafb;border-radius:10px;padding:12px 16px;margin-bottom:12px;text-align:center;">
+              <div style="font-size:11px;color:#9ca3af;margin-bottom:4px;">Old number</div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+                <div style="width:28px;height:28px;background:#e5e7eb;border-radius:50%;display:grid;place-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.22 1.18 2 2 0 012.22 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.56-.56a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div>
+                <span style="font-size:14px;font-weight:500;color:#9ca3af;text-decoration:line-through;">+852 6360 6717</span>
+              </div>
+            </div>
+            <!-- New number (pre-filled, non-editable) -->
+            <div style="background:#f9fafb;border-radius:10px;padding:12px 16px;margin-bottom:24px;cursor:not-allowed;">
+              <div style="font-size:11px;color:#9ca3af;margin-bottom:4px;text-align:center;">New number (cannot be changed)</div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+                <div style="width:28px;height:28px;background:var(--pink-light);border-radius:50%;display:grid;place-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.22 1.18 2 2 0 012.22 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.56-.56a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div>
+                <span style="font-size:14px;font-weight:600;color:#111;">+852 6356 4705</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              </div>
+            </div>
+            <button onclick="cpShowStep(3)" style="width:100%;background:var(--pink);color:#fff;border:none;border-radius:40px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:16px;">Continue</button>
+            <p style="font-size:12px;color:#9ca3af;text-align:center;line-height:1.6;">By continuing, you agree to EchoMakers' <a href="#" style="color:var(--pink);">Terms of Use</a>. Read our <a href="#" style="color:var(--pink);">Privacy Policy</a>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: OTP verification -->
+    <div id="cp-step-3" style="display:none;min-height:calc(100vh - 110px);">
+      <div style="display:flex;min-height:calc(100vh - 110px);">
+        <!-- Left: same geometric art -->
+        <div style="width:45%;flex-shrink:0;background:#111;overflow:hidden;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(5,1fr);gap:3px;padding:3px;">
+          <div style="background:#FF0080;border-radius:50%;margin:8px;"></div>
+          <div style="background:#FF0080;border-radius:4px;display:grid;place-items:center;"><div style="width:60%;height:60%;border:4px solid #fff;border-radius:4px;"></div></div>
+          <div style="background:#00D4AA;position:relative;overflow:hidden;"><div style="position:absolute;bottom:0;right:0;width:150%;height:150%;background:#FFE500;border-radius:50%;transform:translate(30%,30%);"></div></div>
+          <div style="background:#FF0080;position:relative;overflow:hidden;"><div style="position:absolute;top:0;left:0;width:150%;height:150%;background:#00D4AA;clip-path:polygon(0 0,100% 0,0 100%);"></div></div>
+          <div style="background:#00D4AA;display:flex;align-items:center;justify-content:center;gap:4px;padding:8px;"><div style="width:30%;aspect-ratio:1;background:#fff;border-radius:6px;"></div><div style="width:30%;aspect-ratio:1;background:#FF0080;border-radius:6px;"></div><div style="width:30%;aspect-ratio:1;background:#fff;border-radius:6px;"></div></div>
+          <div style="background:#111827;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:12px;"><div style="aspect-ratio:1;background:#FFE500;border-radius:50%;"></div><div style="aspect-ratio:1;background:#FFE500;border-radius:50%;"></div><div style="aspect-ratio:1;background:#FFE500;border-radius:50%;"></div><div style="aspect-ratio:1;background:#FFE500;border-radius:50%;"></div><div style="aspect-ratio:1;background:#FFE500;border-radius:50%;"></div><div style="aspect-ratio:1;background:#FFE500;border-radius:50%;"></div><div style="aspect-ratio:1;background:#FFE500;border-radius:50%;"></div><div style="aspect-ratio:1;background:#FFE500;border-radius:50%;"></div><div style="aspect-ratio:1;background:#FFE500;border-radius:50%;"></div></div>
+          <div style="background:#111827;padding:10px;display:flex;align-items:flex-end;justify-content:center;"><div style="width:60%;border:3px solid #00D4AA;border-top:none;border-radius:0 0 40px 40px;height:60%;"></div></div>
+          <div style="background:#FF0080;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;"><div style="background:#fff;"></div><div style="background:#FF0080;"></div><div style="background:#FF0080;"></div><div style="background:#fff;"></div></div>
+          <div style="background:#00D4AA;position:relative;overflow:hidden;"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;"><div style="width:80%;height:80%;border:4px solid #111;border-radius:6px;display:grid;place-items:center;"><div style="width:50%;height:50%;background:#FFE500;border-radius:3px;"></div></div></div></div>
+          <div style="background:#FF0080;display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;padding:8px;"><div style="width:70%;height:14%;background:#FFE500;border-radius:20px;"></div><div style="width:70%;height:14%;background:#FFE500;border-radius:20px;"></div></div>
+          <div style="background:#FFE500;position:relative;overflow:hidden;"><div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:100%;height:100%;background:#00D4AA;border-radius:50% 50% 0 0;"></div></div>
+          <div style="background:#111827;display:flex;align-items:flex-end;justify-content:space-evenly;padding:6px;"><div style="width:22%;background:#00D4AA;border-radius:20px 20px 0 0;height:40%;"></div><div style="width:22%;background:#00D4AA;border-radius:20px 20px 0 0;height:70%;"></div><div style="width:22%;background:#00D4AA;border-radius:20px 20px 0 0;height:55%;"></div></div>
+          <div style="background:#00D4AA;position:relative;overflow:hidden;"><div style="position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:#FFE500;border-radius:50%;"></div></div>
+          <div style="background:#FF0080;display:flex;align-items:center;justify-content:center;padding:8px;"><div style="width:70%;height:70%;border-radius:50%;border:6px solid #fff;"></div></div>
+          <div style="background:#FFE500;position:relative;overflow:hidden;"><div style="position:absolute;bottom:-20%;right:-20%;width:120%;height:120%;background:#00D4AA;border-radius:50%;"></div></div>
+        </div>
+        <!-- Right: OTP form -->
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;background:#fff;">
+          <div style="margin-bottom:24px;text-align:center;">
+            <div style="font-size:26px;font-weight:900;line-height:1;"><span style="color:var(--pink);">ECHO</span><span style="font-size:16px;vertical-align:middle;">🎵</span><br><span style="font-size:16px;letter-spacing:2px;color:#111;">MAKER</span></div>
+          </div>
+          <div style="width:100%;max-width:340px;text-align:center;">
+            <h2 style="font-size:18px;font-weight:700;color:#111;margin-bottom:12px;">Verification code</h2>
+            <p style="font-size:13px;color:#6b7280;line-height:1.7;margin-bottom:28px;">A six-digit code has been sent to WhatsApp at <span style="color:var(--pink);font-weight:600;">+852 6356 4705</span>.<br>Please enter it before it expires.</p>
+            <!-- 6 OTP boxes -->
+            <div style="display:flex;gap:8px;justify-content:center;margin-bottom:24px;" id="otp-boxes">
+              <input maxlength="1" style="width:46px;height:54px;text-align:center;font-size:20px;font-weight:700;border:2px solid var(--pink);border-radius:8px;outline:none;color:#111;" oninput="otpNext(this,1)" id="otp1"/>
+              <input maxlength="1" style="width:46px;height:54px;text-align:center;font-size:20px;font-weight:700;border:2px solid var(--border);border-radius:8px;outline:none;color:#111;" oninput="otpNext(this,2)" id="otp2"/>
+              <input maxlength="1" style="width:46px;height:54px;text-align:center;font-size:20px;font-weight:700;border:2px solid var(--border);border-radius:8px;outline:none;color:#111;" oninput="otpNext(this,3)" id="otp3"/>
+              <input maxlength="1" style="width:46px;height:54px;text-align:center;font-size:20px;font-weight:700;border:2px solid var(--border);border-radius:8px;outline:none;color:#111;" oninput="otpNext(this,4)" id="otp4"/>
+              <input maxlength="1" style="width:46px;height:54px;text-align:center;font-size:20px;font-weight:700;border:2px solid var(--border);border-radius:8px;outline:none;color:#111;" oninput="otpNext(this,5)" id="otp5"/>
+              <input maxlength="1" style="width:46px;height:54px;text-align:center;font-size:20px;font-weight:700;border:2px solid var(--border);border-radius:8px;outline:none;color:#111;" oninput="otpNext(this,6)" id="otp6"/>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:13px;color:#9ca3af;" id="otp-resend-label">Resend in 59s</span>
+              <a href="#" style="font-size:13px;color:#111;font-weight:500;">Get help</a>
+            </div>
+            <!-- Success state (hidden until all 6 digits entered) -->
+            <div id="otp-success" style="display:none;margin-top:24px;padding:14px;background:#d1fae5;border-radius:10px;color:#065f46;font-size:13px;font-weight:600;text-align:center;">
+              ✓ Verified! Redirecting to homepage…
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end #s1-client-view -->
+
+</div><!-- end #s1 -->
 
 <!-- Modal: Edit Phone -->
 <div class="overlay" id="modal-change-phone" hidden>
   <div class="modal">
     <div class="modal__head"><span class="modal__title">Edit Contact Number</span><button class="modal__close" onclick="this.closest('.overlay').setAttribute('hidden','')">✕</button></div>
     <div class="modal__body">
-      <div class="field"><label class="field__label">New Phone Number</label><input class="input" value="85263606717"/></div>
+      <div class="field">
+        <label class="field__label">New Phone Number</label>
+        <div style="display:flex;gap:0;border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;focus-within:outline:2px solid var(--pink);">
+          <select style="border:none;border-right:1px solid var(--border);background:#f9fafb;padding:0 10px;font-size:14px;color:var(--text-1);cursor:pointer;flex-shrink:0;height:40px;outline:none;">
+            <optgroup label="── Asia Pacific ──">
+              <option value="+852" selected>🇭🇰 +852 Hong Kong</option>
+              <option value="+86">🇨🇳 +86 China</option>
+              <option value="+886">🇹🇼 +886 Taiwan</option>
+              <option value="+65">🇸🇬 +65 Singapore</option>
+              <option value="+60">🇲🇾 +60 Malaysia</option>
+              <option value="+63">🇵🇭 +63 Philippines</option>
+              <option value="+62">🇮🇩 +62 Indonesia</option>
+              <option value="+66">🇹🇭 +66 Thailand</option>
+              <option value="+84">🇻🇳 +84 Vietnam</option>
+              <option value="+95">🇲🇲 +95 Myanmar</option>
+              <option value="+855">🇰🇭 +855 Cambodia</option>
+              <option value="+856">🇱🇦 +856 Laos</option>
+              <option value="+673">🇧🇳 +673 Brunei</option>
+              <option value="+81">🇯🇵 +81 Japan</option>
+              <option value="+82">🇰🇷 +82 South Korea</option>
+              <option value="+91">🇮🇳 +91 India</option>
+              <option value="+92">🇵🇰 +92 Pakistan</option>
+              <option value="+880">🇧🇩 +880 Bangladesh</option>
+              <option value="+94">🇱🇰 +94 Sri Lanka</option>
+              <option value="+977">🇳🇵 +977 Nepal</option>
+              <option value="+61">🇦🇺 +61 Australia</option>
+              <option value="+64">🇳🇿 +64 New Zealand</option>
+            </optgroup>
+            <optgroup label="── Middle East ──">
+              <option value="+971">🇦🇪 +971 UAE</option>
+              <option value="+966">🇸🇦 +966 Saudi Arabia</option>
+              <option value="+974">🇶🇦 +974 Qatar</option>
+              <option value="+965">🇰🇼 +965 Kuwait</option>
+              <option value="+973">🇧🇭 +973 Bahrain</option>
+              <option value="+968">🇴🇲 +968 Oman</option>
+              <option value="+972">🇮🇱 +972 Israel</option>
+              <option value="+90">🇹🇷 +90 Turkey</option>
+            </optgroup>
+            <optgroup label="── Europe ──">
+              <option value="+44">🇬🇧 +44 United Kingdom</option>
+              <option value="+33">🇫🇷 +33 France</option>
+              <option value="+49">🇩🇪 +49 Germany</option>
+              <option value="+39">🇮🇹 +39 Italy</option>
+              <option value="+34">🇪🇸 +34 Spain</option>
+              <option value="+31">🇳🇱 +31 Netherlands</option>
+              <option value="+41">🇨🇭 +41 Switzerland</option>
+              <option value="+43">🇦🇹 +43 Austria</option>
+              <option value="+32">🇧🇪 +32 Belgium</option>
+              <option value="+46">🇸🇪 +46 Sweden</option>
+              <option value="+47">🇳🇴 +47 Norway</option>
+              <option value="+45">🇩🇰 +45 Denmark</option>
+              <option value="+358">🇫🇮 +358 Finland</option>
+              <option value="+351">🇵🇹 +351 Portugal</option>
+              <option value="+30">🇬🇷 +30 Greece</option>
+              <option value="+48">🇵🇱 +48 Poland</option>
+              <option value="+7">🇷🇺 +7 Russia</option>
+            </optgroup>
+            <optgroup label="── Americas ──">
+              <option value="+1">🇺🇸 +1 United States</option>
+              <option value="+1CA">🇨🇦 +1 Canada</option>
+              <option value="+55">🇧🇷 +55 Brazil</option>
+              <option value="+52">🇲🇽 +52 Mexico</option>
+              <option value="+54">🇦🇷 +54 Argentina</option>
+              <option value="+56">🇨🇱 +56 Chile</option>
+              <option value="+57">🇨🇴 +57 Colombia</option>
+            </optgroup>
+            <optgroup label="── Africa ──">
+              <option value="+27">🇿🇦 +27 South Africa</option>
+              <option value="+20">🇪🇬 +20 Egypt</option>
+              <option value="+234">🇳🇬 +234 Nigeria</option>
+              <option value="+254">🇰🇪 +254 Kenya</option>
+              <option value="+233">🇬🇭 +233 Ghana</option>
+            </optgroup>
+          </select>
+          <input style="border:none;flex:1;padding:0 12px;font-size:14px;color:var(--text-1);outline:none;height:40px;" value="63606717" placeholder="Phone number"/>
+        </div>
+      </div>
       <p style="font-size:13px;color:#92400E;background:var(--warning-light);border:1px solid #FDE68A;border-radius:var(--r-md);padding:10px 14px;line-height:1.6;">After saving, the KOL will need to re-verify with the new number. Status will be set to <strong>Verifying</strong> until they complete verification.</p>
     </div>
     <div class="modal__foot">
       <button class="btn btn--ghost" onclick="this.closest('.overlay').setAttribute('hidden','')">Cancel</button>
-      <button class="btn btn--pink" onclick="alert('Phone updated. Status → Verifying.');this.closest('.overlay').setAttribute('hidden','')">Save &amp; Send Verification</button>
+      <button class="btn btn--pink" onclick="savePhoneChange(this)">Save &amp; Send Verification</button>
     </div>
   </div>
 </div>
@@ -590,8 +856,8 @@ table{border-collapse:collapse;width:100%}
               <div style="border:1px solid var(--pink-border);border-radius:var(--r-md);padding:12px;background:var(--pink-light);">
                 <div style="font-size:12px;color:var(--pink);font-weight:600;margin-bottom:8px;">★ New: Birth Year per Child</div>
                 <div id="ai-birth-year-fields" class="stack" style="gap:8px;">
-                  <div class="field"><label class="field__label">Birth year of Child 1</label><input class="input" style="max-width:160px;" value="2018"/></div>
-                  <div class="field"><label class="field__label">Birth year of Child 2</label><input class="input" style="max-width:160px;" value="2021"/></div>
+                  <div class="field"><label class="field__label">Birth year of Child 1</label><div style="display:flex;align-items:center;gap:10px;"><input class="input" style="max-width:160px;" value="2018" data-err="ai-err-1" oninput="updateAIChildAge(this)"/><span class="child-age-tag">Age 8</span></div><span id="ai-err-1" style="display:none;font-size:12px;color:#ef4444;margin-top:2px;"></span></div>
+                  <div class="field"><label class="field__label">Birth year of Child 2</label><div style="display:flex;align-items:center;gap:10px;"><input class="input" style="max-width:160px;" value="2021" data-err="ai-err-2" oninput="updateAIChildAge(this)"/><span class="child-age-tag">Age 5</span></div><span id="ai-err-2" style="display:none;font-size:12px;color:#ef4444;margin-top:2px;"></span></div>
                 </div>
               </div>
             </div>
@@ -701,11 +967,13 @@ table{border-collapse:collapse;width:100%}
                 <div id="reg-birth-year-fields" class="stack" style="gap:10px;">
                   <div class="field">
                     <label class="field__label">Birth year of Child 1</label>
-                    <input class="input" style="max-width:180px;border:1.5px solid var(--border);" placeholder="e.g. 2018"/>
+                    <div style="display:flex;align-items:center;gap:10px;"><input class="input" style="max-width:180px;border:1.5px solid var(--border);" placeholder="e.g. 2018" data-err="reg-err-1" oninput="updateRegChildAge(this)"/><span class="child-age-tag" style="display:none;"></span></div>
+                    <span id="reg-err-1" style="display:none;font-size:12px;color:#ef4444;margin-top:2px;"></span>
                   </div>
                   <div class="field">
                     <label class="field__label">Birth year of Child 2</label>
-                    <input class="input" style="max-width:180px;border:1.5px solid var(--border);" placeholder="e.g. 2021"/>
+                    <div style="display:flex;align-items:center;gap:10px;"><input class="input" style="max-width:180px;border:1.5px solid var(--border);" placeholder="e.g. 2021" data-err="reg-err-2" oninput="updateRegChildAge(this)"/><span class="child-age-tag" style="display:none;"></span></div>
+                    <span id="reg-err-2" style="display:none;font-size:12px;color:#ef4444;margin-top:2px;"></span>
                   </div>
                 </div>
               </div>
@@ -755,7 +1023,7 @@ table{border-collapse:collapse;width:100%}
 </div>
 
 
-<!-- ══ SCREEN 3 — Campaign KOL: Extra Bonus % ══ -->
+<!-- ══ SCREEN 3 — Campaign KOL: Extra Bonus ══ -->
 <div id="s3" class="screen">
   <div class="app">
     <aside class="sidebar">
@@ -803,7 +1071,7 @@ table{border-collapse:collapse;width:100%}
                   <th>FB Followers ⇅</th>
                   <th>IG Followers ⇅</th>
                   <th>Threads Followers ⇅</th>
-                  <th style="color:var(--pink);background:#fff8fc;">Extra Bonus % ⇅</th>
+                  <th style="color:var(--pink);background:#fff8fc;">Extra Bonus ⇅</th>
                   <th>Age ⇅</th>
                   <th>Gender</th>
                   <th>Avg. Engagements</th>
@@ -820,7 +1088,7 @@ table{border-collapse:collapse;width:100%}
                   <td>0<br><span class="text-sm text-muted">移除 IG 连接</span></td>
                   <td>2<br><span class="text-sm text-muted">shine_vvvi</span></td>
                   <td>1<br><span class="text-sm text-muted">shine_vvvi</span></td>
-                  <td style="background:#fff8fc;"><span style="color:var(--pink);font-weight:700;font-size:15px;">+10%</span></td>
+                  <td style="background:#fff8fc;"><span style="color:var(--pink);font-weight:700;font-size:15px;">+HKD 20</span></td>
                   <td>46</td><td>Male</td><td>0</td><td>0%</td><td>2025-10-30</td>
                   <td>
                     <div class="action-menu-wrap">
@@ -886,14 +1154,14 @@ table{border-collapse:collapse;width:100%}
         </div>
 
         <div class="alert alert--info" style="margin-top:16px;">
-          <div><strong>Extra Bonus %</strong> — set per-KOL via ⋮ → Edit extra bonus, or select multiple KOLs and use the bulk bar at the bottom to set the same % for all selected at once.</div>
+          <div><strong>Extra Bonus (KOL level)</strong> — set per-KOL via ⋮ → Edit extra bonus, or select multiple KOLs to bulk-set. Supports % or fixed HKD. <strong>KOL-level bonus overrides the campaign-level Extra Bonus</strong> for that individual KOL. Finance Module always displays the converted HKD amount.</div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Modal: Edit Extra Bonus % -->
+<!-- Modal: Edit Extra Bonus (per-KOL) -->
 <div class="overlay" id="modal-bonus" hidden>
   <div class="modal">
     <div class="modal__head">
@@ -901,24 +1169,31 @@ table{border-collapse:collapse;width:100%}
       <button class="modal__close" onclick="this.closest('.overlay').setAttribute('hidden','')">✕</button>
     </div>
     <div class="modal__body">
+      <div style="background:var(--pink-light);border:1px solid var(--pink-border);border-radius:var(--r-md);padding:10px 14px;font-size:12px;color:var(--pink);margin-bottom:4px;">
+        ★ KOL-level bonus overrides the campaign-level Extra Bonus for this KOL.
+      </div>
       <div class="field">
         <label class="field__label">Campaign Base Reward</label>
         <input class="input" value="HKD 200" disabled/>
       </div>
       <div class="field">
-        <label class="field__label">Extra Bonus (%)</label>
-        <div class="row">
-          <input class="input" id="bonus-pct-input" value="10" type="number" min="0" max="100" style="max-width:100px;" oninput="updateBonusPreview()"/>
-          <span style="font-size:18px;font-weight:700;color:var(--text-2);">%</span>
-        </div>
-        <span class="text-sm text-muted">Set 0 to remove the extra bonus for this KOL.</span>
-      </div>
-      <div id="bonus-preview" style="background:var(--info-light);border-radius:var(--r-md);padding:10px 14px;font-size:13px;color:#1e40af;">
-        Total payout: <strong>HKD 220</strong> (Base HKD 200 + 10% = HKD 20)
+        <label class="field__label">Campaign-level Extra Bonus</label>
+        <input class="input" value="HKD 30 (fixed)" disabled style="color:var(--text-3);"/>
       </div>
       <div class="field">
-        <label class="field__label">Internal note</label>
-        <textarea class="textarea" placeholder="e.g. Top performer incentive">Top performer — Q3 incentive</textarea>
+        <label class="field__label">KOL-level Extra Bonus</label>
+        <div style="display:flex;border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;margin-bottom:8px;width:fit-content;">
+          <button id="bonus-type-pct" onclick="setBonusType('pct')" style="padding:6px 16px;font-size:13px;font-weight:600;border:none;background:var(--pink);color:#fff;cursor:pointer;">%</button>
+          <button id="bonus-type-hkd" onclick="setBonusType('hkd')" style="padding:6px 16px;font-size:13px;font-weight:500;border:none;background:#fff;color:var(--text-2);cursor:pointer;border-left:1px solid var(--border);">HKD</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input class="input" id="bonus-val-input" value="10" type="number" min="0" style="max-width:120px;" oninput="updateBonusPreview()"/>
+          <span id="bonus-unit-label" style="font-size:15px;font-weight:700;color:var(--text-2);">%</span>
+        </div>
+        <span class="text-sm text-muted" style="margin-top:4px;display:block;">Set 0 to remove the KOL-level override (campaign-level bonus will apply).</span>
+      </div>
+      <div id="bonus-preview" style="background:var(--info-light);border-radius:var(--r-md);padding:10px 14px;font-size:13px;color:#1e40af;">
+        Total payout: <strong>HKD 220</strong> &nbsp;(Base HKD 200 + 10% = HKD 20)
       </div>
     </div>
     <div class="modal__foot">
@@ -937,17 +1212,21 @@ table{border-collapse:collapse;width:100%}
       <button class="modal__close" onclick="this.closest('.overlay').setAttribute('hidden','')">✕</button>
     </div>
     <div class="modal__body">
-      <div class="alert alert--info">Apply the same Extra Bonus % to all selected KOLs. This will overwrite any existing individual bonus settings.</div>
+      <div class="alert alert--info">Apply the same KOL-level Extra Bonus to all selected KOLs. This will overwrite any existing individual bonus settings. KOL-level bonus overrides campaign-level.</div>
       <div style="background:var(--divider);border-radius:var(--r-md);padding:10px 14px;font-size:13px;color:var(--text-2);">
         Selected KOLs: <strong id="bulk-kol-names">JK_test, sarah_lifestyle</strong>
       </div>
       <div class="field">
-        <label class="field__label">Extra Bonus (%) — apply to all selected</label>
-        <div class="row">
-          <input class="input" id="bulk-bonus-pct" value="10" type="number" min="0" max="100" style="max-width:100px;" oninput="updateBulkPreview()"/>
-          <span style="font-size:18px;font-weight:700;color:var(--text-2);">%</span>
+        <label class="field__label">Extra Bonus — apply to all selected</label>
+        <div style="display:flex;border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;margin-bottom:8px;width:fit-content;">
+          <button id="bulk-type-pct" onclick="setBulkBonusType('pct')" style="padding:6px 16px;font-size:13px;font-weight:600;border:none;background:var(--pink);color:#fff;cursor:pointer;">%</button>
+          <button id="bulk-type-hkd" onclick="setBulkBonusType('hkd')" style="padding:6px 16px;font-size:13px;font-weight:500;border:none;background:#fff;color:var(--text-2);cursor:pointer;border-left:1px solid var(--border);">HKD</button>
         </div>
-        <span class="text-sm text-muted">Set 0 to remove extra bonus from all selected KOLs.</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input class="input" id="bulk-bonus-val" value="10" type="number" min="0" style="max-width:120px;" oninput="updateBulkPreview()"/>
+          <span id="bulk-unit-label" style="font-size:15px;font-weight:700;color:var(--text-2);">%</span>
+        </div>
+        <span class="text-sm text-muted" style="margin-top:4px;display:block;">Set 0 to remove KOL-level override for all selected.</span>
       </div>
       <div id="bulk-bonus-preview" style="background:var(--info-light);border-radius:var(--r-md);padding:10px 14px;font-size:13px;color:#1e40af;">
         Each selected KOL: Base HKD 200 + <strong>10%</strong> = <strong>HKD 220.00</strong>
@@ -975,52 +1254,399 @@ table{border-collapse:collapse;width:100%}
       <div class="content">
         <div style="max-width:720px;">
           <h1 class="page-title">Create Campaign</h1>
-          <div style="padding:14px 18px;background:#f9fafb;border:1px solid var(--border);border-radius:var(--r-lg);font-size:13px;color:var(--text-2);margin-bottom:16px;">↑ Campaign Info, Requirements, Rewards … (no changes to existing fields)</div>
-
-          <div class="card" style="margin-bottom:16px;">
-            <div class="card__head">
-              <span class="card__title">Customised Questions</span>
-              <button class="btn btn--outline btn--sm" onclick="addQuestion()">+ Add</button>
+          <!-- Content Format -->
+          <div class="field" style="margin-bottom:20px;">
+            <label class="field__label">Content Format <span style="color:var(--pink);">*</span></label>
+            <div style="display:flex;gap:20px;margin-top:8px;">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;">
+                <input type="radio" name="content-format" checked style="accent-color:var(--pink);width:16px;height:16px;"/> Photo
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;">
+                <input type="radio" name="content-format" style="accent-color:var(--pink);width:16px;height:16px;"/> Video
+              </label>
             </div>
-            <div class="card__body stack" id="questions-container">
+          </div>
 
-              <!-- Q1: Multiple Choice (existing) -->
-              <div class="q-card" id="q1">
-                <div class="q-card__head">
-                  <div class="q-card__title"><span style="color:var(--text-2);">🗑</span> Question 1</div>
-                  <div class="toggle-wrap"><span>Multiple Choice</span><button class="toggle on" id="tq1" onclick="toggleQType('q1','tq1','mc1','oe1')"></button></div>
+          <!-- Registration Period + Submit Preview Deadline -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+            <div class="field">
+              <label class="field__label">Registration Period <span style="color:var(--pink);">*</span></label>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+                <div style="flex:1;display:flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:var(--r-md);padding:8px 10px;background:#fff;font-size:13px;color:var(--text-1);">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                  2025-10-30 00:00
                 </div>
-                <input class="input" value="Which platform do you mainly use?"/>
-                <div id="mc1" class="q-mode-options">
-                  <div class="q-option-row"><div class="radio-custom"></div><input class="input" value="Instagram"/><button style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;">✕</button></div>
-                  <div class="q-option-row"><div class="radio-custom"></div><input class="input" value="Facebook"/><button style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;">✕</button></div>
-                  <button class="btn--pink-text" style="font-size:13px;display:flex;align-items:center;gap:4px;"><span style="width:18px;height:18px;border:2px solid var(--pink);border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;">+</span> Add option</button>
-                </div>
-                <div id="oe1" hidden class="open-ended-hint">KOL types a free-text answer — no options needed.<br><br><input style="width:260px;padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;" placeholder="KOL will type their answer here…" disabled/></div>
+                <span style="font-size:13px;color:var(--text-2);">to</span>
+                <div style="flex:1;border:1px solid var(--border);border-radius:var(--r-md);padding:8px 10px;background:#fff;font-size:13px;color:var(--text-1);">2025-11-30 00:00</div>
               </div>
-
-              <!-- Q2: Open-ended ★ NEW ★ -->
-              <div class="q-card" id="q2" style="border-color:var(--pink-border);background:var(--pink-light);">
-                <div style="font-size:11px;font-weight:600;color:var(--pink);margin-bottom:4px;">★ New: Toggle OFF = Open-ended</div>
-                <div class="q-card__head">
-                  <div class="q-card__title"><span style="color:var(--text-2);">🗑</span> Question 2</div>
-                  <div class="toggle-wrap"><span>Multiple Choice</span><button class="toggle" id="tq2" onclick="toggleQType('q2','tq2','mc2','oe2')"></button></div>
-                </div>
-                <input class="input" value="Tell us why you want to join this campaign."/>
-                <div id="mc2" hidden class="q-mode-options"></div>
-                <div id="oe2" class="open-ended-hint">KOL types a free-text answer — no options needed.<br><br><input style="width:260px;padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;" placeholder="KOL will type their answer here…" disabled/></div>
+            </div>
+            <div class="field">
+              <label class="field__label">Submit Preview Deadline <span style="color:var(--pink);">*</span></label>
+              <div style="display:flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:var(--r-md);padding:8px 10px;background:#fff;font-size:13px;color:var(--text-1);margin-top:6px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>
+                2025-11-13
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
               </div>
             </div>
           </div>
 
-          <div class="alert alert--info" style="margin-bottom:16px;">
-            <div><strong>Toggle ON</strong> = Multiple Choice (existing). <strong>Toggle OFF</strong> = Open-ended free text — KOL types any response, no options required.</div>
+          <!-- Post Period -->
+          <div class="field" style="margin-bottom:20px;">
+            <label class="field__label">Post Period <span style="color:var(--pink);">*</span></label>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:6px;max-width:380px;">
+              <div style="flex:1;display:flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:var(--r-md);padding:8px 10px;background:#fff;font-size:13px;color:var(--text-1);">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>
+                2025-10-31
+              </div>
+              <span style="font-size:13px;color:var(--text-2);">to</span>
+              <div style="flex:1;border:1px solid var(--border);border-radius:var(--r-md);padding:8px 10px;background:#fff;font-size:13px;color:var(--text-1);">2025-11-30</div>
+            </div>
           </div>
-          <div class="row" style="justify-content:flex-end;gap:10px;">
-            <button class="btn btn--ghost">Save Draft</button>
-            <button class="btn btn--pink">Publish Campaign</button>
+
+          <!-- Rewards -->
+          <div class="field" style="margin-bottom:20px;">
+            <label class="field__label">Rewards <span style="color:var(--pink);">*</span></label>
+            <div style="display:flex;gap:0;border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;max-width:380px;margin-top:6px;">
+              <select style="border:none;border-right:1px solid var(--border);background:#f9fafb;padding:0 12px;font-size:14px;color:var(--text-1);cursor:pointer;height:40px;outline:none;">
+                <option>HKD</option><option>USD</option><option>TWD</option><option>SGD</option>
+              </select>
+              <input class="input" style="border:none;border-radius:0;flex:1;" value="500"/>
+            </div>
+          </div>
+
+          <!-- ★ Extra Reward — NEW ★ -->
+          <div class="card" style="margin-bottom:20px;border-color:var(--pink-border);background:var(--pink-light);" id="extra-reward-card">
+            <div class="card__head" style="background:var(--pink-light);border-bottom-color:var(--pink-border);">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span class="card__title">Extra Reward</span>
+                <span style="font-size:11px;background:var(--pink);color:#fff;padding:1px 8px;border-radius:20px;font-weight:600;">NEW</span>
+              </div>
+              <button class="btn btn--outline btn--sm" style="border-color:var(--pink);color:var(--pink);" onclick="addExtraRule()">+ Add Rule</button>
+            </div>
+            <div class="card__body" style="background:var(--pink-light);display:flex;flex-direction:column;gap:16px;" id="extra-rules-container">
+
+              <!-- Rule 1 -->
+              <div class="extra-rule" id="rule-1" style="background:#fff;border:1px solid var(--pink-border);border-radius:var(--r-lg);padding:16px 18px;display:flex;flex-direction:column;gap:14px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <span style="font-size:13px;font-weight:600;color:var(--text-1);">Rule 1</span>
+                  <button onclick="this.closest('.extra-rule').remove()" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;line-height:1;">✕</button>
+                </div>
+
+                <!-- Set Extra Reward value -->
+                <div>
+                  <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px;">Set Extra Reward</div>
+                  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                    <div style="display:flex;border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;">
+                      <button id="rule-1-type-pct" onclick="setRewardType('rule-1','pct')" style="padding:7px 14px;font-size:13px;font-weight:600;border:none;background:var(--pink);color:#fff;cursor:pointer;">%</button>
+                      <button id="rule-1-type-hkd" onclick="setRewardType('rule-1','hkd')" style="padding:7px 14px;font-size:13px;font-weight:600;border:none;background:#fff;color:var(--text-2);cursor:pointer;">HKD</button>
+                    </div>
+                    <input id="rule-1-val" class="input" style="width:100px;" placeholder="e.g. 10" value="10"/>
+                    <span id="rule-1-preview" style="font-size:13px;color:var(--text-2);">= Base Reward + <strong>10%</strong></span>
+                  </div>
+                </div>
+
+                <!-- Set KOL Group -->
+                <div>
+                  <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px;">Set KOL Group</div>
+                  <div style="display:flex;gap:16px;margin-bottom:12px;">
+                    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+                      <input type="radio" name="rule-1-logic" value="all" checked style="accent-color:var(--pink);"/> Meet <strong>all</strong> of below conditions
+                    </label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+                      <input type="radio" name="rule-1-logic" value="any" style="accent-color:var(--pink);"/> Meet <strong>any</strong> of below conditions
+                    </label>
+                  </div>
+
+                  <!-- Conditions -->
+                  <div id="rule-1-conditions" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">
+
+                    <!-- Condition row 1 -->
+                    <div class="condition-row" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                      <select class="select" style="width:160px;" onchange="updateConditionInput(this)">
+                        <option value="">— Select metric —</option>
+                        <option value="fb_followers" selected>FB Followers</option>
+                        <option value="ig_followers">IG Followers</option>
+                        <option value="threads_followers">Threads Followers</option>
+                        <option value="age">Age</option>
+                        <option value="gender">Gender</option>
+                        <option value="pets">Pets</option>
+                        <option value="kol_tags">KOL Tags</option>
+                      </select>
+                      <select class="select" style="width:90px;">
+                        <option>≥</option><option>≤</option><option>=</option><option>between</option>
+                      </select>
+                      <input class="input" style="width:100px;" placeholder="e.g. 1000" value="5000"/>
+                      <button onclick="this.closest('.condition-row').remove()" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;flex-shrink:0;">✕</button>
+                    </div>
+
+                    <!-- Condition row 2 (Gender example) -->
+                    <div class="condition-row" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                      <select class="select" style="width:160px;" onchange="updateConditionInput(this)">
+                        <option value="">— Select metric —</option>
+                        <option value="fb_followers">FB Followers</option>
+                        <option value="ig_followers">IG Followers</option>
+                        <option value="threads_followers">Threads Followers</option>
+                        <option value="age">Age</option>
+                        <option value="gender" selected>Gender</option>
+                        <option value="pets">Pets</option>
+                        <option value="kol_tags">KOL Tags</option>
+                      </select>
+                      <select class="select" style="width:90px;"><option>=</option></select>
+                      <select class="select" style="width:120px;"><option>Female</option><option>Male</option></select>
+                      <button onclick="this.closest('.condition-row').remove()" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;flex-shrink:0;">✕</button>
+                    </div>
+
+                  </div>
+                  <button onclick="addCondition('rule-1-conditions')" style="background:none;border:1px dashed var(--pink-border);color:var(--pink);font-size:13px;font-weight:500;cursor:pointer;padding:6px 14px;border-radius:var(--r-full);width:100%;">+ Add Condition</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- ADMIN VIEW only (Client Portal view is now a separate top-level tab ⑤) -->
+          <div id="s4-admin-view">
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card__head">
+                <span class="card__title">Customised Questions</span>
+                <button class="btn btn--outline btn--sm" onclick="addQuestion()">+ Add</button>
+              </div>
+              <div class="card__body stack" id="questions-container">
+
+                <!-- Q1: Multiple Choice -->
+                <div class="q-card" data-qtype="multi" id="q1">
+                  <div class="q-card__head">
+                    <div class="q-card__title">
+                      <button onclick="removeQuestion('q1')" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:15px;padding:0 4px 0 0;">🗑</button>
+                      Question 1
+                    </div>
+                    <div style="display:flex;border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;">
+                      <button class="qtype-btn active" data-type="multi" onclick="setQType('q1','multi')" style="padding:5px 11px;font-size:12px;font-weight:600;border:none;background:var(--pink);color:#fff;cursor:pointer;">Multi-select</button>
+                      <button class="qtype-btn" data-type="single" onclick="setQType('q1','single')" style="padding:5px 11px;font-size:12px;font-weight:500;border:none;background:#fff;color:var(--text-2);cursor:pointer;border-left:1px solid var(--border);">Single-select</button>
+                      <button class="qtype-btn" data-type="open" onclick="setQType('q1','open')" style="padding:5px 11px;font-size:12px;font-weight:500;border:none;background:#fff;color:var(--text-2);cursor:pointer;border-left:1px solid var(--border);">Open-ended</button>
+                    </div>
+                  </div>
+                  <input class="input" placeholder="Enter question text" value="Which platform do you mainly use?"/>
+                  <div class="q-options-block">
+                    <div class="q-mode-options" id="q1-options">
+                      <div class="q-option-row"><div class="option-icon" data-shape="check"></div><input class="input" value="Instagram"/><button onclick="this.closest('.q-option-row').remove()" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;">✕</button></div>
+                      <div class="q-option-row"><div class="option-icon" data-shape="check"></div><input class="input" value="Facebook"/><button onclick="this.closest('.q-option-row').remove()" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;">✕</button></div>
+                      <div class="q-option-row"><div class="option-icon" data-shape="check"></div><input class="input" value="Threads"/><button onclick="this.closest('.q-option-row').remove()" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;">✕</button></div>
+                    </div>
+                    <button class="btn--pink-text" style="font-size:13px;display:flex;align-items:center;gap:4px;margin-top:8px;" onclick="addOption('q1-options','check')">
+                      <span style="width:18px;height:18px;border:2px solid var(--pink);border-radius:4px;display:grid;place-items:center;font-size:11px;font-weight:700;">+</span> Add option
+                    </button>
+                  </div>
+                  <div class="q-open-block" style="display:none;">
+                    <div style="font-size:12px;color:var(--text-2);margin-bottom:6px;">Placeholder text (optional — shown as grey hint inside the answer box)</div>
+                    <input class="input" style="color:var(--text-3);" placeholder="e.g. Please describe your answer…"/>
+                  </div>
+                </div>
+
+                <!-- Q2: Single Choice -->
+                <div class="q-card" data-qtype="single" id="q2">
+                  <div class="q-card__head">
+                    <div class="q-card__title">
+                      <button onclick="removeQuestion('q2')" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:15px;padding:0 4px 0 0;">🗑</button>
+                      Question 2
+                    </div>
+                    <div style="display:flex;border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;">
+                      <button class="qtype-btn" data-type="multi" onclick="setQType('q2','multi')" style="padding:5px 11px;font-size:12px;font-weight:500;border:none;background:#fff;color:var(--text-2);cursor:pointer;">Multi-select</button>
+                      <button class="qtype-btn active" data-type="single" onclick="setQType('q2','single')" style="padding:5px 11px;font-size:12px;font-weight:600;border:none;background:var(--pink);color:#fff;cursor:pointer;border-left:1px solid var(--border);">Single-select</button>
+                      <button class="qtype-btn" data-type="open" onclick="setQType('q2','open')" style="padding:5px 11px;font-size:12px;font-weight:500;border:none;background:#fff;color:var(--text-2);cursor:pointer;border-left:1px solid var(--border);">Open-ended</button>
+                    </div>
+                  </div>
+                  <input class="input" placeholder="Enter question text" value="Which time slot would you be available?"/>
+                  <div class="q-options-block">
+                    <div class="q-mode-options" id="q2-options">
+                      <div class="q-option-row"><div class="option-icon" data-shape="radio"></div><input class="input" value="10AM"/><button onclick="this.closest('.q-option-row').remove()" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;">✕</button></div>
+                      <div class="q-option-row"><div class="option-icon" data-shape="radio"></div><input class="input" value="12PM"/><button onclick="this.closest('.q-option-row').remove()" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;">✕</button></div>
+                      <div class="q-option-row"><div class="option-icon" data-shape="radio"></div><input class="input" value="4PM"/><button onclick="this.closest('.q-option-row').remove()" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;">✕</button></div>
+                    </div>
+                    <button class="btn--pink-text" style="font-size:13px;display:flex;align-items:center;gap:4px;margin-top:8px;" onclick="addOption('q2-options','radio')">
+                      <span style="width:18px;height:18px;border:2px solid var(--pink);border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;">+</span> Add option
+                    </button>
+                  </div>
+                  <div class="q-open-block" style="display:none;">
+                    <div style="font-size:12px;color:var(--text-2);margin-bottom:6px;">Placeholder text (optional)</div>
+                    <input class="input" style="color:var(--text-3);" placeholder="e.g. Please describe your answer…"/>
+                  </div>
+                </div>
+
+                <!-- Q3: Open-ended ★ NEW ★ -->
+                <div class="q-card" data-qtype="open" id="q3" style="border-color:var(--pink-border);background:var(--pink-light);">
+                  <div style="font-size:11px;font-weight:600;color:var(--pink);margin-bottom:6px;">★ New question type</div>
+                  <div class="q-card__head">
+                    <div class="q-card__title">
+                      <button onclick="removeQuestion('q3')" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:15px;padding:0 4px 0 0;">🗑</button>
+                      Question 3
+                    </div>
+                    <div style="display:flex;border:1px solid var(--pink-border);border-radius:var(--r-md);overflow:hidden;">
+                      <button class="qtype-btn" data-type="multi" onclick="setQType('q3','multi')" style="padding:5px 11px;font-size:12px;font-weight:500;border:none;background:#fff;color:var(--text-2);cursor:pointer;">Multi-select</button>
+                      <button class="qtype-btn" data-type="single" onclick="setQType('q3','single')" style="padding:5px 11px;font-size:12px;font-weight:500;border:none;background:#fff;color:var(--text-2);cursor:pointer;border-left:1px solid var(--pink-border);">Single-select</button>
+                      <button class="qtype-btn active" data-type="open" onclick="setQType('q3','open')" style="padding:5px 11px;font-size:12px;font-weight:600;border:none;background:var(--pink);color:#fff;cursor:pointer;border-left:1px solid var(--pink-border);">Open-ended</button>
+                    </div>
+                  </div>
+                  <input class="input" placeholder="Enter question text" value="Tell us why you want to join this campaign."/>
+                  <div class="q-options-block" style="display:none;">
+                    <div class="q-mode-options" id="q3-options"></div>
+                    <button class="btn--pink-text" style="font-size:13px;display:flex;align-items:center;gap:4px;margin-top:8px;" onclick="addOption('q3-options','check')">
+                      <span style="width:18px;height:18px;border:2px solid var(--pink);border-radius:4px;display:grid;place-items:center;font-size:11px;font-weight:700;">+</span> Add option
+                    </button>
+                  </div>
+                  <div class="q-open-block">
+                    <div style="font-size:12px;color:var(--text-2);margin-bottom:6px;">Placeholder text (optional — shown as grey hint inside the answer box)</div>
+                    <input class="input" style="color:var(--text-3);" value="Please enter your answer" placeholder="e.g. Please enter your answer…"/>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="alert alert--info" style="margin-bottom:16px;">
+              <div>
+                <strong>Multi-select</strong> — KOL can tick multiple options (existing).<br>
+                <strong>Single-select</strong> — KOL picks exactly one option (existing).<br>
+                <strong>Open-ended</strong> ★ New — No options needed. KOL types a free-text answer. Set an optional placeholder hint.
+              </div>
+            </div>
+            <div class="row" style="justify-content:flex-end;gap:10px;">
+              <button class="btn btn--ghost">Save Draft</button>
+              <button class="btn btn--pink">Publish Campaign</button>
+            </div>
+          </div><!-- end s4-admin-view -->
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 8 — Client Portal: KOL Confirm Campaign Registration ══ -->
+<div id="s8" class="screen">
+  <div style="min-height:100vh;background:#f3f4f6;display:flex;flex-direction:column;">
+    <!-- Client Portal top nav -->
+    <div style="background:var(--pink);height:56px;display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0;">
+      <svg viewBox="0 0 20 20" fill="none" width="28" height="28"><circle cx="10" cy="10" r="8" stroke="#fff" stroke-width="1.8"/><path d="M6.5 10C6.5 7.5 8 6 10 6s3.5 1.5 3.5 4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><circle cx="10" cy="13" r="1.5" fill="#fff"/></svg>
+      <span style="color:#fff;font-size:16px;font-weight:700;letter-spacing:.3px;">echomaker</span>
+      <span style="flex:1;"></span>
+      <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.25);display:grid;place-items:center;color:#fff;font-size:13px;font-weight:700;">C</div>
+    </div>
+    <!-- Page content -->
+    <div style="max-width:960px;margin:28px auto;padding:0 20px;width:100%;box-sizing:border-box;">
+      <div style="font-size:13px;color:var(--text-2);margin-bottom:4px;">Campaign registration</div>
+      <h1 style="font-size:22px;font-weight:800;color:var(--text-1);margin:0 0 20px;">Confirm your registration</h1>
+
+      <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;">
+
+        <!-- Left: Registration options -->
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="background:#fff;border-radius:12px;border:1px solid var(--border);overflow:hidden;">
+            <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:4px;height:20px;background:var(--pink);border-radius:2px;"></div>
+                <span style="font-size:15px;font-weight:700;color:var(--text-1);">Registration options</span>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+            </div>
+            <div style="padding:16px 20px;">
+              <!-- Q1: Multi-select -->
+              <div style="margin-bottom:20px;">
+                <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">
+                  <div style="width:22px;height:22px;border-radius:50%;background:var(--pink);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;flex-shrink:0;">1</div>
+                  <span style="font-size:14px;font-weight:500;color:var(--text-1);">Which platform do you mainly use?</span>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding-left:32px;">
+                  <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px;"><input type="checkbox" style="accent-color:var(--pink);"/> Instagram</label>
+                  <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px;"><input type="checkbox" style="accent-color:var(--pink);"/> Facebook</label>
+                  <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px;"><input type="checkbox" style="accent-color:var(--pink);"/> Threads</label>
+                </div>
+              </div>
+              <!-- Q2: Single-select -->
+              <div style="margin-bottom:20px;">
+                <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">
+                  <div style="width:22px;height:22px;border-radius:50%;background:var(--pink);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;flex-shrink:0;">2</div>
+                  <span style="font-size:14px;font-weight:500;color:var(--text-1);">Which time slot would you be available?</span>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding-left:32px;">
+                  <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px;"><input type="radio" name="s8-q2" style="accent-color:var(--pink);"/> 10AM</label>
+                  <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px;"><input type="radio" name="s8-q2" style="accent-color:var(--pink);"/> 12PM</label>
+                  <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px;"><input type="radio" name="s8-q2" style="accent-color:var(--pink);"/> 4PM</label>
+                </div>
+              </div>
+              <!-- Q3: Open-ended -->
+              <div>
+                <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">
+                  <div style="width:22px;height:22px;border-radius:50%;background:var(--pink);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;flex-shrink:0;">3</div>
+                  <span style="font-size:14px;font-weight:500;color:var(--text-1);">Tell us why you want to join this campaign.</span>
+                </div>
+                <div style="padding-left:32px;">
+                  <textarea style="width:100%;border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px;color:var(--text-1);resize:vertical;min-height:80px;font-family:inherit;box-sizing:border-box;" placeholder="Please enter your answer"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile info card -->
+          <div style="background:#fff;border-radius:12px;border:2px solid #7C3AED;overflow:hidden;">
+            <div style="padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ede9fe;cursor:pointer;" onclick="var b=document.getElementById('s8-profile-body');b.style.display=b.style.display==='none'?'':'none';this.querySelector('svg').style.transform=b.style.display===''?'rotate(0deg)':'rotate(180deg)'">
+              <span style="font-size:14px;font-weight:700;color:#5B21B6;">Profile info</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5" style="transition:transform .2s;"><polyline points="18 15 12 9 6 15"/></svg>
+            </div>
+            <div id="s8-profile-body">
+              <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:8px 20px;color:var(--text-2);white-space:nowrap;">Full name</td><td style="padding:8px 20px;font-weight:600;color:var(--text-1);">Chan Tai Man</td></tr>
+                <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:8px 20px;color:var(--text-2);">Gender</td><td style="padding:8px 20px;font-weight:600;color:var(--text-1);">Male</td></tr>
+                <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:8px 20px;color:var(--text-2);">Date of birth</td><td style="padding:8px 20px;font-weight:600;color:var(--text-1);">03/1990</td></tr>
+                <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:8px 20px;color:var(--text-2);">Country / Region</td><td style="padding:8px 20px;font-weight:600;color:var(--text-1);">Hong Kong</td></tr>
+                <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:8px 20px;color:var(--text-2);">Contact number</td><td style="padding:8px 20px;font-weight:600;color:var(--text-1);">+852 6123 4567</td></tr>
+                <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:8px 20px;color:var(--text-2);">Email address</td><td style="padding:8px 20px;font-weight:600;color:var(--text-1);">john.doe@mail.com</td></tr>
+                <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:8px 20px;color:var(--text-2);">Occupation</td><td style="padding:8px 20px;font-weight:600;color:var(--text-1);">Freelance</td></tr>
+                <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:8px 20px;color:var(--text-2);white-space:nowrap;">Children</td><td style="padding:8px 20px;font-weight:600;color:var(--text-1);">2 <span style="font-weight:400;color:var(--text-2);font-size:12px;">(Ages: 8, 5)</span></td></tr>
+                <tr><td style="padding:8px 20px;color:var(--text-2);">Pets</td><td style="padding:8px 20px;font-weight:600;color:var(--text-1);">Dogs, cats</td></tr>
+              </table>
+              <div style="padding:10px 20px;text-align:right;border-top:1px solid #f3f4f6;">
+                <button style="background:none;border:none;color:#7C3AED;font-size:13px;font-weight:600;cursor:pointer;">Update Profile Info</button>
+              </div>
+            </div>
+          </div>
+
+          <button style="background:var(--pink);color:#fff;border:none;border-radius:var(--r-full);padding:14px 32px;font-size:15px;font-weight:700;cursor:pointer;width:100%;">Confirm Registration</button>
+        </div>
+
+        <!-- Right: Campaign summary -->
+        <div style="background:#fff;border-radius:12px;border:1px solid var(--border);padding:20px;position:sticky;top:20px;">
+          <div style="font-size:12px;color:var(--text-2);margin-bottom:2px;">{brand name}</div>
+          <div style="font-size:16px;font-weight:700;color:var(--text-1);margin-bottom:12px;">{campaign name}</div>
+          <div style="display:flex;gap:8px;margin-bottom:16px;">
+            <div style="width:32px;height:32px;border-radius:50%;background:#E4405F;display:grid;place-items:center;"><span style="color:#fff;font-size:13px;font-weight:700;">IG</span></div>
+            <div style="width:32px;height:32px;border-radius:50%;background:#1877F2;display:grid;place-items:center;"><span style="color:#fff;font-size:14px;font-weight:700;">f</span></div>
+            <div style="width:32px;height:32px;border-radius:50%;background:#101010;display:grid;place-items:center;"><span style="color:#fff;font-size:12px;font-weight:700;">@</span></div>
+          </div>
+          <div style="background:#f0fdfa;border-radius:10px;padding:14px 16px;margin-bottom:16px;">
+            <div style="font-size:13px;font-weight:600;color:var(--text-1);margin-bottom:10px;">Tasks</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text-1);"><span style="color:#10B981;flex-shrink:0;">●</span><div><strong>Content format:</strong><br>Photo</div></div>
+              <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text-1);"><span style="color:#10B981;flex-shrink:0;">●</span><div><strong>Submit preview deadline:</strong><br>{dd/mm/yyyy}</div></div>
+              <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text-1);"><span style="color:#10B981;flex-shrink:0;">●</span><div><strong>Post period:</strong><br>{dd/mm/yyyy} – {dd/mm/yyyy}</div></div>
+            </div>
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:12px;display:flex;flex-direction:column;gap:6px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:13px;color:var(--text-2);">Base Reward</span>
+              <span style="font-size:13px;font-weight:600;color:var(--text-1);">HK$500</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:13px;color:var(--pink);">Extra Bonus</span>
+              <span style="font-size:13px;font-weight:600;color:var(--pink);">+HK$50</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px dashed var(--border);padding-top:8px;margin-top:2px;">
+              <span style="font-size:14px;font-weight:600;color:var(--text-1);">Total Reward</span>
+              <span style="font-size:22px;font-weight:800;color:var(--pink);">HK$550</span>
+            </div>
           </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -1165,7 +1791,7 @@ table{border-collapse:collapse;width:100%}
                   <th>Bank Code</th>
                   <th>Base Reward</th>
                   <!-- ★ NEW ★ -->
-                  <th style="color:var(--pink);">Extra Bonus % <span class="new-badge">NEW</span></th>
+                  <th style="color:var(--pink);">Extra Bonus (HKD) <span class="new-badge">NEW</span></th>
                   <!-- ★ NEW: amount reflects bonus ★ -->
                   <th style="color:var(--pink);">Total Amount <span class="new-badge">NEW</span></th>
                   <th>Currency</th>
@@ -1200,8 +1826,8 @@ table{border-collapse:collapse;width:100%}
                   <td>Jingkai</td>
                   <td>205</td>
                   <td>200.00</td>
-                  <!-- 10% extra bonus -->
-                  <td style="color:var(--pink);font-weight:600;">+10%</td>
+                  <!-- 10% extra bonus → HKD 20 -->
+                  <td style="color:var(--pink);font-weight:600;">+20.00</td>
                   <td class="font-medium" style="color:var(--pink);">220.00</td>
                   <td>HKD</td>
                   <td class="text-sm text-muted">jk@gmail.com</td>
@@ -1265,7 +1891,7 @@ table{border-collapse:collapse;width:100%}
         <!-- Legend -->
         <div class="alert alert--info" style="margin-top:16px;">
           <div>
-            <strong>Extra Bonus % in Finance:</strong> When a KOL has an Extra Bonus set on their campaign (Screen ③), the Finance Module automatically calculates <strong>Total Amount = Base Reward × (1 + Bonus%)</strong>. Example: JK_test base HKD 200 + 10% = <strong>HKD 220</strong>. The exported CSV includes both columns.
+            <strong>Extra Bonus (HKD) in Finance:</strong> Regardless of how the Extra Bonus is configured in Screen ③ (% or fixed HKD), the Finance Module always converts it to an HKD amount. <strong>Total Amount = Base Reward + Extra Bonus (HKD)</strong>. Example: JK_test base HKD 200 + Extra Bonus HKD 20 = <strong>HKD 220</strong>. The exported CSV includes both columns.
           </div>
         </div>
       </div>
@@ -1286,8 +1912,8 @@ table{border-collapse:collapse;width:100%}
         <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Bank Account Name</span></div>
         <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Bank Code</span></div>
         <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Base Reward</span></div>
-        <div class="export-field new"><div class="export-field__checkbox checked"></div><span class="export-field__name">Extra Bonus %</span><span class="new-badge">NEW</span></div>
-        <div class="export-field new"><div class="export-field__checkbox checked"></div><span class="export-field__name">Total Amount (Base × (1 + Bonus%))</span><span class="new-badge">NEW</span></div>
+        <div class="export-field new"><div class="export-field__checkbox checked"></div><span class="export-field__name">Extra Bonus (HKD)</span><span class="new-badge">NEW</span></div>
+        <div class="export-field new"><div class="export-field__checkbox checked"></div><span class="export-field__name">Total Amount (Base Reward + Extra Bonus HKD)</span><span class="new-badge">NEW</span></div>
         <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Currency</span></div>
         <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Payee's Email Address</span></div>
         <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Request Date</span></div>
@@ -1520,14 +2146,47 @@ function updateBulkBar() {
   }
 }
 
+var _bonusType = 'pct';
+var _bulkBonusType = 'pct';
+
+function setBonusType(type) {
+  _bonusType = type;
+  var pctBtn = document.getElementById('bonus-type-pct');
+  var hkdBtn = document.getElementById('bonus-type-hkd');
+  pctBtn.style.background = type==='pct' ? 'var(--pink)' : '#fff';
+  pctBtn.style.color = type==='pct' ? '#fff' : 'var(--text-2)';
+  pctBtn.style.fontWeight = type==='pct' ? '600' : '500';
+  hkdBtn.style.background = type==='hkd' ? 'var(--pink)' : '#fff';
+  hkdBtn.style.color = type==='hkd' ? '#fff' : 'var(--text-2)';
+  hkdBtn.style.fontWeight = type==='hkd' ? '600' : '500';
+  document.getElementById('bonus-unit-label').textContent = type==='pct' ? '%' : 'HKD';
+  updateBonusPreview();
+}
+
+function setBulkBonusType(type) {
+  _bulkBonusType = type;
+  var pctBtn = document.getElementById('bulk-type-pct');
+  var hkdBtn = document.getElementById('bulk-type-hkd');
+  pctBtn.style.background = type==='pct' ? 'var(--pink)' : '#fff';
+  pctBtn.style.color = type==='pct' ? '#fff' : 'var(--text-2)';
+  pctBtn.style.fontWeight = type==='pct' ? '600' : '500';
+  hkdBtn.style.background = type==='hkd' ? 'var(--pink)' : '#fff';
+  hkdBtn.style.color = type==='hkd' ? '#fff' : 'var(--text-2)';
+  hkdBtn.style.fontWeight = type==='hkd' ? '600' : '500';
+  document.getElementById('bulk-unit-label').textContent = type==='pct' ? '%' : 'HKD';
+  updateBulkPreview();
+}
+
 function updateBulkPreview() {
-  const pct = parseFloat(document.getElementById('bulk-bonus-pct').value) || 0;
-  const base = 200;
-  const total = base * (1 + pct / 100);
+  var val = parseFloat(document.getElementById('bulk-bonus-val').value) || 0;
+  var base = 200;
+  var bonusHKD = _bulkBonusType === 'pct' ? Math.round(base * val / 100 * 100) / 100 : val;
+  var total = base + bonusHKD;
+  var label = _bulkBonusType === 'pct' ? val + '%' : 'HKD ' + val.toFixed(2);
   document.getElementById('bulk-bonus-preview').innerHTML =
-    pct > 0
-      ? `Each selected KOL: Base HKD ${base} + <strong>${pct}%</strong> = <strong>HKD ${total.toFixed(2)}</strong>`
-      : `Each selected KOL: Base HKD ${base}.00 (No extra bonus)`;
+    val > 0
+      ? 'Each selected KOL: Base HKD ' + base + ' + <strong>' + label + '</strong> = <strong>HKD ' + total.toFixed(2) + '</strong>'
+      : 'Each selected KOL: Base HKD ' + base + '.00 (No extra bonus — campaign-level applies)';
 }
 
 function toggleMenu(id) {
@@ -1541,22 +2200,24 @@ document.addEventListener('click', function(e) {
     document.querySelectorAll('.action-menu').forEach(m => m.setAttribute('hidden',''));
 });
 
-function openBonusModal(name, pct) {
+function openBonusModal(name, val) {
+  _bonusType = 'pct';
   document.getElementById('bonus-modal-title').textContent = 'Edit Extra Bonus — ' + name;
-  document.getElementById('bonus-pct-input').value = pct;
-  updateBonusPreview();
+  document.getElementById('bonus-val-input').value = val;
+  setBonusType('pct');
   document.getElementById('modal-bonus').removeAttribute('hidden');
 }
 
 function updateBonusPreview() {
-  const pct = parseFloat(document.getElementById('bonus-pct-input').value) || 0;
-  const base = 200;
-  const bonus = Math.round(base * pct / 100 * 100) / 100;
-  const total = base + bonus;
+  var val = parseFloat(document.getElementById('bonus-val-input').value) || 0;
+  var base = 200;
+  var bonusHKD = _bonusType === 'pct' ? Math.round(base * val / 100 * 100) / 100 : val;
+  var total = base + bonusHKD;
+  var label = _bonusType === 'pct' ? val + '% = HKD ' + bonusHKD.toFixed(2) : 'HKD ' + val.toFixed(2);
   document.getElementById('bonus-preview').innerHTML =
-    pct > 0
-      ? `Total payout: <strong>HKD ${total.toFixed(2)}</strong> (Base HKD ${base} + ${pct}% = HKD ${bonus.toFixed(2)})`
-      : `Total payout: <strong>HKD ${base}.00</strong> (No extra bonus)`;
+    val > 0
+      ? 'Total payout: <strong>HKD ' + total.toFixed(2) + '</strong> (Base HKD ' + base + ' + ' + label + ')'
+      : 'Total payout: <strong>HKD ' + base + '.00</strong> (No KOL-level override — campaign-level applies)';
 }
 
 function switchRegTab(tab) {
@@ -1593,6 +2254,64 @@ function toggleRegChildren(show) {
   document.getElementById('reg-children-detail').hidden = !show;
 }
 
+function calcAge(year) {
+  var y = parseInt(year);
+  if (!y || y < 1900 || y > 2026) return null;
+  return 2026 - y;
+}
+
+function validateBirthYear(input) {
+  var val = input.value.trim();
+  var errId = input.getAttribute('data-err');
+  var errEl = errId ? document.getElementById(errId) : null;
+  if (!val) {
+    input.style.borderColor = '';
+    if (errEl) errEl.style.display = 'none';
+    return null;
+  }
+  if (!/^\d+$/.test(val)) {
+    input.style.borderColor = '#ef4444';
+    if (errEl) { errEl.textContent = 'Must be a number.'; errEl.style.display = ''; }
+    return 'invalid';
+  }
+  var y = parseInt(val);
+  if (y > 2026) {
+    input.style.borderColor = '#ef4444';
+    if (errEl) { errEl.textContent = 'Year cannot be later than 2026.'; errEl.style.display = ''; }
+    return 'invalid';
+  }
+  if (y < 1900) {
+    input.style.borderColor = '#ef4444';
+    if (errEl) { errEl.textContent = 'Please enter a valid year.'; errEl.style.display = ''; }
+    return 'invalid';
+  }
+  input.style.borderColor = '';
+  if (errEl) errEl.style.display = 'none';
+  return y;
+}
+
+function updateRegChildAge(input) {
+  var y = validateBirthYear(input);
+  var tag = input.nextElementSibling;
+  if (typeof y === 'number') {
+    tag.textContent = 'Age ' + (2026 - y);
+    tag.style.display = '';
+  } else {
+    tag.style.display = 'none';
+  }
+}
+
+function updateAIChildAge(input) {
+  var y = validateBirthYear(input);
+  var tag = input.nextElementSibling;
+  if (typeof y === 'number') {
+    tag.textContent = 'Age ' + (2026 - y);
+    tag.style.display = '';
+  } else {
+    tag.style.display = 'none';
+  }
+}
+
 function updateRegChildYears(val) {
   const n = Math.min(parseInt(val)||0, 10);
   const c = document.getElementById('reg-birth-year-fields');
@@ -1600,7 +2319,11 @@ function updateRegChildYears(val) {
   for (let i = 1; i <= n; i++) {
     const d = document.createElement('div');
     d.className = 'field';
-    d.innerHTML = `<label class="field__label">Birth year of Child ${i}</label><input class="input" style="max-width:180px;border:1.5px solid var(--border);" placeholder="e.g. ${2017+i}"/>`;
+    d.innerHTML = '<label class="field__label">Birth year of Child '+i+'</label>'
+      +'<div style="display:flex;align-items:center;gap:10px;">'
+      +'<input class="input" style="max-width:180px;border:1.5px solid var(--border);" placeholder="e.g. '+(2017+i)+'" data-err="reg-dyn-err-'+i+'" oninput="updateRegChildAge(this)"/>'
+      +'<span class="child-age-tag" style="display:none;"></span></div>'
+      +'<span id="reg-dyn-err-'+i+'" style="display:none;font-size:12px;color:#ef4444;margin-top:2px;"></span>';
     c.appendChild(d);
   }
 }
@@ -1626,38 +2349,192 @@ function updateAIChildYears(val) {
   for (let i = 1; i <= n; i++) {
     const d = document.createElement('div');
     d.className = 'field';
-    d.innerHTML = `<label class="field__label">Birth year of Child ${i}</label><input class="input" style="max-width:160px;" placeholder="e.g. ${2017+i}"/>`;
+    d.innerHTML = '<label class="field__label">Birth year of Child '+i+'</label>'
+      +'<div style="display:flex;align-items:center;gap:10px;">'
+      +'<input class="input" style="max-width:160px;" placeholder="e.g. '+(2017+i)+'" data-err="ai-dyn-err-'+i+'" oninput="updateAIChildAge(this)"/>'
+      +'<span class="child-age-tag" style="display:none;"></span></div>'
+      +'<span id="ai-dyn-err-'+i+'" style="display:none;font-size:12px;color:#ef4444;margin-top:2px;"></span>';
     c.appendChild(d);
   }
 }
 
-function toggleQType(cardId, toggleId, mcId, oeId) {
-  const tog = document.getElementById(toggleId);
-  tog.classList.toggle('on');
-  const isMC = tog.classList.contains('on');
-  document.getElementById(mcId).hidden = !isMC;
-  document.getElementById(oeId).hidden = isMC;
+var extraRuleCount = 1;
+
+function setRewardType(ruleId, type) {
+  var pctBtn = document.getElementById(ruleId + '-type-pct');
+  var hkdBtn = document.getElementById(ruleId + '-type-hkd');
+  var preview = document.getElementById(ruleId + '-preview');
+  var val = document.getElementById(ruleId + '-val').value || '0';
+  if (type === 'pct') {
+    pctBtn.style.background = 'var(--pink)'; pctBtn.style.color = '#fff';
+    hkdBtn.style.background = '#fff'; hkdBtn.style.color = 'var(--text-2)';
+    if (preview) preview.innerHTML = '= Base Reward + <strong>' + val + '%</strong>';
+  } else {
+    hkdBtn.style.background = 'var(--pink)'; hkdBtn.style.color = '#fff';
+    pctBtn.style.background = '#fff'; pctBtn.style.color = 'var(--text-2)';
+    if (preview) preview.innerHTML = '= Base Reward + <strong>HKD ' + val + '</strong>';
+  }
 }
 
-let qCount = 2;
+function updateConditionInput(sel) {
+  var row = sel.closest('.condition-row');
+  var metric = sel.value;
+  // Remove old operator + value elements (keep metric select + remove btn)
+  var children = Array.from(row.children);
+  children.slice(1, -1).forEach(function(el){ el.remove(); });
+
+  var opSel, valEl;
+  if (metric === 'gender') {
+    opSel = '<select class="select" style="width:90px;"><option>=</option></select>';
+    valEl = '<select class="select" style="width:120px;"><option>Female</option><option>Male</option></select>';
+  } else if (metric === 'pets') {
+    opSel = '<select class="select" style="width:90px;"><option>=</option></select>';
+    valEl = '<select class="select" style="width:120px;"><option>Yes</option><option>No</option></select>';
+  } else if (metric === 'kol_tags') {
+    opSel = '<select class="select" style="width:90px;"><option>includes</option><option>excludes</option></select>';
+    valEl = '<select class="select" style="width:180px;"><option>Pet Owner</option><option>Foodie</option><option>Lifestyle</option><option>Beauty</option><option>Tech</option><option>Fitness</option><option>Parents</option></select>';
+  } else if (metric === '') {
+    opSel = '<select class="select" style="width:90px;"><option>≥</option><option>≤</option><option>=</option><option>between</option></select>';
+    valEl = '<input class="input" style="width:100px;" placeholder="value"/>';
+  } else {
+    opSel = '<select class="select" style="width:90px;"><option>≥</option><option>≤</option><option>=</option><option>between</option></select>';
+    valEl = '<input class="input" style="width:100px;" placeholder="e.g. 1000"/>';
+  }
+  var removeBtn = row.lastElementChild;
+  var tmp = document.createElement('div');
+  tmp.innerHTML = opSel + valEl;
+  Array.from(tmp.children).forEach(function(el){ row.insertBefore(el, removeBtn); });
+}
+
+function addCondition(containerId) {
+  var container = document.getElementById(containerId);
+  var row = document.createElement('div');
+  row.className = 'condition-row';
+  row.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;';
+  row.innerHTML = '<select class="select" style="width:160px;" onchange="updateConditionInput(this)">' +
+    '<option value="">— Select metric —</option>' +
+    '<option value="fb_followers">FB Followers</option>' +
+    '<option value="ig_followers">IG Followers</option>' +
+    '<option value="threads_followers">Threads Followers</option>' +
+    '<option value="age">Age</option>' +
+    '<option value="gender">Gender</option>' +
+    '<option value="pets">Pets</option>' +
+    '<option value="kol_tags">KOL Tags</option>' +
+    '</select>' +
+    '<select class="select" style="width:90px;"><option>≥</option><option>≤</option><option>=</option><option>between</option></select>' +
+    '<input class="input" style="width:100px;" placeholder="value"/>' +
+    '<button onclick="this.closest(\'.condition-row\').remove()" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;flex-shrink:0;">✕</button>';
+  container.appendChild(row);
+}
+
+function addExtraRule() {
+  extraRuleCount++;
+  var n = extraRuleCount;
+  var container = document.getElementById('extra-rules-container');
+  var div = document.createElement('div');
+  div.className = 'extra-rule';
+  div.id = 'rule-' + n;
+  div.style.cssText = 'background:#fff;border:1px solid var(--pink-border);border-radius:var(--r-lg);padding:16px 18px;display:flex;flex-direction:column;gap:14px;';
+  div.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:600;color:var(--text-1);">Rule ' + n + '</span><button onclick="this.closest(\'.extra-rule\').remove()" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;">✕</button></div>' +
+    '<div><div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px;">Set Extra Reward</div>' +
+    '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
+    '<div style="display:flex;border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;">' +
+    '<button id="rule-' + n + '-type-pct" onclick="setRewardType(\'rule-' + n + '\',\'pct\')" style="padding:7px 14px;font-size:13px;font-weight:600;border:none;background:var(--pink);color:#fff;cursor:pointer;">%</button>' +
+    '<button id="rule-' + n + '-type-hkd" onclick="setRewardType(\'rule-' + n + '\',\'hkd\')" style="padding:7px 14px;font-size:13px;font-weight:600;border:none;background:#fff;color:var(--text-2);cursor:pointer;">HKD</button></div>' +
+    '<input id="rule-' + n + '-val" class="input" style="width:100px;" placeholder="e.g. 10"/>' +
+    '<span id="rule-' + n + '-preview" style="font-size:13px;color:var(--text-2);">= Base Reward + <strong>0%</strong></span></div></div>' +
+    '<div><div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px;">Set KOL Group</div>' +
+    '<div style="display:flex;gap:16px;margin-bottom:12px;">' +
+    '<label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="radio" name="rule-' + n + '-logic" value="all" checked style="accent-color:var(--pink);"/> Meet <strong>all</strong> of below conditions</label>' +
+    '<label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="radio" name="rule-' + n + '-logic" value="any" style="accent-color:var(--pink);"/> Meet <strong>any</strong> of below conditions</label></div>' +
+    '<div id="rule-' + n + '-conditions" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;"></div>' +
+    '<button onclick="addCondition(\'rule-' + n + '-conditions\')" style="background:none;border:1px dashed var(--pink-border);color:var(--pink);font-size:13px;font-weight:500;cursor:pointer;padding:6px 14px;border-radius:var(--r-full);width:100%;">+ Add Condition</button></div>';
+  container.appendChild(div);
+}
+
+/* ── Screen 4 view switcher ── */
+
+/* ── Question type selector ── */
+function setQType(cardId, type) {
+  var card = document.getElementById(cardId);
+  card.setAttribute('data-qtype', type);
+  // Update segmented control buttons
+  card.querySelectorAll('.qtype-btn').forEach(function(btn){
+    var isActive = btn.getAttribute('data-type') === type;
+    btn.style.background = isActive ? 'var(--pink)' : '#fff';
+    btn.style.color = isActive ? '#fff' : 'var(--text-2)';
+    btn.style.fontWeight = isActive ? '600' : '500';
+  });
+  // Show/hide blocks
+  var optionsBlock = card.querySelector('.q-options-block');
+  var openBlock = card.querySelector('.q-open-block');
+  if(type === 'open'){
+    if(optionsBlock) optionsBlock.style.display = 'none';
+    if(openBlock) openBlock.style.display = '';
+  } else {
+    if(optionsBlock) optionsBlock.style.display = '';
+    if(openBlock) openBlock.style.display = 'none';
+    // Update option icons shape
+    var shape = type === 'multi' ? 'check' : 'radio';
+    card.querySelectorAll('.option-icon').forEach(function(el){ el.setAttribute('data-shape', shape); });
+    // Update "Add option" button icon
+    var addBtn = card.querySelector('.q-options-block > button');
+    if(addBtn){
+      var icon = addBtn.querySelector('span');
+      if(icon) icon.style.borderRadius = shape==='check' ? '4px' : '50%';
+    }
+  }
+}
+
+function addOption(containerId, shape) {
+  var c = document.getElementById(containerId);
+  var row = document.createElement('div');
+  row.className = 'q-option-row';
+  row.innerHTML = '<div class="option-icon" data-shape="'+shape+'"></div>'
+    + '<input class="input" placeholder="Option text"/>'
+    + '<button onclick="this.closest(\'.q-option-row\').remove()" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;">✕</button>';
+  c.appendChild(row);
+}
+
+function removeQuestion(cardId) {
+  var el = document.getElementById(cardId);
+  if(el) el.remove();
+  // Re-number remaining questions
+  var cards = document.querySelectorAll('#questions-container .q-card');
+  cards.forEach(function(card, i){
+    var title = card.querySelector('.q-card__title');
+    if(title) title.lastChild.textContent = ' Question '+(i+1);
+  });
+}
+
+let qCount = 3;
 function addQuestion() {
   qCount++;
-  const n = qCount;
-  const c = document.getElementById('questions-container');
-  const div = document.createElement('div');
-  div.className = 'q-card'; div.id = `q${n}`;
-  div.innerHTML = `
-    <div class="q-card__head">
-      <div class="q-card__title"><span style="color:var(--text-2);">🗑</span> Question ${n}</div>
-      <div class="toggle-wrap"><span>Multiple Choice</span><button class="toggle on" id="tq${n}" onclick="toggleQType('q${n}','tq${n}','mc${n}','oe${n}')"></button></div>
-    </div>
-    <input class="input" placeholder="Enter question text…"/>
-    <div id="mc${n}" class="q-mode-options">
-      <div class="q-option-row"><div class="radio-custom"></div><input class="input" placeholder="Option A"/><button style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;">✕</button></div>
-      <button class="btn--pink-text" style="font-size:13px;display:flex;align-items:center;gap:4px;"><span style="width:18px;height:18px;border:2px solid var(--pink);border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;">+</span> Add option</button>
-    </div>
-    <div id="oe${n}" hidden class="open-ended-hint">KOL types a free-text answer — no options needed.</div>
-  `;
+  var n = qCount;
+  var c = document.getElementById('questions-container');
+  var realCount = c.querySelectorAll('.q-card').length + 1;
+  var div = document.createElement('div');
+  div.className = 'q-card'; div.id = 'q'+n;
+  div.setAttribute('data-qtype','multi');
+  div.innerHTML = '<div class="q-card__head">'
+    +'<div class="q-card__title"><button onclick="removeQuestion(\'q'+n+'\')" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:15px;padding:0 4px 0 0;">🗑</button> Question '+realCount+'</div>'
+    +'<div style="display:flex;border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;">'
+    +'<button class="qtype-btn active" data-type="multi" onclick="setQType(\'q'+n+'\',\'multi\')" style="padding:5px 11px;font-size:12px;font-weight:600;border:none;background:var(--pink);color:#fff;cursor:pointer;">Multi-select</button>'
+    +'<button class="qtype-btn" data-type="single" onclick="setQType(\'q'+n+'\',\'single\')" style="padding:5px 11px;font-size:12px;font-weight:500;border:none;background:#fff;color:var(--text-2);cursor:pointer;border-left:1px solid var(--border);">Single-select</button>'
+    +'<button class="qtype-btn" data-type="open" onclick="setQType(\'q'+n+'\',\'open\')" style="padding:5px 11px;font-size:12px;font-weight:500;border:none;background:#fff;color:var(--text-2);cursor:pointer;border-left:1px solid var(--border);">Open-ended</button>'
+    +'</div></div>'
+    +'<input class="input" placeholder="Enter question text"/>'
+    +'<div class="q-options-block">'
+    +'<div class="q-mode-options" id="q'+n+'-options">'
+    +'<div class="q-option-row"><div class="option-icon" data-shape="check"></div><input class="input" placeholder="Option A"/><button onclick="this.closest(\'.q-option-row\').remove()" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;">✕</button></div>'
+    +'</div>'
+    +'<button class="btn--pink-text" style="font-size:13px;display:flex;align-items:center;gap:4px;margin-top:8px;" onclick="addOption(\'q'+n+'-options\',\'check\')">'
+    +'<span style="width:18px;height:18px;border:2px solid var(--pink);border-radius:4px;display:grid;place-items:center;font-size:11px;font-weight:700;">+</span> Add option</button>'
+    +'</div>'
+    +'<div class="q-open-block" style="display:none;">'
+    +'<div style="font-size:12px;color:var(--text-2);margin-bottom:6px;">Placeholder text (optional)</div>'
+    +'<input class="input" style="color:var(--text-3);" placeholder="e.g. Please describe your answer…"/>'
+    +'</div>';
   c.appendChild(div);
 }
 
@@ -1670,6 +2547,86 @@ function updateChildrenYears(val) {
     d.className = 'field';
     d.innerHTML = `<label class="field__label">Birth year of Child ${i}</label><input class="input" style="max-width:160px;" placeholder="e.g. ${2018+i-1}"/>`;
     c.appendChild(d);
+  }
+}
+
+function savePhoneChange(btn) {
+  var newNum = btn.closest('.modal').querySelector('input[placeholder="Phone number"]').value;
+  var code = btn.closest('.modal').querySelector('select').value.replace('CA','');
+  var full = code.replace('+','') + newNum;
+  // Update phone number display
+  var numEl = document.getElementById('kol-phone-number');
+  if (numEl && newNum) numEl.textContent = full;
+  // Flip badge to Verifying
+  var badge = document.getElementById('kol-phone-badge');
+  if (badge) {
+    badge.className = 'badge badge--verifying';
+    badge.textContent = '⏳ Verifying';
+  }
+  btn.closest('.overlay').setAttribute('hidden','');
+}
+
+function s1ShowView(view) {
+  var admin = document.getElementById('s1-admin-view');
+  var client = document.getElementById('s1-client-view');
+  var atab = document.getElementById('s1-admin-tab');
+  var ctab = document.getElementById('s1-client-tab');
+  if (view === 'admin') {
+    admin.style.display = ''; client.style.display = 'none';
+    atab.style.background = 'var(--pink)'; atab.style.color = '#fff'; atab.style.borderColor = 'var(--pink)';
+    ctab.style.background = '#fff'; ctab.style.color = 'var(--text-2)'; ctab.style.borderColor = 'var(--border)';
+  } else {
+    admin.style.display = 'none'; client.style.display = '';
+    ctab.style.background = 'var(--pink)'; ctab.style.color = '#fff'; ctab.style.borderColor = 'var(--pink)';
+    atab.style.background = '#fff'; atab.style.color = 'var(--text-2)'; atab.style.borderColor = 'var(--border)';
+    cpShowStep(1);
+  }
+}
+
+function cpShowStep(step) {
+  [1,2,3].forEach(function(n) {
+    var el = document.getElementById('cp-step-' + n);
+    var btn = document.getElementById('cp-step-btn-' + n);
+    if (el) el.style.display = (n === step) ? '' : 'none';
+    if (btn) {
+      if (n === step) {
+        btn.style.background = 'var(--pink)'; btn.style.color = '#fff'; btn.style.borderColor = 'var(--pink)';
+      } else {
+        btn.style.background = '#fff'; btn.style.color = 'var(--text-2)'; btn.style.borderColor = 'var(--border)';
+      }
+    }
+  });
+  if (step === 3) {
+    // start OTP resend countdown
+    var sec = 59;
+    var label = document.getElementById('otp-resend-label');
+    var t = setInterval(function() {
+      sec--;
+      if (label) label.textContent = sec > 0 ? 'Resend in ' + sec + 's' : 'Resend';
+      if (sec <= 0) clearInterval(t);
+    }, 1000);
+    // clear OTP boxes
+    [1,2,3,4,5,6].forEach(function(i) {
+      var b = document.getElementById('otp' + i);
+      if (b) { b.value = ''; b.style.borderColor = i === 1 ? 'var(--pink)' : 'var(--border)'; }
+    });
+    document.getElementById('otp-success').style.display = 'none';
+    setTimeout(function(){ var f = document.getElementById('otp1'); if(f) f.focus(); }, 100);
+  }
+}
+
+function otpNext(el, idx) {
+  el.style.borderColor = 'var(--pink)';
+  if (el.value && idx < 6) {
+    var next = document.getElementById('otp' + (idx + 1));
+    if (next) { next.style.borderColor = 'var(--pink)'; next.focus(); }
+  }
+  // check if all filled
+  var all = [1,2,3,4,5,6].every(function(i){ return document.getElementById('otp'+i).value.length === 1; });
+  if (all) {
+    setTimeout(function(){
+      document.getElementById('otp-success').style.display = 'block';
+    }, 300);
   }
 }
 
