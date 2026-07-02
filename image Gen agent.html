@@ -1169,7 +1169,7 @@ svg{display:block;}
         <circle cx="4.5" cy="13" r="1" fill="rgba(255,255,255,.65)"/>
       </svg>
     </div>
-    <span class="panel-head__title" id="panelTitle">AI Creative Studio</span>
+    <span class="panel-head__title" id="panelTitle">AI Agent</span>
     <button class="panel-head__close" onclick="closePanel()">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8"/></svg>
     </button>
@@ -1214,23 +1214,6 @@ svg{display:block;}
 
     <!-- Ad Advisor state -->
     <div id="welcomeAdvisor">
-      <div class="aa-chart-mock">
-        <div class="aa-chart-mock__blur">
-          <div class="aa-chart-bar" style="width:75%;opacity:.8;"></div>
-          <div class="aa-chart-bar red" style="width:90%;opacity:.7;"></div>
-          <div class="aa-chart-bar" style="width:55%;opacity:.9;"></div>
-          <div class="aa-chart-bar red" style="width:40%;opacity:.6;"></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;">
-            <div style="height:8px;border-radius:4px;background:#D1D5DB;"></div>
-            <div style="height:8px;border-radius:4px;background:#D1D5DB;width:60%;"></div>
-            <div style="height:8px;border-radius:4px;background:#D1D5DB;width:80%;"></div>
-            <div style="height:8px;border-radius:4px;background:#D1D5DB;width:45%;"></div>
-          </div>
-        </div>
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-          <div style="background:rgba(255,255,255,.8);border-radius:var(--r-md);padding:6px 12px;font-size:11px;color:var(--text-regular);backdrop-filter:blur(2px);">Performance overview</div>
-        </div>
-      </div>
       <div class="aa-prompts">
         <div class="aa-prompt-card" onclick="fillAdvisorPrompt(this)">
           <div class="aa-prompt-card__icon">
@@ -1936,8 +1919,8 @@ function applyPanelState(mode) {
     icon.style.background = '#DB2777';
   } else if (mode === 'ad-advisor') {
     advisor.classList.add('visible');
-    footCreative.classList.add('hidden');
-    footAdvisor.classList.remove('hidden');
+    footCreative.classList.remove('hidden');
+    footAdvisor.classList.add('hidden');
     platformSel.style.display = 'none';
     title.textContent = 'Ad Advisor';
     icon.style.background = '#2563EB';
@@ -1947,17 +1930,20 @@ function applyPanelState(mode) {
     footCreative.classList.remove('hidden');
     footAdvisor.classList.add('hidden');
     platformSel.style.display = 'none';
-    title.textContent = 'AI Creative Studio';
+    title.textContent = 'AI Agent';
     icon.style.background = 'var(--brand-blue)';
   }
 }
 
 function fillAdvisorPrompt(card) {
   const text = card.querySelector('.aa-prompt-card__text').textContent;
-  const input = document.getElementById('aaInput');
-  input.value = text;
-  input.focus();
-  updateAaSend();
+  const ta = document.getElementById('promptTA');
+  ta.value = text;
+  document.getElementById('charCt').textContent = text.length + ' / 4000';
+  document.getElementById('promptWrap').classList.add('has-text');
+  updateSendBtn();
+  document.getElementById('welcomeAdvisor').classList.remove('visible');
+  ta.focus();
 }
 
 const IMG_GEN_PROMPTS = {
