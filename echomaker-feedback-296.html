@@ -213,7 +213,8 @@ table{border-collapse:collapse;width:100%}
   <button class="proto-tab active" onclick="showScreen('s1',this)">① [Admin] KOL Phone — Change Record</button>
   <button class="proto-tab" onclick="showScreen('s2',this)">② [Client Portal] KOL Registration</button>
   <button class="proto-tab" onclick="showScreen('s3',this)">③ [Admin] Campaign KOL — Extra Bonus</button>
-  <button class="proto-tab" onclick="showScreen('s4',this)">④ [Admin] Campaign — Extra Bonus &amp; Questions</button>
+  <button class="proto-tab" onclick="showScreen('s9',this)">④ [Admin] KOL — Extra Bonus</button>
+  <button class="proto-tab" onclick="showScreen('s4',this)">⑤ [Admin] Campaign — Open Question</button>
   <button class="proto-tab" onclick="showScreen('s8',this)">⑤ [Client Portal] KOL Confirm Campaign Registration</button>
   <button class="proto-tab" onclick="showScreen('s5',this)">⑥ [Admin] KOL List Export CSV</button>
   <button class="proto-tab" onclick="showScreen('s6',this)">⑦ [Admin] Finance Module</button>
@@ -1023,6 +1024,125 @@ table{border-collapse:collapse;width:100%}
 </div>
 
 
+<!-- ══ SCREEN 9 — KOL: Extra Bonus ══ -->
+<div id="s9" class="screen">
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar__logo"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#fff" stroke-width="1.8"/><path d="M6.5 10C6.5 7.5 8 6 10 6s3.5 1.5 3.5 4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><circle cx="10" cy="13" r="1.5" fill="#fff"/></svg></div>
+      <button class="sidebar__icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button>
+      <button class="sidebar__icon active"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 2a5 5 0 1 1 0 10A5 5 0 0 1 12 2zM4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></button>
+      <button class="sidebar__icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg></button>
+      <button class="sidebar__icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg></button>
+      <button class="sidebar__icon sidebar__bottom"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 1 1 4.93 19.07 10 10 0 0 1 19.07 4.93z"/></svg></button>
+    </aside>
+    <div class="main">
+      <div class="topbar">
+        <div class="breadcrumb"><span class="breadcrumb__current">KOL Module</span></div>
+        <div class="topbar__right"><span class="text-muted text-sm">julie li</span><div class="avatar">J</div></div>
+      </div>
+      <div class="content">
+        <h1 style="font-size:22px;font-weight:700;margin-bottom:20px;">KOL List</h1>
+
+        <div class="row" style="margin-bottom:20px;gap:10px;">
+          <div class="search-box" style="max-width:320px;flex:1;">
+            <span class="search-box__icon">🔍</span>
+            <input class="input input--sm" placeholder="Enter keywords to search KOL" style="padding-left:30px;"/>
+          </div>
+          <div style="margin-left:auto;display:flex;gap:8px;">
+            <button class="btn btn--outline btn--sm" style="border-color:var(--pink);color:var(--pink);">↑ Export</button>
+            <button class="btn btn--pink btn--sm">↑ Data Export</button>
+          </div>
+        </div>
+
+        <div class="card" style="overflow:hidden;">
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th style="width:40px;"><input type="checkbox"/></th>
+                  <th>Influencer</th>
+                  <th>Platform ▾</th>
+                  <th>FB Followers ⓘ ⇅</th>
+                  <th>IG Followers ⓘ ⇅</th>
+                  <th>Threads Followers ⓘ ⇅</th>
+                  <th>Age ⇅</th>
+                  <th>Gender ▾</th>
+                  <th>Parent</th>
+                  <th style="color:var(--pink);background:#fff8fc;">Extra Bonus <span class="new-badge">NEW</span></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><input type="checkbox"/></td>
+                  <td><div class="row" style="gap:8px;"><div class="kol-avatar" style="overflow:hidden;background:#d1d5db;"><img src="https://i.pravatar.cc/32?u=twoheart" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/></div><span class="font-medium">Twoheartsonehome</span></div></td>
+                  <td><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#E4405F" stroke-width="1.8"/><circle cx="12" cy="12" r="4" stroke="#E4405F" stroke-width="1.8"/><circle cx="17.5" cy="6.5" r="1" fill="#E4405F"/></svg></td>
+                  <td style="color:var(--text-3);">—</td>
+                  <td>69<br><span class="text-sm text-muted">two_asone1002</span></td>
+                  <td style="color:var(--text-3);">—</td>
+                  <td>20</td><td>Female</td><td>No</td>
+                  <td style="background:#fff8fc;"><span style="color:var(--pink);font-weight:700;">10%</span></td>
+                  <td>
+                    <div class="action-menu-wrap">
+                      <button class="btn btn--ghost btn--sm" style="padding:4px 8px;" onclick="toggleMenu('s9m1')">⋮</button>
+                      <div class="action-menu" id="s9m1" hidden>
+                        <button class="action-item">✏ Add Tags</button>
+                        <button class="action-item pink" onclick="openBonusModal('Twoheartsonehome','10');toggleMenu('s9m1')">✏ Edit extra bonus</button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"/></td>
+                  <td><div class="row" style="gap:8px;"><div class="kol-avatar" style="background:#f3e8ff;color:#7c3aed;font-weight:600;font-size:11px;">CN</div><span class="font-medium">Chan Chor Tung</span></div></td>
+                  <td><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#E4405F" stroke-width="1.8"/><circle cx="12" cy="12" r="4" stroke="#E4405F" stroke-width="1.8"/><circle cx="17.5" cy="6.5" r="1" fill="#E4405F"/></svg></td>
+                  <td style="color:var(--text-3);">—</td>
+                  <td>4.0k<br><span class="text-sm text-muted">nikko.artstudio</span></td>
+                  <td style="color:var(--text-3);">—</td>
+                  <td>28</td><td>Female</td><td>No</td>
+                  <td style="background:#fff8fc;color:var(--text-3);">—</td>
+                  <td>
+                    <div class="action-menu-wrap">
+                      <button class="btn btn--ghost btn--sm" style="padding:4px 8px;" onclick="toggleMenu('s9m2')">⋮</button>
+                      <div class="action-menu" id="s9m2" hidden>
+                        <button class="action-item">✏ Add Tags</button>
+                        <button class="action-item pink" onclick="openBonusModal('Chan Chor Tung','0');toggleMenu('s9m2')">✏ Edit extra bonus</button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"/></td>
+                  <td><div class="row" style="gap:8px;"><div class="kol-avatar" style="background:#111827;color:#fff;font-size:11px;font-weight:600;">JS</div><span class="font-medium">Jason Shum</span></div></td>
+                  <td><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" stroke="#1877F2" stroke-width="1.8" fill="none"/></svg></td>
+                  <td>16.9k<br><span class="text-sm text-muted">唔係賣廣告</span></td>
+                  <td style="color:var(--text-3);">—</td>
+                  <td style="color:var(--text-3);">—</td>
+                  <td>38</td><td>Male</td><td>No</td>
+                  <td style="background:#fff8fc;color:var(--text-3);">—</td>
+                  <td>
+                    <div class="action-menu-wrap">
+                      <button class="btn btn--ghost btn--sm" style="padding:4px 8px;" onclick="toggleMenu('s9m3')">⋮</button>
+                      <div class="action-menu" id="s9m3" hidden>
+                        <button class="action-item">✏ Add Tags</button>
+                        <button class="action-item pink" onclick="openBonusModal('Jason Shum','0');toggleMenu('s9m3')">✏ Edit extra bonus</button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="alert alert--info" style="margin-top:16px;">
+          <div><strong>Extra Bonus (KOL level)</strong> — set per-KOL via ⋮ → Edit extra bonus. Supports % or fixed HKD. The Extra Bonus column shows the user-set value (e.g. 10% or HKD 100). Finance Module always displays the converted HKD amount.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ══ SCREEN 3 — Campaign KOL: Extra Bonus ══ -->
 <div id="s3" class="screen">
   <div class="app">
@@ -1314,96 +1434,6 @@ table{border-collapse:collapse;width:100%}
             </div>
           </div>
 
-          <!-- ★ Extra Reward — NEW ★ -->
-          <div class="card" style="margin-bottom:20px;border-color:var(--pink-border);background:var(--pink-light);" id="extra-reward-card">
-            <div class="card__head" style="background:var(--pink-light);border-bottom-color:var(--pink-border);">
-              <div style="display:flex;align-items:center;gap:10px;">
-                <span class="card__title">Extra Reward</span>
-                <span style="font-size:11px;background:var(--pink);color:#fff;padding:1px 8px;border-radius:20px;font-weight:600;">NEW</span>
-              </div>
-              <button class="btn btn--outline btn--sm" style="border-color:var(--pink);color:var(--pink);" onclick="addExtraRule()">+ Add Rule</button>
-            </div>
-            <div class="card__body" style="background:var(--pink-light);display:flex;flex-direction:column;gap:16px;" id="extra-rules-container">
-
-              <!-- Rule 1 -->
-              <div class="extra-rule" id="rule-1" style="background:#fff;border:1px solid var(--pink-border);border-radius:var(--r-lg);padding:16px 18px;display:flex;flex-direction:column;gap:14px;">
-                <div style="display:flex;align-items:center;justify-content:space-between;">
-                  <span style="font-size:13px;font-weight:600;color:var(--text-1);">Rule 1</span>
-                  <button onclick="this.closest('.extra-rule').remove()" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;line-height:1;">✕</button>
-                </div>
-
-                <!-- Set Extra Reward value -->
-                <div>
-                  <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px;">Set Extra Reward</div>
-                  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-                    <div style="display:flex;border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;">
-                      <button id="rule-1-type-pct" onclick="setRewardType('rule-1','pct')" style="padding:7px 14px;font-size:13px;font-weight:600;border:none;background:var(--pink);color:#fff;cursor:pointer;">%</button>
-                      <button id="rule-1-type-hkd" onclick="setRewardType('rule-1','hkd')" style="padding:7px 14px;font-size:13px;font-weight:600;border:none;background:#fff;color:var(--text-2);cursor:pointer;">HKD</button>
-                    </div>
-                    <input id="rule-1-val" class="input" style="width:100px;" placeholder="e.g. 10" value="10"/>
-                    <span id="rule-1-preview" style="font-size:13px;color:var(--text-2);">= Base Reward + <strong>10%</strong></span>
-                  </div>
-                </div>
-
-                <!-- Set KOL Group -->
-                <div>
-                  <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px;">Set KOL Group</div>
-                  <div style="display:flex;gap:16px;margin-bottom:12px;">
-                    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
-                      <input type="radio" name="rule-1-logic" value="all" checked style="accent-color:var(--pink);"/> Meet <strong>all</strong> of below conditions
-                    </label>
-                    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
-                      <input type="radio" name="rule-1-logic" value="any" style="accent-color:var(--pink);"/> Meet <strong>any</strong> of below conditions
-                    </label>
-                  </div>
-
-                  <!-- Conditions -->
-                  <div id="rule-1-conditions" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">
-
-                    <!-- Condition row 1 -->
-                    <div class="condition-row" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                      <select class="select" style="width:160px;" onchange="updateConditionInput(this)">
-                        <option value="">— Select metric —</option>
-                        <option value="fb_followers" selected>FB Followers</option>
-                        <option value="ig_followers">IG Followers</option>
-                        <option value="threads_followers">Threads Followers</option>
-                        <option value="age">Age</option>
-                        <option value="gender">Gender</option>
-                        <option value="pets">Pets</option>
-                        <option value="kol_tags">KOL Tags</option>
-                      </select>
-                      <select class="select" style="width:90px;">
-                        <option>≥</option><option>≤</option><option>=</option><option>between</option>
-                      </select>
-                      <input class="input" style="width:100px;" placeholder="e.g. 1000" value="5000"/>
-                      <button onclick="this.closest('.condition-row').remove()" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;flex-shrink:0;">✕</button>
-                    </div>
-
-                    <!-- Condition row 2 (Gender example) -->
-                    <div class="condition-row" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                      <select class="select" style="width:160px;" onchange="updateConditionInput(this)">
-                        <option value="">— Select metric —</option>
-                        <option value="fb_followers">FB Followers</option>
-                        <option value="ig_followers">IG Followers</option>
-                        <option value="threads_followers">Threads Followers</option>
-                        <option value="age">Age</option>
-                        <option value="gender" selected>Gender</option>
-                        <option value="pets">Pets</option>
-                        <option value="kol_tags">KOL Tags</option>
-                      </select>
-                      <select class="select" style="width:90px;"><option>=</option></select>
-                      <select class="select" style="width:120px;"><option>Female</option><option>Male</option></select>
-                      <button onclick="this.closest('.condition-row').remove()" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;flex-shrink:0;">✕</button>
-                    </div>
-
-                  </div>
-                  <button onclick="addCondition('rule-1-conditions')" style="background:none;border:1px dashed var(--pink-border);color:var(--pink);font-size:13px;font-weight:500;cursor:pointer;padding:6px 14px;border-radius:var(--r-full);width:100%;">+ Add Condition</button>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
           <!-- ADMIN VIEW only (Client Portal view is now a separate top-level tab ⑤) -->
           <div id="s4-admin-view">
             <div class="card" style="margin-bottom:16px;">
@@ -1631,16 +1661,8 @@ table{border-collapse:collapse;width:100%}
               <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text-1);"><span style="color:#10B981;flex-shrink:0;">●</span><div><strong>Post period:</strong><br>{dd/mm/yyyy} – {dd/mm/yyyy}</div></div>
             </div>
           </div>
-          <div style="border-top:1px solid var(--border);padding-top:12px;display:flex;flex-direction:column;gap:6px;">
+          <div style="border-top:1px solid var(--border);padding-top:12px;">
             <div style="display:flex;align-items:center;justify-content:space-between;">
-              <span style="font-size:13px;color:var(--text-2);">Base Reward</span>
-              <span style="font-size:13px;font-weight:600;color:var(--text-1);">HK$500</span>
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <span style="font-size:13px;color:var(--pink);">Extra Bonus</span>
-              <span style="font-size:13px;font-weight:600;color:var(--pink);">+HK$50</span>
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px dashed var(--border);padding-top:8px;margin-top:2px;">
               <span style="font-size:14px;font-weight:600;color:var(--text-1);">Total Reward</span>
               <span style="font-size:22px;font-weight:800;color:var(--pink);">HK$550</span>
             </div>
@@ -1789,10 +1811,6 @@ table{border-collapse:collapse;width:100%}
                   <th>Bank Name</th>
                   <th>Bank Account Name</th>
                   <th>Bank Code</th>
-                  <th>Base Reward</th>
-                  <!-- ★ NEW ★ -->
-                  <th style="color:var(--pink);">Extra Bonus (HKD) <span class="new-badge">NEW</span></th>
-                  <!-- ★ NEW: amount reflects bonus ★ -->
                   <th style="color:var(--pink);">Total Amount <span class="new-badge">NEW</span></th>
                   <th>Currency</th>
                   <th>Payee's Email</th>
@@ -1809,8 +1827,6 @@ table{border-collapse:collapse;width:100%}
                   <td class="text-sm">Credit Agricole Co.</td>
                   <td>jingkai</td>
                   <td>005</td>
-                  <td>1.00</td>
-                  <td style="color:var(--text-3);">—</td>
                   <td class="font-medium">1.00</td>
                   <td>HKD</td>
                   <td class="text-sm text-muted">jingkai@gmail.com</td>
@@ -1825,9 +1841,6 @@ table{border-collapse:collapse;width:100%}
                   <td class="text-sm">Coutts &amp; Co. Ltd.</td>
                   <td>Jingkai</td>
                   <td>205</td>
-                  <td>200.00</td>
-                  <!-- 10% extra bonus → HKD 20 -->
-                  <td style="color:var(--pink);font-weight:600;">+20.00</td>
                   <td class="font-medium" style="color:var(--pink);">220.00</td>
                   <td>HKD</td>
                   <td class="text-sm text-muted">jk@gmail.com</td>
@@ -1842,8 +1855,6 @@ table{border-collapse:collapse;width:100%}
                   <td class="text-sm">Bank Of China (HK)</td>
                   <td>Julie Li</td>
                   <td>012</td>
-                  <td>100.00</td>
-                  <td style="color:var(--text-3);">—</td>
                   <td class="font-medium">100.00</td>
                   <td>HKD</td>
                   <td class="text-sm text-muted">julie.li@press.com</td>
@@ -1858,15 +1869,12 @@ table{border-collapse:collapse;width:100%}
                   <td class="text-sm">Credit Agricole Co.</td>
                   <td>jingkai</td>
                   <td>005</td>
-                  <td>100.00</td>
-                  <td style="color:var(--text-3);">—</td>
                   <td class="font-medium">100.00</td>
                   <td>HKD</td>
                   <td class="text-sm text-muted">jingkai@gmail.com</td>
                   <td class="text-sm text-muted">2025-09-21</td>
                   <td class="text-sm text-muted">—</td>
                 </tr>
-                <!-- ★ Paid row with extra bonus ★ -->
                 <tr style="background:#f0fdf4;">
                   <td><input type="checkbox"/></td>
                   <td><span class="badge badge--paid">Paid</span></td>
@@ -1875,8 +1883,6 @@ table{border-collapse:collapse;width:100%}
                   <td class="text-sm">Credit Agricole Co.</td>
                   <td>jingkai</td>
                   <td>005</td>
-                  <td>1.00</td>
-                  <td style="color:var(--text-3);">—</td>
                   <td class="font-medium">1.00</td>
                   <td>HKD</td>
                   <td class="text-sm text-muted">jingkai@gmail.com</td>
@@ -1891,7 +1897,7 @@ table{border-collapse:collapse;width:100%}
         <!-- Legend -->
         <div class="alert alert--info" style="margin-top:16px;">
           <div>
-            <strong>Extra Bonus (HKD) in Finance:</strong> Regardless of how the Extra Bonus is configured in Screen ③ (% or fixed HKD), the Finance Module always converts it to an HKD amount. <strong>Total Amount = Base Reward + Extra Bonus (HKD)</strong>. Example: JK_test base HKD 200 + Extra Bonus HKD 20 = <strong>HKD 220</strong>. The exported CSV includes both columns.
+            <strong>Total Amount in Finance</strong> already includes any Extra Bonus (converted to HKD). Example: JK_test base HKD 200 + Extra Bonus 10% = <strong>HKD 220</strong>. The exported CSV reflects this final amount.
           </div>
         </div>
       </div>
@@ -1911,9 +1917,7 @@ table{border-collapse:collapse;width:100%}
         <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Bank Name</span></div>
         <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Bank Account Name</span></div>
         <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Bank Code</span></div>
-        <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Base Reward</span></div>
-        <div class="export-field new"><div class="export-field__checkbox checked"></div><span class="export-field__name">Extra Bonus (HKD)</span><span class="new-badge">NEW</span></div>
-        <div class="export-field new"><div class="export-field__checkbox checked"></div><span class="export-field__name">Total Amount (Base Reward + Extra Bonus HKD)</span><span class="new-badge">NEW</span></div>
+        <div class="export-field new"><div class="export-field__checkbox checked"></div><span class="export-field__name">Total Amount</span><span class="new-badge">NEW</span></div>
         <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Currency</span></div>
         <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Payee's Email Address</span></div>
         <div class="export-field"><div class="export-field__checkbox checked"></div><span class="export-field__name">Request Date</span></div>
