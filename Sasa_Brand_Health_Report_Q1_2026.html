@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sasa - Brand Health Report Q1 2026</title>
+<style>
+  :root{
+    --ink:#102532;
+    --muted:#6F7C85;
+    --blue:#23A9F6;
+    --fb:#2B77E7;
+    --ig:#E63B7A;
+    --red:#FF4D4F;
+    --green:#2F9E44;
+    --line:#E4EBEF;
+    --soft:#F7F9FB;
+    --soft-blue:#EFF8FE;
+    --navy:#0B2433;
+    --bg:#F9FBFC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#E9EEF1}
+  body{
+    font-family:"Inter","Noto Sans CJK TC","Noto Sans",Arial,sans-serif;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    padding:68px 16px 36px;
+  }
+  .toolbar{
+    position:fixed;z-index:100;top:0;left:0;right:0;height:48px;
+    display:flex;align-items:center;gap:12px;padding:0 20px;
+    background:var(--navy);color:#fff;font-size:12px;
+  }
+  .toolbar b{color:#73DFFF}
+  .toolbar span{padding:4px 10px;border:1px solid rgba(255,255,255,.22);border-radius:999px;color:rgba(255,255,255,.82)}
+
+  .slide{
+    width:1000px;height:563px;margin:0 auto 24px;background:linear-gradient(180deg,#FFFFFF 0%, #FBFCFD 100%);
+    border-radius:14px;box-shadow:0 8px 28px rgba(16,37,50,.13);
+    overflow:hidden;position:relative;display:flex;flex-direction:column;
+  }
+  .slide::before{
+    content:"";position:absolute;right:26px;top:22px;width:88px;height:88px;border-radius:50%;
+    background:radial-gradient(circle, rgba(35,169,246,.08) 0%, rgba(35,169,246,0) 72%);
+    pointer-events:none;
+  }
+  .slide::after{
+    content:"";position:absolute;left:36px;bottom:24px;width:120px;height:1px;
+    background:linear-gradient(90deg, rgba(35,169,246,.25), rgba(35,169,246,0));pointer-events:none;
+  }
+  .header{
+    height:104px;padding:28px 42px 0;display:flex;justify-content:space-between;align-items:flex-start;
+    border-top:5px solid var(--blue); position:relative; z-index:2;
+  }
+  .title{font-size:28px;line-height:1.12;font-weight:700;letter-spacing:-.35px;color:var(--ink)}
+  .meta{text-align:right;padding-left:20px;flex-shrink:0}
+  .brand{font-size:13px;font-weight:700;color:var(--ink)}
+  .lead{
+    min-height:48px;margin:0 42px;padding:10px 14px;
+    background:var(--soft-blue);border-left:3px solid var(--blue);border-radius:8px;
+    color:#46545D;font-size:12.5px;line-height:1.5;display:flex;align-items:center; position:relative; z-index:2;
+  }
+  .body{flex:1;min-height:0;padding:18px 42px 12px; position:relative; z-index:2;}
+  .footer{
+    height:36px;margin:0 42px;display:flex;justify-content:space-between;align-items:flex-start;
+    border-top:1px solid #EEF2F4;padding-top:10px;font-size:10.5px;color:#8A969D; position:relative; z-index:2;
+  }
+  .footer b{color:var(--blue)}
+
+  .cover{background:linear-gradient(135deg,#081F2D 0%,#0E3C55 62%,#176F9F 100%);color:#fff}
+  .cover::before{content:"";position:absolute;right:-120px;top:-160px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(115,223,255,.28),transparent 68%)}
+  .cover::after{content:"";position:absolute;left:-120px;bottom:-180px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(35,169,246,.18),transparent 68%)}
+  .cover .content{position:relative;z-index:1;height:100%;padding:62px 58px;display:flex;flex-direction:column;justify-content:center}
+  .cover .eyebrow{font-size:13px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;color:#73DFFF}
+  .cover h1{font-size:49px;line-height:1.08;letter-spacing:-1.1px;font-weight:700;margin-top:14px;max-width:760px}
+  .cover .sub{font-size:19px;color:rgba(255,255,255,.88);margin-top:10px}
+  .cover .facts{display:flex;gap:12px;margin-top:34px}
+  .cover .fact{min-width:190px;padding:14px 16px;border:1px solid rgba(255,255,255,.2);border-radius:12px;background:rgba(255,255,255,.08)}
+  .cover .fact-label{font-size:10px;text-transform:uppercase;letter-spacing:.65px;color:rgba(255,255,255,.67)}
+  .cover .fact-value{font-size:18px;font-weight:700;margin-top:5px;color:#fff}
+  .cover .bottom{position:absolute;z-index:1;left:58px;right:58px;bottom:28px;display:flex;justify-content:space-between;font-size:11.5px;color:rgba(255,255,255,.76)}
+  .cover .bottom b{color:#fff}
+
+  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .metric{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fff;min-height:104px;display:flex;flex-direction:column;justify-content:center;box-shadow:0 1px 0 rgba(16,37,50,.02)}
+  .metric .label{font-size:10.2px;line-height:1.35;color:var(--muted);font-weight:600}
+  .metric .value{font-size:26px;line-height:1.1;font-weight:700;color:var(--ink);margin-top:7px}
+  .metric .delta{font-size:11.2px;font-weight:700;margin-top:5px}
+  .down{color:var(--red)} .up{color:var(--green)} .neutral{color:var(--muted)}
+
+  .stat-panel{
+    height:100%; background:#F3F5F7; border:1px solid #E9EEF2; border-radius:22px; padding:22px;
+    position:relative; overflow:hidden;
+  }
+  .stat-panel::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0));pointer-events:none}
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px;align-items:stretch}
+  .stat-card{
+    background:#fff;border:1px solid #DCE5EA;border-radius:22px;padding:22px 24px 20px;position:relative;
+    box-shadow:0 2px 12px rgba(16,37,50,.03);
+  }
+  .stat-card.neutral{border-top:5px solid #BFC8CF}
+  .stat-card.fb{border-top:5px solid var(--fb)}
+  .stat-card.ig{border-top:5px solid var(--ig)}
+  .card-kicker{font-size:11px;letter-spacing:.8px;text-transform:uppercase;font-weight:800;color:#7B8A94;display:flex;align-items:center;gap:8px}
+  .card-kicker.fb{color:var(--fb)}
+  .card-kicker.ig{color:var(--ig)}
+  .icon-dot{width:26px;height:26px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;border:2px solid currentColor;line-height:1}
+  .big-number{font-size:46px;line-height:1;font-weight:800;letter-spacing:-1px;margin-top:22px;color:#052133}
+  .big-number.small{font-size:44px}
+  .card-delta{font-size:17px;font-weight:800;margin-top:20px;color:var(--red)}
+  .card-delta.up{color:var(--green)}
+  .card-delta.neutral{color:var(--muted)}
+  .card-note{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.4}
+
+  .feature-layout{display:grid;grid-template-columns:320px 1fr;gap:20px;height:100%}
+  .image-card{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--line);min-height:300px;background:#fff}
+  .image-card .image-tag{position:absolute;z-index:3;top:14px;left:14px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.94);font-size:10.5px;font-weight:700;color:var(--ink)}
+  .post-art{height:100%;position:relative;background:linear-gradient(150deg,#FDF1F6,#FBD6E6 58%,#F2A9C8)}
+  .post-art:before{content:"";position:absolute;left:104px;top:55px;width:112px;height:225px;border-radius:28px 28px 18px 18px;background:linear-gradient(90deg,#fff,#FEF0F6 48%,#F9D3E4);box-shadow:0 20px 40px rgba(150,30,90,.17)}
+  .post-art:after{content:"Sasa";position:absolute;left:128px;top:159px;width:62px;height:52px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;color:#C13A72;font-weight:700;font-size:11px;letter-spacing:1px}
+  .campaign-art{height:100%;position:relative;background:linear-gradient(145deg,#FDF1F6,#FBD6E6 55%,#F2A9C8)}
+  .campaign-art:before{content:"";position:absolute;left:95px;top:68px;width:130px;height:205px;border-radius:18px;background:linear-gradient(145deg,#fff,#FEEBF3);box-shadow:0 20px 40px rgba(150,30,90,.17)}
+  .campaign-art:after{content:"K-BEAUTY";position:absolute;left:107px;top:153px;width:106px;height:48px;border-radius:10px;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;color:#C13A72;font-weight:700;font-size:10px;letter-spacing:.7px}
+  .image-caption{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:52px 17px 16px;background:linear-gradient(transparent,rgba(10,31,44,.82));color:#fff}
+  .image-caption h3{font-size:16px;line-height:1.25;font-weight:700}
+  .image-caption p{font-size:10.5px;line-height:1.4;color:rgba(255,255,255,.82);margin-top:5px}
+  .feature-metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-content:center}
+  .feature-metric{border:1px solid var(--line);border-radius:12px;padding:16px 17px;min-height:112px;background:#fff}
+  .feature-metric .label{font-size:10.5px;color:var(--muted);font-weight:600}
+  .feature-metric .value{font-size:27px;font-weight:700;margin-top:8px;color:var(--ink)}
+  .feature-metric .sub{font-size:11.5px;font-weight:700;color:var(--green);margin-top:4px}
+  .feature-metric .value.small-val{font-size:16px;line-height:1.35}
+
+  .keyword-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px;height:100%;align-content:center}
+  .keyword{display:grid;grid-template-columns:32px 1fr;align-items:center;border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:#fff}
+  .keyword .rank{width:24px;height:24px;border-radius:7px;background:var(--soft-blue);color:var(--blue);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .keyword .word{font-size:13px;font-weight:600;color:var(--ink)}
+
+  table{width:100%;border-collapse:collapse;font-size:12.3px;background:#fff;border-radius:12px;overflow:hidden}
+  th{padding:8px 12px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.55px;color:var(--muted);border-bottom:2px solid var(--line)}
+  td{padding:8px 12px;border-bottom:1px solid #EEF2F4}
+  th.r,td.r{text-align:right}
+  .rank-badge{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border-radius:7px;background:#F0F4F6;color:var(--muted);font-size:11px;font-weight:700}
+  tr.you{background:#FDF0F5;font-weight:700}
+  tr.you .rank-badge{background:var(--ig);color:#fff}
+  .ellipsis td{text-align:center;color:#AAB4BA;letter-spacing:5px;padding:5px;border-bottom:none}
+  .table-note{margin-top:11px;font-size:10.8px;line-height:1.45;color:var(--muted)}
+
+  .next-list{display:grid;grid-template-columns:1fr;gap:10px;margin-top:2px}
+  .next-item{display:flex;align-items:flex-start;gap:12px;border:1px solid var(--line);border-radius:11px;padding:12px 14px;font-size:12.5px;line-height:1.45;color:var(--ink);background:#fff}
+  .next-item .arrow{color:var(--blue);font-weight:700;font-size:16px;line-height:1.1}
+  .cta{margin-top:14px;border-radius:12px;background:var(--blue);color:#fff;padding:15px 18px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+  .cta h3{font-size:15px;line-height:1.3}
+  .cta p{font-size:11.5px;line-height:1.45;color:rgba(255,255,255,.88);margin-top:3px}
+  .cta .action{white-space:nowrap;padding:9px 14px;border-radius:999px;background:#fff;color:var(--blue);font-size:11.5px;font-weight:700}
+
+  @media print{
+    @page{size:1000px 563px;margin:0}
+    html,body{background:#fff}
+    body{padding:0}
+    .toolbar{display:none}
+    .slide{margin:0;border-radius:0;box-shadow:none;page-break-after:always}
+    .slide:last-child{page-break-after:auto}
+  }
+</style>
+</head>
+<body>
+<div class="toolbar"><b>Brand Health Report</b><span>Print / Save as PDF</span><span>Landscape · No margins · Background graphics</span></div>
+
+<!-- SLIDE 1: Cover -->
+<section class="slide cover">
+  <div class="content">
+    <div class="eyebrow">MediaLens · Brand Health Report</div>
+    <h1>Sasa</h1>
+    <div class="sub">Cosmetics &amp; Skincare · Hong Kong</div>
+    <div class="facts">
+      <div class="fact"><div class="fact-label">Report Period</div><div class="fact-value">Q1 2026</div></div>
+      <div class="fact"><div class="fact-label">Source</div><div class="fact-value">MediaLens Social Media Intelligence Platform</div></div>
+    </div>
+  </div>
+  <div class="bottom"><span>January 1–March 31, 2026</span><span>Powered by <b>MediaLens</b></span></div>
+</section>
+
+<!-- SLIDE 2: At a Glance -->
+<section class="slide">
+  <div class="header"><div class="title">At a Glance</div><div class="meta"><div class="brand">Sasa</div></div></div>
+  <div class="lead">Share of Voice in the Cosmetics &amp; Skincare category fell 18.4% quarter over quarter — your brand ranked #15 among category advertisers, and the gap with leading brands is widening.</div>
+  <div class="body">
+    <div class="grid-4">
+      <div class="metric"><div class="label">Advertiser Rank (Category)</div><div class="value">#15</div><div class="delta neutral">—</div></div>
+      <div class="metric"><div class="label">Share of Voice</div><div class="value">0.6%</div><div class="delta down">▼ 18.4%</div></div>
+      <div class="metric"><div class="label">Total Fans</div><div class="value">445.9K</div><div class="delta up">▲ 0.7%</div></div>
+      <div class="metric"><div class="label">Total Posts</div><div class="value">388</div><div class="delta up">▲ 2.6%</div></div>
+      <div class="metric"><div class="label">Total Sentiment Score</div><div class="value">0.84</div><div class="delta down">▼ 0.003</div></div>
+      <div class="metric"><div class="label">Top Post Engagement</div><div class="value">2,393</div><div class="delta neutral">—</div></div>
+      <div class="metric"><div class="label">Top Campaign Engagement</div><div class="value">19,188</div><div class="delta neutral">—</div></div>
+    </div>
+  </div>
+  <div class="footer"><span>Q1 2026 · Hong Kong</span><span>Powered by <b>MediaLens</b></span></div>
+</section>
+
+<!-- SLIDE 3: Fans Growth -->
+<section class="slide">
+  <div class="header"><div class="title">Fans Growth</div><div class="meta"><div class="brand">Sasa</div></div></div>
+  <div class="lead">Total fans grew by 0.7% this quarter, reaching 445.9K. Sustaining this growth momentum is a key priority for Q2.</div>
+  <div class="body">
+    <div class="stat-panel">
+      <div class="stat-grid">
+        <div class="stat-card neutral">
+          <div class="card-kicker">TOTAL FANS (END OF Q1 2026)</div>
+          <div class="big-number">445.9K</div>
+          <div class="card-delta up">▲ 0.7% QoQ</div>
+        </div>
+        <div class="stat-card fb">
+          <div class="card-kicker fb"><span class="icon-dot">f</span> FACEBOOK FANS</div>
+          <div class="big-number small">389.8K</div>
+          <div class="card-delta neutral">— QoQ</div>
+        </div>
+        <div class="stat-card ig">
+          <div class="card-kicker ig"><span class="icon-dot">◎</span> INSTAGRAM FANS</div>
+          <div class="big-number small">56.2K</div>
+          <div class="card-delta up">▲ 5.5% QoQ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span>End of Q1 2026</span><span>Powered by <b>MediaLens</b></span></div>
+</section>
+
+<!-- SLIDE 4: Total Posts per Platform -->
+<section class="slide">
+  <div class="header"><div class="title">Total Posts per Platform</div><div class="meta"><div class="brand">Sasa</div></div></div>
+  <div class="lead">The brand published 388 posts this quarter (excluding dark posts). Posting frequency directly affects the accumulation of reach and share of voice.</div>
+  <div class="body">
+    <div class="stat-panel">
+      <div class="stat-grid">
+        <div class="stat-card neutral">
+          <div class="card-kicker">TOTAL POSTS (Q1 2026)</div>
+          <div class="big-number">388</div>
+          <div class="card-delta up">▲ 2.6% QoQ</div>
+        </div>
+        <div class="stat-card fb">
+          <div class="card-kicker fb"><span class="icon-dot">f</span> FACEBOOK POSTS</div>
+          <div class="big-number">303</div>
+          <div class="card-delta up">▲ 1.0% QoQ</div>
+        </div>
+        <div class="stat-card ig">
+          <div class="card-kicker ig"><span class="icon-dot">◎</span> INSTAGRAM POSTS</div>
+          <div class="big-number small">85</div>
+          <div class="card-delta up">▲ 9.0% QoQ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span>Q1 2026</span><span>Powered by <b>MediaLens</b></span></div>
+</section>
+
+<!-- SLIDE 5: Sentiment Analysis -->
+<section class="slide">
+  <div class="header"><div class="title">Sentiment Analysis</div><div class="meta"><div class="brand">Sasa</div></div></div>
+  <div class="lead">Overall brand sentiment this quarter is 0.84 (Positive), 0.02 above the Cosmetics &amp; Skincare category average of 0.82 — the gap between platforms is a key lever for content strategy.</div>
+  <div class="body">
+    <div class="stat-panel">
+      <div class="stat-grid">
+        <div class="stat-card neutral">
+          <div class="card-kicker">TOTAL SENTIMENT SCORE</div>
+          <div class="big-number small">0.84</div>
+          <div class="card-delta up">▲ 0.02 vs. Benchmark (0.82)</div>
+          <div class="card-note">99% Positive · 1% Neutral · 0% Negative · ▼ 0.003 QoQ</div>
+        </div>
+        <div class="stat-card fb">
+          <div class="card-kicker fb"><span class="icon-dot">f</span> FACEBOOK SENTIMENT</div>
+          <div class="big-number small">0.83</div>
+          <div class="card-delta up">▲ 0.01 vs. Benchmark (0.82)</div>
+          <div class="card-note">99% Positive · 1% Neutral · 0% Negative · ▼ 0.006 MoM</div>
+        </div>
+        <div class="stat-card ig">
+          <div class="card-kicker ig"><span class="icon-dot">◎</span> INSTAGRAM SENTIMENT</div>
+          <div class="big-number small">0.85</div>
+          <div class="card-delta up">▲ 0.03 vs. Benchmark (0.82)</div>
+          <div class="card-note">99% Positive · 1% Neutral · 0% Negative · ▲ 0.010 QoQ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span>Q1 2026</span><span>Powered by <b>MediaLens</b></span></div>
+</section>
+
+<!-- SLIDE 6: Top Post -->
+<section class="slide">
+  <div class="header"><div class="title">Top Post</div><div class="meta"><div class="brand">Sasa</div></div></div>
+  <div class="lead">The quarter's top-performing post generated 2,393 engagements. More content in this format is worth exploring.</div>
+  <div class="body">
+    <div class="feature-layout">
+      <div class="image-card">
+        <div class="image-tag">Instagram · Video</div>
+        <div class="post-art"></div>
+        <div class="image-caption"><h3>近期大愛！3款晚間「偽素顏」護膚神助攻 ✨</h3><p>Published: January 5, 2026</p></div>
+      </div>
+      <div class="feature-metrics">
+        <div class="feature-metric"><div class="label">Platform / Format</div><div class="value small-val">Instagram · Video</div></div>
+        <div class="feature-metric"><div class="label">Engagement</div><div class="value">2,393</div></div>
+        <div class="feature-metric"><div class="label">Likes</div><div class="value">2,359</div></div>
+        <div class="feature-metric"><div class="label">Comments</div><div class="value">34</div></div>
+        <div class="feature-metric" style="grid-column:1 / span 2"><div class="label">Content</div><div class="value small-val" style="font-size:12.5px;font-weight:500;line-height:1.5;color:#46545D">成日俾人讚我素顏皮膚好、妝容又貼服？其實秘訣全靠每日嘅晚間保養！今次想同大家分享3款我最近愛不釋手、效果真係好驚艷嘅護理神器，包括御容鑑昇華滋氧煥顏逆齡眼部精華，主打黑眼圈、浮腫同皺紋一次搞掂，並加入 PDRN 人蔘同赤靈芝抗炎成分…</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span>Q1 2026</span><span>Powered by <b>MediaLens</b></span></div>
+</section>
+
+<!-- SLIDE 7: Top Campaign -->
+<section class="slide">
+  <div class="header"><div class="title">Top Campaign</div><div class="meta"><div class="brand">Sasa</div></div></div>
+  <div class="lead">"Sasa K-beauty Trend Hub 限定店" was the quarter's top-performing campaign. Its approach is worth replicating across other product lines.</div>
+  <div class="body">
+    <div class="feature-layout">
+      <div class="image-card">
+        <div class="image-tag">Brand Campaign</div>
+        <div class="campaign-art"></div>
+        <div class="image-caption"><h3>Sasa K-beauty Trend Hub 限定店</h3><p>Period: January–December 2026</p></div>
+      </div>
+      <div class="feature-metrics">
+        <div class="feature-metric"><div class="label">Campaign Name</div><div class="value small-val">Sasa K-beauty Trend Hub 限定店</div></div>
+        <div class="feature-metric"><div class="label">Engagement</div><div class="value">19,188</div></div>
+        <div class="feature-metric"><div class="label">Number of Posts</div><div class="value">35</div></div>
+        <div class="feature-metric"><div class="label">Campaign Period</div><div class="value small-val">Jan 2026 – Dec 2026</div></div>
+        <div class="feature-metric" style="grid-column:1 / span 2"><div class="label">Avg. Engagement per Post</div><div class="value">548</div><div class="sub">35 posts in campaign · 19,022 likes · 149 comments</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span>Q1 2026</span><span>Powered by <b>MediaLens</b></span></div>
+</section>
+
+<!-- SLIDE 8: Top Keywords -->
+<section class="slide">
+  <div class="header"><div class="title">Top Keywords</div><div class="meta"><div class="brand">Sasa</div></div></div>
+  <div class="lead">These were your top 10 keywords this quarter. Leading brands are building greater share of voice around different content themes.</div>
+  <div class="body">
+    <div class="keyword-grid">
+      <div class="keyword"><div class="rank">1</div><div class="word">莎莎香港</div></div>
+      <div class="keyword"><div class="rank">6</div><div class="word">sasakbeautytrendhub</div></div>
+      <div class="keyword"><div class="rank">2</div><div class="word">sasahk</div></div>
+      <div class="keyword"><div class="rank">7</div><div class="word">莎莎獨家代理</div></div>
+      <div class="keyword"><div class="rank">3</div><div class="word">sasahk_official</div></div>
+      <div class="keyword"><div class="rank">8</div><div class="word">莎莎網</div></div>
+      <div class="keyword"><div class="rank">4</div><div class="word">sasahkofficial</div></div>
+      <div class="keyword"><div class="rank">9</div><div class="word">莎莎化粧品有限公司</div></div>
+      <div class="keyword"><div class="rank">5</div><div class="word">kbeauty</div></div>
+      <div class="keyword"><div class="rank">10</div><div class="word">美容</div></div>
+    </div>
+  </div>
+  <div class="footer"><span>Q1 2026</span><span>Powered by <b>MediaLens</b></span></div>
+</section>
+
+<!-- SLIDE 9: Top Advertisers Ranking -->
+<section class="slide">
+  <div class="header"><div class="title">Top Advertisers Ranking</div><div class="meta"><div class="brand">Sasa</div></div></div>
+  <div class="lead">Your brand ranked #15 among Cosmetics &amp; Skincare category advertisers. Share of Voice fell 18.4% quarter over quarter — the gap with leading brands is widening.</div>
+  <div class="body">
+    <table>
+      <thead><tr><th style="width:70px">Rank</th><th>Advertiser</th><th class="r">SOV</th><th class="r" style="width:110px">QoQ</th></tr></thead>
+      <tbody>
+        <tr><td><span class="rank-badge">1</span></td><td>DIOR</td><td class="r">42.1%</td><td class="r">—</td></tr>
+        <tr><td><span class="rank-badge">2</span></td><td>GUCCI</td><td class="r">16.6%</td><td class="r">—</td></tr>
+        <tr><td><span class="rank-badge">3</span></td><td>Armani Beauty</td><td class="r">13.0%</td><td class="r">—</td></tr>
+        <tr><td><span class="rank-badge">4</span></td><td>medicube</td><td class="r">2.3%</td><td class="r">—</td></tr>
+        <tr><td><span class="rank-badge">5</span></td><td>Christian Louboutin</td><td class="r">1.8%</td><td class="r">—</td></tr>
+        <tr class="ellipsis"><td colspan="4">· · ·</td></tr>
+        <tr class="you"><td><span class="rank-badge">15</span></td><td>Sasa — You</td><td class="r">0.6%</td><td class="r">▼ 18.4%</td></tr>
+      </tbody>
+    </table>
+    <div class="table-note">SoV represents each advertiser's share of engagement within the Cosmetics &amp; Skincare category. Ranking is based on paid engagement among category advertisers in Hong Kong.</div>
+  </div>
+  <div class="footer"><span>Q1 2026 · Hong Kong</span><span>Powered by <b>MediaLens</b></span></div>
+</section>
+
+<!-- SLIDE 10: Next Steps -->
+<section class="slide">
+  <div class="header"><div class="title">Next Steps</div><div class="meta"><div class="brand">Sasa</div></div></div>
+  <div class="lead">To close the gap with leading brands and convert engagement into business results, the following areas are worth exploring:</div>
+  <div class="body">
+    <div class="next-list">
+      <div class="next-item"><span class="arrow">→</span><span><b>Where your share of voice is slipping — and who's taking it.</b></span></div>
+      <div class="next-item"><span class="arrow">→</span><span><b>Which content formats and themes are pulling ahead.</b></span></div>
+      <div class="next-item"><span class="arrow">→</span><span><b>How to turn reach and engagement into sales.</b></span></div>
+    </div>
+    <div class="cta">
+      <div><h3>Want a plan tailored to your brand?</h3><p>Our team can walk you through what's driving performance in your category and where to focus next.</p></div>
+      <div class="action">Book a free 20-minute Q2 competitive strategy consultation</div>
+    </div>
+  </div>
+  <div class="footer"><span>Q1 2026 · Hong Kong · Cosmetics &amp; Skincare</span><span>Powered by <b>MediaLens</b></span></div>
+</section>
+
+</body>
+</html>
