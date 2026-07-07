@@ -1,0 +1,3099 @@
+<!DOCTYPE html>
+<!--
+  MediaLens — Buzz × AI Creative Studio Prototype  (v2)
+  Flow:
+    1. Open AI panel via float button
+    2. Click "+" in input → pick Buzz posts → appear above input as reference chips
+    3. "@" to select product; upload image as extra reference
+    4. Agent: Marketing Agent (default) | Ad Advisor | Image Generation
+    5. Output: full post (formatted copy + image combined)
+    6. Hover generated image → Edit / Check Original → AI Generator page (4 tabs)
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediaLens — Buzz × AI Creative Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════ */
+:root {
+  --brand-blue:#23A9F6; --brand-light-blue:#73DFFF;
+  --brand-blue-tint:#EEF6FF; --brand-blue-subtle:#F1FCFF;
+  --title:#0A1F2C; --text-primary:#102532; --text-regular:#707070;
+  --text-secondary:#828282; --text-placeholder:#CACACA;
+  --surface-white:#FFFFFF; --surface-page:#F7F7F7; --surface-ai:#F6F8FD;
+  --border:#D9E3E6; --divider:#E8EEF0;
+  --danger:#FF3F41; --danger-light:#FFECEC;
+  --success:#52C41A; --success-light:#E6FBEB;
+  --warning:#FFC960; --warning-light:#FFF8EB;
+  --r-sm:6px; --r-md:8px; --r-card:12px; --r-tag:20px; --r-full:9999px;
+  --sp-xxs:4px; --sp-xs:8px; --sp-sm:12px; --sp-md:16px;
+  --sp-lg:20px; --sp-xl:24px; --sp-2xl:32px;
+  --fs-h2:28px; --fs-title:16px; --fs-title-sm:14px;
+  --fs-body:14px; --fs-small:12px; --fs-label:11px;
+  --lh-body:22px; --lh-small:20px;
+  --shadow-float:0 4px 16px rgba(0,0,0,.08);
+  --shadow-modal:0 8px 32px rgba(0,0,0,.16);
+  --overlay:rgba(10,31,44,.5);
+  --nav-h:72px; --sidebar-w:220px; --panel-w:440px;
+  --font-en:'Poppins','Noto Sans HK',system-ui,sans-serif;
+  --ai-orange:#F97316; --ai-orange-lt:#FFF7F0;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font-en);font-size:var(--fs-body);line-height:var(--lh-body);
+  color:var(--text-primary);background:var(--surface-page);-webkit-font-smoothing:antialiased;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;}
+svg{display:block;}
+
+/* ═══ NAV ═══ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:300;height:var(--nav-h);
+  background:var(--brand-blue);display:flex;align-items:center;
+  gap:var(--sp-lg);padding:0 clamp(var(--sp-md),4vw,var(--sp-2xl));color:#fff;}
+.nav__logo{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:700;}
+.nav__logo-icon{width:32px;height:32px;background:rgba(255,255,255,.2);border-radius:50%;
+  display:grid;place-items:center;font-size:14px;font-weight:700;flex-shrink:0;}
+.nav__right{margin-left:auto;display:flex;align-items:center;gap:var(--sp-sm);}
+.nav__user{font-size:12px;opacity:.88;}
+.nav__avatar{width:36px;height:36px;border-radius:var(--r-full);
+  background:rgba(255,255,255,.22);color:#fff;display:grid;place-items:center;font-weight:600;font-size:13px;}
+
+/* ═══ LAYOUT ═══ */
+.shell{display:flex;margin-top:var(--nav-h);min-height:calc(100vh - var(--nav-h));}
+.sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--surface-white);
+  border-right:1px solid var(--border);padding:var(--sp-md) 0;
+  position:sticky;top:var(--nav-h);height:calc(100vh - var(--nav-h));overflow-y:auto;}
+.sidebar__org{padding:var(--sp-sm) var(--sp-md) var(--sp-md);border-bottom:1px solid var(--divider);margin-bottom:var(--sp-xs);}
+.sidebar__av{width:32px;height:32px;border-radius:50%;background:var(--brand-blue);color:#fff;
+  display:grid;place-items:center;font-weight:600;font-size:13px;margin-bottom:var(--sp-xs);}
+.sidebar__name{font-weight:600;font-size:13px;color:var(--title);}
+.sidebar__sub{font-size:11px;color:var(--text-regular);margin-top:2px;}
+.nav-item{display:flex;align-items:center;gap:var(--sp-xs);padding:var(--sp-xs) var(--sp-md);
+  font-size:13px;color:var(--text-regular);width:100%;text-align:left;transition:background .15s,color .15s;}
+.nav-item:hover{background:var(--brand-blue-tint);color:var(--brand-blue);}
+.nav-item.active{background:var(--brand-blue-tint);color:var(--brand-blue);font-weight:600;}
+.nav-item__icon{width:18px;text-align:center;flex-shrink:0;}
+
+.content{flex:1;min-width:0;padding:var(--sp-xl);
+  transition:margin-right .3s cubic-bezier(.4,0,.2,1);}
+.content.panel-open{margin-right:var(--panel-w);}
+
+/* ═══ BUZZ PAGE ═══ */
+.page-tabs{display:flex;gap:4px;margin-bottom:var(--sp-md);}
+.ptab{padding:6px var(--sp-md);border-radius:var(--r-md);font-size:13px;font-weight:500;
+  color:var(--text-regular);transition:all .15s;}
+.ptab.active{background:var(--brand-blue);color:#fff;}
+.ptab:not(.active):hover{background:var(--divider);}
+.bdot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--brand-blue);margin-left:4px;vertical-align:2px;}
+
+.filter-bar{display:flex;align-items:center;gap:var(--sp-xs);flex-wrap:wrap;
+  padding:var(--sp-sm) var(--sp-md);background:var(--surface-white);
+  border:1px solid var(--border);border-radius:var(--r-md);margin-bottom:var(--sp-xs);}
+.fb{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;
+  border-radius:var(--r-tag);font-size:12px;font-weight:500;border:1px solid var(--border);
+  background:var(--surface-white);color:var(--text-primary);cursor:pointer;transition:all .15s;}
+.fb:hover,.fb.active{border-color:var(--brand-blue);color:var(--brand-blue);background:var(--brand-blue-tint);}
+.fb.purple{background:#F0F0FF;border-color:#C4B5FD;color:#6D28D9;}
+.fb.watch{background:#FFF8E7;border-color:#F59E0B;color:#B45309;}
+.fdiv{width:1px;height:20px;background:var(--border);}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;
+  border-radius:var(--r-tag);font-size:11px;background:var(--brand-blue-tint);color:var(--brand-blue);border:1px solid #B3DEFF;}
+
+.sort-row{display:flex;align-items:center;gap:var(--sp-md);margin-bottom:var(--sp-md);}
+.sort-lbl{font-size:12px;color:var(--text-regular);}
+.sort-btn{font-size:12px;color:var(--text-regular);padding:3px 8px;border-radius:var(--r-sm);transition:all .15s;}
+.sort-btn.active{color:var(--brand-blue);font-weight:600;}
+
+/* ═══ CREATIVE GRID ═══ */
+.creative-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:var(--sp-md);}
+.cc{background:var(--surface-white);border-radius:var(--r-card);border:1.5px solid var(--border);
+  overflow:hidden;transition:box-shadow .2s,border-color .2s;cursor:pointer;position:relative;}
+.cc:hover{box-shadow:var(--shadow-float);border-color:var(--brand-blue);}
+.cc.selectable:hover .cc-sel-hint{opacity:1;}
+.cc-sel-hint{position:absolute;top:var(--sp-xs);right:var(--sp-xs);
+  background:var(--brand-blue);color:#fff;font-size:10px;font-weight:600;
+  padding:2px 8px;border-radius:var(--r-tag);opacity:0;transition:opacity .2s;pointer-events:none;z-index:2;}
+.cc__badge{padding:5px var(--sp-sm);font-size:11px;font-weight:700;color:#fff;
+  display:flex;align-items:center;justify-content:space-between;}
+.b25{background:#22C55E;} .b10{background:#F59E0B;}
+.cc__head{padding:var(--sp-xs) var(--sp-sm);display:flex;align-items:center;gap:var(--sp-xs);}
+.pav{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff;}
+.pav-yr{background:#1A7A3B;} .pav-md{background:#0066B3;}
+.cc__name{font-size:12px;font-weight:600;color:var(--title);}
+.cc__date{font-size:11px;color:var(--text-regular);}
+.cc__tags{display:flex;flex-wrap:wrap;gap:4px;padding:0 var(--sp-sm) var(--sp-xs);}
+.ctag{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:var(--r-tag);font-size:10px;font-weight:600;}
+.ctag-of{background:#EFF6FF;color:#1D4ED8;}
+.ctag-bo{background:#FFF7ED;color:#C2410C;}
+.ctag-br{background:#F0FDF4;color:#166534;}
+.cc__img{width:100%;aspect-ratio:1/1;position:relative;overflow:hidden;}
+.cc-clone-overlay{position:absolute;inset:0;background:rgba(10,31,44,.45);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .18s;pointer-events:none;z-index:3;}
+.cc.select-mode:hover .cc-clone-overlay{opacity:1;pointer-events:auto;}
+.cc-clone-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;
+  border-radius:var(--r-full);font-size:12px;font-weight:600;
+  background:var(--brand-blue);color:#fff;border:1px solid rgba(255,255,255,.6);
+  cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.25);transition:background .15s;}
+.cc-clone-btn:hover{background:#1b9bea;}
+.cc__cap{font-size:11px;color:var(--text-primary);line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+  padding:var(--sp-xs) var(--sp-sm);}
+.show-more{font-size:11px;color:var(--brand-blue);cursor:pointer;padding:0 var(--sp-sm) var(--sp-xs);}
+.cc__stats{display:flex;gap:var(--sp-sm);padding:var(--sp-xs) var(--sp-sm);
+  border-top:1px solid var(--divider);flex-wrap:wrap;}
+.stat{font-size:11px;color:var(--text-regular);}
+
+/* poster mocks */
+.pm{width:100%;height:100%;position:relative;display:flex;align-items:flex-start;justify-content:center;padding:16px;}
+.pm-bg{position:absolute;inset:0;}
+.pm-content{position:relative;z-index:1;text-align:center;}
+
+/* ═══ AI FLOAT BUTTON ═══ */
+.ai-fab{position:fixed;bottom:var(--sp-2xl);right:var(--sp-2xl);z-index:500;
+  width:56px;height:56px;border-radius:16px;
+  background:var(--brand-blue);color:#fff;
+  display:grid;place-items:center;box-shadow:0 4px 20px rgba(35,169,246,.45);
+  cursor:pointer;border:3px solid #fff;transition:transform .2s,box-shadow .2s,opacity .3s;}
+.ai-fab:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(35,169,246,.55);}
+.ai-fab.hidden{opacity:0;pointer-events:none;}
+.fab-pulse{position:absolute;inset:-6px;border-radius:20px;
+  border:2px solid rgba(35,169,246,.35);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.7;}50%{transform:scale(1.18);opacity:0;}}
+
+/* ═══ AI PANEL ═══ */
+.ai-panel{position:fixed;right:0;top:var(--nav-h);bottom:0;
+  width:var(--panel-w);background:var(--surface-white);
+  border-left:1px solid var(--border);display:flex;flex-direction:column;z-index:450;
+  box-shadow:-4px 0 24px rgba(0,0,0,.08);
+  transform:translateX(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);}
+.ai-panel.open{transform:translateX(0);}
+
+.panel-head{padding:var(--sp-md) var(--sp-lg);border-bottom:1px solid var(--divider);
+  display:flex;align-items:center;gap:var(--sp-sm);flex-shrink:0;}
+.panel-head__icon{width:30px;height:30px;border-radius:var(--r-md);
+  background:linear-gradient(135deg,#F97316,#FBBF24);display:grid;place-items:center;
+  color:#fff;font-size:15px;flex-shrink:0;}
+.panel-head__title{font-size:15px;font-weight:600;color:var(--title);flex:1;}
+.panel-head__close{width:28px;height:28px;border-radius:var(--r-sm);color:var(--text-regular);
+  display:grid;place-items:center;transition:background .15s;}
+.panel-head__close:hover{background:var(--surface-page);}
+
+/* chat area */
+.chat-body{flex:1;overflow-y:auto;padding:var(--sp-md) var(--sp-lg);
+  display:flex;flex-direction:column;gap:var(--sp-md);}
+
+/* empty / welcome */
+.chat-welcome{text-align:center;padding:var(--sp-xl) 0 var(--sp-md);}
+.chat-welcome__icon{font-size:40px;margin-bottom:var(--sp-sm);}
+.chat-welcome__title{font-size:15px;font-weight:600;color:var(--title);margin-bottom:var(--sp-xs);}
+.chat-welcome__sub{font-size:12px;color:var(--text-regular);line-height:1.7;max-width:30ch;margin:0 auto;}
+.chat-tip{background:var(--surface-ai);border:1px solid #DBE6FF;border-radius:var(--r-md);padding:var(--sp-md);}
+.chat-tip__title{font-size:12px;font-weight:600;color:var(--brand-blue);margin-bottom:var(--sp-xs);}
+.chat-tip__list{font-size:11px;color:var(--text-regular);line-height:1.8;}
+
+/* brand card */
+.brand-mini{background:var(--surface-white);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-sm);}
+.brand-mini__name{font-size:12px;font-weight:600;color:var(--title);}
+.brand-mini__sub{font-size:11px;color:var(--text-regular);margin-top:2px;}
+.brand-mini__tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:var(--sp-xs);}
+.btag{font-size:10px;padding:2px 6px;border-radius:var(--r-tag);background:#F0FDF4;color:#166534;}
+
+/* chat messages */
+.msg{display:flex;flex-direction:column;gap:4px;}
+.msg--user{align-items:flex-end;}
+.msg--ai{align-items:flex-start;}
+.msg__bubble{max-width:88%;padding:var(--sp-xs) var(--sp-sm);border-radius:var(--r-md);font-size:13px;line-height:1.55;}
+.msg--user .msg__bubble{background:var(--brand-blue);color:#fff;border-radius:var(--r-md) 2px var(--r-md) var(--r-md);}
+.msg--ai .msg__bubble{background:var(--surface-ai);border:1px solid #DBE6FF;color:var(--text-primary);border-radius:2px var(--r-md) var(--r-md) var(--r-md);}
+.msg__time{font-size:10px;color:var(--text-placeholder);}
+.msg__refs{display:flex;gap:var(--sp-xs);margin-bottom:4px;}
+.msg-ref-thumb{width:48px;height:48px;border-radius:var(--r-md);overflow:hidden;border:1.5px solid rgba(255,255,255,.4);}
+
+/* generation plan */
+.gen-plan{border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;font-size:13px;}
+.gen-plan__head{display:flex;align-items:center;justify-content:space-between;
+  padding:var(--sp-xs) var(--sp-sm);background:var(--surface-page);border-bottom:1px solid var(--divider);}
+.gen-plan__head-title{font-size:12px;font-weight:600;}
+.badge-conf{background:var(--success-light);color:#166534;padding:2px 8px;border-radius:var(--r-tag);font-size:10px;font-weight:600;}
+.gen-plan__body{padding:var(--sp-sm);}
+.gen-plan__item-name{font-size:12px;font-weight:600;color:var(--title);display:flex;align-items:center;gap:6px;margin-bottom:var(--sp-xs);}
+.gen-meta{display:flex;align-items:center;gap:var(--sp-xs);flex-wrap:wrap;}
+.gmb{display:inline-flex;align-items:center;gap:4px;font-size:11px;
+  padding:2px 8px;border-radius:var(--r-sm);background:var(--surface-page);
+  border:1px solid var(--border);color:var(--text-regular);}
+.gen-plan__refs{display:flex;gap:4px;margin-top:var(--sp-xs);}
+.grt{width:34px;height:34px;border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--border);}
+.status-row{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--success);}
+.spinner{width:14px;height:14px;border:2px solid var(--success-light);border-top-color:var(--success);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── GENERATED POST (full copy + image combined) ── */
+.gen-post{border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;background:var(--surface-white);}
+.gen-post__header{display:flex;align-items:center;gap:var(--sp-xs);padding:var(--sp-sm);}
+.gen-post__av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#0d3320,#1a6640);
+  display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
+.gen-post__brand{font-size:13px;font-weight:600;color:var(--title);}
+.gen-post__meta{font-size:11px;color:var(--text-regular);}
+.gen-post__copy{padding:0 var(--sp-sm) var(--sp-sm);font-size:12px;line-height:1.65;color:var(--text-primary);}
+.gen-post__copy .highlight{color:var(--brand-blue);}
+.gen-post__img-wrap{position:relative;overflow:hidden;cursor:pointer;}
+.gen-post__img-wrap:hover .gen-post__img-hover{opacity:1;}
+.gen-post__img{width:100%;aspect-ratio:1/1;background:linear-gradient(160deg,#0a2218,#134526);position:relative;overflow:hidden;}
+.gen-post__img-hover{position:absolute;inset:0;background:rgba(10,31,44,.55);
+  display:flex;align-items:center;justify-content:center;gap:var(--sp-sm);
+  opacity:0;transition:opacity .2s;}
+.gen-img-btn{display:inline-flex;align-items:center;gap:4px;padding:7px 14px;
+  border-radius:var(--r-full);font-size:12px;font-weight:600;
+  border:1px solid rgba(255,255,255,.8);color:#fff;background:rgba(255,255,255,.12);
+  backdrop-filter:blur(4px);transition:all .15s;cursor:pointer;}
+.gen-img-btn:hover{background:rgba(255,255,255,.28);}
+.gen-img-btn.primary{background:var(--brand-blue);border-color:var(--brand-blue);}
+.gen-post__img-label{padding:var(--sp-xs) var(--sp-sm);background:var(--surface-page);
+  font-size:11px;color:var(--text-regular);display:flex;align-items:center;gap:4px;border-top:1px solid var(--divider);}
+.gen-post__actions{display:flex;gap:var(--sp-xs);padding:var(--sp-xs) var(--sp-sm) var(--sp-sm);flex-wrap:wrap;}
+
+/* ai typing */
+.typing{display:flex;align-items:center;gap:4px;padding:var(--sp-xs) var(--sp-sm);}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--brand-blue);opacity:.4;animation:blink 1.2s infinite;}
+.typing span:nth-child(2){animation-delay:.2s;}
+.typing span:nth-child(3){animation-delay:.4s;}
+@keyframes blink{0%,80%,100%{opacity:.4;}40%{opacity:1;}}
+
+/* ═══ INPUT FOOT ═══ */
+.panel-foot{padding:var(--sp-sm) var(--sp-lg) var(--sp-md);border-top:1px solid var(--divider);flex-shrink:0;}
+
+/* reference chips above input */
+.ref-strip{display:flex;gap:var(--sp-xs);flex-wrap:wrap;margin-bottom:var(--sp-xs);}
+.ref-chip{display:inline-flex;align-items:center;gap:5px;
+  padding:3px 8px 3px 4px;border-radius:var(--r-tag);
+  background:var(--brand-blue-tint);border:1px solid #B3DEFF;font-size:11px;color:var(--brand-blue);}
+.ref-chip__thumb{width:20px;height:20px;border-radius:4px;overflow:hidden;flex-shrink:0;}
+.ref-chip__x{width:14px;height:14px;border-radius:50%;background:rgba(35,169,246,.2);
+  display:grid;place-items:center;cursor:pointer;font-size:9px;margin-left:2px;}
+.ref-chip__x:hover{background:rgba(35,169,246,.4);}
+.img-chip{display:inline-flex;align-items:center;gap:5px;
+  padding:3px 8px 3px 4px;border-radius:var(--r-tag);
+  background:#FFF7F0;border:1px solid #FED7AA;font-size:11px;color:#C2410C;}
+
+.prompt-wrap{border:1.5px solid var(--border);border-radius:var(--r-md);overflow:hidden;
+  transition:border-color .15s;}
+.prompt-wrap.focused{border-color:var(--brand-blue);}
+.prompt-wrap.has-text{border-color:var(--ai-orange);}
+.prompt-ta{width:100%;padding:var(--sp-sm);font-family:inherit;font-size:13px;
+  color:var(--text-primary);background:var(--surface-white);border:none;resize:none;
+  min-height:68px;outline:none;line-height:1.55;}
+.prompt-ta::placeholder{color:var(--text-placeholder);}
+
+/* mention/upload auto-suggest */
+.mention-dropdown{position:absolute;bottom:calc(100% + 6px);left:0;right:0;
+  background:var(--surface-white);border:1px solid var(--border);
+  border-radius:var(--r-md);box-shadow:var(--shadow-float);overflow:hidden;z-index:20;}
+.mention-item{display:flex;align-items:center;gap:var(--sp-sm);padding:var(--sp-sm) var(--sp-md);cursor:pointer;transition:background .12s;}
+.mention-item:hover,.mention-item.active{background:var(--brand-blue-tint);}
+.mention-item__icon{width:30px;height:30px;border-radius:var(--r-md);display:grid;place-items:center;font-size:15px;background:var(--surface-page);flex-shrink:0;}
+.mention-item__name{font-size:13px;font-weight:600;color:var(--title);}
+.mention-item__sub{font-size:11px;color:var(--text-regular);}
+
+.prompt-bar{display:flex;align-items:center;gap:var(--sp-xs);padding:var(--sp-xs) var(--sp-sm);
+  background:var(--surface-page);border-top:1px solid var(--divider);}
+.pbar-btn{width:28px;height:28px;border-radius:var(--r-md);display:grid;place-items:center;
+  color:var(--text-regular);transition:background .15s,color .15s;flex-shrink:0;}
+.pbar-btn:hover{background:var(--divider);color:var(--title);}
+.pbar-btn.plus{background:var(--brand-blue-tint);color:var(--brand-blue);border:1px solid #B3DEFF;}
+.pbar-btn.plus:hover{background:var(--brand-blue);color:#fff;}
+
+/* agent selector */
+.agent-sel{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;
+  border-radius:var(--r-md);font-size:12px;font-weight:500;
+  background:var(--surface-white);border:1px solid var(--border);color:var(--text-primary);
+  cursor:pointer;transition:all .15s;position:relative;}
+.agent-sel:hover,.agent-sel.open{border-color:var(--ai-orange);color:var(--ai-orange);}
+/* AI Agent full-page toolbar pill (agent + ratio selectors) — same shape as .agent-sel/.platform-sel but sized for the compact toolbar */
+.agent-sel-btn{display:inline-flex;align-items:center;border-radius:var(--r-md);
+  background:var(--surface-white);border:1px solid var(--border);color:var(--text-primary);
+  cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;position:relative;}
+.agent-sel-btn:hover,.agent-sel-btn.open{border-color:var(--ai-orange);color:var(--ai-orange);}
+.agent-sel-btn svg{flex-shrink:0;}
+.agent-dd{position:fixed;
+  background:var(--surface-white);border:1px solid var(--border);
+  border-radius:var(--r-md);box-shadow:var(--shadow-float);overflow:hidden;
+  min-width:220px;z-index:460;}
+.agent-opt{display:flex;align-items:center;gap:var(--sp-sm);padding:var(--sp-sm) var(--sp-md);cursor:pointer;transition:background .12s;}
+.agent-opt:hover{background:var(--brand-blue-tint);}
+.agent-opt.sel{background:var(--ai-orange-lt);}
+.agent-opt__av{width:32px;height:32px;border-radius:var(--r-md);display:grid;place-items:center;font-size:16px;flex-shrink:0;}
+.agent-opt__name{font-size:12px;font-weight:600;color:var(--title);}
+.agent-opt__sub{font-size:11px;color:var(--text-regular);}
+
+/* platform selector */
+.platform-sel{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;
+  border-radius:var(--r-md);font-size:12px;font-weight:500;
+  background:var(--surface-white);border:1px solid var(--border);color:var(--text-primary);
+  cursor:pointer;transition:all .15s;position:relative;white-space:nowrap;}
+.platform-sel:hover,.platform-sel.open{border-color:var(--brand-blue);color:var(--brand-blue);}
+.platform-dd{position:fixed;
+  background:var(--surface-white);border:1px solid var(--border);
+  border-radius:var(--r-md);box-shadow:var(--shadow-float);overflow:hidden;
+  min-width:230px;z-index:460;max-height:320px;overflow-y:auto;}
+.plat-group-label{font-size:10px;font-weight:700;color:var(--text-placeholder);
+  text-transform:uppercase;letter-spacing:.5px;padding:var(--sp-xs) var(--sp-md) 2px;
+  background:var(--surface-page);}
+.plat-opt{display:flex;align-items:center;justify-content:space-between;
+  padding:8px var(--sp-md);cursor:pointer;transition:background .12s;gap:var(--sp-md);}
+.plat-opt:hover{background:var(--brand-blue-tint);}
+.plat-opt.sel{background:#EFF6FF;}
+.plat-opt__name{font-size:12px;font-weight:500;color:var(--title);}
+.plat-opt.sel .plat-opt__name{color:var(--brand-blue);font-weight:600;}
+.plat-ratio{font-size:10px;color:var(--text-regular);background:var(--surface-page);
+  border:1px solid var(--border);padding:1px 6px;border-radius:3px;flex-shrink:0;}
+.plat-opt.sel .plat-ratio{background:var(--brand-blue-tint);border-color:#B3DEFF;color:var(--brand-blue);}
+.platform-badge{font-size:10px;color:var(--text-regular);margin-left:3px;opacity:.7;}
+.hidden{display:none!important;}
+
+.char-ct{font-size:10px;color:var(--text-placeholder);margin-left:auto;}
+.send-btn{width:30px;height:30px;border-radius:50%;background:var(--text-placeholder);
+  color:#fff;display:grid;place-items:center;transition:background .15s;flex-shrink:0;}
+.send-btn.ready{background:var(--ai-orange);}
+.send-btn.ready:hover{background:#ea6c0a;}
+
+/* ═══ ADD REFERENCE MODAL ═══ */
+.picker-overlay{position:fixed;inset:0;background:var(--overlay);z-index:600;
+  display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s;}
+.picker-overlay.open{opacity:1;pointer-events:auto;}
+.picker-sheet{background:var(--surface-white);border-radius:var(--r-card) var(--r-card) 0 0;
+  width:100%;display:flex;flex-direction:column;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}
+.picker-overlay.open .picker-sheet{transform:translateY(0);}
+.picker-head{padding:var(--sp-md) var(--sp-lg);border-bottom:1px solid var(--divider);
+  display:flex;align-items:center;gap:var(--sp-md);}
+.picker-head__title{font-size:15px;font-weight:600;color:var(--title);flex:1;}
+.picker-head__close{width:28px;height:28px;border-radius:var(--r-sm);color:var(--text-regular);
+  display:grid;place-items:center;transition:background .15s;}
+.picker-head__close:hover{background:var(--surface-page);}
+
+/* reference slot cards */
+.ref-slots{display:flex;flex-direction:column;gap:var(--sp-sm);padding:var(--sp-lg);}
+.ref-slot{display:flex;align-items:center;gap:var(--sp-md);
+  border:1.5px dashed var(--border);border-radius:var(--r-card);
+  padding:var(--sp-md) var(--sp-lg);cursor:pointer;
+  background:var(--surface-white);transition:all .18s;min-height:80px;}
+.ref-slot:hover{border-color:var(--brand-blue);background:var(--brand-blue-tint);}
+.ref-slot.filled{border-style:solid;border-color:var(--brand-blue);background:var(--brand-blue-subtle);}
+.ref-slot__icon{width:44px;height:44px;border-radius:var(--r-md);
+  background:var(--surface-page);border:1px solid var(--border);
+  display:grid;place-items:center;flex-shrink:0;transition:background .18s;}
+.ref-slot:hover .ref-slot__icon{background:rgba(35,169,246,.1);border-color:var(--brand-blue);}
+.ref-slot.filled .ref-slot__icon{background:var(--brand-blue);border-color:var(--brand-blue);}
+.ref-slot__body{flex:1;}
+.ref-slot__title{font-size:13px;font-weight:600;color:var(--title);}
+.ref-slot__sub{font-size:11px;color:var(--text-regular);margin-top:2px;}
+.ref-slot.filled .ref-slot__title{color:var(--brand-blue);}
+.ref-slot__arrow{color:var(--text-placeholder);transition:color .15s;}
+.ref-slot:hover .ref-slot__arrow{color:var(--brand-blue);}
+.ref-slot.filled .ref-slot__arrow{color:var(--brand-blue);}
+
+/* post selection mode banner */
+.select-mode-bar{position:fixed;top:var(--nav-h);left:0;right:0;z-index:550;
+  background:var(--brand-blue);color:#fff;padding:var(--sp-sm) var(--sp-xl);
+  display:flex;align-items:center;gap:var(--sp-md);font-size:13px;
+  transform:translateY(-100%);transition:transform .25s;}
+.select-mode-bar.active{transform:translateY(0);}
+.select-mode-bar__done{background:#fff;color:var(--brand-blue);padding:5px 16px;
+  border-radius:var(--r-tag);font-size:12px;font-weight:700;margin-left:auto;cursor:pointer;}
+/* buzz cards selectable glow */
+.cc.select-mode{cursor:crosshair;}
+.cc.select-mode:hover{border-color:var(--brand-blue);box-shadow:0 0 0 3px rgba(35,169,246,.18);}
+.cc.buzz-selected{border:2px solid var(--brand-blue);box-shadow:0 0 0 3px rgba(35,169,246,.18);}
+.cc.buzz-selected .cc-sel-badge{display:flex;}
+.cc-sel-badge{display:none;position:absolute;top:var(--sp-xs);right:var(--sp-xs);
+  width:22px;height:22px;border-radius:50%;background:var(--brand-blue);
+  align-items:center;justify-content:center;z-index:2;}
+
+/* ═══ BUTTONS ═══ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-xs);
+  font-size:13px;font-weight:500;padding:var(--sp-xs) var(--sp-md);border-radius:var(--r-md);
+  border:1px solid transparent;transition:all .15s;cursor:pointer;}
+.btn-pri{background:var(--brand-blue);color:#fff;border-color:var(--brand-blue);}
+.btn-pri:hover{background:#1b9bea;}
+.btn-out{background:var(--surface-white);color:var(--brand-blue);border-color:var(--brand-blue);}
+.btn-out:hover{background:var(--brand-blue-tint);}
+.btn-sec{background:var(--surface-white);color:var(--text-regular);border-color:var(--border);}
+.btn-sec:hover{background:var(--surface-page);}
+.btn-org{background:var(--ai-orange);color:#fff;border-color:var(--ai-orange);}
+.btn-org:hover{background:#ea6c0a;}
+
+/* ═══ AI GENERATOR PAGE ═══ */
+#gen-page{display:none;position:fixed;inset:0;background:var(--surface-page);z-index:700;flex-direction:column;}
+#gen-page.on{display:flex;}
+.gp-nav{height:var(--nav-h);background:var(--brand-blue);display:flex;align-items:center;
+  gap:var(--sp-md);padding:0 var(--sp-2xl);color:#fff;flex-shrink:0;}
+.gp-nav__back{display:flex;align-items:center;gap:5px;font-size:14px;font-weight:500;opacity:.85;cursor:pointer;transition:opacity .15s;}
+.gp-nav__back:hover{opacity:1;}
+
+/* Left nav */
+.gp-leftnav{background:var(--surface-white);border-right:1px solid var(--border);overflow-y:auto;padding:var(--sp-sm) 0;display:flex;flex-direction:column;}
+.gp-nav-group{padding:var(--sp-sm) 0;}
+.gp-nav-group + .gp-nav-group{border-top:1px solid var(--divider);margin-top:4px;padding-top:var(--sp-sm);}
+.gp-nav-label{font-size:10px;font-weight:700;color:var(--text-regular);letter-spacing:.6px;text-transform:uppercase;padding:2px var(--sp-md) var(--sp-xs);}
+.gp-navitem{display:flex;align-items:center;gap:10px;padding:9px var(--sp-md);cursor:pointer;transition:background .15s;border-left:3px solid transparent;position:relative;}
+.gp-navitem:hover{background:var(--surface-page);}
+.gp-navitem.active{background:var(--brand-blue-tint);border-left-color:var(--brand-blue);}
+.gp-navitem__icon{width:30px;height:30px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.gp-navitem__info{flex:1;min-width:0;}
+.gp-navitem__label{font-size:12px;font-weight:600;color:var(--text-primary);line-height:1.2;}
+.gp-navitem.active .gp-navitem__label{color:var(--brand-blue);}
+.gp-navitem__sub{font-size:10px;color:var(--text-regular);margin-top:2px;}
+.gp-navitem__count{background:var(--brand-blue);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;flex-shrink:0;min-width:20px;text-align:center;}
+.gp-dest-row{display:flex;align-items:center;gap:7px;padding:7px var(--sp-md);font-size:11px;color:var(--text-regular);}
+.gp-dest-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* Center main */
+.gp-main{overflow-y:auto;padding:var(--sp-xl);background:var(--surface-page);}
+.gp-main-pane{display:none;}
+.gp-main-pane.active{display:block;}
+.gp-pane-head{display:flex;align-items:flex-start;gap:var(--sp-md);margin-bottom:var(--sp-lg);}
+.gp-pane-title{font-size:16px;font-weight:700;color:var(--title);}
+.gp-pane-sub{font-size:12px;color:var(--text-regular);margin-top:3px;}
+.gen-canvas{background:var(--surface-white);border:1px solid var(--border);border-radius:var(--r-card);overflow:hidden;margin-bottom:var(--sp-md);}
+.gen-canvas:last-child{margin-bottom:0;}
+.gen-canvas__label{display:flex;align-items:center;gap:var(--sp-xs);padding:var(--sp-sm) var(--sp-md);border-bottom:1px solid var(--divider);font-size:12px;font-weight:600;color:var(--text-primary);}
+.gen-toolbar{display:flex;align-items:center;gap:var(--sp-xs);padding:var(--sp-sm) var(--sp-md);border-bottom:1px solid var(--divider);flex-wrap:wrap;}
+.tbtn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:var(--r-sm);font-size:12px;border:1px solid var(--border);background:var(--surface-white);color:var(--text-regular);cursor:pointer;transition:all .15s;}
+.tbtn:hover,.tbtn.active{border-color:var(--brand-blue);color:var(--brand-blue);background:var(--brand-blue-tint);}
+.gen-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:var(--sp-md);padding:var(--sp-md);}
+.gi{border-radius:var(--r-md);overflow:hidden;border:1.5px solid var(--border);cursor:pointer;transition:all .2s;}
+.gi:hover{box-shadow:var(--shadow-float);border-color:var(--brand-blue);}
+.gi.sel{border-color:var(--brand-blue);border-width:2px;}
+.gi__img{aspect-ratio:1/1;overflow:hidden;}
+.gi__foot{padding:6px 8px;background:var(--surface-page);font-size:10px;color:var(--text-regular);display:flex;gap:4px;align-items:center;}
+.score{background:#FFF3E0;color:#E65100;padding:1px 5px;border-radius:3px;font-weight:700;font-size:10px;}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:var(--sp-md);padding:var(--sp-md);}
+.vi{border-radius:var(--r-md);overflow:hidden;border:1px solid var(--border);}
+.vi__thumb{aspect-ratio:9/16;background:linear-gradient(160deg,#1e2d4a,#0d1c33);display:flex;align-items:center;justify-content:center;position:relative;}
+.play{width:40px;height:40px;background:rgba(255,255,255,.18);border-radius:50%;display:grid;place-items:center;backdrop-filter:blur(4px);}
+.vdur{position:absolute;bottom:6px;right:8px;background:rgba(0,0,0,.6);color:#fff;font-size:10px;padding:2px 5px;border-radius:3px;}
+
+/* Ad Creative pane */
+.adc-list{display:flex;flex-direction:column;gap:var(--sp-md);}
+.adc-card{background:var(--surface-white);border:1px solid var(--border);border-radius:var(--r-card);overflow:hidden;}
+.adc-card__top{display:flex;}
+.adc-card__img{width:180px;flex-shrink:0;position:relative;}
+.adc-card__fields{flex:1;padding:var(--sp-md);display:flex;flex-direction:column;gap:var(--sp-sm);}
+.adc-field__label{font-size:10px;font-weight:700;color:var(--text-regular);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;}
+.adc-field__val{font-size:12px;color:var(--text-primary);background:var(--surface-page);border:1px dashed var(--border);border-radius:var(--r-sm);padding:5px 8px;line-height:1.5;cursor:text;}
+.adc-field__val:focus{outline:none;border-color:var(--brand-blue);border-style:solid;background:#fff;}
+.adc-cta-row{display:flex;gap:6px;flex-wrap:wrap;}
+.adc-cta-chip{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--brand-blue);color:#fff;cursor:pointer;}
+.adc-cta-chip.alt{background:var(--surface-page);color:var(--text-regular);border:1px solid var(--border);}
+.adc-score-pill{font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;}
+.adc-card__foot{display:flex;gap:var(--sp-xs);padding:var(--sp-sm) var(--sp-md);border-top:1px solid var(--divider);background:var(--surface-page);align-items:center;}
+
+/* AI Post pane */
+.post-fmt-bar{display:flex;gap:4px;margin-bottom:var(--sp-md);}
+.post-fmt-btn{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--border);background:var(--surface-white);color:var(--text-regular);cursor:pointer;transition:all .15s;}
+.post-fmt-btn.active{background:var(--brand-blue);color:#fff;border-color:var(--brand-blue);}
+.post-list{display:flex;flex-direction:column;gap:var(--sp-md);}
+.post-card{background:var(--surface-white);border:1px solid var(--border);border-radius:var(--r-card);overflow:hidden;}
+.post-card__header{display:flex;align-items:center;gap:var(--sp-sm);padding:var(--sp-sm) var(--sp-md);}
+.post-card__av{width:32px;height:32px;border-radius:50%;background:var(--brand-blue);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;}
+.post-card__brand{font-size:12px;font-weight:600;color:var(--title);}
+.post-card__meta{font-size:10px;color:var(--text-regular);}
+.post-card__copy{font-size:12px;color:var(--text-primary);line-height:1.7;padding:0 var(--sp-md) var(--sp-sm);}
+.post-card__foot{display:flex;align-items:center;gap:var(--sp-sm);padding:var(--sp-xs) var(--sp-md);background:var(--surface-page);font-size:10px;color:var(--text-regular);border-top:1px solid var(--divider);}
+.post-card__actions{display:flex;gap:var(--sp-xs);padding:var(--sp-xs) var(--sp-md) var(--sp-sm);border-top:1px solid var(--divider);}
+
+/* sidebar */
+.gp-sidebar{background:var(--surface-white);border-left:1px solid var(--border);overflow-y:auto;padding:var(--sp-md);display:flex;flex-direction:column;gap:var(--sp-md);}
+.gp-card{background:var(--surface-white);border:1px solid var(--border);border-radius:var(--r-card);padding:var(--sp-md);}
+.gp-card__title{font-size:13px;font-weight:600;color:var(--title);margin-bottom:var(--sp-sm);}
+.gp-ref{display:flex;gap:var(--sp-xs);align-items:center;}
+.gp-ref-img{width:72px;height:72px;border-radius:var(--r-md);overflow:hidden;border:2px solid var(--brand-blue);flex-shrink:0;}
+.gp-ref-info{font-size:11px;color:var(--text-regular);}
+.gp-ref-brand{font-size:12px;font-weight:600;color:var(--title);}
+.prompt-box{border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-sm);font-size:12px;color:var(--text-primary);background:var(--surface-ai);line-height:1.6;}
+.gp-actions{display:flex;flex-direction:column;gap:var(--sp-xs);}
+.gp-actions .btn{width:100%;justify-content:center;font-size:13px;}
+.cscore{background:#E0F2FE;color:#0369A1;padding:2px 7px;border-radius:var(--r-sm);font-size:10px;font-weight:600;}
+.iscore{background:#FFF3E0;color:#E65100;padding:2px 7px;border-radius:var(--r-sm);font-size:10px;font-weight:600;}
+.cstrip{display:flex;gap:var(--sp-sm);padding:var(--sp-md);overflow-x:auto;}
+.cframe{flex-shrink:0;width:150px;border-radius:var(--r-md);overflow:hidden;border:1px solid var(--border);}
+.cframe__img{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;padding:16px;}
+.cframe__num{padding:4px 8px;font-size:10px;text-align:center;color:var(--text-regular);background:var(--surface-page);}
+
+/* ── AI Generator page: tabs ── */
+.gp-tab-bar{display:flex;gap:2px;padding:var(--sp-md) var(--sp-xl) 0;border-bottom:1px solid var(--divider);background:var(--surface-white);flex-shrink:0;}
+.gp-tab{padding:7px 16px;font-size:13px;font-weight:500;color:var(--text-regular);border-bottom:2px solid transparent;cursor:pointer;transition:color .15s,border-color .15s;}
+.gp-tab.active{color:var(--brand-blue);border-bottom-color:var(--brand-blue);font-weight:600;}
+.gp-tab:hover:not(.active){color:var(--text-primary);}
+.gp-tab__count{font-size:11px;color:var(--text-regular);background:var(--surface-page);border:1px solid var(--border);padding:1px 6px;border-radius:var(--r-tag);margin-left:4px;}
+.gp-tab.active .gp-tab__count{background:var(--brand-blue-tint);border-color:#B3DEFF;color:var(--brand-blue);}
+
+/* ── AI Assets: filter bar ── */
+.assets-filter-bar{display:flex;align-items:center;gap:var(--sp-xs);padding:var(--sp-sm) var(--sp-xl);border-bottom:1px solid var(--divider);background:var(--surface-white);flex-shrink:0;position:relative;z-index:20;}
+.filter-dd{position:relative;}
+.filter-dd.dd-disabled{display:none;}
+.size-filter-sel{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--r-md);font-size:12px;font-weight:500;background:var(--surface-white);border:1px solid var(--border);color:var(--text-primary);cursor:pointer;transition:all .15s;user-select:none;}
+.size-filter-sel:hover,.filter-dd.open .size-filter-sel{border-color:var(--brand-blue);color:var(--brand-blue);}
+.filter-dd__caret{transition:transform .15s;}
+.filter-dd.open .filter-dd__caret{transform:rotate(180deg);}
+.filter-dd__menu{position:absolute;top:calc(100% + 6px);left:0;background:#fff;border:1px solid var(--border);border-radius:var(--r-md);box-shadow:var(--shadow-float);padding:4px;min-width:110px;z-index:50;display:none;flex-direction:column;gap:1px;}
+.filter-dd.open .filter-dd__menu{display:flex;}
+.filter-dd__opt{padding:6px 10px;font-size:12px;border-radius:6px;color:var(--text-primary);cursor:pointer;white-space:nowrap;}
+.filter-dd__opt:hover{background:var(--surface-page);}
+.filter-dd__opt.active{color:var(--brand-blue);font-weight:600;background:var(--brand-blue-tint);}
+.assets-sort-lbl{font-size:12px;color:var(--text-regular);margin-left:auto;}
+
+/* ── Asset card (every thumbnail forced to a 1:1 grid tile; ratio badge still shows the real ratio) ── */
+.asset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:var(--sp-md);padding:var(--sp-xl);align-items:start;}
+.asset-card{background:var(--surface-white);border:1.5px solid var(--border);border-radius:4px;overflow:visible;cursor:pointer;transition:box-shadow .2s,border-color .2s;position:relative;}
+.asset-card:hover{box-shadow:var(--shadow-float);border-color:var(--brand-blue);}
+.asset-card.selected{border-color:var(--brand-blue);border-width:2px;box-shadow:0 0 0 3px rgba(35,169,246,.18);}
+.asset-card__thumb{width:100%;aspect-ratio:1/1!important;position:relative;overflow:hidden;cursor:zoom-in;}
+.asset-card__hover{position:absolute;inset:0;background:rgba(10,31,44,.5);opacity:0;transition:opacity .2s;display:flex;align-items:center;justify-content:center;gap:var(--sp-xs);flex-wrap:wrap;padding:var(--sp-sm);}
+.asset-card:hover .asset-card__hover{opacity:1;}
+.ah-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:var(--r-full);font-size:11px;font-weight:600;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.6);color:#fff;backdrop-filter:blur(4px);cursor:pointer;transition:background .15s;white-space:nowrap;}
+.ah-btn:hover{background:rgba(255,255,255,.3);}
+.ah-btn.pri{background:var(--brand-blue);border-color:var(--brand-blue);}
+.asset-card__sel-badge{position:absolute;top:var(--sp-xs);right:var(--sp-xs);width:22px;height:22px;border-radius:50%;background:var(--brand-blue);display:none;align-items:center;justify-content:center;z-index:3;}
+.asset-card.selected .asset-card__sel-badge{display:flex;}
+.asset-card__meta{padding:6px var(--sp-sm) 8px;display:flex;flex-direction:column;gap:3px;border-top:1px solid var(--divider);}
+.asset-card__tags{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
+.asset-tag{font-size:10px;font-weight:600;padding:1px 6px;border-radius:3px;background:var(--surface-page);border:1px solid var(--border);color:var(--text-regular);}
+.asset-tag.ratio{background:rgba(35,169,246,.1);border-color:rgba(35,169,246,.3);color:var(--brand-blue);}
+.asset-tag.size{background:rgba(249,115,22,.1);border-color:rgba(249,115,22,.3);color:#C2650A;}
+.asset-tag.res{background:rgba(82,196,26,.1);border-color:rgba(82,196,26,.3);color:#3B8C11;}
+.asset-tag.dur{background:rgba(147,51,234,.1);border-color:rgba(147,51,234,.3);color:#9333EA;}
+.asset-card__time{font-size:10px;color:var(--text-regular);margin-top:1px;}
+.asset-card__hover{z-index:4;}
+.assets-empty-state{display:none;grid-column:1/-1;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:60px 20px;color:var(--text-regular);text-align:center;}
+.assets-empty-state.show{display:flex;}
+.assets-empty-state__title{font-size:14px;font-weight:600;color:var(--text-primary);}
+.assets-empty-state__clear{margin-top:4px;font-size:12px;font-weight:600;color:var(--brand-blue);cursor:pointer;padding:5px 14px;border:1px solid var(--brand-blue);border-radius:var(--r-full);}
+
+/* ── Selection mode bar (bottom of gen-page) ── */
+.gen-sel-bar{position:fixed;bottom:0;left:0;right:0;z-index:800;background:var(--brand-blue);color:#fff;padding:var(--sp-sm) var(--sp-xl);display:flex;align-items:center;gap:var(--sp-md);font-size:13px;transform:translateY(100%);transition:transform .25s;}
+.gen-sel-bar.active{transform:translateY(0);}
+.gen-sel-bar__count{background:rgba(255,255,255,.2);padding:2px 10px;border-radius:var(--r-tag);font-size:12px;}
+.gen-sel-bar__confirm{background:#fff;color:var(--brand-blue);padding:6px 18px;border-radius:var(--r-tag);font-size:12px;font-weight:700;cursor:pointer;margin-left:auto;}
+.gen-sel-bar__cancel{font-size:12px;opacity:.8;cursor:pointer;}
+
+/* ── Creative Agent output: image/video grid only ── */
+.creative-out{border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;}
+.creative-out__grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--divider);}
+.creative-out__item{position:relative;cursor:pointer;overflow:hidden;}
+.creative-out__item:hover .gen-post__img-hover{opacity:1;}
+.creative-out__label{padding:6px var(--sp-sm);background:var(--surface-page);font-size:10px;color:var(--text-regular);display:flex;align-items:center;gap:4px;}
+.creative-out__actions{display:flex;gap:var(--sp-xs);padding:var(--sp-xs) var(--sp-sm) var(--sp-sm);flex-wrap:wrap;background:var(--surface-white);}
+
+/* ── Ad Creative Agent output: image + ad fields ── */
+.ad-creative-out{border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;background:var(--surface-white);}
+.ad-creative-out__img{position:relative;cursor:pointer;}
+.ad-creative-out__img:hover .gen-post__img-hover{opacity:1;}
+.ad-fields{padding:var(--sp-sm) var(--sp-md);display:flex;flex-direction:column;gap:var(--sp-xs);}
+.ad-field{display:flex;flex-direction:column;gap:3px;}
+.ad-field__label{font-size:10px;font-weight:600;color:var(--text-regular);text-transform:uppercase;letter-spacing:.4px;}
+.ad-field__val{font-size:12px;color:var(--text-primary);background:var(--surface-page);border:1px solid var(--border);border-radius:var(--r-sm);padding:5px 8px;line-height:1.5;}
+.ad-field__val.editable{border-style:dashed;cursor:text;}
+.ad-field__val.editable:focus{outline:none;border-color:var(--brand-blue);border-style:solid;background:#fff;}
+.ad-cta-row{display:flex;gap:var(--sp-xs);align-items:center;flex-wrap:wrap;}
+.ad-cta-chip{padding:4px 12px;border-radius:var(--r-tag);font-size:11px;font-weight:600;background:var(--brand-blue);color:#fff;cursor:pointer;}
+.ad-cta-chip.alt{background:var(--surface-page);color:var(--text-regular);border:1px solid var(--border);}
+.ad-creative-out__actions{display:flex;gap:var(--sp-xs);padding:var(--sp-xs) var(--sp-md) var(--sp-md);flex-wrap:wrap;border-top:1px solid var(--divider);}
+
+/* ── Image attachment card style (chat bubble) ── */
+.img-attach-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.img-attach{width:148px;border-radius:var(--r-md);overflow:hidden;border:1px solid var(--border);cursor:pointer;position:relative;flex-shrink:0;background:var(--surface-page);transition:box-shadow .15s;}
+.img-attach:hover{box-shadow:0 4px 14px rgba(0,0,0,.12);}
+.img-attach__thumb{width:148px;height:148px;display:block;object-fit:cover;}
+.img-attach__foot{padding:6px 8px 8px;background:var(--surface-white);}
+.img-attach__name{font-size:11px;font-weight:600;color:var(--title);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.img-attach__meta{font-size:10px;color:var(--text-regular);margin-top:1px;display:flex;align-items:center;gap:4px;}
+.img-attach__badge{background:var(--ai-orange-lt);color:var(--ai-orange);font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;}
+.img-attach__hover{position:absolute;inset:0;background:rgba(10,25,40,.5);opacity:0;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .15s;height:148px;}
+.img-attach:hover .img-attach__hover{opacity:1;}
+.img-attach__hbtn{padding:5px 10px;border-radius:var(--r-sm);font-size:11px;font-weight:600;border:none;cursor:pointer;}
+.img-attach__hbtn.pri{background:var(--brand-blue);color:#fff;}
+.img-attach__hbtn.sec{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.3);}
+.attach-actions{display:flex;gap:var(--sp-xs);margin-top:10px;flex-wrap:wrap;}
+
+/* ── Per-image generated card ── */
+.gen-img-card{border:1.5px solid var(--border);border-radius:var(--r-card);overflow:hidden;margin-top:10px;background:var(--surface-white);}
+.gen-img-card__thumb{width:100%;aspect-ratio:1/1;background:var(--surface-page);position:relative;overflow:hidden;}
+.gen-img-card__thumb-inner{width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:14px;}
+/* info label overlaid on thumb bottom */
+.gen-img-card__info{position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;font-weight:500;padding:2px 6px;border-radius:10px;pointer-events:none;line-height:1.4;}
+/* hover overlay with icon buttons */
+.gen-img-card__hover{position:absolute;inset:0;background:rgba(10,25,40,.45);opacity:0;transition:opacity .18s;display:flex;align-items:center;justify-content:center;gap:10px;}
+.gen-img-card__thumb:hover .gen-img-card__hover{opacity:1;}
+.gen-img-card__icon-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;flex-shrink:0;}
+.gen-img-card__icon-btn:hover{background:rgba(255,255,255,.32);}
+/* bottom action row */
+.gen-img-card__actions{display:flex;gap:6px;padding:7px 8px 8px;}
+.gen-img-card__btn{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1.5px solid var(--border);background:var(--surface-white);color:var(--text-primary);cursor:pointer;transition:background .15s;white-space:nowrap;}
+.gen-img-card__btn:hover{background:var(--surface-page);}
+.gen-img-card__btn.regen{background:var(--surface-page);border-color:var(--border);}
+.gen-img-card__btn.edit-btn{font-size:10px;padding:3px 10px;color:var(--text-regular);}
+.gen-img-card__btn.cite-btn{padding:4px 12px;font-size:12px;font-weight:600;color:var(--text-primary);border-color:var(--border);background:var(--surface-page);flex:0 0 auto;}
+
+/* ── Generating progress card ── */
+.gen-img-card.generating .gen-img-card__thumb{background:var(--surface-page);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
+.gen-progress-wrap{width:80%;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.gen-progress-label{font-size:11px;color:var(--text-regular);}
+.gen-progress-bar{width:100%;height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+.gen-progress-fill{height:100%;background:var(--brand-blue);border-radius:2px;width:0%;transition:width .6s ease;}
+
+/* ── Image lightbox ── */
+.img-lightbox{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:1300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+.img-lightbox.open{opacity:1;pointer-events:auto;}
+.img-lightbox__inner{position:relative;max-width:min(680px,90vw);max-height:88vh;border-radius:var(--r-card);overflow:hidden;}
+.img-lightbox__img{width:100%;height:100%;display:block;object-fit:cover;}
+.img-lightbox__close{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.55);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.img-lightbox__close:hover{background:rgba(0,0,0,.75);}
+.img-lightbox__content{width:min(680px,90vw);max-height:88vh;}
+
+/* ── View Prompt modal ── */
+.vp-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+.vp-overlay.open{opacity:1;pointer-events:auto;}
+.vp-sheet{background:#fff;border-radius:var(--r-modal);width:min(480px,92vw);max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.18);}
+.vp-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid var(--divider);}
+.vp-head__title{font-size:16px;font-weight:700;color:var(--title);}
+.vp-close{background:none;border:none;cursor:pointer;color:var(--text-regular);padding:4px;}
+.vp-section{padding:16px 20px;border-bottom:1px solid var(--divider);}
+.vp-section:last-child{border-bottom:none;}
+.vp-section__label{font-size:11px;font-weight:600;color:var(--text-placeholder);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+.vp-ref-thumb{width:72px;height:72px;border-radius:var(--r-sm);object-fit:cover;border:1px solid var(--border);}
+.vp-prompt-text{font-size:13px;color:var(--text-primary);line-height:1.6;white-space:pre-wrap;}
+.vp-copy-btn{float:right;background:none;border:none;cursor:pointer;color:var(--text-regular);padding:2px;}
+.vp-copy-btn:hover{color:var(--brand-blue);}
+.vp-meta-row{display:flex;gap:0;flex-direction:column;}
+.vp-meta-item{display:flex;padding:5px 0;font-size:13px;gap:16px;}
+.vp-meta-item__key{color:var(--text-regular);min-width:110px;}
+.vp-meta-item__val{color:var(--text-primary);font-weight:500;}
+
+/* ── VP Reference Post card ── */
+.vp-ref-post{border:1px solid var(--border);border-radius:var(--r-card);overflow:hidden;background:var(--surface-white);max-width:240px;}
+.vp-ref-post__head{display:flex;align-items:center;gap:8px;padding:10px 12px 8px;}
+.vp-ref-post__av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#b8922e,#7a5520);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;}
+.vp-ref-post__name{font-size:12px;font-weight:600;color:var(--title);line-height:1.2;}
+.vp-ref-post__date{font-size:10px;color:var(--text-regular);}
+.vp-ref-post__img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;}
+.vp-ref-post__img-placeholder{width:100%;aspect-ratio:4/3;display:flex;flex-direction:column;justify-content:space-between;padding:14px;}
+.vp-ref-post__caption{padding:8px 12px 10px;font-size:11px;color:var(--text-primary);line-height:1.55;}
+.vp-ref-post__more{color:var(--brand-blue);cursor:pointer;font-size:11px;}
+
+/* tip rows */
+.chat-tip__list{font-size:12px;color:var(--text-regular);display:flex;flex-direction:column;gap:6px;}
+.tip-row{display:flex;align-items:center;gap:8px;}
+.tip-key{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:20px;
+  padding:0 5px;border-radius:4px;font-size:11px;font-weight:700;
+  background:var(--surface-page);border:1px solid var(--border);color:var(--text-primary);flex-shrink:0;}
+
+/* setup prompt (onboarding) */
+.setup-prompt{display:flex;align-items:center;gap:var(--sp-sm);
+  padding:var(--sp-sm) var(--sp-md);border:1px dashed var(--border);border-radius:var(--r-md);
+  cursor:pointer;transition:border-color .15s,background .15s;}
+.setup-prompt:hover{border-color:var(--brand-blue);background:var(--brand-blue-tint);}
+.setup-prompt__dot{width:8px;height:8px;border-radius:50%;background:var(--warning);flex-shrink:0;}
+.setup-prompt__label{font-size:12px;color:var(--text-regular);}
+.setup-prompt__action{font-size:12px;font-weight:600;color:var(--brand-blue);}
+
+/* welcome (remove icon spacing) */
+.chat-welcome{text-align:center;padding:var(--sp-lg) 0 var(--sp-md);}
+.chat-welcome__title{font-size:15px;font-weight:600;color:var(--title);margin-bottom:var(--sp-xs);}
+.chat-welcome__sub{font-size:12px;color:var(--text-regular);line-height:1.7;max-width:32ch;margin:0 auto;}
+.chat-tip__title{font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:var(--sp-sm);}
+
+/* ── Left nav AI Generator module ── */
+.nav-section-label{font-size:10px;font-weight:700;color:var(--text-placeholder);
+  letter-spacing:.6px;text-transform:uppercase;padding:var(--sp-sm) var(--sp-md) 4px;
+  margin-top:var(--sp-xs);}
+.nav-ai-gen{border-top:1px solid var(--divider);margin-top:var(--sp-sm);padding-top:var(--sp-sm);}
+.nav-ai-gen__item{display:flex;align-items:center;gap:8px;padding:7px var(--sp-md);
+  font-size:12px;font-weight:500;color:var(--text-primary);cursor:pointer;
+  transition:background .15s;border-radius:0;}
+.nav-ai-gen__item:hover{background:var(--brand-blue-tint);color:var(--brand-blue);}
+.nav-ai-gen__icon{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;}
+.nav-ai-gen__count{margin-left:auto;font-size:10px;color:var(--text-placeholder);}
+.nav-ai-thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;
+  padding:4px var(--sp-md) var(--sp-sm);cursor:pointer;}
+.nav-ai-thumb{border-radius:4px;overflow:hidden;aspect-ratio:1/1;}
+.nav-ai-more{font-size:11px;color:var(--brand-blue);padding:0 var(--sp-md) var(--sp-sm);cursor:pointer;}
+.nav-ai-more:hover{text-decoration:underline;}
+
+/* ── Panel: state classes ── */
+.panel-head__title-wrap{display:flex;align-items:center;gap:6px;flex:1;min-width:0;}
+.panel-mode-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;flex-shrink:0;}
+
+/* ── Ad Advisor panel UI ── */
+#welcomeAdvisor{display:none;flex-direction:column;height:100%;}
+#welcomeAdvisor.visible{display:flex;}
+.aa-chart-mock{flex-shrink:0;height:200px;background:var(--surface-white);
+  border:1px solid var(--border);border-radius:var(--r-md);margin-bottom:var(--sp-md);
+  overflow:hidden;position:relative;}
+.aa-chart-mock__blur{width:100%;height:100%;display:flex;flex-direction:column;gap:12px;padding:20px;
+  filter:blur(6px);pointer-events:none;user-select:none;}
+.aa-chart-bar{height:10px;border-radius:5px;background:linear-gradient(90deg,#3B82F6,#8B5CF6);}
+.aa-chart-bar.red{background:linear-gradient(90deg,#F87171,#EF4444);}
+.aa-prompts{display:flex;flex-direction:column;gap:var(--sp-xs);margin-bottom:var(--sp-md);}
+.aa-prompt-card{display:flex;align-items:center;gap:var(--sp-sm);
+  background:var(--surface-page);border:1px solid var(--border);border-radius:var(--r-md);
+  padding:var(--sp-sm) var(--sp-md);cursor:pointer;transition:border-color .15s,background .15s;}
+.aa-prompt-card:hover{border-color:var(--brand-blue);background:var(--brand-blue-tint);}
+.aa-prompt-card__icon{width:30px;height:30px;border-radius:var(--r-sm);background:var(--surface-white);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.aa-prompt-card__text{font-size:12px;color:var(--text-primary);line-height:1.45;}
+
+/* Ad Advisor bottom bar */
+.aa-foot{border-top:1px solid var(--divider);padding:var(--sp-xs) var(--sp-sm);}
+.aa-ctx-chips{display:flex;gap:5px;flex-wrap:wrap;padding:6px 0 4px;}
+.aa-ctx-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;
+  background:var(--surface-page);border:1px solid var(--border);border-radius:var(--r-sm);
+  padding:3px 8px;color:var(--text-primary);}
+.aa-ctx-chip__x{color:var(--text-placeholder);cursor:pointer;font-size:10px;line-height:1;}
+.aa-ctx-chip__x:hover{color:var(--danger);}
+.aa-input-row{display:flex;align-items:center;gap:var(--sp-sm);padding:4px 0;}
+.aa-input-plus{width:28px;height:28px;border-radius:var(--r-md);background:var(--surface-page);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;cursor:pointer;color:var(--text-regular);}
+.aa-input-plus:hover{background:var(--brand-blue-tint);border-color:var(--brand-blue);color:var(--brand-blue);}
+.aa-input-field{flex:1;font-size:13px;color:var(--text-placeholder);background:none;caret-color:var(--brand-blue);}
+.aa-input-field:focus{outline:none;color:var(--text-primary);}
+.aa-send-btn{width:30px;height:30px;border-radius:50%;background:var(--text-placeholder);
+  color:#fff;display:grid;place-items:center;flex-shrink:0;transition:background .15s;}
+.aa-send-btn.ready{background:var(--ai-orange);}
+.aa-disclaimer{font-size:10px;color:var(--text-placeholder);text-align:center;padding:4px 0 2px;}
+
+/* ── Panel: blank (Auto) state ── */
+#welcomeBlank{display:none;flex:1;}
+#welcomeBlank.visible{display:block;}
+
+/* ── Panel head: dynamic title ── */
+.panel-state-img .panel-head__title{display:none;}
+
+/* ── AI Agent full page ── */
+.content{position:relative;}
+#aiAgentPage{display:none;position:fixed;top:var(--nav-h);left:var(--sidebar-w);right:0;bottom:0;background:var(--surface-page);z-index:50;flex-direction:row;overflow:hidden;}
+#aiAgentPage.on{display:flex;}
+
+/* History sidebar */
+.aa-history{width:240px;flex-shrink:0;background:var(--surface-white);border-right:1.5px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.aa-history__head{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 10px;border-bottom:1px solid var(--border);}
+.aa-history__title{font-size:13px;font-weight:700;color:var(--text-primary);}
+.aa-history__new{width:26px;height:26px;border-radius:8px;background:var(--brand-blue);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.aa-history__list{flex:1;overflow-y:auto;padding:6px 0;}
+.aa-history__date{font-size:10px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;padding:10px 14px 4px;letter-spacing:.04em;}
+.aa-conv-item{padding:8px 10px;cursor:pointer;border-radius:8px;margin:1px 6px;display:flex;flex-direction:column;gap:2px;}
+.aa-conv-item:hover{background:var(--surface-page);}
+.aa-conv-item.aa-active{background:var(--brand-blue);}
+.aa-conv-item__name{font-size:12px;font-weight:600;color:var(--text-primary);}
+.aa-conv-item.aa-active .aa-conv-item__name{color:#fff;}
+.aa-conv-item__sub{font-size:10px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.aa-conv-item.aa-active .aa-conv-item__sub{color:rgba(255,255,255,.7);}
+
+/* Main area */
+.aa-main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;background:var(--surface-page);}
+.aa-main__head{padding:14px 24px 10px;border-bottom:1px solid var(--border);background:var(--surface-white);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.aa-main__head-title{font-size:14px;font-weight:700;color:var(--text-primary);flex:1;}
+.aa-agent-badge{padding:4px 10px;border-radius:var(--r-tag);border:1.5px solid var(--border);font-size:11px;font-weight:600;color:var(--text-secondary);background:var(--surface-white);display:flex;align-items:center;gap:5px;}
+.aa-msgs{flex:1;overflow-y:auto;padding:24px 28px 12px;display:flex;flex-direction:column;gap:14px;}
+.aa-input-wrap{border-top:1.5px solid var(--border);background:var(--surface-white);padding:10px 16px 12px;flex-shrink:0;}
+.aa-input-box{border:1.5px solid var(--border);border-radius:var(--r-card);background:var(--surface-white);overflow:hidden;}
+.aa-input-row{display:flex;align-items:flex-start;gap:0;padding:8px 10px 4px;}
+.aa-textarea{flex:1;border:none;outline:none;font-family:inherit;font-size:13px;color:var(--text-primary);resize:none;height:40px;background:transparent;line-height:1.5;padding:0;}
+.aa-toolbar{display:flex;align-items:center;gap:6px;padding:4px 8px 8px;}
+.aa-plus-btn{width:28px;height:28px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface-white);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--text-secondary);font-weight:300;}
+.aa-send-btn{width:30px;height:30px;border-radius:8px;background:var(--brand-blue);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-left:auto;}
+.aa-input-hint{font-size:10px;color:var(--text-secondary);margin-top:4px;padding:0 4px;}
+</style>
+</head>
+<body>
+
+<!-- ═══ TOP NAV ═══ -->
+<nav class="nav">
+  <div class="nav__logo">
+    <div class="nav__logo-icon">M</div>
+    MEDIA<span style="font-weight:400;opacity:.9">LENS</span>
+  </div>
+  <div class="nav__right">
+    <span class="nav__user">PL – Hong Kong</span>
+    <div class="nav__avatar">JL</div>
+  </div>
+</nav>
+
+<!-- ═══ MAIN SHELL ═══ -->
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar__org">
+      <div class="sidebar__av">P</div>
+      <div class="sidebar__name">PL – Hong Kong</div>
+      <div class="sidebar__sub">Admin · Julie-Free-Connect 1 Page</div>
+    </div>
+    <button class="nav-item">Dashboard</button>
+    <button class="nav-item">My Pages</button>
+    <button class="nav-item">Competitor Analysis</button>
+    <button class="nav-item active">Buzz (Market Insights)</button>
+    <button class="nav-item">Leader Board</button>
+    <button class="nav-item">Social Listening</button>
+    <button class="nav-item">Social Pulses</button>
+    <button class="nav-item">Ad Manager</button>
+    <button class="nav-item">Ad Intelligence</button>
+    <button class="nav-item">Report Scheduler</button>
+    <button class="nav-item">AIGC</button>
+    <button class="nav-item" id="navAiAgent" onclick="openAiAgentPage()">AI Agent</button>
+
+    <!-- AI Generator module -->
+    <div class="nav-ai-gen">
+      <div class="nav-section-label">AI Generator</div>
+      <div class="nav-ai-gen__item" onclick="openGenPage()">
+        <div class="nav-ai-gen__icon" style="background:#EFF6FF;">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x=".5" y=".5" width="4.5" height="4.5" rx="1" fill="#3B82F6"/><rect x="7" y=".5" width="4.5" height="4.5" rx="1" fill="#3B82F6" opacity=".5"/><rect x=".5" y="7" width="4.5" height="4.5" rx="1" fill="#3B82F6" opacity=".4"/><rect x="7" y="7" width="4.5" height="4.5" rx="1" fill="#3B82F6" opacity=".25"/></svg>
+        </div>
+        Assets
+        <span class="nav-ai-gen__count">7</span>
+      </div>
+      <div class="nav-ai-gen__item" onclick="openGenPage()">
+        <div class="nav-ai-gen__icon" style="background:#FFF7ED;">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x=".5" y="2" width="11" height="8" rx="1.5" stroke="#F97316" stroke-width="1.1"/><path d="M3 5.5h4M3 7.5h2.5" stroke="#F97316" stroke-width="1" stroke-linecap="round"/><rect x="8" y="4" width="2.5" height="4" rx=".8" fill="#F97316" opacity=".6"/></svg>
+        </div>
+        AI Ad Creative
+        <span class="nav-ai-gen__count">2</span>
+      </div>
+      <div class="nav-ai-gen__item" onclick="openGenPage()">
+        <div class="nav-ai-gen__icon" style="background:#F0FDF4;">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="1.5" stroke="#22C55E" stroke-width="1.1"/><path d="M3.5 4h5M3.5 6.5h3.5M3.5 9h2" stroke="#22C55E" stroke-width="1" stroke-linecap="round"/></svg>
+        </div>
+        AI Post
+        <span class="nav-ai-gen__count">1</span>
+      </div>
+      <!-- Recent thumbnails -->
+      <div class="nav-ai-thumbs" onclick="openGenPage()">
+        <div class="nav-ai-thumb" style="background:linear-gradient(135deg,#0a2218,#134526);"></div>
+        <div class="nav-ai-thumb" style="background:linear-gradient(135deg,#1a0533,#3b0f6e);"></div>
+        <div class="nav-ai-thumb" style="background:linear-gradient(135deg,#3a1a0a,#5a2a10);"></div>
+      </div>
+      <div class="nav-ai-more" onclick="openGenPage()">View all generated content →</div>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content" id="mainContent">
+
+    <div class="page-tabs">
+      <button class="ptab active">Posts</button>
+      <button class="ptab">Keywords</button>
+      <button class="ptab">Topics<span class="bdot"></span></button>
+      <button class="ptab">LIHKG</button>
+    </div>
+
+    <!-- Filter row 1 -->
+    <div class="filter-bar" style="margin-bottom:var(--sp-xs)">
+      <span style="font-size:12px;color:var(--text-regular);">What's Viral</span>
+      <button class="fb watch">My Watchlists
+        <span style="background:var(--brand-blue);color:#fff;font-size:10px;padding:1px 6px;border-radius:var(--r-tag);">Dr.Once – Hair</span>
+        ▾</button>
+    </div>
+
+    <!-- Filter row 2 -->
+    <div class="filter-bar" style="margin-bottom:var(--sp-xs)">
+      <button class="fb active">Top 25% Engagements ▾</button>
+      <button class="fb active">Last 28 days ▾</button>
+      <button class="fb">Chatbot</button>
+      <div class="fdiv"></div>
+      <button class="fb purple">Boosted ▾</button>
+      <button class="fb">Post Type ▾</button>
+      <button class="fb">AI category ▾</button>
+      <button class="fb">Keywords ▾</button>
+    </div>
+
+    <!-- Filter chips -->
+    <div class="filter-bar" style="margin-bottom:var(--sp-md)">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:var(--text-regular)"><path d="M2 4h10M4 7h6M6 10h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <span class="chip">Kérastase ✕</span>
+      <span class="chip">Aveda ✕</span>
+      <span class="chip">Apivita ✕</span>
+      <span class="chip">(+22 pages)... ✕</span>
+      <span class="chip" style="background:#F0F0FF;color:#6D28D9;border-color:#C4B5FD;">Boosted Post ✕</span>
+      <button class="btn btn-sec" style="margin-left:auto;font-size:12px;padding:3px 10px;">Clear All</button>
+      <button class="btn btn-pri" style="font-size:12px;padding:3px 10px;">Apply</button>
+    </div>
+
+    <!-- Sort row -->
+    <div class="sort-row">
+      <span class="sort-lbl">Sort By</span>
+      <button class="sort-btn active">Date</button>
+      <button class="sort-btn">Likes</button>
+      <button class="sort-btn">Views</button>
+      <button class="sort-btn">Comments</button>
+      <button class="sort-btn">Engagements</button>
+    </div>
+
+    <!-- Creative Grid -->
+    <div class="creative-grid">
+
+      <!-- Card 1: Yves Rocher Top 25% -->
+      <div class="cc" id="bcard-0">
+        <div class="cc__badge b25">Top 25%</div>
+        <div class="cc__head">
+          <div class="pav pav-yr">YR</div>
+          <div><div class="cc__name">Yves Rocher Hong Kong</div><div class="cc__date">16 Jun 2026 17:30</div></div>
+        </div>
+        <div class="cc__tags">
+          <span class="ctag ctag-of">Official</span><span class="ctag ctag-bo">Boosted</span><span class="ctag ctag-br">Yves Rocher</span>
+        </div>
+        <div class="cc__img">
+          <div class="cc-clone-overlay"><button class="cc-clone-btn" onclick="event.stopPropagation();cloneAd(0)">🔁 Clone Creative</button></div>
+          <div style="width:100%;height:100%;background:linear-gradient(160deg,#b8922e,#7a5520);display:flex;align-items:center;justify-content:center;">
+            <div style="text-align:center;padding:20px;position:relative;z-index:1;">
+              <div style="font-size:17px;font-weight:700;color:#fff;line-height:1.3;margin-bottom:4px;text-shadow:0 1px 4px rgba(0,0,0,.3);">30+升級護膚智慧</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.85);margin-bottom:12px;">幹細胞活顏高效護理</div>
+              <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-start;">
+                <div style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:5px 9px;font-size:9px;color:#fff;font-weight:600;">極致提升<br><span style="opacity:.75;font-size:8px;">細胞再生力</span></div>
+                <div style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:5px 9px;font-size:9px;color:#fff;font-weight:600;">精準修正<br><span style="opacity:.75;font-size:8px;">老化痕跡</span></div>
+                <div style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:5px 9px;font-size:9px;color:#fff;font-weight:600;">高效喚醒<br><span style="opacity:.75;font-size:8px;">年輕光澤</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cc__cap">30+升級護膚智慧 | 幹細胞活顏高效護理 🌟不論 30+ 定 40+，當你學識護膚嘅智慧💡，就唔使再盲目追求絕齡，都可以展現出當下最好嘅黃金狀態✨！</div>
+        <div class="show-more">Show More...</div>
+        <div class="cc__stats">
+          <span class="stat">👍 225</span><span class="stat">❤️ 2</span><span class="stat">↗ 6</span><span class="stat">💬 3</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Moist Diane -->
+      <div class="cc" id="bcard-1">
+        <div class="cc__badge b10">Top 10%</div>
+        <div class="cc__head">
+          <div class="pav pav-md">MD</div>
+          <div><div class="cc__name">Moist Diane HK</div><div class="cc__date">03 Jun 2026 10:00</div></div>
+        </div>
+        <div class="cc__tags">
+          <span class="ctag ctag-of">Official</span><span class="ctag ctag-bo">Boosted</span><span class="ctag ctag-br">Moist Diane</span>
+        </div>
+        <div class="cc__img">
+          <div class="cc-clone-overlay"><button class="cc-clone-btn" onclick="event.stopPropagation();cloneAd(1)">🔁 Clone Creative</button></div>
+          <div style="width:100%;height:100%;background:#f5f0e8;display:flex;align-items:center;justify-content:center;">
+            <div style="text-align:center;">
+              <div style="font-family:Georgia,serif;font-size:30px;font-style:italic;font-weight:700;color:#1a1a1a;line-height:1.1;">Moist,<br>Diane</div>
+            </div>
+          </div>
+        </div>
+        <div class="cc__cap">Moist Diane 全新祈「神の沐浴露」降臨 🌿植萃持香沐浴露系列完美實現 3-in-1 神級功效...</div>
+        <div class="show-more">Show More...</div>
+        <div class="cc__stats"><span class="stat">👍 596</span><span class="stat">❤️ 170</span><span class="stat">↗ 39</span></div>
+      </div>
+
+      <!-- Card 3: Yves Rocher grooming -->
+      <div class="cc" id="bcard-2">
+        <div class="cc__badge b10">Top 10%</div>
+        <div class="cc__head">
+          <div class="pav pav-yr">YR</div>
+          <div><div class="cc__name">Yves Rocher Hong Kong</div><div class="cc__date">02 Jun 2026 19:00</div></div>
+        </div>
+        <div class="cc__tags">
+          <span class="ctag ctag-of">Official</span><span class="ctag ctag-bo">Boosted</span><span class="ctag ctag-br">Yves Rocher</span>
+        </div>
+        <div class="cc__img">
+          <div class="cc-clone-overlay"><button class="cc-clone-btn" onclick="event.stopPropagation();cloneAd(2)">🔁 Clone Creative</button></div>
+          <div style="width:100%;height:100%;background:linear-gradient(160deg,#1a3a2a,#0d3320);display:flex;align-items:center;justify-content:center;padding:20px;">
+            <div style="text-align:center;">
+              <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:12px;">他的專屬 Grooming 時光</div>
+              <div style="display:flex;gap:8px;justify-content:center;">
+                <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                  <div style="width:28px;height:44px;background:rgba(255,255,255,.15);border-radius:4px;"></div>
+                  <div style="font-size:8px;color:rgba(255,255,255,.6);">洗髮乳</div>
+                </div>
+                <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                  <div style="width:28px;height:44px;background:rgba(255,255,255,.12);border-radius:4px;"></div>
+                  <div style="font-size:8px;color:rgba(255,255,255,.6);">護髮素</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cc__cap">每日奔波發跡碌，默默揮老成家园父，即便係超人老爸爸。都需要你一停一停，好好享受屬于自己的放鬆時光☀️</div>
+        <div class="cc__stats"><span class="stat">👍 303</span><span class="stat">❤️ 2</span><span class="stat">💬 2</span><span class="stat">↗ 5</span></div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="cc" id="bcard-3">
+        <div class="cc__badge b10">Top 10%</div>
+        <div class="cc__head">
+          <div class="pav pav-yr">YR</div>
+          <div><div class="cc__name">Yves Rocher Hong Kong</div><div class="cc__date">01 Jun 2026 12:00</div></div>
+        </div>
+        <div class="cc__tags">
+          <span class="ctag ctag-of">Official</span><span class="ctag ctag-bo">Boosted</span><span class="ctag ctag-br">Yves Rocher</span>
+        </div>
+        <div class="cc__img">
+          <div class="cc-clone-overlay"><button class="cc-clone-btn" onclick="event.stopPropagation();cloneAd(3)">🔁 Clone Creative</button></div>
+          <div style="width:100%;height:100%;background:linear-gradient(160deg,#2a4a1a,#1a3a0a);display:flex;align-items:center;justify-content:center;padding:20px;">
+            <div style="text-align:center;">
+              <div style="font-size:11px;color:rgba(255,255,255,.7);margin-bottom:8px;">淨化洗髮系列</div>
+              <div style="width:50px;height:75px;background:rgba(255,255,255,.12);border-radius:6px;margin:0 auto 8px;border:1px solid rgba(255,255,255,.2);"></div>
+              <div style="font-size:10px;color:rgba(255,255,255,.6);">你最近頭皮狀態係偵？</div>
+            </div>
+          </div>
+        </div>
+        <div class="cc__cap">頭皮都Emo😰？ 情緒護護，頭皮都有「情緒」，會叫「皮」氣😤</div>
+        <div class="cc__stats"><span class="stat">👍 474</span><span class="stat">❤️ 6</span><span class="stat">💬 7</span><span class="stat">↗ 7</span></div>
+      </div>
+
+    </div><!-- /creative-grid -->
+    <div style="height:80px;"></div>
+
+    <!-- ═══ AI AGENT PAGE ═══ -->
+    <div id="aiAgentPage">
+
+      <!-- Chat History sidebar -->
+      <div class="aa-history">
+        <div class="aa-history__head">
+          <span class="aa-history__title">Chat History</span>
+          <button class="aa-history__new" title="New chat" onclick="aaNewChat()">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <div class="aa-history__list">
+          <div class="aa-history__date">Today</div>
+          <div class="aa-conv-item aa-active" onclick="aaSelectConv(this)">
+            <div class="aa-conv-item__name">春季護膚活動素材</div>
+            <div class="aa-conv-item__sub">Generate 3 campaign images for...</div>
+          </div>
+          <div class="aa-conv-item" onclick="aaSelectConv(this)">
+            <div class="aa-conv-item__name">Ad Creative Review</div>
+            <div class="aa-conv-item__sub">Which headline performs better?</div>
+          </div>
+          <div class="aa-history__date">Yesterday</div>
+          <div class="aa-conv-item" onclick="aaSelectConv(this)">
+            <div class="aa-conv-item__name">Mother's Day Campaign</div>
+            <div class="aa-conv-item__sub">Help me create 5 image variations</div>
+          </div>
+          <div class="aa-conv-item" onclick="aaSelectConv(this)">
+            <div class="aa-conv-item__name">Brand Tone Analysis</div>
+            <div class="aa-conv-item__sub">Analyse our top 10 posts tone...</div>
+          </div>
+          <div class="aa-conv-item" onclick="aaSelectConv(this)">
+            <div class="aa-conv-item__name">夏日飲品系列</div>
+            <div class="aa-conv-item__sub">生成清涼風格廣告圖</div>
+          </div>
+          <div class="aa-history__date">Last 7 days</div>
+          <div class="aa-conv-item" onclick="aaSelectConv(this)">
+            <div class="aa-conv-item__name">Competitor Insight</div>
+            <div class="aa-conv-item__sub">What content works for competitors?</div>
+          </div>
+          <div class="aa-conv-item" onclick="aaSelectConv(this)">
+            <div class="aa-conv-item__name">CNY Gifting Campaign</div>
+            <div class="aa-conv-item__sub">Create festive red ad banners...</div>
+          </div>
+          <div class="aa-conv-item" onclick="aaSelectConv(this)">
+            <div class="aa-conv-item__name">Post Caption Generator</div>
+            <div class="aa-conv-item__sub">Write 5 captions in Traditional Ch...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main chat area -->
+      <div class="aa-main">
+        <!-- Header -->
+        <div class="aa-main__head">
+          <span class="aa-main__head-title">春季護膚活動素材</span>
+          <div class="aa-agent-badge">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4.5" stroke="#23A9F6" stroke-width="1.2"/><path d="M3.5 5.5c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z" fill="#23A9F6" opacity=".35"/><circle cx="5.5" cy="5.5" r="1.1" fill="#23A9F6"/></svg>
+            Image Gen agent
+          </div>
+          <button onclick="closeAiAgentPage()" style="width:28px;height:28px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface-white);cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Close">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1.5 1.5l8 8M9.5 1.5l-8 8" stroke="var(--text-secondary)" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <!-- Messages -->
+        <div class="aa-msgs" id="aaMsgs">
+          <!-- User message -->
+          <div class="msg msg--user">
+            <div class="msg__bubble" style="max-width:460px;">幫我生成3張春季護膚品牌廣告圖，風格清新自然，帶有粉綠色調。參考我剛才選的帖子。</div>
+          </div>
+          <!-- AI reply -->
+          <div class="msg msg--ai">
+            <div class="msg__bubble" style="max-width:520px;">
+              <div style="margin-bottom:10px;">好的！根據你選取的參考帖子，我將生成 3 張春季護膚廣告圖，風格清新自然，以粉綠色調為主。</div>
+              <!-- gen card 1 -->
+              <div class="gen-img-card" id="aac1" style="max-width:280px;"></div>
+              <!-- gen card 2 -->
+              <div class="gen-img-card" id="aac2" style="max-width:280px;margin-top:8px;"></div>
+              <!-- gen card 3 -->
+              <div class="gen-img-card" id="aac3" style="max-width:280px;margin-top:8px;"></div>
+            </div>
+          </div>
+          <!-- User follow-up -->
+          <div class="msg msg--user">
+            <div class="msg__bubble" style="max-width:460px;">第一張很好！幫我把第二張的色調再暖一點，加入金色元素。</div>
+          </div>
+          <!-- AI reply -->
+          <div class="msg msg--ai">
+            <div class="msg__bubble" style="max-width:520px;">
+              <div style="margin-bottom:10px;">明白！重新生成第二張，加入暖色調和金色元素。</div>
+              <div class="gen-img-card" id="aac4" style="max-width:280px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input bar -->
+        <div class="aa-input-wrap">
+          <div class="aa-input-box">
+            <div class="aa-input-row">
+              <textarea class="aa-textarea" id="aaTextarea" placeholder="Enter a prompt here..." oninput="aaUpdateSend()"></textarea>
+            </div>
+            <div class="aa-toolbar">
+              <!-- + button -->
+              <button class="aa-plus-btn" onclick="openPicker()" title="Add reference">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="var(--text-secondary)" stroke-width="1.6" stroke-linecap="round"/></svg>
+              </button>
+              <!-- Agent selector (reuse existing dropdown) -->
+              <button class="agent-sel-btn" id="aaAgentBtn" onclick="toggleAgentDD(event)" style="height:26px;padding:0 8px 0 6px;font-size:11px;gap:4px;">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="var(--brand-blue)" stroke-width="1.2"/><circle cx="5" cy="5" r="1.5" fill="var(--brand-blue)"/></svg>
+                <span id="aaAgentLabel">Auto</span>
+                <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 3L4 5.5 6.5 3" stroke="var(--text-secondary)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <!-- Ratio / platform selector (Image Gen agent only, mirrors the AI bubble's selector) -->
+              <button class="agent-sel-btn hidden" id="aaPlatformSel" onclick="togglePlatformDD(event)" style="height:26px;padding:0 8px 0 6px;font-size:11px;gap:4px;">
+                <svg width="10" height="10" viewBox="0 0 11 11" fill="none"><rect x=".5" y="1.5" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3.5 9.5v1M7.5 9.5v1M2 10.5h7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                <span id="aaPlatformName">Auto</span><span class="platform-badge" id="aaPlatformBadge"></span>
+                <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 3L4 5.5 6.5 3" stroke="var(--text-secondary)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <!-- Send -->
+              <button class="aa-send-btn" id="aaSendBtn" disabled onclick="aaSend()" style="opacity:.4;">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M12 7H2M8 3l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="aa-input-hint">0 / 4000 · Press Enter to send</div>
+        </div>
+      </div>
+    </div><!-- /aiAgentPage -->
+
+  </main>
+
+</div><!-- /shell -->
+
+<!-- ═══ AI FLOAT BUTTON ═══ -->
+<button class="ai-fab" id="aiFAB" onclick="openPanel()" title="AI Creative Studio">
+  <div class="fab-pulse"></div>
+  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+    <!-- large centre star -->
+    <path d="M14 4 L15.2 11.5 L22 12 L15.2 13.5 L14 21 L12.8 13.5 L6 12 L12.8 11.5 Z" fill="#fff"/>
+    <!-- small top-right star -->
+    <path d="M21 5 L21.7 8.2 L24.5 8.5 L21.7 9 L21 12 L20.3 9 L17.5 8.5 L20.3 8.2 Z" fill="rgba(255,255,255,.75)"/>
+    <!-- tiny bottom-left dot -->
+    <circle cx="8" cy="20" r="1.5" fill="rgba(255,255,255,.6)"/>
+  </svg>
+</button>
+
+<!-- ═══ AI PANEL ═══ -->
+<aside class="ai-panel" id="aiPanel">
+  <div class="panel-head" id="panelHead">
+    <div class="panel-head__icon" id="panelHeadIcon" style="background:var(--brand-blue);border-radius:var(--r-md);">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M9 2 L10 7.5 L15.5 8 L10 9 L9 14.5 L8 9 L2.5 8 L8 7.5 Z" fill="#fff"/>
+        <path d="M14 2 L14.5 4.2 L16.5 4.5 L14.5 4.8 L14 7 L13.5 4.8 L11.5 4.5 L13.5 4.2 Z" fill="rgba(255,255,255,.8)"/>
+        <circle cx="4.5" cy="13" r="1" fill="rgba(255,255,255,.65)"/>
+      </svg>
+    </div>
+    <span class="panel-head__title" id="panelTitle">AI Agent</span>
+    <button class="panel-head__close" onclick="closePanel()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8"/></svg>
+    </button>
+  </div>
+
+  <!-- CHAT BODY -->
+  <div class="chat-body" id="chatBody">
+
+    <!-- Welcome state -->
+    <div id="welcomeState">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <div style="width:38px;height:38px;border-radius:50%;background:var(--brand-blue);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;">JL</div>
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--text-primary);line-height:1.3;">How can I help you today?</div>
+          <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">Image Gen agent · AI Creative Studio</div>
+        </div>
+      </div>
+      <div class="aa-prompts" style="gap:8px;">
+        <div class="aa-prompt-card" onclick="fillImgGenPrompt('campaign-content')">
+          <div class="aa-prompt-card__icon" style="background:#EFF6FF;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="2" width="11" height="10" rx="1.5" stroke="#2563EB" stroke-width="1.2"/><path d="M4 5.5h6M4 7.5h4" stroke="#2563EB" stroke-width="1" stroke-linecap="round"/></svg>
+          </div>
+          <div class="aa-prompt-card__text">Help me generate a campaign content</div>
+        </div>
+        <div class="aa-prompt-card" onclick="fillImgGenPrompt('image-gen')">
+          <div class="aa-prompt-card__icon" style="background:#FFF7ED;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="1.5" width="11" height="11" rx="1.5" stroke="#F97316" stroke-width="1.2"/><circle cx="5" cy="5" r="1.2" fill="#F97316" opacity=".7"/><path d="M1.5 9.5l3-3 2 2 2-2 3 3" stroke="#F97316" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="aa-prompt-card__text">Generate product images for social media</div>
+        </div>
+        <div class="aa-prompt-card" onclick="fillImgGenPrompt('ad-creative')">
+          <div class="aa-prompt-card__icon" style="background:#F0FDF4;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="8" rx="1.5" stroke="#22C55E" stroke-width="1.2"/><path d="M4 6.5h3M4 8.5h2" stroke="#22C55E" stroke-width="1" stroke-linecap="round"/><rect x="9" y="5" width="2.5" height="4" rx=".8" fill="#22C55E" opacity=".6"/></svg>
+          </div>
+          <div class="aa-prompt-card__text">Create an ad creative from reference posts</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Blank state (Auto mode) -->
+    <div id="welcomeBlank"></div>
+
+    <!-- Ad Advisor state -->
+    <div id="welcomeAdvisor">
+      <div class="aa-prompts">
+        <div class="aa-prompt-card" onclick="fillAdvisorPrompt(this)">
+          <div class="aa-prompt-card__icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="10" rx="1.5" stroke="#3B82F6" stroke-width="1.2"/><path d="M3 9l2-3 2 2 2-3 2 3" stroke="#3B82F6" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="aa-prompt-card__text">Summarize top KPIs and flag any anomalies this period.</div>
+        </div>
+        <div class="aa-prompt-card" onclick="fillAdvisorPrompt(this)">
+          <div class="aa-prompt-card__icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 2v10M3 2l5 4-5 4" stroke="#F97316" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="aa-prompt-card__text">Which campaigns should I scale, hold, or pause?</div>
+        </div>
+        <div class="aa-prompt-card" onclick="fillAdvisorPrompt(this)">
+          <div class="aa-prompt-card__icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#8B5CF6" stroke-width="1.2"/><path d="M7 7L7 2A5 5 0 0112 7Z" fill="#8B5CF6" opacity=".4"/><path d="M7 7L2.5 4.5A5 5 0 007 2Z" fill="#8B5CF6" opacity=".7"/></svg>
+          </div>
+          <div class="aa-prompt-card__text">Is my TOFU / MOFU / BOFU budget split optimized?</div>
+        </div>
+        <div class="aa-prompt-card" onclick="fillAdvisorPrompt(this)">
+          <div class="aa-prompt-card__icon" style="background:var(--surface-page);border:1px solid var(--border);">
+          </div>
+          <div class="aa-prompt-card__text">Which top CTR ads share common patterns?</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conversation (hidden initially) -->
+    <div id="conversation" class="hidden"></div>
+
+  </div><!-- /chat-body -->
+
+  <!-- INPUT FOOT: Creative Studio (default) -->
+  <div class="panel-foot" id="panelFootCreative">
+    <!-- Reference chips (above input) -->
+    <div class="ref-strip" id="refStrip" style="display:none;"></div>
+
+    <!-- Prompt wrap -->
+    <div class="prompt-wrap" id="promptWrap" style="position:relative;">
+      <div id="mentionDrop" class="mention-dropdown hidden">
+        <div class="mention-item active" onclick="selectProduct('Dr.Once – Hair · 醫美級防脫髮爆水修護')">
+          <div class="mention-item__icon">💊</div>
+          <div>
+            <div class="mention-item__name">Dr.Once – Hair</div>
+            <div class="mention-item__sub">醫美級防脫髮爆水修護</div>
+          </div>
+        </div>
+        <div class="mention-item" onclick="selectProduct('Dr.Once – Scalp · 頭皮護理精華')">
+          <div class="mention-item__icon">🌿</div>
+          <div>
+            <div class="mention-item__name">Dr.Once – Scalp</div>
+            <div class="mention-item__sub">頭皮護理精華</div>
+          </div>
+        </div>
+        <div class="mention-item" onclick="selectProduct('Dr.Once – Treatment · 深層修護髮膜')">
+          <div class="mention-item__icon">✨</div>
+          <div>
+            <div class="mention-item__name">Dr.Once – Treatment</div>
+            <div class="mention-item__sub">深層修護髮膜</div>
+          </div>
+        </div>
+      </div>
+      <textarea class="prompt-ta" id="promptTA"
+        placeholder="Describe your idea… Use @ to select a product"
+        rows="3"
+        oninput="onPromptInput(event)"
+        onfocus="this.closest('.prompt-wrap').classList.add('focused')"
+        onblur="setTimeout(()=>{this.closest('.prompt-wrap').classList.remove('focused')},150)"></textarea>
+      <div class="prompt-bar">
+        <!-- + button -->
+        <button class="pbar-btn plus" title="Add reference from Buzz" onclick="openPicker()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <!-- agent select -->
+        <div class="agent-sel" id="agentSel" onclick="toggleAgentDD()">
+          <span id="agentName">Auto</span>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.4"/></svg>
+        </div>
+        <!-- platform selector -->
+        <div class="platform-sel" id="platformSel" onclick="togglePlatformDD()">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><rect x=".5" y="1.5" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3.5 9.5v1M7.5 9.5v1M2 10.5h7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <span id="platformName">Auto</span><span class="platform-badge" id="platformBadge"></span>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.4"/></svg>
+        </div>
+        <span class="char-ct" id="charCt">0 / 4000</span>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1.5 11.5L11.5 6.5L1.5 1.5V5.5L8.5 6.5L1.5 7.5V11.5Z" fill="#fff"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INPUT FOOT: Ad Advisor -->
+  <div class="aa-foot hidden" id="panelFootAdvisor">
+    <div class="aa-ctx-chips">
+      <div class="aa-ctx-chip">
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><rect x=".5" y=".5" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M2.5 3.5h6M2.5 5.5h4M2.5 7.5h3" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
+        Ad Account: ChatCommerce
+        <span class="aa-ctx-chip__x" onclick="this.closest('.aa-ctx-chip').remove()">✕</span>
+      </div>
+      <div class="aa-ctx-chip">
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><rect x=".5" y=".5" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M2.5 3.5h6M2.5 5.5h4M2.5 7.5h3" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
+        Page: Performance
+        <span class="aa-ctx-chip__x" onclick="this.closest('.aa-ctx-chip').remove()">✕</span>
+      </div>
+    </div>
+    <div class="aa-input-row">
+      <div class="aa-input-plus" title="Upload image" onclick="triggerUpload();renderRefStrip();">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.1"/><circle cx="4" cy="4.5" r="1" fill="currentColor"/><path d="M1 9l2.5-2.5 1.5 1.5 2-2L9 9" stroke="currentColor" stroke-width="1"/></svg>
+      </div>
+      <input id="aaInput" class="aa-input-field" placeholder="Enter a prompt here" oninput="updateAaSend()"/>
+      <button class="aa-send-btn" id="aaSendBtn">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1.5 11.5L11.5 6.5L1.5 1.5V5.5L8.5 6.5L1.5 7.5V11.5Z" fill="#fff"/></svg>
+      </button>
+    </div>
+    <div class="aa-disclaimer">MediaLens AI can make mistakes. Consider checking important information.</div>
+  </div>
+
+</aside>
+
+<!-- ═══ SELECT MODE BANNER (shown over Buzz while picking posts) ═══ -->
+<div class="select-mode-bar" id="selectModeBar">
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#fff" stroke-width="1.5"/><path d="M5 8l2.5 2.5 3.5-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+  Click a post to select as reference · hover a post for Clone Creative
+  <span id="selectModeCount" style="background:rgba(255,255,255,.2);padding:2px 10px;border-radius:var(--r-tag);font-size:12px;">0/1 selected</span>
+  <button class="select-mode-bar__done" onclick="doneSelectingPosts()">Done</button>
+</div>
+
+<!-- ═══ ADD REFERENCE MODAL ═══ -->
+<div class="picker-overlay" id="pickerOverlay" onclick="closePicker(event)">
+  <div class="picker-sheet" onclick="event.stopPropagation()">
+    <div class="picker-head">
+      <div class="picker-head__title">Add Reference</div>
+      <button class="picker-head__close" onclick="closePickerSheet()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8"/></svg>
+      </button>
+    </div>
+    <div class="ref-slots">
+
+      <!-- Slot 1: Reference posts -->
+      <div class="ref-slot" id="slot-posts" onclick="startSelectPosts()">
+        <div class="ref-slot__icon" id="slot-posts-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <rect x="2" y="3" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.4"/>
+            <circle cx="6.5" cy="8.5" r="1.5" fill="currentColor"/>
+            <path d="M2 14l4-4 3 3 3-3.5 6 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="ref-slot__body">
+          <div class="ref-slot__title" id="slot-posts-title">Select a Post</div>
+          <div class="ref-slot__sub" id="slot-posts-sub">Select 1 post as reference</div>
+        </div>
+        <div class="ref-slot__arrow">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+
+      <!-- Slot 2: Upload local -->
+      <div class="ref-slot" id="slot-upload" onclick="triggerUpload()">
+        <div class="ref-slot__icon" id="slot-upload-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 13V4M6 7l4-4 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M3 15h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="ref-slot__body">
+          <div class="ref-slot__title" id="slot-upload-title">Upload Local</div>
+          <div class="ref-slot__sub" id="slot-upload-sub">Support image, video, pdf</div>
+        </div>
+        <div class="ref-slot__arrow">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══ AI GENERATOR PAGE ═══ -->
+<div id="gen-page">
+  <nav class="gp-nav">
+    <div class="gp-nav__back" onclick="closeGenPage()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8l4 4" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+      Back to Buzz
+    </div>
+    <span style="opacity:.4;margin:0 4px;">/</span>
+    <span style="font-size:16px;font-weight:600;">AI Assets</span>
+    <div style="margin-left:auto;display:flex;gap:var(--sp-sm);">
+      <button class="btn" style="background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.4);" onclick="enterGenSelMode('ad-creative-ai')">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="margin-right:4px;"><rect x="1" y="2.5" width="11" height="8" rx="1.5" stroke="#fff" stroke-width="1.2"/><path d="M3 6h4M3 8h2" stroke="#fff" stroke-width="1" stroke-linecap="round"/><rect x="8.5" y="4" width="2.5" height="4" rx=".8" fill="#fff" opacity=".7"/></svg>
+        Create ad creative with AI
+      </button>
+      <button class="btn" style="background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.4);" onclick="enterGenSelMode('post-ai')">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="margin-right:4px;"><rect x="1.5" y="1" width="10" height="11" rx="1.5" stroke="#fff" stroke-width="1.2"/><path d="M4 4.5h5M4 7h3.5M4 9.5h2" stroke="#fff" stroke-width="1" stroke-linecap="round"/></svg>
+        Create Post with AI
+      </button>
+      <button class="btn" style="background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.4);" onclick="enterGenSelMode('content-ai')">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="margin-right:4px;"><circle cx="6.5" cy="6.5" r="5" stroke="#fff" stroke-width="1.2"/><path d="M4.5 6.5h4M6.5 4.5v4" stroke="#fff" stroke-width="1.1" stroke-linecap="round"/></svg>
+        Create Content with AI
+      </button>
+      <button class="btn" style="background:#fff;color:var(--brand-blue);font-weight:600;" onclick="downloadSelected()">Download</button>
+    </div>
+  </nav>
+
+  <!-- Tab bar -->
+  <div class="gp-tab-bar">
+    <div class="gp-tab active" onclick="switchAssetTab('all',this)">All <span class="gp-tab__count">7</span></div>
+    <div class="gp-tab" onclick="switchAssetTab('images',this)">Images <span class="gp-tab__count">4</span></div>
+    <div class="gp-tab" onclick="switchAssetTab('videos',this)">Videos <span class="gp-tab__count">3</span></div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="assets-filter-bar">
+    <div class="filter-dd" id="ddSize">
+      <div class="size-filter-sel" onclick="event.stopPropagation();toggleFilterDD('ddSize')">
+        <span id="ddSizeLabel">Size: All</span>
+        <svg class="filter-dd__caret" width="9" height="6" viewBox="0 0 9 6" fill="none"><path d="M1 1l3.5 3.5L8 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </div>
+      <div class="filter-dd__menu">
+        <div class="filter-dd__opt active" onclick="setAssetFilter('size','all','All',this)">All</div>
+        <div class="filter-dd__opt" onclick="setAssetFilter('size','&lt;1M','&lt;1MB',this)">&lt;1MB</div>
+        <div class="filter-dd__opt" onclick="setAssetFilter('size','&lt;=3M','≤3MB',this)">≤3MB</div>
+        <div class="filter-dd__opt" onclick="setAssetFilter('size','&lt;=5M','≤5MB',this)">≤5MB</div>
+        <div class="filter-dd__opt" onclick="setAssetFilter('size','&lt;=10M','≤10MB',this)">≤10MB</div>
+        <div class="filter-dd__opt" onclick="setAssetFilter('size','&gt;10M','&gt;10MB',this)">&gt;10MB</div>
+      </div>
+    </div>
+    <div class="filter-dd" id="ddRatio">
+      <div class="size-filter-sel" onclick="event.stopPropagation();toggleFilterDD('ddRatio')">
+        <span id="ddRatioLabel">Ratio: All</span>
+        <svg class="filter-dd__caret" width="9" height="6" viewBox="0 0 9 6" fill="none"><path d="M1 1l3.5 3.5L8 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </div>
+      <div class="filter-dd__menu">
+        <div class="filter-dd__opt active" onclick="setAssetFilter('ratio','all','All',this)">All</div>
+        <div class="filter-dd__opt" onclick="setAssetFilter('ratio','1:1','1:1',this)">1:1</div>
+        <div class="filter-dd__opt" onclick="setAssetFilter('ratio','4:5','4:5',this)">4:5</div>
+        <div class="filter-dd__opt" onclick="setAssetFilter('ratio','1.91:1','1.91:1',this)">1.91:1</div>
+        <div class="filter-dd__opt" onclick="setAssetFilter('ratio','9:16','9:16',this)">9:16</div>
+        <div class="filter-dd__opt" onclick="setAssetFilter('ratio','16:9','16:9',this)">16:9</div>
+        <div class="filter-dd__opt" onclick="setAssetFilter('ratio','custom','Custom',this)">Custom</div>
+      </div>
+    </div>
+    <div class="filter-dd" id="ddDuration">
+      <div class="size-filter-sel" onclick="event.stopPropagation();toggleFilterDD('ddDuration')">
+        <span id="ddDurationLabel">Duration: All</span>
+        <svg class="filter-dd__caret" width="9" height="6" viewBox="0 0 9 6" fill="none"><path d="M1 1l3.5 3.5L8 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </div>
+      <div class="filter-dd__menu">
+        <div class="filter-dd__opt active" onclick="setAssetFilter('duration','all','All',this)">All</div>
+        <div class="filter-dd__opt" onclick="setAssetFilter('duration','&lt;3s','&lt;3s',this)">&lt;3s</div>
+        <div class="filter-dd__opt" onclick="setAssetFilter('duration','&lt;5s','&lt;5s',this)">&lt;5s</div>
+        <div class="filter-dd__opt" onclick="setAssetFilter('duration','&lt;10s','&lt;10s',this)">&lt;10s</div>
+        <div class="filter-dd__opt" onclick="setAssetFilter('duration','&lt;20s','&lt;20s',this)">&lt;20s</div>
+        <div class="filter-dd__opt" onclick="setAssetFilter('duration','&lt;90s','&lt;90s',this)">&lt;90s</div>
+        <div class="filter-dd__opt" onclick="setAssetFilter('duration','&gt;90s','&gt;90s',this)">&gt;90s</div>
+      </div>
+    </div>
+    <span class="assets-sort-lbl">Sorted by: Generate Time ↓</span>
+  </div>
+
+  <!-- Asset grid — every thumbnail is shown 1:1; the ratio tag still reports the asset's real aspect ratio -->
+  <div style="overflow-y:auto;flex:1;">
+    <div class="asset-grid" id="assetGrid">
+
+      <!-- Image 1 — 1:1 — 20s ago -->
+      <div class="asset-card" data-type="image" data-ratio-bucket="1:1" data-size-mb="3.2" onclick="toggleAssetCard(this)">
+        <div class="asset-card__sel-badge">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="asset-card__thumb" style="aspect-ratio:1/1;background:linear-gradient(160deg,#0a2218,#134526);" ondblclick="event.stopPropagation();openAssetLightbox(this.closest('.asset-card'))">
+          <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:16px;">
+            <div><div style="font-size:14px;font-weight:700;color:#fff;line-height:1.3;">醫美級<br>防脫髮爆水修護</div><div style="font-size:10px;color:rgba(255,255,255,.75);margin-top:3px;">dr.once 專業護理</div></div>
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:4px;padding:3px 7px;font-size:8px;color:#fff;font-weight:600;">頭髮提升 · 回復密度</div>
+              <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:4px;padding:3px 7px;font-size:8px;color:#fff;font-weight:600;">減少洗髮時落髮</div>
+            </div>
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.85);">dr.once</div>
+          </div>
+          <div class="asset-card__hover">
+            <button class="ah-btn" onclick="event.stopPropagation();chatWithAsset(this.closest('.asset-card'))">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M9.5 1.5h-8a1 1 0 00-1 1v5a1 1 0 001 1h1v2l2.5-2h4.5a1 1 0 001-1v-5a1 1 0 00-1-1z" stroke="#fff" stroke-width="1.1"/></svg>
+              Chat with Agent
+            </button>
+            <button class="ah-btn pri" onclick="event.stopPropagation();downloadAsset(this)">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1v6M2.5 5l3 3 3-3M1 9.5h9" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg>
+              Download
+            </button>
+          </div>
+        </div>
+        <div class="asset-card__meta">
+          <div class="asset-card__tags">
+            <span class="asset-tag ratio">1:1</span>
+            <span class="asset-tag size">3.2 MB</span>
+            <span class="asset-tag res">1080×1080</span>
+          </div>
+          <div class="asset-card__time">20s ago</div>
+        </div>
+      </div>
+
+      <!-- Image 2 — 3:4 (Custom ratio, shown as 1:1 in grid) — 45s ago -->
+      <div class="asset-card" data-type="image" data-ratio-bucket="custom" data-size-mb="2.8" onclick="toggleAssetCard(this)">
+        <div class="asset-card__sel-badge">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="asset-card__thumb" style="aspect-ratio:1/1;background:linear-gradient(145deg,#1a0533,#3b0f6e);display:flex;align-items:center;justify-content:center;padding:16px;" ondblclick="event.stopPropagation();openAssetLightbox(this.closest('.asset-card'))">
+          <div style="text-align:center;"><div style="font-size:13px;font-weight:700;color:#fff;line-height:1.3;">強韌髮根<br>無懼脫落</div><div style="font-size:9px;color:rgba(255,255,255,.6);margin-top:5px;">dr.once</div></div>
+          <div class="asset-card__hover">
+            <button class="ah-btn" onclick="event.stopPropagation();chatWithAsset(this.closest('.asset-card'))">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M9.5 1.5h-8a1 1 0 00-1 1v5a1 1 0 001 1h1v2l2.5-2h4.5a1 1 0 001-1v-5a1 1 0 00-1-1z" stroke="#fff" stroke-width="1.1"/></svg>
+              Chat with Agent
+            </button>
+            <button class="ah-btn pri" onclick="event.stopPropagation();downloadAsset(this)">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1v6M2.5 5l3 3 3-3M1 9.5h9" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg>
+              Download
+            </button>
+          </div>
+        </div>
+        <div class="asset-card__meta">
+          <div class="asset-card__tags">
+            <span class="asset-tag ratio">3:4</span>
+            <span class="asset-tag size">2.8 MB</span>
+            <span class="asset-tag res">1080×1440</span>
+          </div>
+          <div class="asset-card__time">45s ago</div>
+        </div>
+      </div>
+
+      <!-- Video 1 — 9:16 (shown as 1:1 in grid) — 14s — 2 min ago -->
+      <div class="asset-card video" data-type="video" data-ratio-bucket="9:16" data-size-mb="28" data-duration-sec="14" onclick="toggleAssetCard(this)">
+        <div class="asset-card__sel-badge">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="asset-card__thumb" style="aspect-ratio:1/1;background:linear-gradient(160deg,#1e2d4a,#0d1c33);" ondblclick="event.stopPropagation();openAssetLightbox(this.closest('.asset-card'))">
+          <div class="play" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M5 3l9 5-9 5V3z" fill="#fff"/></svg></div>
+          <div class="asset-card__hover">
+            <button class="ah-btn" onclick="event.stopPropagation();chatWithAsset(this.closest('.asset-card'))">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M9.5 1.5h-8a1 1 0 00-1 1v5a1 1 0 001 1h1v2l2.5-2h4.5a1 1 0 001-1v-5a1 1 0 00-1-1z" stroke="#fff" stroke-width="1.1"/></svg>
+              Chat with Agent
+            </button>
+            <button class="ah-btn pri" onclick="event.stopPropagation();downloadAsset(this)">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1v6M2.5 5l3 3 3-3M1 9.5h9" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg>
+              Download
+            </button>
+          </div>
+        </div>
+        <div class="asset-card__meta">
+          <div class="asset-card__tags">
+            <span class="asset-tag ratio">9:16</span>
+            <span class="asset-tag size">28 MB</span>
+            <span class="asset-tag res">1080p</span>
+            <span class="asset-tag dur">14s</span>
+          </div>
+          <div class="asset-card__time">2 min ago</div>
+        </div>
+      </div>
+
+      <!-- Image 3 — 4:5 (shown as 1:1 in grid) — 3 min ago -->
+      <div class="asset-card" data-type="image" data-ratio-bucket="4:5" data-size-mb="2.1" onclick="toggleAssetCard(this)">
+        <div class="asset-card__sel-badge">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="asset-card__thumb" style="aspect-ratio:1/1;background:linear-gradient(160deg,#3a1a0a,#5a2a10);display:flex;align-items:center;justify-content:center;" ondblclick="event.stopPropagation();openAssetLightbox(this.closest('.asset-card'))">
+          <div style="text-align:center;padding:16px;"><div style="font-size:9px;font-weight:700;color:#FFD700;letter-spacing:1px;">MEDICAL GRADE</div><div style="font-size:13px;font-weight:700;color:#fff;margin-top:4px;">防脫髮療程</div></div>
+          <div class="asset-card__hover">
+            <button class="ah-btn" onclick="event.stopPropagation();chatWithAsset(this.closest('.asset-card'))">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M9.5 1.5h-8a1 1 0 00-1 1v5a1 1 0 001 1h1v2l2.5-2h4.5a1 1 0 001-1v-5a1 1 0 00-1-1z" stroke="#fff" stroke-width="1.1"/></svg>
+              Chat with Agent
+            </button>
+            <button class="ah-btn pri" onclick="event.stopPropagation();downloadAsset(this)">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1v6M2.5 5l3 3 3-3M1 9.5h9" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg>
+              Download
+            </button>
+          </div>
+        </div>
+        <div class="asset-card__meta">
+          <div class="asset-card__tags">
+            <span class="asset-tag ratio">4:5</span>
+            <span class="asset-tag size">2.1 MB</span>
+            <span class="asset-tag res">1080×1350</span>
+          </div>
+          <div class="asset-card__time">3 min ago</div>
+        </div>
+      </div>
+
+      <!-- Video 2 — 1:1 — 12s — 5 min ago -->
+      <div class="asset-card video" data-type="video" data-ratio-bucket="1:1" data-size-mb="22" data-duration-sec="12" onclick="toggleAssetCard(this)">
+        <div class="asset-card__sel-badge">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="asset-card__thumb" style="aspect-ratio:1/1;background:linear-gradient(160deg,#0d3320,#1a5a35);" ondblclick="event.stopPropagation();openAssetLightbox(this.closest('.asset-card'))">
+          <div class="play" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M5 3l9 5-9 5V3z" fill="#fff"/></svg></div>
+          <div class="asset-card__hover">
+            <button class="ah-btn" onclick="event.stopPropagation();chatWithAsset(this.closest('.asset-card'))">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M9.5 1.5h-8a1 1 0 00-1 1v5a1 1 0 001 1h1v2l2.5-2h4.5a1 1 0 001-1v-5a1 1 0 00-1-1z" stroke="#fff" stroke-width="1.1"/></svg>
+              Chat with Agent
+            </button>
+            <button class="ah-btn pri" onclick="event.stopPropagation();downloadAsset(this)">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1v6M2.5 5l3 3 3-3M1 9.5h9" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg>
+              Download
+            </button>
+          </div>
+        </div>
+        <div class="asset-card__meta">
+          <div class="asset-card__tags">
+            <span class="asset-tag ratio">1:1</span>
+            <span class="asset-tag size">22 MB</span>
+            <span class="asset-tag res">1080p</span>
+            <span class="asset-tag dur">12s</span>
+          </div>
+          <div class="asset-card__time">5 min ago</div>
+        </div>
+      </div>
+
+      <!-- Image 4 — 1.91:1 (shown as 1:1 in grid) — 2 hours ago -->
+      <div class="asset-card" data-type="image" data-ratio-bucket="1.91:1" data-size-mb="4.7" onclick="toggleAssetCard(this)">
+        <div class="asset-card__sel-badge">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="asset-card__thumb" style="aspect-ratio:1/1;background:linear-gradient(135deg,#f5f0e8,#e8dcc8);display:flex;align-items:center;justify-content:center;" ondblclick="event.stopPropagation();openAssetLightbox(this.closest('.asset-card'))">
+          <div style="text-align:center;padding:16px;"><div style="font-size:8px;letter-spacing:2px;color:#8B6914;text-transform:uppercase;margin-bottom:4px;">dr.once</div><div style="font-size:12px;font-weight:700;color:#2a1a0a;">醫美級<br>爆水修護</div></div>
+          <div class="asset-card__hover">
+            <button class="ah-btn" style="color:#102532;background:rgba(0,0,0,.1);border-color:rgba(0,0,0,.2);" onclick="event.stopPropagation();chatWithAsset(this.closest('.asset-card'))">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M9.5 1.5h-8a1 1 0 00-1 1v5a1 1 0 001 1h1v2l2.5-2h4.5a1 1 0 001-1v-5a1 1 0 00-1-1z" stroke="currentColor" stroke-width="1.1"/></svg>
+              Chat with Agent
+            </button>
+            <button class="ah-btn pri" onclick="event.stopPropagation();downloadAsset(this)">Download</button>
+          </div>
+        </div>
+        <div class="asset-card__meta">
+          <div class="asset-card__tags">
+            <span class="asset-tag ratio">1.91:1</span>
+            <span class="asset-tag size">4.7 MB</span>
+            <span class="asset-tag res">1080×566</span>
+          </div>
+          <div class="asset-card__time">2 hours ago</div>
+        </div>
+      </div>
+
+      <!-- Video 3 — 16:9 (shown as 1:1 in grid) — 95s — 1 day ago -->
+      <div class="asset-card video" data-type="video" data-ratio-bucket="16:9" data-size-mb="19" data-duration-sec="95" onclick="toggleAssetCard(this)">
+        <div class="asset-card__sel-badge">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="asset-card__thumb" style="aspect-ratio:1/1;background:linear-gradient(160deg,#1a0a3a,#2d1260);" ondblclick="event.stopPropagation();openAssetLightbox(this.closest('.asset-card'))">
+          <div class="play" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M5 3l9 5-9 5V3z" fill="#fff"/></svg></div>
+          <div class="asset-card__hover">
+            <button class="ah-btn" onclick="event.stopPropagation();chatWithAsset(this.closest('.asset-card'))">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M9.5 1.5h-8a1 1 0 00-1 1v5a1 1 0 001 1h1v2l2.5-2h4.5a1 1 0 001-1v-5a1 1 0 00-1-1z" stroke="#fff" stroke-width="1.1"/></svg>
+              Chat with Agent
+            </button>
+            <button class="ah-btn pri" onclick="event.stopPropagation();downloadAsset(this)">Download</button>
+          </div>
+        </div>
+        <div class="asset-card__meta">
+          <div class="asset-card__tags">
+            <span class="asset-tag ratio">16:9</span>
+            <span class="asset-tag size">19 MB</span>
+            <span class="asset-tag res">1080p</span>
+            <span class="asset-tag dur">1m 35s</span>
+          </div>
+          <div class="asset-card__time">1 day ago</div>
+        </div>
+      </div>
+
+      <!-- Empty state — shown when filters/tab combination has no matches -->
+      <div class="assets-empty-state" id="assetsEmptyState">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect x="5" y="8" width="30" height="24" rx="3" stroke="var(--border)" stroke-width="2"/><path d="M5 26l8-8 6 6 8-9 8 8" stroke="var(--border)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="15" r="2.5" stroke="var(--border)" stroke-width="2"/></svg>
+        <div class="assets-empty-state__title">No assets match your filters</div>
+        <div class="assets-empty-state__clear" onclick="clearAssetFilters()">Clear filters</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Selection mode bottom bar -->
+  <div class="gen-sel-bar" id="genSelBar">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#fff" stroke-width="1.5"/><path d="M5 8l2.5 2.5 3.5-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <span id="genSelLabel">Select assets</span>
+    <span class="gen-sel-bar__count" id="genSelCount">0 selected</span>
+    <span class="gen-sel-bar__cancel" onclick="cancelGenSel()">Cancel</span>
+    <button class="gen-sel-bar__confirm" onclick="confirmGenSel()">Confirm</button>
+  </div>
+
+</div>
+
+<script>
+/* ── State ── */
+let panelOpen = false;
+let pickerOpen = false;
+let selectedPosts = [];
+let uploadedImgs = [];
+let uploadedVideos = [];
+let hasConversation = false;
+let agentDDOpen = false;
+let mentionOpen = false;
+let mentionBuffer = '';
+
+const POSTS_DATA = [
+  {id:0, label:'Yves Rocher HK', sub:'Top 25% · 16 Jun', bg:'linear-gradient(135deg,#b8922e,#7a5520)', initials:'YR', type:'image'},
+  {id:1, label:'Moist Diane HK', sub:'Top 10% · 03 Jun', bg:'linear-gradient(135deg,#f5f0e8,#e8dcc8)', initials:'MD', dark:true, type:'image'},
+  {id:2, label:'Yves Rocher HK', sub:'Top 10% · 02 Jun', bg:'linear-gradient(135deg,#1a3a2a,#0d3320)', initials:'YR', type:'image'},
+  {id:3, label:'Yves Rocher HK', sub:'Top 10% · 01 Jun', bg:'linear-gradient(135deg,#2a4a1a,#1a3a0a)', initials:'YR', type:'image'},
+];
+
+/* ── Panel ── */
+function openPanel() {
+  panelOpen = true;
+  document.getElementById('aiPanel').classList.add('open');
+  document.getElementById('aiFAB').classList.add('hidden');
+  document.getElementById('mainContent').classList.add('panel-open');
+}
+function closePanel() {
+  panelOpen = false;
+  document.getElementById('aiPanel').classList.remove('open');
+  document.getElementById('aiFAB').classList.remove('hidden');
+  document.getElementById('mainContent').classList.remove('panel-open');
+}
+
+/* ── Add Reference Modal ── */
+function openPicker() {
+  syncSlotStates();
+  const isImgGen = currentAgentMode === 'image-gen';
+  // Post selection: only for Image Gen agent
+  document.getElementById('slot-posts').style.display = isImgGen ? '' : 'none';
+  // Upload: shown for all agents
+  document.getElementById('slot-upload').style.display = '';
+  document.getElementById('pickerOverlay').classList.add('open');
+  pickerOpen = true;
+}
+function closePickerSheet() {
+  document.getElementById('pickerOverlay').classList.remove('open');
+  pickerOpen = false;
+}
+function closePicker(e) {
+  if (e && e.target !== document.getElementById('pickerOverlay')) return;
+  closePickerSheet();
+}
+
+/* keep slot visuals in sync with state */
+function syncSlotStates() {
+  // Slot: posts
+  const hasPosts = selectedPosts.length > 0;
+  const s1 = document.getElementById('slot-posts');
+  s1.classList.toggle('filled', hasPosts);
+  document.getElementById('slot-posts-icon').style.color = hasPosts ? '#fff' : '';
+  document.getElementById('slot-posts-title').textContent = hasPosts
+    ? selectedPosts.map(p => p.label).join(', ')
+    : 'Select a Post';
+  document.getElementById('slot-posts-sub').textContent = hasPosts
+    ? `1 post selected — click to change`
+    : 'Select 1 post as reference';
+
+  // Slot: upload local
+  const hasUpload = uploadedImgs.length > 0;
+  const s3 = document.getElementById('slot-upload');
+  s3.classList.toggle('filled', hasUpload);
+  document.getElementById('slot-upload-title').textContent = 'Upload Local';
+  document.getElementById('slot-upload-sub').textContent = hasUpload
+    ? `${uploadedImgs.length} file(s) attached — click to add more`
+    : 'Support image, video, pdf';
+}
+
+/* Slot 1: close modal → enter select mode on Buzz grid */
+function startSelectPosts() {
+  const selectablePosts = POSTS_DATA.filter(p => p.type === 'image');
+  if (selectablePosts.length === 0) {
+    showToast('当前无可选的 post');
+    return;
+  }
+  closePickerSheet();
+  enterSelectMode();
+}
+
+/* Select mode: show top banner, make cards clickable */
+let selectMode = false;
+function enterSelectMode() {
+  selectMode = true;
+  document.getElementById('selectModeBar').classList.add('active');
+  document.querySelectorAll('.cc').forEach(card => {
+    card.classList.add('select-mode');
+    card.onclick = function() { toggleBuzzCard(this); };
+  });
+  updateSelectModeCount();
+}
+function exitSelectMode() {
+  selectMode = false;
+  document.getElementById('selectModeBar').classList.remove('active');
+  document.querySelectorAll('.cc').forEach(card => {
+    card.classList.remove('select-mode');
+    card.onclick = null;
+  });
+}
+/* Single-post scope: picking a post replaces any prior selection */
+function toggleBuzzCard(el) {
+  const id = parseInt(el.id.replace('bcard-', ''));
+  const post = POSTS_DATA.find(p => p.id === id);
+  const alreadySelected = selectedPosts.some(s => s.id === id);
+  document.querySelectorAll('.cc.buzz-selected').forEach(c => c.classList.remove('buzz-selected'));
+  if (alreadySelected) {
+    selectedPosts = [];
+  } else {
+    selectedPosts = [post];
+    el.classList.add('buzz-selected');
+  }
+  updateSelectModeCount();
+}
+function updateSelectModeCount() {
+  document.getElementById('selectModeCount').textContent = selectedPosts.length + '/1 selected';
+}
+
+/* Clone Creative: hover shortcut on a Buzz card — uses it as reference + preloads a clone-creative prompt */
+const CLONE_AD_PROMPT = 'Clone this ad: recreate the same visual style, layout, composition, and color palette as the reference creative, then adapt the messaging, product shot, and copy for our brand. Keep the mood and framing consistent with the original — just swap in our own product details.';
+function cloneAd(id) {
+  const post = POSTS_DATA.find(p => p.id === id);
+  document.querySelectorAll('.cc.buzz-selected').forEach(c => c.classList.remove('buzz-selected'));
+  selectedPosts = [post];
+  document.getElementById('bcard-' + id).classList.add('buzz-selected');
+  exitSelectMode();
+  renderRefStrip();
+  setAgent('Image Generation', 'image-gen');
+  const ta = document.getElementById('promptTA');
+  ta.value = CLONE_AD_PROMPT;
+  document.getElementById('promptWrap').classList.add('has-text');
+  updateSendBtn();
+  openPanel();
+  ta.focus();
+}
+function doneSelectingPosts() {
+  exitSelectMode();
+  renderRefStrip();
+  updateSendBtn();
+  openPanel();
+}
+
+/* Upload image */
+function triggerUpload() {
+  const maxTotal = 10;
+  const total = uploadedImgs.length + selectedPosts.filter(p => p.type === 'image').length;
+  if (total < maxTotal) {
+    uploadedImgs.push('ref-image-' + (uploadedImgs.length + 1) + '.jpg');
+    renderRefStrip();
+    updateSendBtn();
+  }
+  closePickerSheet();
+  openPanel();
+}
+
+/* Upload video */
+function triggerVideoUpload() {
+  if (uploadedVideos.length < 2) {
+    uploadedVideos.push('ref-video-' + (uploadedVideos.length + 1) + '.mp4');
+    renderRefStrip();
+    updateSendBtn();
+  }
+  syncSlotStates();
+}
+
+/* ── Reference strip ── */
+function renderRefStrip() {
+  const strip = document.getElementById('refStrip');
+  if (selectedPosts.length === 0 && uploadedImgs.length === 0 && uploadedVideos.length === 0) {
+    strip.style.display = 'none';
+    strip.innerHTML = '';
+    return;
+  }
+  strip.style.display = 'flex';
+  strip.innerHTML = '';
+  selectedPosts.forEach(p => {
+    strip.innerHTML += `
+      <div class="ref-chip">
+        <div class="ref-chip__thumb" style="background:${p.bg};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:${p.dark?'#333':'#fff'};">${p.initials}</div>
+        ${p.label}
+        <div class="ref-chip__x" onclick="removeRef(${p.id})">✕</div>
+      </div>`;
+  });
+  uploadedImgs.forEach((img, i) => {
+    strip.innerHTML += `
+      <div class="img-chip">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="4" cy="4.5" r="1" fill="currentColor"/><path d="M1 9l2.5-2.5 1.5 1.5 2-2L9 9" stroke="currentColor" stroke-width="1"/></svg>
+        ${img}
+        <div class="ref-chip__x" onclick="removeUpload(${i})">✕</div>
+      </div>`;
+  });
+  uploadedVideos.forEach((vid, i) => {
+    strip.innerHTML += `
+      <div class="img-chip" style="background:#F0F9FF;border-color:#BAE6FD;color:#0369A1;">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="8" height="8" rx="1.2" stroke="currentColor" stroke-width="1.1"/><path d="M9 5l2.5-1.5v5L9 7V5z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>
+        ${vid}
+        <div class="ref-chip__x" onclick="removeVideo(${i})">✕</div>
+      </div>`;
+  });
+}
+function removeRef(id) {
+  selectedPosts = selectedPosts.filter(s => s.id !== id);
+  renderRefStrip();
+  updateSendBtn();
+}
+function removeUpload(i) {
+  uploadedImgs.splice(i, 1);
+  renderRefStrip();
+  updateSendBtn();
+}
+function removeVideo(i) {
+  uploadedVideos.splice(i, 1);
+  renderRefStrip();
+  updateSendBtn();
+}
+
+/* ── Agent dropdown ── */
+function toggleAgentDD() {
+  agentDDOpen = !agentDDOpen;
+  const dd = document.getElementById('agentDD');
+  dd.classList.toggle('hidden', !agentDDOpen);
+  document.getElementById('agentSel').classList.toggle('open', agentDDOpen);
+  if (agentDDOpen) {
+    // Anchor to whichever trigger is on screen: AI Agent full page → aaAgentBtn, else panel selector
+    const onAiAgentPage = document.getElementById('aiAgentPage').classList.contains('on');
+    const anchor = onAiAgentPage
+      ? document.getElementById('aaAgentBtn')
+      : document.getElementById('agentSel');
+    const rect = anchor.getBoundingClientRect();
+    dd.style.bottom = (window.innerHeight - rect.top + 6) + 'px';
+    dd.style.left = rect.left + 'px';
+    closePlatformDD();
+  }
+}
+function closeAgentDD() {
+  agentDDOpen = false;
+  document.getElementById('agentDD').classList.add('hidden');
+  document.getElementById('agentSel').classList.remove('open');
+}
+let currentAgent = 'Auto';
+let currentAgentMode = 'auto';
+
+function setAgent(name, mode) {
+  currentAgent = name;
+  currentAgentMode = mode || 'auto';
+  document.getElementById('agentName').textContent = name;
+  // Keep the AI Agent full-page selector label in sync
+  const aaLabel = document.getElementById('aaAgentLabel');
+  if (aaLabel) aaLabel.textContent = name;
+  document.querySelectorAll('.agent-opt').forEach(o => o.classList.remove('sel'));
+  const modeToOptId = {
+    'auto': 'agopt-auto',
+    'image-gen': 'agopt-imggen',
+    'ad-advisor': 'agopt-advisor'
+  };
+  const optEl = document.getElementById(modeToOptId[currentAgentMode]);
+  if (optEl) optEl.classList.add('sel');
+  applyPanelState(currentAgentMode);
+}
+
+function applyPanelState(mode) {
+  const welcome = document.getElementById('welcomeState');
+  const blank = document.getElementById('welcomeBlank');
+  const advisor = document.getElementById('welcomeAdvisor');
+  const footCreative = document.getElementById('panelFootCreative');
+  const footAdvisor = document.getElementById('panelFootAdvisor');
+  const platformSel = document.getElementById('platformSel');
+  const aaPlatformSel = document.getElementById('aaPlatformSel');
+  const title = document.getElementById('panelTitle');
+  const icon = document.getElementById('panelHeadIcon');
+
+  // reset all welcome states
+  welcome.classList.add('hidden');
+  advisor.classList.remove('visible');
+  blank.classList.remove('visible');
+
+  if (mode === 'image-gen') {
+    welcome.classList.remove('hidden');
+    footCreative.classList.remove('hidden');
+    footAdvisor.classList.add('hidden');
+    platformSel.style.display = '';
+    if (aaPlatformSel) aaPlatformSel.classList.remove('hidden');
+    title.textContent = 'Image Gen';
+    icon.style.background = '#DB2777';
+  } else if (mode === 'ad-advisor') {
+    advisor.classList.add('visible');
+    footCreative.classList.remove('hidden');
+    footAdvisor.classList.add('hidden');
+    platformSel.style.display = 'none';
+    if (aaPlatformSel) aaPlatformSel.classList.add('hidden');
+    title.textContent = 'Ad Advisor';
+    icon.style.background = '#2563EB';
+  } else {
+    // auto → blank
+    blank.classList.add('visible');
+    footCreative.classList.remove('hidden');
+    footAdvisor.classList.add('hidden');
+    platformSel.style.display = 'none';
+    if (aaPlatformSel) aaPlatformSel.classList.add('hidden');
+    title.textContent = 'AI Agent';
+    icon.style.background = 'var(--brand-blue)';
+  }
+}
+
+function fillAdvisorPrompt(card) {
+  const text = card.querySelector('.aa-prompt-card__text').textContent;
+  const ta = document.getElementById('promptTA');
+  ta.value = text;
+  document.getElementById('charCt').textContent = text.length + ' / 4000';
+  document.getElementById('promptWrap').classList.add('has-text');
+  updateSendBtn();
+  document.getElementById('welcomeAdvisor').classList.remove('visible');
+  ta.focus();
+}
+
+const IMG_GEN_PROMPTS = {
+  'campaign-content': `Help me generate a campaign content:
+Objective: [Branding / Sales / Traffic / Leads / Awareness]
+Brand name: [Brand name]
+Product name: [Product name]
+Product details: [sellable bullet, discount offer]
+Target Audience: [Gender: All, Age: 18-65+, Region: Hong Kong]
+Landing page: [URL]`,
+  'image-gen': `Generate product images for social media:
+Style: [clean / lifestyle / minimalist / bold]
+Background: [white / outdoor / studio / abstract]
+Format: [1:1 Feed / 9:16 Story / 4:5 Portrait]
+Brand colour: [hex or description]
+Key message: [tagline or CTA text to overlay]`,
+  'ad-creative': `Create an ad creative from reference posts:
+Brand name: [Brand name]
+Objective: [Awareness / Traffic / Leads / Sales]
+Format: [Feed Square / Story / Carousel]
+Tone: [Professional / Playful / Urgent]
+CTA: [Shop Now / Learn More / Contact Us]`
+};
+
+function fillImgGenPrompt(key) {
+  const preset = IMG_GEN_PROMPTS[key] || '';
+  const ta = document.getElementById('promptTA');
+  ta.value = preset;
+  document.getElementById('charCt').textContent = preset.length + ' / 4000';
+  document.getElementById('promptWrap').classList.add('has-text');
+  updateSendBtn();
+  // Hide welcome state so the textarea gets focus
+  document.getElementById('welcomeState').classList.add('hidden');
+  ta.focus();
+  // Place cursor at first bracket for easy editing
+  const first = preset.indexOf('[');
+  if (first >= 0) { ta.setSelectionRange(first, preset.indexOf(']', first) + 1); }
+}
+function updateAaSend() {
+  const ready = document.getElementById('aaInput').value.trim().length > 0;
+  document.getElementById('aaSendBtn').classList.toggle('ready', ready);
+}
+
+/* ── Platform selector ── */
+let platformDDOpen = false;
+let currentPlatformId = 'plat-auto';
+function togglePlatformDD() {
+  platformDDOpen = !platformDDOpen;
+  // Anchor to whichever trigger is on screen: AI Agent full page → aaPlatformSel, else panel selector
+  const onAiAgentPage = document.getElementById('aiAgentPage').classList.contains('on');
+  const anchor = onAiAgentPage
+    ? document.getElementById('aaPlatformSel')
+    : document.getElementById('platformSel');
+  const dd = document.getElementById('platformDD');
+  dd.classList.toggle('hidden', !platformDDOpen);
+  document.getElementById('platformSel').classList.remove('open');
+  document.getElementById('aaPlatformSel').classList.remove('open');
+  anchor.classList.toggle('open', platformDDOpen);
+  if (platformDDOpen) {
+    const rect = anchor.getBoundingClientRect();
+    dd.style.bottom = (window.innerHeight - rect.top + 6) + 'px';
+    dd.style.right = (window.innerWidth - rect.right) + 'px';
+    closeAgentDD();
+  }
+}
+function closePlatformDD() {
+  platformDDOpen = false;
+  document.getElementById('platformDD').classList.add('hidden');
+  document.getElementById('platformSel').classList.remove('open');
+  document.getElementById('aaPlatformSel').classList.remove('open');
+}
+function setPlatform(name, ratio, optId) {
+  currentPlatformId = optId;
+  document.getElementById('platformName').textContent = name;
+  document.getElementById('platformBadge').textContent = ratio ? ratio : '';
+  const aaName = document.getElementById('aaPlatformName');
+  const aaBadge = document.getElementById('aaPlatformBadge');
+  if (aaName) aaName.textContent = name;
+  if (aaBadge) aaBadge.textContent = ratio ? ratio : '';
+  document.querySelectorAll('.plat-opt').forEach(o => o.classList.remove('sel'));
+  document.getElementById(optId).classList.add('sel');
+  closePlatformDD();
+}
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = '_toast';
+    t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#102532;color:#fff;padding:8px 18px;border-radius:20px;font-size:13px;z-index:9999;pointer-events:none;opacity:0;transition:opacity .2s;white-space:nowrap;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._hide);
+  t._hide = setTimeout(() => { t.style.opacity = '0'; }, 2200);
+}
+
+function goToSetup() {
+  window.location.href = 'file:///Users/julie.li/Documents/Medialens/prototypes/ai-generator-brand-setup.html';
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#agentSel') && !e.target.closest('#aaAgentBtn')) closeAgentDD();
+  if (!e.target.closest('#platformSel') && !e.target.closest('#aaPlatformSel')) closePlatformDD();
+  if (!e.target.closest('#promptWrap')) closeMentionDD();
+});
+
+/* ── @mention ── */
+function onPromptInput(e) {
+  const ta = e.target;
+  const val = ta.value;
+  const charCt = document.getElementById('charCt');
+  charCt.textContent = val.length + ' / 4000';
+  updateSendBtn();
+
+  // detect @
+  const cur = ta.selectionStart;
+  const before = val.slice(0, cur);
+  const atMatch = before.match(/@(\w*)$/);
+  if (atMatch) {
+    mentionBuffer = atMatch[1];
+    openMentionDD();
+  } else {
+    closeMentionDD();
+  }
+
+  document.getElementById('promptWrap').classList.toggle('has-text', val.length > 0);
+}
+function openMentionDD() {
+  mentionOpen = true;
+  document.getElementById('mentionDrop').classList.remove('hidden');
+}
+function closeMentionDD() {
+  mentionOpen = false;
+  document.getElementById('mentionDrop').classList.add('hidden');
+}
+function selectProduct(product) {
+  const ta = document.getElementById('promptTA');
+  const val = ta.value;
+  const cur = ta.selectionStart;
+  const before = val.slice(0, cur);
+  const replaced = before.replace(/@\w*$/, '@' + product + ' ');
+  ta.value = replaced + val.slice(cur);
+  closeMentionDD();
+  ta.focus();
+  ta.selectionStart = ta.selectionEnd = replaced.length;
+  updateSendBtn();
+  document.getElementById('promptWrap').classList.add('has-text');
+}
+
+/* ── Send button ── */
+function updateSendBtn() {
+  const ta = document.getElementById('promptTA');
+  const ready = ta.value.trim().length > 0 || selectedPosts.length > 0;
+  document.getElementById('sendBtn').classList.toggle('ready', ready);
+}
+
+/* ── Send & generate conversation ── */
+function clearRefs() {
+  selectedPosts = [];
+  uploadedImgs = [];
+  uploadedVideos = [];
+  renderRefStrip();
+  updateSendBtn();
+}
+function sendMessage() {
+  const ta = document.getElementById('promptTA');
+  const prompt = ta.value.trim();
+  if (!prompt && selectedPosts.length === 0) return;
+
+  // Hide welcome
+  document.getElementById('welcomeState').classList.add('hidden');
+  const conv = document.getElementById('conversation');
+  conv.classList.remove('hidden');
+
+  // Build user message with ref thumbs above
+  const refHTML = selectedPosts.map(p => `
+    <div class="msg-ref-thumb" style="background:${p.bg};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:${p.dark?'#333':'#fff'};">${p.initials}</div>`).join('');
+  const uploadHTML = uploadedImgs.map(u => `
+    <div class="msg-ref-thumb" style="background:#FFF3E0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#C2410C;">IMG</div>`).join('');
+
+  const displayPrompt = prompt || '完全複製參考 creative 的視覺構圖，替換品牌 @Dr.Once – Hair，重寫文案，突出防脫髮爆水修護效果，語氣輕鬆貼地';
+
+  conv.innerHTML += `
+    <div class="msg msg--user">
+      ${(refHTML || uploadHTML) ? `<div class="msg__refs">${refHTML}${uploadHTML}</div>` : ''}
+      <div class="msg__bubble">${displayPrompt}</div>
+      <div class="msg__time">Just now</div>
+    </div>`;
+
+  // Typing indicator
+  conv.innerHTML += `<div class="msg msg--ai" id="typingMsg"><div class="msg__bubble"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
+
+  ta.value = '';
+  document.getElementById('charCt').textContent = '0 / 4000';
+  updateSendBtn();
+  document.getElementById('promptWrap').classList.remove('has-text');
+  clearRefs();
+
+  const cb = document.getElementById('chatBody');
+  cb.scrollTop = cb.scrollHeight;
+
+  const agent = currentAgent;
+  const ratioLabel = document.getElementById('platformName').textContent;
+
+  // Plan label and meta vary by agent
+  const planMeta = {
+    'Image Gen': { label: 'dr.once Creative 圖像生成', badge: '⭐ 20', agent: 'Image Gen agent', model: 'GPT-image-2', ratio: ratioLabel + ' · High' },
+    'Ad Advisor':      { label: 'Ad Advisor 分析', badge: '⭐ 15', agent: 'Ad Advisor agent', model: 'MediaLens AI', ratio: 'N/A' },
+  };
+  const pm = planMeta[agent] || { label: 'dr.once 品牌海報完整貼文生成', badge: '⭐ 40', agent: 'Auto agent', model: 'GPT-image-2', ratio: ratioLabel + ' · High' };
+
+  setTimeout(() => {
+    const typingMsg = document.getElementById('typingMsg');
+    if (typingMsg) typingMsg.remove();
+
+    const refPreviews = selectedPosts.map(p => `
+      <div class="grt" style="background:${p.bg};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:${p.dark?'#333':'#fff'};">${p.initials}</div>`).join('');
+
+    conv.innerHTML += `<div class="status-row"><div class="spinner"></div>Generating…</div>`;
+
+    cb.scrollTop = cb.scrollHeight;
+
+    setTimeout(() => {
+      document.querySelector('.status-row').remove();
+
+      // ── Shared image block (reused in all branches) ──
+      const imgBlock = `
+        <div class="gen-post__img">
+          <div style="width:100%;height:100%;position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:24px;background:linear-gradient(160deg,#0a2218 0%,#134526 60%,#0d3320 100%);">
+            <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 40% 60%,rgba(255,220,150,.18) 0%,transparent 65%);"></div>
+            <div style="position:relative;">
+              <div style="font-size:20px;font-weight:700;color:#fff;line-height:1.3;">醫美級 防脫髮<br>爆水修護</div>
+              <div style="font-size:12px;color:rgba(255,255,255,.75);margin-top:6px;">dr.once 專業護理</div>
+            </div>
+            <div style="position:relative;display:flex;flex-direction:column;gap:6px;align-items:flex-start;">
+              <div style="background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.28);border-radius:7px;padding:6px 10px;font-size:10px;color:#fff;font-weight:600;">頭髮提升 · 回復頭髮密度</div>
+              <div style="background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.28);border-radius:7px;padding:6px 10px;font-size:10px;color:#fff;font-weight:600;">減少洗髮時 · 導入修復療程</div>
+            </div>
+            <div style="position:relative;font-size:13px;font-weight:700;color:rgba(255,255,255,.9);">dr.once
+              <span style="margin-left:6px;font-size:10px;font-weight:400;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);padding:2px 8px;border-radius:4px;">專業護理</span>
+            </div>
+          </div>
+          <div class="gen-post__img-hover">
+            <button class="gen-img-btn primary" onclick="openGenPage()">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 11l3.5-3.5 1.5 1.5 3.5-5.5" stroke="#fff" stroke-width="1.4"/></svg>
+              Edit
+            </button>
+            <button class="gen-img-btn" onclick="openGenPage()">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="#fff" stroke-width="1.4"/><circle cx="6.5" cy="6.5" r="2" fill="#fff"/></svg>
+              Check Original
+            </button>
+          </div>
+        </div>`;
+
+      if (agent === 'Image Gen') {
+        // ── Image Gen: one card per image, with generating → reveal animation ──
+        if (!window._genCards) window._genCards = {};
+        const msgId = 'imggen-' + Date.now();
+        conv.innerHTML += `
+          <div class="msg msg--ai" id="${msgId}">
+            <div class="msg__bubble" style="max-width:100%;padding:var(--sp-sm) var(--sp-md) var(--sp-md);">
+              <div style="font-size:12px;color:var(--text-regular);margin-bottom:4px;">已為你生成 2 款 dr.once Creative 視覺素材，可直接用於貼文或廣告。</div>
+
+              <!-- Card 1 — generating state first -->
+              <div class="gen-img-card generating" id="${msgId}-c1">
+                <div class="gen-img-card__thumb" style="min-height:180px;">
+                  <div class="gen-progress-wrap">
+                    <div class="gen-progress-label">Generating image 1 of 2…</div>
+                    <div class="gen-progress-bar"><div class="gen-progress-fill" id="${msgId}-p1"></div></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 2 — generating state first -->
+              <div class="gen-img-card generating" id="${msgId}-c2">
+                <div class="gen-img-card__thumb" style="min-height:180px;">
+                  <div class="gen-progress-wrap">
+                    <div class="gen-progress-label">Generating image 2 of 2…</div>
+                    <div class="gen-progress-bar"><div class="gen-progress-fill" id="${msgId}-p2"></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>`;
+
+        cb.scrollTop = cb.scrollHeight;
+
+        // Animate progress bars, then reveal cards
+        const CARDS = [
+          {
+            pid: msgId+'-p1', cid: msgId+'-c1',
+            delay: 0, revealDelay: 3200,
+            bg: 'linear-gradient(160deg,#0a2218,#134526)',
+            inner: `<div style="font-size:13px;font-weight:700;color:#fff;line-height:1.3;">醫美級<br>防脫直髮<br>修護智慧</div><div style="font-size:10px;color:rgba(255,255,255,.7);">dr.once</div>`,
+            name: 'creative_01.jpg', meta: '1:1 · 1080×1080',
+            prompt: '生成一款 dr.once 醫美級防脫直髮修護智慧 品牌海報，深綠背景，現代感，白色標題文字，底部品牌名稱'
+          },
+          {
+            pid: msgId+'-p2', cid: msgId+'-c2',
+            delay: 800, revealDelay: 4800,
+            bg: 'linear-gradient(145deg,#1a0533,#3b0f6e)',
+            inner: `<div style="position:relative;font-size:13px;font-weight:700;color:#fff;line-height:1.3;">強韌髮根<br>無懼脫落</div><div style="position:relative;font-size:10px;color:rgba(255,255,255,.7);">dr.once · Advanced Hair</div>`,
+            name: 'creative_02.jpg', meta: '1:1 · 1080×1080',
+            prompt: '生成一款 dr.once Advanced Hair 系列海報，深紫色漸變背景，強調強韌髮根及防脫效果，高端質感排版'
+          }
+        ];
+        CARDS.forEach(c => {
+          window._genCards[c.cid] = c;
+          const fill = document.getElementById(c.pid);
+          if (!fill) return;
+          let pct = 0;
+          const tick = setInterval(() => {
+            pct = Math.min(pct + (Math.random() * 4 + 1), 85);
+            fill.style.width = pct + '%';
+          }, 200);
+          setTimeout(() => {
+            clearInterval(tick);
+            fill.style.width = '100%';
+            setTimeout(() => {
+              renderGenCard(c.cid);
+              cb.scrollTop = cb.scrollHeight;
+            }, 300);
+          }, c.revealDelay);
+        });
+
+      } else if (agent === 'Ad Advisor') {
+        // ── Ad Creative Agent: attachment card + ad fields ──
+        conv.innerHTML += `
+          <div class="msg msg--ai">
+            <div class="msg__bubble" style="max-width:100%;padding:var(--sp-sm) var(--sp-md) var(--sp-md);">
+              <div style="font-size:12px;color:var(--text-regular);margin-bottom:2px;">已生成廣告素材及配套廣告文案，可直接用於 Meta 廣告投放。</div>
+              <!-- Image attachment -->
+              <div class="img-attach-row">
+                <div class="img-attach" onclick="openGenPage()">
+                  <div class="img-attach__thumb" style="background:linear-gradient(160deg,#0a2218,#134526);display:flex;flex-direction:column;justify-content:space-between;padding:14px;">
+                    <div style="font-size:13px;font-weight:700;color:#fff;line-height:1.3;">醫美級<br>防脫直髮<br>修護智慧</div>
+                    <div style="font-size:10px;color:rgba(255,255,255,.7);">dr.once</div>
+                  </div>
+                  <div class="img-attach__hover">
+                    <button class="img-attach__hbtn pri" onclick="event.stopPropagation();openGenPage()">Edit</button>
+                    <button class="img-attach__hbtn sec">Use</button>
+                  </div>
+                  <div class="img-attach__foot">
+                    <div class="img-attach__name">ad_creative_01.jpg</div>
+                    <div class="img-attach__meta"><span class="img-attach__badge">AI</span>1:1 · Meta Ad</div>
+                  </div>
+                </div>
+              </div>
+              <!-- Ad fields -->
+              <div class="ad-fields" style="margin-top:10px;padding:0;">
+                <div class="ad-field">
+                  <div class="ad-field__label">Headline</div>
+                  <div class="ad-field__val editable" contenteditable="true">醫美級防脫髮爆水修護 — dr.once 專業護理系列</div>
+                </div>
+                <div class="ad-field">
+                  <div class="ad-field__label">Primary Text</div>
+                  <div class="ad-field__val editable" contenteditable="true" style="min-height:56px;">不論頭髮稀疏定脫落，dr.once 醫美級成分深層滋養髮根，強化髮絲，讓你重現豐盈健康頭髮。限時體驗套裝，即日起至7月31日。</div>
+                </div>
+                <div class="ad-field">
+                  <div class="ad-field__label">Call to Action</div>
+                  <div class="ad-cta-row">
+                    <div class="ad-cta-chip">Shop Now</div>
+                    <div class="ad-cta-chip alt">Learn More</div>
+                    <div class="ad-cta-chip alt">Get Offer</div>
+                    <div class="ad-cta-chip alt">Sign Up</div>
+                  </div>
+                </div>
+              </div>
+              <div class="attach-actions" style="border-top:1px solid var(--divider);margin-top:10px;padding-top:8px;">
+                <button class="btn btn-out" style="font-size:11px;padding:4px 10px;" onclick="openGenPage()">Edit Creative</button>
+                <button class="btn btn-sec" style="font-size:11px;padding:4px 10px;">Regenerate</button>
+                <button class="btn btn-pri" style="font-size:11px;padding:4px 10px;margin-left:auto;">Send to Ad Manager</button>
+              </div>
+            </div>
+          </div>`;
+
+      } else {
+        // ── Default: full post (copy + image) ──
+        conv.innerHTML += `
+          <div class="msg msg--ai">
+            <div class="msg__bubble" style="max-width:100%;width:100%;padding:0;background:transparent;border:none;">
+              <div style="font-size:12px;color:var(--text-regular);padding:var(--sp-xs) var(--sp-sm) var(--sp-xs);">已為你生成一篇完整 dr.once 品牌貼文，包含文案與視覺。視覺完全複刻參考 creative 的沙龍構圖，文案替換為防脫髮爆水修護主題，品牌更新為 dr.once。</div>
+            </div>
+          </div>
+
+          <div class="gen-post">
+            <div class="gen-post__header">
+              <div class="gen-post__av">dr</div>
+              <div>
+                <div class="gen-post__brand">Dr.Once – Hair</div>
+                <div class="gen-post__meta">Sponsored · Hong Kong</div>
+              </div>
+            </div>
+            <div class="gen-post__copy">
+              <strong>醫美級防脫髮爆水修護智慧 | dr.once 專業護理系列</strong><br><br>
+              不論頭髮稀疏定脫落，當你識用醫美級護髮智慧，就唔使再擔心每日洗頭時的脫髮困擾，都可以重現當下最豐盈嘅健康頭髮狀態！<br><br>
+              dr.once 深諳現代人對頭髮健康嘅追求，透過醫美級成分科研，成功發揮「防脫髮 · 爆水修護」—— 深層滋養髮根、強化髮絲、鎖住水份，並將專業護理力量引入全新「防脫髮爆水修護系列」。<br><br>
+              <strong>[限時優惠]</strong> 防脫髮爆水修護體驗套裝<br>
+              醫美級成分：蘊含2倍濃縮防脫因子 + 爆水修護技術，強韌髮根、減少脫髮<br>
+              頭皮護理：深層清潔 + 舒緩頭皮，回復健康頭皮環境<br><br>
+              了解更多或立即選購：<span class="highlight">dronce.hk/hair-care</span><br><br>
+              優惠期：即日至7月31日<br><br>
+              #DrOnce #防脫髮 #爆水修護 #醫美護髮 #頭髮健康 #HairCare #DrOnceHK #專業護理
+            </div>
+            <div class="gen-post__img-wrap" onclick="openGenPage()">
+              ${imgBlock}
+              <div class="gen-post__img-label">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1l1 2.2 2.4.35-1.75 1.7.41 2.4L6 6.5 3.84 7.65l.41-2.4L2.5 3.55l2.4-.35L6 1z" fill="#F59E0B"/></svg>
+                AI Generated · GPT-image-2 · 1:1
+                <span style="margin-left:auto;color:var(--brand-blue);cursor:pointer;" onclick="openGenPage()">Open in Generator →</span>
+              </div>
+            </div>
+            <div class="gen-post__actions">
+              <button class="btn btn-out" style="font-size:11px;padding:4px 10px;" onclick="openGenPage()">Edit in Generator</button>
+              <button class="btn btn-sec" style="font-size:11px;padding:4px 10px;">Regenerate</button>
+              <button class="btn btn-sec" style="font-size:11px;padding:4px 10px;">Try Video</button>
+              <button class="btn btn-pri" style="font-size:11px;padding:4px 10px;margin-left:auto;">Use This Post</button>
+            </div>
+          </div>`;
+      }
+
+      cb.scrollTop = cb.scrollHeight;
+      hasConversation = true;
+    }, 2200);
+  }, 1400);
+}
+
+/* ── Per-card image actions ── */
+function editGenCard(btn, bg) {
+  // Add the card image as a reference and open the panel
+  const name = btn.closest('.gen-img-card').querySelector('.gen-img-card__name').textContent;
+  uploadedImgs.push(name);
+  renderRefStrip();
+  updateSendBtn();
+  openPanel();
+}
+
+function renderGenCard(cid) {
+  const card = document.getElementById(cid);
+  const c = window._genCards && window._genCards[cid];
+  if (!card || !c) return;
+  card.classList.remove('generating');
+
+  const thumb = document.createElement('div');
+  thumb.className = 'gen-img-card__thumb';
+
+  // thumb inner — dblclick opens lightbox
+  const inner = document.createElement('div');
+  inner.className = 'gen-img-card__thumb-inner';
+  inner.style.background = c.bg;
+  inner.innerHTML = c.inner;
+  inner.title = 'Double-click to enlarge';
+  inner.style.cursor = 'zoom-in';
+  inner.addEventListener('dblclick', function(e) {
+    e.stopPropagation();
+    openImgLightbox(cid);
+  });
+  thumb.appendChild(inner);
+
+  // info label
+  const info = document.createElement('div');
+  info.className = 'gen-img-card__info';
+  info.textContent = c.meta + ' · 2.4 MB';
+  thumb.appendChild(info);
+
+  // hover overlay — Download | View Prompt | Assets
+  const hover = document.createElement('div');
+  hover.className = 'gen-img-card__hover';
+  hover.innerHTML =
+    '<div class="gen-img-card__icon-btn" title="Download" onclick="event.stopPropagation();showToast(\'Downloading…\')">' +
+      '<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 2v8M4 7l3.5 3.5L11 7" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12h11" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>' +
+    '</div>' +
+    '<div class="gen-img-card__icon-btn" title="View Prompt" onclick="event.stopPropagation();viewPromptById(\'' + cid + '\')">' +
+      '<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><ellipse cx="7.5" cy="7.5" rx="6" ry="4" stroke="#fff" stroke-width="1.4"/><circle cx="7.5" cy="7.5" r="1.8" fill="#fff"/></svg>' +
+    '</div>' +
+    '<div class="gen-img-card__icon-btn" title="AI Assets" onclick="event.stopPropagation();openGenPage()">' +
+      '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1.2" fill="#fff"/><rect x="9" y="1.5" width="5.5" height="5.5" rx="1.2" fill="#fff" opacity=".65"/><rect x="1.5" y="9" width="5.5" height="5.5" rx="1.2" fill="#fff" opacity=".65"/><rect x="9" y="9" width="5.5" height="5.5" rx="1.2" fill="#fff" opacity=".35"/></svg>' +
+    '</div>';
+  thumb.appendChild(hover);
+
+  // actions row — Re-gen | @
+  const actions = document.createElement('div');
+  actions.className = 'gen-img-card__actions';
+  actions.innerHTML =
+    '<button class="gen-img-card__btn regen" onclick="regenCard(\'' + cid + '\')">Re-gen</button>' +
+    '<button class="gen-img-card__btn cite-btn" title="Cite this image" onclick="citeGenCard(\'' + cid + '\')">@</button>';
+
+  card.innerHTML = '';
+  card.appendChild(thumb);
+  card.appendChild(actions);
+}
+
+function regenCard(cid) {
+  const srcCard = document.getElementById(cid);
+  const c = window._genCards && window._genCards[cid];
+  if (!srcCard || !c) return;
+
+  // Create a new card inserted after the original
+  const newCid = cid + '-r' + Date.now();
+  window._genCards[newCid] = c;
+  const newCard = document.createElement('div');
+  newCard.className = 'gen-img-card generating';
+  newCard.id = newCid;
+  const fillId = newCid + '-fill';
+  newCard.innerHTML = '<div class="gen-img-card__thumb" style="min-height:180px;"><div class="gen-progress-wrap"><div class="gen-progress-label">Regenerating…</div><div class="gen-progress-bar"><div class="gen-progress-fill" id="' + fillId + '"></div></div></div></div>';
+  srcCard.after(newCard);
+
+  const fill = document.getElementById(fillId);
+  let pct = 0;
+  const tick = setInterval(() => {
+    pct = Math.min(pct + (Math.random() * 4 + 1), 85);
+    if (fill) fill.style.width = pct + '%';
+  }, 200);
+  setTimeout(() => {
+    clearInterval(tick);
+    if (fill) fill.style.width = '100%';
+    setTimeout(() => renderGenCard(newCid), 300);
+  }, 3500);
+}
+
+function viewPromptById(cid) {
+  const c = window._genCards && window._genCards[cid];
+  if (!c) return;
+  viewPrompt(c.name, c.prompt, c.meta);
+}
+
+/* size the lightbox content box to an aspect ratio, bounded by viewport (like object-fit:contain) */
+function sizeLightboxContent(ratioStr) {
+  const content = document.getElementById('imgLightboxContent');
+  const parts = ratioStr.split('/').map(Number);
+  const rw = parts[0] || 1, rh = parts[1] || 1;
+  const maxW = Math.min(680, window.innerWidth * 0.9);
+  const maxH = window.innerHeight * 0.88;
+  let w = maxW, h = w * rh / rw;
+  if (h > maxH) { h = maxH; w = h * rw / rh; }
+  content.style.width = w + 'px';
+  content.style.height = h + 'px';
+}
+
+function openImgLightbox(cid) {
+  const c = window._genCards && window._genCards[cid];
+  if (!c) return;
+  const lb = document.getElementById('imgLightbox');
+  const content = document.getElementById('imgLightboxContent');
+  sizeLightboxContent('1/1');
+  content.style.background = c.bg;
+  content.innerHTML = c.inner;
+  lb.classList.add('open');
+}
+function closeImgLightbox() {
+  document.getElementById('imgLightbox').classList.remove('open');
+}
+
+function citeGenCard(cid) {
+  const c = window._genCards && window._genCards[cid];
+  if (!c) return;
+  uploadedImgs.push(c.name);
+  renderRefStrip();
+  updateSendBtn();
+  openPanel();
+  showToast('Image added as reference');
+}
+
+function viewPrompt(name, prompt, meta) {
+  document.getElementById('vpTitle').textContent = name;
+  document.getElementById('vpPromptText').textContent = decodeURIComponent(prompt.replace(/&#39;/g,"'"));
+  const ratio = meta.split('·')[0].trim();
+  document.getElementById('vpModel').textContent = 'GPT-image-2';
+  document.getElementById('vpRatio').textContent = ratio;
+  document.getElementById('vpRes').textContent = 'High';
+  document.getElementById('vpOverlay').classList.add('open');
+}
+function closeVpModal() {
+  document.getElementById('vpOverlay').classList.remove('open');
+}
+function copyVpPrompt() {
+  const txt = document.getElementById('vpPromptText').textContent;
+  navigator.clipboard.writeText(txt).catch(() => {});
+  showToast('Prompt copied');
+}
+
+/* ── Generator page ── */
+function openGenPage() {
+  document.getElementById('gen-page').classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+function closeGenPage() {
+  cancelGenSel();
+  document.getElementById('gen-page').classList.remove('on');
+  document.body.style.overflow = '';
+}
+
+/* ── Asset tabs + filters ── */
+let currentAssetTab = 'all';
+const assetFilters = { size: 'all', ratio: 'all', duration: 'all' };
+
+function switchAssetTab(tab, el) {
+  currentAssetTab = tab;
+  document.querySelectorAll('.gp-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  // Duration filter is video-only: hide it entirely on the Images tab
+  document.getElementById('ddDuration').classList.toggle('dd-disabled', tab === 'images');
+  applyAssetFilters();
+}
+
+function toggleFilterDD(id) {
+  document.querySelectorAll('.filter-dd').forEach(dd => {
+    if (dd.id !== id) dd.classList.remove('open');
+  });
+  document.getElementById(id).classList.toggle('open');
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.filter-dd')) {
+    document.querySelectorAll('.filter-dd').forEach(dd => dd.classList.remove('open'));
+  }
+});
+
+function setAssetFilter(type, value, label, el) {
+  assetFilters[type] = value;
+  document.getElementById('dd' + type.charAt(0).toUpperCase() + type.slice(1) + 'Label').textContent =
+    type.charAt(0).toUpperCase() + type.slice(1) + ': ' + label;
+  el.closest('.filter-dd__menu').querySelectorAll('.filter-dd__opt').forEach(o => o.classList.remove('active'));
+  el.classList.add('active');
+  el.closest('.filter-dd').classList.remove('open');
+  applyAssetFilters();
+}
+
+function clearAssetFilters() {
+  ['size', 'ratio', 'duration'].forEach(type => {
+    assetFilters[type] = 'all';
+    const menu = document.getElementById('dd' + type.charAt(0).toUpperCase() + type.slice(1)).querySelector('.filter-dd__menu');
+    menu.querySelectorAll('.filter-dd__opt').forEach((o, i) => o.classList.toggle('active', i === 0));
+    document.getElementById('dd' + type.charAt(0).toUpperCase() + type.slice(1) + 'Label').textContent =
+      type.charAt(0).toUpperCase() + type.slice(1) + ': All';
+  });
+  applyAssetFilters();
+}
+
+function inSizeBucket(mb, key) {
+  switch (key) {
+    case '<1M': return mb < 1;
+    case '<=3M': return mb >= 1 && mb <= 3;
+    case '<=5M': return mb > 3 && mb <= 5;
+    case '<=10M': return mb > 5 && mb <= 10;
+    case '>10M': return mb > 10;
+    default: return true;
+  }
+}
+function inDurationBucket(sec, key) {
+  switch (key) {
+    case '<3s': return sec < 3;
+    case '<5s': return sec >= 3 && sec < 5;
+    case '<10s': return sec >= 5 && sec < 10;
+    case '<20s': return sec >= 10 && sec < 20;
+    case '<90s': return sec >= 20 && sec < 90;
+    case '>90s': return sec >= 90;
+    default: return true;
+  }
+}
+
+function applyAssetFilters() {
+  let visibleCount = 0;
+  document.querySelectorAll('.asset-card').forEach(card => {
+    const type = card.dataset.type;
+    let visible = true;
+    if (currentAssetTab === 'images') visible = type === 'image';
+    else if (currentAssetTab === 'videos') visible = type === 'video';
+
+    if (visible && assetFilters.size !== 'all') {
+      visible = inSizeBucket(parseFloat(card.dataset.sizeMb), assetFilters.size);
+    }
+    if (visible && assetFilters.ratio !== 'all') {
+      visible = card.dataset.ratioBucket === assetFilters.ratio;
+    }
+    if (visible && assetFilters.duration !== 'all' && type === 'video') {
+      visible = inDurationBucket(parseFloat(card.dataset.durationSec), assetFilters.duration);
+    }
+    card.style.display = visible ? '' : 'none';
+    if (visible) visibleCount++;
+  });
+  document.getElementById('assetsEmptyState').classList.toggle('show', visibleCount === 0);
+}
+
+/* ── Asset lightbox (double-click to enlarge; always shown as a 1:1 tile, but the popup uses the real ratio) ── */
+function openAssetLightbox(card) {
+  const thumb = card.querySelector('.asset-card__thumb');
+  const isVideo = card.dataset.type === 'video';
+  const lb = document.getElementById('imgLightbox');
+  const content = document.getElementById('imgLightboxContent');
+  const realRatio = { '1:1':'1/1', '4:5':'4/5', '9:16':'9/16', '16:9':'16/9', '1.91:1':'1.91/1', 'custom':'3/4' }[card.dataset.ratioBucket] || '1/1';
+  sizeLightboxContent(realRatio);
+  content.style.display = 'flex';
+  content.style.flexDirection = 'row';
+  content.style.alignItems = 'center';
+  content.style.justifyContent = 'center';
+  content.style.padding = isVideo ? '0' : '24px';
+  content.style.background = thumb.style.background;
+  content.innerHTML = isVideo
+    ? '<div style="width:64px;height:64px;background:rgba(255,255,255,.18);border-radius:50%;display:grid;place-items:center;backdrop-filter:blur(4px);cursor:pointer;" onclick="event.stopPropagation();showToast(\'Playing preview…\')"><svg width="26" height="26" viewBox="0 0 16 16" fill="none"><path d="M5 3l9 5-9 5V3z" fill="#fff"/></svg></div>'
+    : (thumb.querySelector('div') ? thumb.querySelector('div').outerHTML : '');
+  lb.classList.add('open');
+}
+
+/* ── Asset selection ── */
+let genSelMode = null;
+let genSelectedCards = [];
+
+// Preset prompts for each flow
+const GEN_PROMPTS = {
+  'ad-creative-ai': `Help me build a full ad from a creative:
+Creative: [creative name or hash]
+Objective: [Sales / Traffic / Leads / Awareness]
+Budget: [amount] HKD per day
+Landing page: [URL]
+Page: [FB Page name]
+Headline: [one-line hook]
+Primary text: [1-2 sentence value prop]`,
+
+  'post-ai': `Help me create a social media post with this creative:
+Platform: [Facebook / Instagram / Both]
+Post format: [Feed / Story / Reels]
+Caption language: [繁體中文 / English]
+Tone: [輕鬆貼地 / 專業 / 幽默]
+Key message: [main selling point or CTA]
+Include hashtags: [yes / no]`,
+
+  'content-ai': `Help me build a campaign content:
+Objective: [Branding / Sales / Traffic / Leads / Awareness]
+Brand name: [Brand name]
+Product name: [Product name]
+Product details: [sellable bullet, discount offer]
+Target Audience: [Gender: All, Age: 18-65+, Region: Hong Kong]
+Landing page: [URL]`
+};
+
+function toggleAssetCard(card) {
+  if (!genSelMode) return;
+  // Both flows allow exactly 1 image or 1 video
+  const idx = genSelectedCards.indexOf(card);
+  if (idx >= 0) {
+    // deselect
+    card.classList.remove('selected');
+    genSelectedCards.splice(idx, 1);
+  } else {
+    // replace any existing selection with this card
+    genSelectedCards.forEach(c => c.classList.remove('selected'));
+    genSelectedCards = [card];
+    card.classList.add('selected');
+  }
+  updateGenSelCount();
+}
+
+function updateGenSelCount() {
+  document.getElementById('genSelCount').textContent = genSelectedCards.length + ' selected';
+}
+
+function enterGenSelMode(mode) {
+  genSelMode = mode;
+  genSelectedCards = [];
+  document.querySelectorAll('.asset-card').forEach(c => c.classList.remove('selected'));
+  const labels = {
+    'ad-creative-ai': 'Select 1 image or video for Ad Creative',
+    'post-ai': 'Select 1 image or video for Post',
+    'content-ai': 'Select 1 image or video for Campaign Content'
+  };
+  document.getElementById('genSelLabel').textContent = labels[mode] || 'Select assets';
+  document.getElementById('genSelBar').classList.add('active');
+  updateGenSelCount();
+}
+
+function cancelGenSel() {
+  genSelMode = null;
+  genSelectedCards.forEach(c => c.classList.remove('selected'));
+  genSelectedCards = [];
+  document.getElementById('genSelBar').classList.remove('active');
+}
+
+function confirmGenSel() {
+  if (genSelectedCards.length === 0) { cancelGenSel(); return; }
+  const card = genSelectedCards[0];
+  const assetType = card.dataset.type;
+  const preset = GEN_PROMPTS[genSelMode] || '';
+
+  cancelGenSel();
+  closeGenPage();
+
+  // Add asset as reference chip
+  if (assetType === 'video') {
+    uploadedVideos.push('ai-asset.mp4');
+  } else {
+    uploadedImgs.push('ai-asset.jpg');
+  }
+  renderRefStrip();
+  updateSendBtn();
+
+  // Pre-fill textarea with preset prompt
+  const ta = document.getElementById('promptTA');
+  ta.value = preset;
+  document.getElementById('charCt').textContent = preset.length + ' / 4000';
+  document.getElementById('promptWrap').classList.add('has-text');
+
+  // Open panel
+  openPanel();
+  // Scroll textarea to top
+  ta.scrollTop = 0;
+}
+
+function chatWithAsset(card) {
+  // card is the .asset-card element
+  const assetType = card ? card.dataset.type : 'image';
+  closeGenPage();
+  if (assetType === 'video') {
+    uploadedVideos.push('ai-asset.mp4');
+  } else {
+    uploadedImgs.push('ai-asset.jpg');
+  }
+  renderRefStrip();
+  updateSendBtn();
+  openPanel();
+}
+
+function downloadAsset(btn) {
+  const orig = btn.textContent;
+  btn.textContent = '✓ Saved';
+  setTimeout(() => { btn.textContent = orig; }, 1200);
+}
+
+function downloadSelected() {
+  alert('Downloading selected assets...');
+}
+
+/* ── Init: apply default agent state on load ── */
+applyPanelState('auto');
+
+/* ── Click outside to close pickers ── */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (pickerOpen) { document.getElementById('pickerOverlay').classList.remove('open'); pickerOpen = false; }
+    if (document.getElementById('gen-page').classList.contains('on')) closeGenPage();
+  }
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) sendMessage();
+});
+
+/* ── AI Agent page ── */
+function openAiAgentPage() {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('navAiAgent').classList.add('active');
+  const page = document.getElementById('aiAgentPage');
+  page.classList.add('on');
+  // Hide the floating AI bubble on the AI Agent full page
+  document.getElementById('aiFAB').classList.add('hidden');
+  // Neutralise mainContent padding so overlay fills edge-to-edge
+  document.getElementById('mainContent').style.padding = '0';
+  // Render demo cards into the AI Agent page if not yet rendered
+  aaInitCards();
+}
+
+function closeAiAgentPage() {
+  document.getElementById('aiAgentPage').classList.remove('on');
+  // Restore the floating AI bubble when leaving the AI Agent page
+  document.getElementById('aiFAB').classList.remove('hidden');
+  document.getElementById('mainContent').style.padding = '';
+  // Restore Buzz as active
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.nav-item')[3].classList.add('active');
+}
+
+function aaSelectConv(el) {
+  document.querySelectorAll('.aa-conv-item').forEach(i => i.classList.remove('aa-active'));
+  el.classList.add('aa-active');
+}
+
+function aaNewChat() {
+  document.querySelectorAll('.aa-conv-item').forEach(i => i.classList.remove('aa-active'));
+  document.getElementById('aaMsgs').innerHTML =
+    '<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--text-secondary);font-size:13px;padding:40px 0;">' +
+    '<svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="var(--border)" stroke-width="1.5"/><path d="M13 20h14M20 13v14" stroke="var(--brand-blue)" stroke-width="1.5" stroke-linecap="round"/></svg>' +
+    '<div style="font-weight:600;color:var(--text-primary);">New conversation</div>' +
+    '<div>Select an agent and start typing to begin.</div></div>';
+  document.getElementById('aaTextarea').value = '';
+  aaUpdateSend();
+}
+
+function aaUpdateSend() {
+  const ta = document.getElementById('aaTextarea');
+  const btn = document.getElementById('aaSendBtn');
+  const hint = document.querySelector('.aa-input-hint');
+  const len = ta.value.length;
+  if (hint) hint.textContent = len + ' / 4000 · Press Enter to send';
+  const active = len > 0;
+  btn.disabled = !active;
+  btn.style.opacity = active ? '1' : '.4';
+}
+
+function aaSend() {
+  const ta = document.getElementById('aaTextarea');
+  const txt = ta.value.trim();
+  if (!txt) return;
+  const msgs = document.getElementById('aaMsgs');
+  // Append user bubble
+  const um = document.createElement('div');
+  um.className = 'msg msg--user';
+  um.innerHTML = '<div class="msg__bubble" style="max-width:460px;">' + txt.replace(/</g,'&lt;') + '</div>';
+  msgs.appendChild(um);
+  ta.value = '';
+  aaUpdateSend();
+  msgs.scrollTop = msgs.scrollHeight;
+  // Append AI thinking indicator
+  const aim = document.createElement('div');
+  aim.className = 'msg msg--ai';
+  aim.innerHTML = '<div class="msg__bubble" style="max-width:320px;"><span style="color:var(--text-secondary);font-size:12px;">Thinking…</span></div>';
+  msgs.appendChild(aim);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+/* Render demo gen-cards into AI Agent page on first open */
+let aaCardsInited = false;
+function aaInitCards() {
+  if (aaCardsInited) return;
+  aaCardsInited = true;
+  const demos = [
+    {id:'aac1', bg:'linear-gradient(135deg,#d4edda,#a8d5b5,#7fb98a)', inner:'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><svg width="56" height="56" viewBox="0 0 56 56" fill="none"><ellipse cx="28" cy="34" rx="14" ry="10" fill="#7fb98a" opacity=".5"/><circle cx="28" cy="22" r="10" fill="#a8d5b5"/><path d="M20 32c0-4.4 3.6-8 8-8s8 3.6 8 8" fill="#7fb98a" opacity=".7"/></svg></div>', name:'spring_01.jpg', meta:'1:1 · 1080×1080', prompt:'春季護膚品牌廣告圖，風格清新自然，帶有粉綠色調，展示保濕精華產品，背景為嫩綠植物。'},
+    {id:'aac2', bg:'linear-gradient(135deg,#fce4ec,#f8bbd9,#f48fb1)', inner:'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><svg width="56" height="56" viewBox="0 0 56 56" fill="none"><ellipse cx="28" cy="36" rx="16" ry="8" fill="#f48fb1" opacity=".4"/><rect x="20" y="14" width="16" height="24" rx="4" fill="#f8bbd9"/><rect x="23" y="10" width="10" height="6" rx="2" fill="#f48fb1" opacity=".7"/></svg></div>', name:'spring_02.jpg', meta:'1:1 · 1080×1080', prompt:'春季護膚品牌廣告圖，粉色基調，展示保濕面霜產品，花卉裝飾背景，溫柔氛圍。'},
+    {id:'aac3', bg:'linear-gradient(135deg,#e8f5e9,#c8e6c9,#a5d6a7)', inner:'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><svg width="56" height="56" viewBox="0 0 56 56" fill="none"><circle cx="28" cy="28" r="16" fill="#c8e6c9"/><path d="M18 28c3-6 8-10 10-10s7 4 10 10" fill="#a5d6a7" opacity=".7"/><ellipse cx="28" cy="36" rx="10" ry="5" fill="#7cb342" opacity=".4"/></svg></div>', name:'spring_03.jpg', meta:'1:1 · 1080×1080', prompt:'春季護膚品牌廣告圖，以嫩綠色為主調，展示防曬乳液，配合春日戶外場景。'},
+    {id:'aac4', bg:'linear-gradient(135deg,#fff8e1,#ffe082,#ffd54f)', inner:'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><svg width="56" height="56" viewBox="0 0 56 56" fill="none"><circle cx="28" cy="28" r="14" fill="#ffd54f" opacity=".6"/><circle cx="28" cy="28" r="8" fill="#ffb300"/><path d="M28 14v4M28 38v4M14 28h4M38 28h4" stroke="#ff8f00" stroke-width="2" stroke-linecap="round"/></svg></div>', name:'spring_04.jpg', meta:'1:1 · 1080×1080', prompt:'春季護膚廣告圖，暖色調加入金色元素，奢華感，高光精華產品，金箔裝飾背景。'}
+  ];
+  demos.forEach(function(d) {
+    window._genCards = window._genCards || {};
+    window._genCards[d.id] = d;
+    renderGenCard(d.id);
+  });
+}
+</script>
+
+<!-- ═══ IMAGE LIGHTBOX ═══ -->
+<div class="img-lightbox" id="imgLightbox" onclick="if(event.target===this)closeImgLightbox()">
+  <div class="img-lightbox__inner">
+    <button class="img-lightbox__close" onclick="closeImgLightbox()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <div id="imgLightboxContent" style="width:min(680px,90vw);aspect-ratio:1/1;display:flex;flex-direction:column;justify-content:space-between;padding:28px;font-size:20px;font-weight:700;color:#fff;line-height:1.4;"></div>
+  </div>
+</div>
+
+<!-- ═══ VIEW PROMPT MODAL ═══ -->
+<div class="vp-overlay" id="vpOverlay" onclick="if(event.target===this)closeVpModal()">
+  <div class="vp-sheet">
+    <div class="vp-head">
+      <div class="vp-head__title" id="vpTitle">Image 1</div>
+      <button class="vp-close" onclick="closeVpModal()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="vp-section">
+      <div class="vp-section__label">Reference Images</div>
+      <div style="width:72px;height:72px;border-radius:var(--r-sm);border:1px solid var(--border);background:linear-gradient(160deg,#0a2218,#134526);display:flex;align-items:flex-end;padding:6px;">
+        <span style="font-size:8px;color:rgba(255,255,255,.7);">dr.once</span>
+      </div>
+    </div>
+
+    <div class="vp-section">
+      <div class="vp-section__label">Reference Posts</div>
+      <div class="vp-ref-post">
+        <div class="vp-ref-post__head">
+          <div class="vp-ref-post__av">YR</div>
+          <div>
+            <div class="vp-ref-post__name">Yves Rocher Hong Kong</div>
+            <div class="vp-ref-post__date">16 Jun 2026 17:30</div>
+          </div>
+        </div>
+        <!-- post image -->
+        <div class="vp-ref-post__img-placeholder" style="background:linear-gradient(135deg,#b8922e,#7a5520);">
+          <div style="font-size:15px;font-weight:700;color:#fff;text-align:center;line-height:1.4;">30+升級護膚智慧<br><span style="font-size:11px;font-weight:400;opacity:.85;">幹細胞活顏高效護理</span></div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div style="background:rgba(255,255,255,.18);border-radius:6px;padding:5px 10px;text-align:center;font-size:10px;font-weight:600;color:#fff;">極致提升<br><span style="font-weight:400;opacity:.8;">細胞再生力</span></div>
+            <div style="background:rgba(255,255,255,.18);border-radius:6px;padding:5px 10px;text-align:center;font-size:10px;font-weight:600;color:#fff;">精準修正<br><span style="font-weight:400;opacity:.8;">老化痕跡</span></div>
+          </div>
+        </div>
+        <div class="vp-ref-post__caption">
+          30+升級護膚智慧｜幹細胞活顏高效護理 🌟<br>
+          不論 30+ 定 40+，當你學識護膚嘅智慧 💡，就唔使再盲目追求絕齡…
+          <span class="vp-ref-post__more">Show More...</span>
+        </div>
+      </div>
+    </div>
+    <div class="vp-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div class="vp-section__label" style="margin-bottom:0;">Prompt</div>
+        <button class="vp-copy-btn" onclick="copyVpPrompt()" title="Copy prompt">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="5" y="1" width="10" height="12" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="4" width="10" height="12" rx="1.5" stroke="currentColor" stroke-width="1.3" fill="white"/></svg>
+        </button>
+      </div>
+      <div class="vp-prompt-text" id="vpPromptText"></div>
+    </div>
+    <div class="vp-section">
+      <div class="vp-section__label">Model Config</div>
+      <div class="vp-meta-row">
+        <div class="vp-meta-item"><span class="vp-meta-item__key">Model</span><span class="vp-meta-item__val" id="vpModel">GPT-image-2</span></div>
+        <div class="vp-meta-item"><span class="vp-meta-item__key">Aspect Ratio</span><span class="vp-meta-item__val" id="vpRatio">1:1</span></div>
+        <div class="vp-meta-item"><span class="vp-meta-item__key">Resolution</span><span class="vp-meta-item__val" id="vpRes">High</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Agent dropdown — lifted to body to escape ai-panel transform -->
+<div class="agent-dd hidden" id="agentDD" onclick="event.stopPropagation()">
+  <div style="font-size:10px;font-weight:600;color:var(--text-placeholder);text-transform:uppercase;letter-spacing:.5px;padding:var(--sp-xs) var(--sp-md) 2px;">Select Agent</div>
+  <div class="agent-opt sel" id="agopt-auto" onclick="setAgent('Auto','auto'); closeAgentDD()">
+    <div class="agent-opt__av" style="background:#F0FDF4;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1l1.2 2.4 2.6.38-1.9 1.85.45 2.6L7 7.1 4.65 8.23l.45-2.6L3.2 3.78l2.6-.38L7 1z" fill="#16A34A"/></svg></div>
+    <div><div class="agent-opt__name">Auto</div><div class="agent-opt__sub">Routes to the best agent for your intent</div></div>
+  </div>
+  <div class="agent-opt" id="agopt-imggen" onclick="setAgent('Image Gen','image-gen'); closeAgentDD()">
+    <div class="agent-opt__av" style="background:#FFF0F9;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="2" width="11" height="10" rx="1.5" stroke="#DB2777" stroke-width="1.3"/><circle cx="4.5" cy="5.5" r="1.2" fill="#DB2777"/><path d="M1.5 10.5l3.5-3.5 2 2 2.5-3 2.5 3.5" stroke="#DB2777" stroke-width="1.1" stroke-linecap="round"/></svg></div>
+    <div><div class="agent-opt__name">Image Gen agent</div><div class="agent-opt__sub">Generate image creative assets</div></div>
+  </div>
+  <div class="agent-opt" id="agopt-vidgen" style="opacity:.45;cursor:not-allowed;position:relative;" title="Coming soon" onclick="event.stopPropagation();showToast('Video Gen — Coming soon')">
+    <div class="agent-opt__av" style="background:#F3F4F6;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="2.5" width="8" height="9" rx="1.5" stroke="#9CA3AF" stroke-width="1.3"/><path d="M9.5 5.5l3-1.5v6l-3-1.5V5.5z" stroke="#9CA3AF" stroke-width="1.3" stroke-linejoin="round"/></svg></div>
+    <div><div class="agent-opt__name" style="color:#9CA3AF;">Video Gen agent</div><div class="agent-opt__sub">Coming soon</div></div>
+  </div>
+  <div class="agent-opt" id="agopt-advisor" onclick="setAgent('Ad Advisor','ad-advisor'); closeAgentDD()">
+    <div class="agent-opt__av" style="background:#EFF6FF;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#2563EB" stroke-width="1.3"/><path d="M7 4v3.5l2 1.5" stroke="#2563EB" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+    <div><div class="agent-opt__name">Ad Advisor agent</div><div class="agent-opt__sub">Ad strategy &amp; performance recommendations</div></div>
+  </div>
+</div>
+
+<!-- Platform dropdown — lifted to body to escape ai-panel transform -->
+<div class="platform-dd hidden" id="platformDD" onclick="event.stopPropagation()">
+  <div class="plat-opt sel" id="plat-auto" onclick="setPlatform('Auto','','plat-auto')"><span class="plat-opt__name">Auto</span><span class="plat-ratio">Best fit</span></div>
+  <div style="height:1px;background:var(--divider);"></div>
+  <div class="plat-group-label">Photo</div>
+  <div class="plat-opt" id="plat-feed-sq" onclick="setPlatform('Feed Square','1:1','plat-feed-sq')"><span class="plat-opt__name">Feed Square</span><span class="plat-ratio">1:1 · 1080×1080</span></div>
+  <div class="plat-opt" id="plat-feed-pt" onclick="setPlatform('Feed Portrait','4:5','plat-feed-pt')"><span class="plat-opt__name">Feed Portrait</span><span class="plat-ratio">4:5 · 1080×1350</span></div>
+  <div class="plat-opt" id="plat-feed-ls" onclick="setPlatform('Feed Landscape','1.91:1','plat-feed-ls')"><span class="plat-opt__name">Feed Landscape</span><span class="plat-ratio">1.91:1 · 1080×566</span></div>
+  <div class="plat-opt" id="plat-story-photo" onclick="setPlatform('Story Photo','9:16','plat-story-photo')"><span class="plat-opt__name">Story Photo</span><span class="plat-ratio">9:16 · 1080×1920</span></div>
+  <div class="plat-opt" id="plat-web-ls" onclick="setPlatform('Web Landscape','16:9','plat-web-ls')"><span class="plat-opt__name">Web Landscape</span><span class="plat-ratio">16:9 · 1920×1080</span></div>
+</div>
+
+</body>
+</html>
