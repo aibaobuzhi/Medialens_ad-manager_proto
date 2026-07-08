@@ -1420,7 +1420,7 @@ svg{display:block;}
         onblur="setTimeout(()=>{this.closest('.prompt-wrap').classList.remove('focused')},150)"></textarea>
       <div class="prompt-bar">
         <!-- + button -->
-        <button class="pbar-btn plus" title="Add reference from Buzz" onclick="openPicker()">
+        <button class="pbar-btn plus" id="promptPlusBtn" title="Add reference from Buzz" onclick="openPicker()">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </button>
         <!-- agent select -->
@@ -1894,15 +1894,16 @@ function openPicker() {
   const sheet = overlay.querySelector('.picker-sheet');
   const onAiAgentPage = document.getElementById('aiAgentPage').classList.contains('on');
   if (!onAiAgentPage) {
-    // Small AI bubble panel: dock the picker as a compact card directly
-    // above the input toolbar, width-matched to the panel — not a
-    // full-viewport bottom sheet. Same anchoring technique as .agent-dd /
-    // .platform-dd (position:fixed, bounding-rect of the trigger's container).
-    const anchor = document.getElementById('promptWrap');
+    // Small AI bubble panel: dock the picker as a compact floating card
+    // directly above the "+" button (not the whole input toolbar) — same
+    // anchoring technique as .agent-dd / .platform-dd (position:fixed,
+    // bounding-rect of the trigger button itself).
+    const anchor = document.getElementById('promptPlusBtn');
+    const wrapRect = document.getElementById('promptWrap').getBoundingClientRect();
     const rect = anchor.getBoundingClientRect();
     overlay.classList.add('anchored');
+    sheet.style.width = Math.min(300, wrapRect.width) + 'px';
     sheet.style.left = rect.left + 'px';
-    sheet.style.width = rect.width + 'px';
     sheet.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
   } else {
     // Full-page AI Agent view: keep the original full-viewport bottom sheet.
