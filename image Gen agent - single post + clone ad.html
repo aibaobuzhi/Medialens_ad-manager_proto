@@ -1952,6 +1952,7 @@ body{
           <div class="ref-slot__title" id="slot-posts-title">Post</div>
           <div class="ref-slot__sub" id="slot-posts-sub">Select a post as reference</div>
         </div>
+        <span class="coming-soon-pill hidden" id="slot-posts-soon">Coming soon</span>
         <div class="ref-slot__arrow">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
         </div>
@@ -2351,14 +2352,22 @@ function aiPanelNewChat() {
 function openPicker(anchorEl) {
   syncSlotStates();
   const isImgGen = currentAgentMode === 'image-gen';
+  const anchor = anchorEl || document.getElementById('promptPlusBtn') || document.querySelector('.aa-plus-btn');
+  const isAiAgentModule = !!(anchor && anchor.closest('#aiAgentPage'));
+  const postComingSoon = isImgGen && isAiAgentModule;
   // Post selection: only for Image Gen agent
   document.getElementById('slot-posts').style.display = isImgGen ? '' : 'none';
+  document.getElementById('slot-posts').classList.toggle('is-disabled', postComingSoon);
+  document.getElementById('slot-posts').dataset.comingSoon = postComingSoon ? 'true' : 'false';
+  document.getElementById('slot-posts-soon').classList.toggle('hidden', !postComingSoon);
+  document.getElementById('slot-posts-sub').textContent = postComingSoon
+    ? 'Post selection in AI Agent module is coming soon'
+    : document.getElementById('slot-posts-sub').textContent;
   // Upload: shown for all agents
   document.getElementById('slot-upload').style.display = '';
 
   const overlay = document.getElementById('pickerOverlay');
   const sheet = overlay.querySelector('.picker-sheet');
-  const anchor = anchorEl || document.getElementById('promptPlusBtn') || document.querySelector('.aa-plus-btn');
   if (anchor) {
     // Dock the picker as a compact floating menu directly above the "+"
     // button. Both AI bubble and AI Agent page use the same placement.
@@ -2414,6 +2423,11 @@ function syncSlotStates() {
 
 /* Slot 1: close modal → enter select mode on Buzz grid */
 function startSelectPosts() {
+  const slot = document.getElementById('slot-posts');
+  if (slot && slot.dataset.comingSoon === 'true') {
+    showToast('Post selection in AI Agent module — Coming soon');
+    return;
+  }
   const selectablePosts = POSTS_DATA.filter(p => p.type === 'image');
   if (selectablePosts.length === 0) {
     showToast('当前无可选的 post');
