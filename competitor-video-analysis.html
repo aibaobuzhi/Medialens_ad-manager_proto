@@ -21,7 +21,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MediaLens — My Page · AI Category Performance</title>
+<title>MediaLens — Competitor Analysis · AI Category Performance</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -84,6 +84,7 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
 /* ===== TAB BODY ===== */
 .tabbody{padding:18px 32px 48px;}
 .lensbar{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+.metricbar{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
 .lens-group{display:inline-flex;background:#eef2f5;border-radius:var(--r);padding:3px;gap:2px;}
 .lens-btn{border:none;background:transparent;font-family:inherit;font-size:13px;color:var(--muted);padding:8px 18px;border-radius:8px;cursor:pointer;font-weight:500;}
 .lens-btn.active{background:#fff;color:var(--brand);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08);}
@@ -205,6 +206,25 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
 .hm td{padding:5px;text-align:center;}
 .hm td.rowh{text-align:left;font-size:12px;color:var(--text);}
 .hm-cell{border-radius:7px;padding:9px 6px;font-weight:600;font-size:12px;}
+
+/* ===== VIDEO CATEGORY ANALYSIS ===== */
+.video-analysis-view{display:none;}
+.va-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);padding:24px;margin-bottom:16px;}
+.va-section-header{margin-bottom:4px;}
+.va-section-title{font-size:16px;font-weight:700;color:var(--text);}
+.va-section-sub{font-size:12.5px;color:var(--secondary);line-height:1.5;margin-top:2px;}
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;}
+.chart-row:last-child{margin-bottom:0;}
+.chart-card{border:1px solid var(--divider);border-radius:var(--r-card);padding:20px;background:#fff;}
+.chart-card-title{font-size:14px;font-weight:700;color:var(--text);letter-spacing:0;}
+.chart-card-sub{font-size:12px;color:var(--secondary);margin-bottom:16px;line-height:1.5;}
+.hbar-list{display:flex;flex-direction:column;gap:12px;}
+.hbar-row{display:flex;align-items:center;gap:12px;}
+.hbar-label{font-size:12.5px;color:var(--text);width:160px;flex-shrink:0;font-weight:600;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;}
+.hbar-track{flex:1;height:24px;background:#F1F5F9;border-radius:6px;overflow:hidden;position:relative;}
+.hbar-fill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;}
+.hbar-val{font-size:11.5px;font-weight:700;color:#fff;}
+@media (max-width:1024px){.chart-row{grid-template-columns:1fr;}.hbar-label{width:150px;}}
 
 /* ===== SENTIMENT STACKED ===== */
 .sent-row{display:grid;grid-template-columns:158px 1fr 42px;align-items:center;gap:10px;margin-bottom:9px;}
@@ -342,10 +362,14 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
 
 /* ===== tooltip ===== */
 .has-tooltip{position:relative;cursor:help;}
-.has-tooltip .qm{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;background:#e0e0e0;border-radius:50%;font-size:9px;font-weight:700;color:var(--muted);margin-left:5px;vertical-align:middle;}
+.has-tooltip .qm{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;background:#dde5e9;border-radius:50%;font-size:9px;font-weight:700;color:var(--muted);margin-left:5px;vertical-align:middle;}
 .tooltip-box{display:none;}
-#tt{position:fixed;z-index:99999;display:none;background:#102532;color:#fff;border-radius:10px;padding:12px 14px;max-width:280px;font-size:12px;line-height:1.6;box-shadow:0 4px 20px rgba(0,0,0,.25);pointer-events:none;}
-.tt-r{display:block;color:#fff;}
+#tt{position:fixed;z-index:9999;display:none;background:var(--title);color:#fff;border-radius:10px;padding:13px 15px;width:300px;font-size:11.5px;line-height:1.6;box-shadow:0 8px 32px rgba(0,0,0,.28);pointer-events:none;}
+.tt-t{font-size:12.5px;font-weight:700;margin-bottom:7px;}
+.tt-r{margin-bottom:5px;color:#dbe4ea;}
+.tt-r b{color:#9CCBF0;font-weight:600;}
+.tt-src{margin-top:9px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15);font-size:10px;font-weight:600;}
+.tt-src .s-meta{color:#7FD0FF;} .tt-src .s-ai{color:#C3B0FF;}
 @media(max-width:1180px){.grid.c2-wide,.grid.c2{grid-template-columns:1fr;}.ex-grid{grid-template-columns:1fr 1fr;}}
 </style>
 </head>
@@ -462,9 +486,22 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
             <button class="lens-btn active" data-lens="content" onclick="setLens('content')">Content category</button>
             <button class="lens-btn" data-lens="ad" onclick="setLens('ad')">Ad category</button>
             <button class="lens-btn" data-lens="image" onclick="setLens('image')">Image category</button>
+            <button class="lens-btn" data-lens="video" onclick="setLens('video')">Video category</button>
           </div>
         </div>
 
+        <!-- METRIC SELECTOR (global — applies to all 4 lenses) -->
+        <div class="metricbar">
+          <div class="metric-group" id="metricGroup">
+            <button class="metric-btn active" data-m="aeng" onclick="setMetric('aeng')">Avg Engagement</button>
+            <button class="metric-btn" data-m="eng" onclick="setMetric('eng')">Engagement</button>
+            <button class="metric-btn" data-m="pageer" onclick="setMetric('pageer')">Page ER</button>
+            <button class="metric-btn" data-m="avv" onclick="setMetric('avv')">Video Views</button>
+            <button class="metric-btn" data-m="svr" onclick="setMetric('svr')">3s View Rate</button>
+          </div>
+        </div>
+
+        <div id="categoryView">
         <!-- A. AI ADVISOR -->
         <div class="card advisor" id="advisor">
           <div class="adv-hd">
@@ -488,17 +525,12 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
           <div class="card-hd">
             <div class="card-title" id="barsTitle">Engagement per post by category
               <span class="has-tooltip"><span class="qm">?</span>
-                <span class="tooltip-box"><span class="tt-r">Shows the average result per post, so categories can be compared fairly regardless of posting volume.</span></span>
+                <span class="tooltip-box"><span class="tt-t">Performance per post by category</span>
+                <span class="tt-r"><b>What:</b> Average value of the selected metric each category earns per post.</span>
+                <span class="tt-r"><b>Why it matters:</b> Per-post averages remove the bias of how often you post a theme, so you see which content genuinely resonates.</span>
+                <span class="tt-r"><b>Page ER:</b> page engagement ÷ days ÷ followers ×100 (daily page rate).</span>
+                <span class="tt-src">Source: <span class="s-meta">Meta ✓ metrics</span> · <span class="s-ai">MediaLens AI category</span></span></span>
               </span>
-            </div>
-            <div class="metric-group" id="metricGroup">
-              <button class="metric-btn active" data-m="aeng" onclick="setMetric('aeng')">Avg Engagement</button>
-              <button class="metric-btn" data-m="eng" onclick="setMetric('eng')">Engagement</button>
-              <button class="metric-btn" data-m="er" onclick="setMetric('er')">ER</button>
-              <button class="metric-btn" data-m="pageer" onclick="setMetric('pageer')">Page ER</button>
-              <button class="metric-btn" data-m="avv" onclick="setMetric('avv')">Avg Video Views</button>
-              <button class="metric-btn" data-m="ctr" onclick="setMetric('ctr')">CTR</button>
-              <button class="metric-btn" data-m="nfr" onclick="setMetric('nfr')">Non-Fans Reach</button>
             </div>
           </div>
           <div class="card-sub" id="barsSub">
@@ -523,7 +555,10 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
           <div class="card-hd">
             <div class="card-title">Performance vs volume matrix
               <span class="has-tooltip"><span class="qm">?</span>
-                <span class="tooltip-box"><span class="tt-r">Maps each category by performance and posting volume to show what to scale or reduce.</span></span>
+                <span class="tooltip-box"><span class="tt-t">Performance vs volume</span>
+                <span class="tt-r"><b>What:</b> Each bubble is a category — X = avg engagement per post, Y = how many posts, size = total engagement.</span>
+                <span class="tt-r"><b>Why it matters:</b> High engagement + low volume (bottom-right) = scale up; high volume + low engagement (top-left) = over-served.</span>
+                <span class="tt-src">Source: <span class="s-meta">Meta ✓ engagement</span> · <span class="s-ai">MediaLens AI category</span></span></span>
               </span>
             </div>
           </div>
@@ -540,7 +575,10 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
           <div class="card-hd">
             <div class="card-title">Which format wins in each category
               <span class="has-tooltip"><span class="qm">?</span>
-                <span class="tooltip-box"><span class="tt-r">Shows which post format performs best for each content category.</span></span>
+                <span class="tooltip-box"><span class="tt-t">Format × Category</span>
+                <span class="tt-r"><b>What:</b> Relative engagement (index vs channel average = 100) for each category in each post format.</span>
+                <span class="tt-r"><b>Why it matters:</b> The same theme can perform very differently as a Photo vs a Video — this tells you the format to publish it in.</span>
+                <span class="tt-src">Source: <span class="s-meta">Meta ✓ format &amp; engagement</span> · <span class="s-ai">MediaLens AI category</span></span></span>
               </span>
             </div>
           </div>
@@ -554,7 +592,10 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
             <div class="card-hd">
               <div class="card-title" id="comboTitle1">Content category × Ad category
                 <span class="has-tooltip"><span class="qm">?</span>
-                  <span class="tooltip-box"><span class="tt-r">Ranks content and ad-category pairings by average engagement per post.</span></span>
+                  <span class="tooltip-box"><span class="tt-t">Content × Ad combinations</span>
+                  <span class="tt-r"><b>What:</b> Each post carries both a content-theme tag and an ad-format tag — this ranks the pairings by avg engagements per post.</span>
+                  <span class="tt-r"><b>Why it matters:</b> Shows which theme delivered in which creative format — the recipes worth repeating.</span>
+                  <span class="tt-src">Source: <span class="s-meta">Meta ✓ engagement</span> · <span class="s-ai">MediaLens AI categories</span></span></span>
                 </span>
               </div>
             </div>
@@ -565,7 +606,10 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
             <div class="card-hd">
               <div class="card-title" id="comboTitle2">Content category × Image category
                 <span class="has-tooltip"><span class="qm">?</span>
-                  <span class="tooltip-box"><span class="tt-r">Ranks content and image-category pairings by average engagement per post.</span></span>
+                  <span class="tooltip-box"><span class="tt-t">Content × Image combinations</span>
+                  <span class="tt-r"><b>What:</b> Pairs each post's content-theme tag with its image-content tag, ranked by avg engagements per post.</span>
+                  <span class="tt-r"><b>Why it matters:</b> Reveals which subject matter on screen lifts which theme.</span>
+                  <span class="tt-src">Source: <span class="s-meta">Meta ✓ engagement</span> · <span class="s-ai">MediaLens AI categories</span></span></span>
                 </span>
               </div>
             </div>
@@ -579,7 +623,10 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
           <div class="card-hd">
             <div class="card-title">Top content
               <span class="has-tooltip"><span class="qm">?</span>
-                <span class="tooltip-box"><span class="tt-r">Lists the individual posts driving the strongest category performance.</span></span>
+                <span class="tooltip-box"><span class="tt-t">Top content</span>
+                <span class="tt-r"><b>What:</b> The best-performing individual posts, each tagged with its content category, sub-category and ad-format.</span>
+                <span class="tt-r"><b>Why it matters:</b> Drills from category averages down to the actual posts driving them — the concrete winners to learn from.</span>
+                <span class="tt-src">Source: <span class="s-meta">Meta ✓ metrics</span> · <span class="s-ai">MediaLens AI categories</span></span></span>
               </span>
             </div>
             <span class="src-tag src-ai" id="topMetricLabel">Avg Engagement</span>
@@ -587,6 +634,30 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
           <div class="card-sub">Ranked individual posts by selected metric.</div>
           <div id="topContent"></div>
         </div>
+
+        </div><!-- /categoryView -->
+
+        <div id="videoView" class="video-analysis-view">
+          <div class="va-section">
+            <div class="va-section-header">
+              <div class="va-section-title">Initial 3-second hook classification</div>
+              <div class="va-section-sub">The make-or-break moment. How the first 3 seconds affect retention and downstream engagement performance.</div>
+            </div>
+            <div style="height:1px;background:var(--divider);margin:20px 0;"></div>
+
+            <div class="chart-row">
+              <div class="chart-card" id="videoHookCard"></div>
+
+              <div class="chart-card" id="videoCatCard"></div>
+            </div>
+
+            <div class="chart-row">
+              <div class="chart-card" id="videoLengthCard"></div>
+
+              <div class="chart-card" id="videoAngleCard"></div>
+            </div>
+          </div>
+        </div><!-- /videoView -->
 
       </div><!-- /tabbody -->
     </div>
@@ -627,8 +698,6 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
             <th style="text-align:right">Engagements</th>
             <th style="text-align:right">Reaches</th>
             <th style="text-align:right">Clicks</th>
-            <th style="text-align:right">ER</th>
-            <th style="text-align:right">CTR</th>
           </tr></thead>
           <tbody id="postModalBody"></tbody>
         </table>
@@ -708,6 +777,35 @@ var DATA = {
     ]
   }
 };
+
+/* ============ VIDEO LENS MOCK DATA (metric-driven video cards) ============ */
+var HOOK_ROWS=[
+  {n:'KOL Speaking Direct',c:'#EF4444',posts:42,eng:2779,vv:15200},
+  {n:'Problem/Solution Setup',c:'#EF4444',posts:35,eng:2393,vv:12800},
+  {n:'Face Close-up',c:'#EF4444',posts:38,eng:2287,vv:11400},
+  {n:'Person Holding Product',c:'#EF4444',posts:29,eng:1917,vv:8600},
+  {n:'Product Display with Text',c:'#EF4444',posts:24,eng:1426,vv:6200}
+];
+var VIDCAT_ROWS=[
+  {n:'Product demonstration',c:'#10B981',g:'linear-gradient(90deg,#10B981,#34D399)',posts:46,eng:2350,vv:13800},
+  {n:'Before & after transformation',c:'#F59E0B',g:'linear-gradient(90deg,#F59E0B,#FBBF24)',posts:28,eng:2059,vv:11200},
+  {n:'Talking head / KOL endorsement',c:'#EF4444',g:'linear-gradient(90deg,#EF4444,#F87171)',posts:34,eng:1907,vv:9600},
+  {n:'Text animation / graphics',c:'#8B5CF6',g:'linear-gradient(90deg,#8B5CF6,#A78BFA)',posts:19,eng:1059,vv:4200}
+];
+var ANGLE_ROWS=[
+  {n:'KOL testimonial',c:'#0EA5E9',posts:41,eng:2779,vv:15400},
+  {n:'Before/after transformation',c:'#0EA5E9',posts:33,eng:2525,vv:13200},
+  {n:'Product demo',c:'#0EA5E9',posts:37,eng:2280,vv:11800},
+  {n:'Food & lifestyle',c:'#0EA5E9',posts:26,eng:1924,vv:9200},
+  {n:'Event & launch',c:'#0EA5E9',posts:22,eng:1719,vv:7800},
+  {n:'Promotions & Discounts',c:'#0EA5E9',posts:31,eng:1082,vv:5100},
+  {n:'Brand awareness',c:'#0EA5E9',posts:19,eng:904,vv:4300}
+];
+var LENGTH_ROWS=[
+  {n:'Short (<15s)',short:'Short',posts:52,eng:924,vv:6200},
+  {n:'Medium (15-30s)',short:'Medium',posts:38,eng:1485,vv:11400},
+  {n:'Long (30s+)',short:'Long (30s+)',posts:21,eng:2376,vv:18600}
+];
 
 var EXAMPLES = {
   content:[
@@ -867,8 +965,8 @@ var TOPPOSTS=[
   {th:'🚇',name:'Breaking: new MTR line opens ahead of schedule',fmt:'LINK',cat:'News & Current Affairs',sub:'Local & Regional News',adcat:'Text-Only Graphic',eng:1240,likes:680,comments:360,vv:2100,d:-6}
 ];
 
-var METRIC_LABEL = {aeng:'Avg Engagement',eng:'Engagement',er:'ER',pageer:'Page ER',avv:'Avg Video Views',ctr:'CTR',nfr:'Non-Fans Reach'};
-var METRIC_UNIT  = {aeng:'per post',eng:'total',er:'vs followers',pageer:'daily · vs followers',avv:'per post',ctr:'per post',nfr:'total'};
+var METRIC_LABEL = {aeng:'Avg Engagement',eng:'Engagement',pageer:'Page ER',avv:'Video Views',svr:'3s View Rate'};
+var METRIC_UNIT  = {aeng:'per post',eng:'total',pageer:'daily · vs followers',avv:'per post',svr:'views ÷ impressions'};
 
 /* ============ STATE ============ */
 var lens='content', metric='aeng', comboLevel='main';
@@ -881,16 +979,13 @@ function subVal(subEng,m){return m==='eng'?subEng:Math.round(subEng*SUB_RATIO[m]
 function metricVal(r,m){
   if(m==='aeng')  return r.eng;
   if(m==='eng')   return r.posts*r.eng;
-  if(m==='er')    return r.eng/FOLLOWERS*100;
   if(m==='pageer')return (r.posts*r.eng)/12000000*100;
   if(m==='avv')   return r.vv;                          /* avg video views per post */
-  if(m==='ctr')   return +(r.eng/FOLLOWERS*2.8).toFixed(2); /* mock CTR */
-  if(m==='nfr')   return Math.round(r.posts*r.eng*4.2); /* mock non-fans reach */
+  if(m==='svr')   return +(r.vv/FOLLOWERS*150).toFixed(1); /* mock 3s View Rate: vv ÷ synthetic impressions (FOLLOWERS-based, same denominator pattern as ER/Page ER) */
   return 0;
 }
 function barValText(v){
-  if(metric==='er'||metric==='pageer') return v.toFixed(1)+'%';
-  if(metric==='ctr') return v.toFixed(2)+'%';
+  if(metric==='pageer'||metric==='svr') return v.toFixed(1)+'%';
   return fmt(v);
 }
 function overallAvg(d,m){ // weighted by posts
@@ -939,6 +1034,113 @@ function renderBars(){
   backToMain();
 }
 
+/* ============ VIDEO LENS RENDERING (metric-driven) ============ */
+/* Shared value/bar-width rule for the 4 video cards:
+   - aeng/avv  : raw formatted number only
+   - eng       : raw formatted number + (% share of total within this card's own rows)
+   - pageer/svr: metric's own percentage only
+   Rows are always sorted descending by metricVal; bar width scaled to the top row. */
+function videoMetricDisplay(rows, m){
+  var sorted=rows.slice().sort(function(a,b){return metricVal(b,m)-metricVal(a,m);});
+  var top=metricVal(sorted[0],m);
+  var total=0; sorted.forEach(function(r){total+=metricVal(r,m);});
+  var items=sorted.map(function(r){
+    var v=metricVal(r,m);
+    var barPct=top>0?Math.round(v/top*100):0;
+    var displayText;
+    if(m==='aeng'){
+      displayText=fmt(v);
+    }else if(m==='avv'){
+      displayText=fmtK(v);
+    }else if(m==='eng'){
+      var share=total>0?(v/total*100):0;
+      displayText=fmtK(v)+' ('+share.toFixed(1)+'%)';
+    }else{ // pageer, svr
+      displayText=v.toFixed(2)+'%';
+    }
+    return {row:r, value:v, displayText:displayText, barPct:barPct};
+  });
+  return {sortedRows:sorted, items:items};
+}
+function renderHbarList(items, gradientFn){
+  return items.map(function(it){
+    var grad=gradientFn(it.row);
+    return '<div class="hbar-row"><div class="hbar-label">'+it.row.n+'</div>'+
+      '<div class="hbar-track"><div class="hbar-fill" style="width:'+it.barPct+'%;background:'+grad+';">'+
+      '<span class="hbar-val">'+it.displayText+'</span></div></div></div>';
+  }).join('');
+}
+function renderVideoLengthChart(){
+  var rows=LENGTH_ROWS;
+  var vals=rows.map(function(r){return metricVal(r,metric);});
+  var maxVal=Math.max.apply(null, vals);
+  var axisMax=maxVal>0?maxVal*1.15:1;
+  var total=0; vals.forEach(function(v){total+=v;});
+  function fmtAxis(v){
+    if(metric==='pageer'||metric==='svr') return v.toFixed(1)+'%';
+    if(metric==='avv') return fmtK(v);
+    return fmt(v);
+  }
+  function fmtVal(v){
+    if(metric==='aeng') return fmt(v);
+    if(metric==='avv') return fmtK(v);
+    if(metric==='eng'){
+      var share=total>0?(v/total*100):0;
+      return fmtK(v)+' ('+share.toFixed(1)+'%)';
+    }
+    return v.toFixed(2)+'%';
+  }
+  var xs=[65,125,195], barW=40, chartTop=10, chartBottom=130, steps=4;
+  var gridSvg='', barsSvg='';
+  for(var i=0;i<=steps;i++){
+    var frac=i/steps;
+    var y=chartBottom-frac*(chartBottom-chartTop);
+    var isBottom=(i===steps);
+    gridSvg+='<line x1="40" y1="'+y+'" x2="270" y2="'+y+'" stroke="'+(isBottom?'#E2E8F0':'#F1F5F9')+'" stroke-width="'+(isBottom?'1.5':'1')+'"'+(isBottom?'':' stroke-dasharray="4,4"')+'/>';
+    gridSvg+='<text x="32" y="'+(y+4)+'" text-anchor="end" font-size="10" font-weight="600" fill="#94A3B8">'+fmtAxis(axisMax*frac)+'</text>';
+  }
+  rows.forEach(function(r,i){
+    var v=metricVal(r,metric);
+    var h=axisMax>0?(v/axisMax)*(chartBottom-chartTop):0;
+    var y=chartBottom-h;
+    var x=xs[i], cx=x+barW/2;
+    barsSvg+='<rect x="'+x+'" y="'+y+'" width="'+barW+'" height="'+h+'" rx="5" fill="url(#videoBlueGrad)"/>';
+    barsSvg+='<text x="'+cx+'" y="'+(y-8)+'" text-anchor="middle" font-size="11" font-weight="700" fill="#0F172A">'+fmtVal(v)+'</text>';
+    barsSvg+='<text x="'+cx+'" y="148" text-anchor="middle" font-size="10" font-weight="500" fill="#64748B">'+r.short+'</text>';
+  });
+  var svg='<svg width="100%" height="160" viewBox="0 0 280 160">'+
+    '<line x1="40" y1="10" x2="40" y2="130" stroke="#E2E8F0" stroke-width="1.5"/>'+
+    gridSvg+barsSvg+
+    '<defs><linearGradient id="videoBlueGrad" x1="0" y1="0" x2="0" y2="1">'+
+    '<stop offset="0%" stop-color="#0EA5E9"/><stop offset="100%" stop-color="#2563EB"/></linearGradient></defs>'+
+    '</svg>';
+  document.getElementById('videoLengthCard').innerHTML=
+    '<div class="chart-card-title">Video Length vs Performance</div>'+
+    '<div class="chart-card-sub">'+METRIC_LABEL[metric]+' · Short (&lt;15s) vs Medium (15-30s) vs Long (30s+)</div>'+
+    '<div style="display:flex;justify-content:center;padding-top:10px;">'+svg+'</div>';
+}
+function renderVideoView(){
+  var hookD=videoMetricDisplay(HOOK_ROWS, metric);
+  document.getElementById('videoHookCard').innerHTML=
+    '<div class="chart-card-title">3s hook type → '+METRIC_LABEL[metric]+'</div>'+
+    '<div class="chart-card-sub">Which opening pattern drives highest downstream engagement</div>'+
+    '<div class="hbar-list">'+renderHbarList(hookD.items,function(){return 'linear-gradient(90deg,#EF4444,#F87171)';})+'</div>';
+
+  var catD=videoMetricDisplay(VIDCAT_ROWS, metric);
+  document.getElementById('videoCatCard').innerHTML=
+    '<div class="chart-card-title">Video category → '+METRIC_LABEL[metric]+'</div>'+
+    '<div class="chart-card-sub">Taxonomy-classified video types ranked by '+METRIC_LABEL[metric]+'</div>'+
+    '<div class="hbar-list">'+renderHbarList(catD.items,function(row){return row.g;})+'</div>';
+
+  var angleD=videoMetricDisplay(ANGLE_ROWS, metric);
+  document.getElementById('videoAngleCard').innerHTML=
+    '<div class="chart-card-title">Video Content Angle → '+METRIC_LABEL[metric]+'</div>'+
+    '<div class="chart-card-sub">Creative angle ranked by '+METRIC_LABEL[metric]+'</div>'+
+    '<div class="hbar-list">'+renderHbarList(angleD.items,function(){return 'linear-gradient(90deg,#0EA5E9,#38BDF8)';})+'</div>';
+
+  renderVideoLengthChart();
+}
+
 /* ============ SUB-CAT DRILL-DOWN ============ */
 function openSubCat(catName){
   var d=DATA[lens];
@@ -980,7 +1182,7 @@ function openPostModal(catName, idx, filterFormat, extra){
   var d=DATA[lens];
   var parent=d.rows[idx]||d.rows.find(function(r){return r.n===catName;})||d.rows[0];
   var metLbl=METRIC_LABEL[metric];
-  var isPct=metric==='er'||metric==='pageer'||metric==='ctr';
+  var isPct=metric==='pageer'||metric==='svr';
 
   /* build mock posts */
   var posts=[];
@@ -992,12 +1194,10 @@ function openPostModal(catName, idx, filterFormat, extra){
     var mv=metricVal(fakeRow,metric);
     var reaches=Math.round(baseEng/0.0053); /* mock: ER~0.53% */
     var clicks=Math.round(reaches*(0.072-i*0.008));
-    var er=(baseEng/reaches*100).toFixed(2);
-    var ctr=(clicks/reaches*100).toFixed(2);
     var sub=parent.sub?parent.sub[i%parent.sub.length][0]:'';
     var d7=parent.d-(i*2);
     posts.push({emoji:POST_EMOJIS[i%10],author:POST_AUTHORS[i%5],cap:POST_CAPTIONS[i%POST_CAPTIONS.length],
-      fmt:filterFormat||POST_FMTS[i%6],sub:sub,mv:mv,eng:baseEng,reaches:reaches,clicks:clicks,er:er,ctr:ctr,d7:d7});
+      fmt:filterFormat||POST_FMTS[i%6],sub:sub,mv:mv,eng:baseEng,reaches:reaches,clicks:clicks,d7:d7});
   }
   /* sort by active metric desc */
   posts.sort(function(a,b){return b.mv-a.mv;});
@@ -1036,8 +1236,8 @@ function openPostModal(catName, idx, filterFormat, extra){
   document.getElementById('pmSummary').innerHTML=sumHTML;
 
   /* metric col: hide when it duplicates an existing table column
-     aeng/eng → same as Engagements; er → ER col; ctr → CTR col */
-  var METRIC_REDUNDANT={aeng:true,eng:true,er:true,ctr:true};
+     aeng/eng → same as Engagements */
+  var METRIC_REDUNDANT={aeng:true,eng:true};
   var showMetricCol=!METRIC_REDUNDANT[metric];
   document.getElementById('pmMetricTh').style.display=showMetricCol?'':'none';
   document.getElementById('pmMetricTh').textContent=metLbl;
@@ -1059,8 +1259,6 @@ function openPostModal(catName, idx, filterFormat, extra){
       '<td><div class="post-num">'+fmtK(p.eng)+'</div></td>'+
       '<td><div class="post-num">'+fmtK(p.reaches)+'</div></td>'+
       '<td><div class="post-num">'+fmtK(p.clicks)+'</div></td>'+
-      '<td><div class="post-num">'+p.er+'%</div></td>'+
-      '<td><div class="post-num">'+p.ctr+'%</div></td>'+
     '</tr>';
   }).join('');
 
@@ -1085,10 +1283,8 @@ function comboMetricVal(baseV){
   /* scale the base avg-engagement combo value to the selected metric */
   if(metric==='aeng'||metric==='eng') return baseV;
   if(metric==='avv') return Math.round(baseV*3.2);
-  if(metric==='er')  return +(baseV/FOLLOWERS*100).toFixed(2);
   if(metric==='pageer') return +(baseV*0.0004).toFixed(3);
-  if(metric==='ctr') return +(baseV/FOLLOWERS*2.8).toFixed(2);
-  if(metric==='nfr') return Math.round(baseV*4.2);
+  if(metric==='svr') return +(baseV/FOLLOWERS*400).toFixed(1); /* mock 3s View Rate proxy from combo's avg-engagement base */
   return baseV;
 }
 function openComboPostModal(catA, catB, labelA, labelB){
@@ -1102,7 +1298,7 @@ function renderCombo(elId, data, labelA, labelB){
                .sort(function(a,b){return b.mv-a.mv;});
   var max=rows[0].mv;
   var total=0; rows.forEach(function(r){total+=r.mv;});
-  var isPct=metric==='er'||metric==='pageer'||metric==='ctr';
+  var isPct=metric==='pageer'||metric==='svr';
   document.getElementById(elId).innerHTML=rows.map(function(r){
     var w=r.mv/max*100, label=r.a+' + '+r.b;
     var disp=isPct?r.mv+'%':fmt(r.mv);
@@ -1187,16 +1383,14 @@ function toggleAdvExpand(){
 function postMetricVal(p,m){
   if(m==='aeng'||m==='eng') return p.eng;
   if(m==='avv') return p.vv;
-  if(m==='er')  return +(p.eng/FOLLOWERS*100).toFixed(2);
   if(m==='pageer') return +(p.eng*0.0004).toFixed(3);
-  if(m==='ctr') return +(p.eng/FOLLOWERS*2.8).toFixed(2);
-  if(m==='nfr') return Math.round(p.eng*4.2);
+  if(m==='svr') return +(p.vv/FOLLOWERS*150).toFixed(1); /* mock 3s View Rate: vv ÷ synthetic impressions (FOLLOWERS-based) */
   return p.eng;
 }
 function renderTopContent(){
   var lbl=METRIC_LABEL[metric];
   document.getElementById('topMetricLabel').textContent=lbl;
-  var isPct=metric==='er'||metric==='pageer'||metric==='ctr';
+  var isPct=metric==='pageer'||metric==='svr';
   var rows=TOPPOSTS.slice().sort(function(a,b){return postMetricVal(b,metric)-postMetricVal(a,metric);});
   document.getElementById('topContent').innerHTML=rows.map(function(p,i){
     var mv=postMetricVal(p,metric);
@@ -1297,11 +1491,19 @@ function renderAll(){
 function setLens(l){
   lens=l;
   document.querySelectorAll('.lens-btn').forEach(function(b){b.classList.toggle('active',b.dataset.lens===l);});
+  var categoryView=document.getElementById('categoryView');
+  var videoView=document.getElementById('videoView');
+  if(categoryView&&videoView){
+    categoryView.style.display=l==='video'?'none':'block';
+    videoView.style.display=l==='video'?'block':'none';
+  }
+  if(l==='video'){ renderVideoView(); return; }
   resetAdvisor();renderAll();
 }
 function setMetric(m){
   metric=m;
   document.querySelectorAll('#metricGroup .metric-btn').forEach(function(b){b.classList.toggle('active',b.dataset.m===m);});
+  if(lens==='video'){ renderVideoView(); return; }
   renderAll();
   renderTopContent();
 }
