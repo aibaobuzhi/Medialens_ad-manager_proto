@@ -844,6 +844,458 @@ svg{display:block;}
 .aa-plus-btn{width:28px;height:28px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface-white);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--text-secondary);font-weight:300;}
 .aa-send-btn{width:30px;height:30px;border-radius:8px;background:var(--brand-blue);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-left:auto;}
 .aa-input-hint{font-size:10px;color:var(--text-secondary);margin-top:4px;padding:0 4px;}
+
+/* ═══════════════════════════════════
+   VISUAL REFINEMENT OVERRIDES
+   Keeps interaction logic intact; upgrades density, hierarchy, and finish.
+═══════════════════════════════════ */
+:root{
+  --brand-blue:#23A9F6;
+  --brand-light-blue:#73DFFF;
+  --brand-blue-tint:#EDF7FF;
+  --brand-blue-subtle:#F6FBFF;
+  --title:#17212B;
+  --text-primary:#24313D;
+  --text-regular:#667483;
+  --text-secondary:#8793A0;
+  --surface-page:#F3F6F9;
+  --surface-white:#FFFFFF;
+  --surface-ai:#F7FAFD;
+  --border:#DFE7EE;
+  --divider:#E9EEF3;
+  --r-card:8px;
+  --shadow-float:0 12px 34px rgba(24,39,75,.10),0 2px 8px rgba(24,39,75,.06);
+  --shadow-modal:0 22px 70px rgba(15,23,42,.22);
+  --nav-h:64px;
+  --panel-w:468px;
+}
+body{
+  background:
+    linear-gradient(180deg,#F8FAFC 0%,#F2F5F8 260px,#F3F6F9 100%);
+  color:var(--text-primary);
+}
+.nav{
+  height:64px;
+  background:var(--brand-blue);
+  color:#fff;
+  border-bottom:none;
+  box-shadow:0 8px 28px rgba(35,169,246,.16);
+}
+.nav__logo{font-size:15px;letter-spacing:.02em;}
+.nav__logo-icon{
+  width:30px;height:30px;border-radius:8px;
+  background:rgba(255,255,255,.22);color:#fff;
+}
+.nav__user{color:#fff;opacity:.9;}
+.nav__avatar{width:32px;height:32px;background:rgba(255,255,255,.22);color:#fff;}
+
+.shell{margin-top:64px;min-height:calc(100vh - 64px);}
+.sidebar{
+  top:64px;height:calc(100vh - 64px);
+  width:236px;
+  background:rgba(255,255,255,.82);
+  backdrop-filter:blur(16px);
+  border-right:1px solid var(--divider);
+  padding:14px 10px 18px;
+}
+.sidebar__org{
+  margin:0 0 10px;
+  padding:10px;
+  border:1px solid var(--divider);
+  border-radius:8px;
+  background:#fff;
+}
+.sidebar__av{width:28px;height:28px;border-radius:7px;background:var(--brand-blue);}
+.sidebar__name{font-size:12px;}
+.sidebar__sub{font-size:10px;line-height:1.4;}
+.nav-item{
+  min-height:34px;
+  border-radius:7px;
+  padding:7px 10px;
+  color:#5D6977;
+}
+.nav-item:hover{background:#F2F7FC;color:var(--title);}
+.nav-item.active{
+  background:var(--brand-blue-tint);
+  color:var(--brand-blue);
+  box-shadow:inset 0 0 0 1px rgba(35,169,246,.16);
+}
+.nav-ai-gen{
+  margin:14px 0 0;
+  padding-top:12px;
+  border-top:1px solid var(--divider);
+}
+.nav-section-label{padding:0 8px 6px;color:#98A3AE;}
+.nav-ai-gen__item{
+  border-radius:7px;
+  margin:1px 0;
+  padding:8px 10px;
+}
+.nav-ai-thumbs{padding:8px 8px 6px;}
+.nav-ai-thumb{border-radius:6px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.28);}
+.nav-ai-more{padding:0 8px 6px;text-decoration:none;}
+
+.content{
+  padding:22px 28px 32px;
+  max-width:1480px;
+}
+.page-tabs{
+  align-items:center;
+  gap:2px;
+  background:#fff;
+  border:1px solid var(--divider);
+  border-radius:8px;
+  padding:3px;
+  width:max-content;
+  box-shadow:0 1px 2px rgba(15,23,42,.03);
+}
+.ptab{
+  border-radius:6px;
+  padding:7px 14px;
+  color:#657384;
+}
+.ptab.active{
+  background:var(--brand-blue);
+  color:#fff;
+  box-shadow:0 7px 18px rgba(35,169,246,.24);
+}
+
+.filter-bar{
+  border-color:var(--divider);
+  border-radius:8px;
+  padding:9px 12px;
+  background:rgba(255,255,255,.84);
+  box-shadow:0 1px 2px rgba(15,23,42,.03);
+}
+.fb,.chip{
+  border-radius:7px;
+  background:#fff;
+  border-color:#DDE6EE;
+  color:#465564;
+}
+.fb{padding:5px 10px;}
+.fb.active{
+  background:#F2F8FE;
+  border-color:#B8DDFB;
+  color:var(--brand-blue);
+}
+.fb.watch{
+  background:#FFFAEF;
+  border-color:#F1D89C;
+  color:#896319;
+}
+.fb.purple{
+  background:#F7F3FF;
+  border-color:#D6C8F5;
+  color:#6D45B8;
+}
+.chip{
+  background:#F7FAFD;
+  color:#3F8ACA;
+  border-color:#CFE4F6;
+  padding:4px 8px;
+}
+.sort-row{
+  margin:14px 0 16px;
+  gap:8px;
+}
+.sort-lbl{margin-right:4px;color:#83909D;}
+.sort-btn{
+  border:1px solid transparent;
+  border-radius:6px;
+  padding:4px 9px;
+}
+.sort-btn.active{
+  background:#fff;
+  border-color:var(--divider);
+  color:var(--title);
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
+}
+
+.creative-grid{
+  grid-template-columns:repeat(auto-fill,minmax(248px,1fr));
+  gap:18px;
+}
+.cc{
+  border:1px solid var(--divider);
+  border-radius:8px;
+  background:#fff;
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
+}
+.cc:hover{
+  transform:translateY(-2px);
+  border-color:#C7D8E8;
+  box-shadow:0 18px 44px rgba(24,39,75,.12),0 3px 9px rgba(24,39,75,.06);
+}
+.cc__badge{
+  position:absolute;
+  top:10px;
+  left:10px;
+  z-index:4;
+  width:auto;
+  border-radius:999px;
+  padding:3px 8px;
+  background:rgba(18,24,31,.72)!important;
+  backdrop-filter:blur(8px);
+  font-size:10px;
+  letter-spacing:.01em;
+}
+.cc__head{
+  padding:12px 12px 8px;
+}
+.pav{
+  width:30px;height:30px;border-radius:7px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);
+}
+.cc__name{font-size:12px;color:#1F2933;}
+.cc__date{font-size:10px;color:#8A96A3;}
+.cc__tags{padding:0 12px 10px;}
+.ctag{
+  border-radius:5px;
+  padding:2px 6px;
+  font-size:9px;
+  letter-spacing:.01em;
+}
+.cc__img{aspect-ratio:4/5;background:#F6F8FA;}
+.cc__cap{
+  padding:10px 12px 8px;
+  color:#344250;
+  font-size:11.5px;
+}
+.show-more{padding:0 12px 8px;}
+.cc__stats{
+  padding:9px 12px 11px;
+  background:#FAFBFC;
+}
+.stat{color:#6C7885;}
+.cc-clone-overlay{background:rgba(17,24,39,.42);}
+.cc-clone-btn{
+  background:#fff;
+  color:#17212B;
+  border:none;
+  box-shadow:0 12px 32px rgba(0,0,0,.20);
+}
+.cc-clone-btn:hover{background:#F5F8FB;color:#0E6FC8;}
+
+.ai-fab{
+  width:52px;height:52px;border-radius:14px;
+  background:var(--brand-blue);
+  border:1px solid rgba(255,255,255,.9);
+  box-shadow:0 16px 38px rgba(35,169,246,.36);
+}
+.ai-fab:hover{box-shadow:0 18px 44px rgba(35,169,246,.44);}
+.fab-pulse{border-color:rgba(35,169,246,.26);}
+.ai-panel{
+  top:64px;
+  background:#fff;
+  border-left:1px solid var(--divider);
+  box-shadow:-18px 0 50px rgba(15,23,42,.10);
+}
+.panel-head,#panelHistoryHead{
+  padding:14px 18px;
+  border-bottom:1px solid var(--divider);
+  background:#fff;
+}
+.panel-head__title,.ph-title{font-size:14px;color:#17212B;}
+.aa-hamburger,.panel-head__close,.ph-back{
+  border-color:var(--divider);
+  border-radius:7px;
+  background:#fff;
+}
+.chat-body{
+  padding:18px;
+  gap:14px;
+  background:linear-gradient(180deg,#FBFCFE 0%,#F7FAFD 100%);
+}
+.aa-prompt-card{
+  background:#fff;
+  border-color:var(--divider);
+  border-radius:8px;
+  padding:12px;
+}
+.aa-prompt-card:hover{
+  background:#F7FBFF;
+  border-color:#BBDCF7;
+  box-shadow:0 8px 22px rgba(24,39,75,.06);
+}
+.aa-prompt-card__icon{border-radius:7px;}
+.msg__bubble{
+  border-radius:10px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
+}
+.msg--user .msg__bubble{
+  background:var(--brand-blue);
+  border-radius:10px 10px 3px 10px;
+}
+.msg--ai .msg__bubble{
+  background:#fff;
+  border-color:var(--divider);
+  border-radius:10px 10px 10px 3px;
+}
+.panel-foot,.aa-foot{
+  padding:12px 18px 16px;
+  background:#fff;
+  border-top:1px solid var(--divider);
+}
+.prompt-wrap,.aa-input-box{
+  border-color:#CBD6E2;
+  border-radius:10px;
+  box-shadow:0 8px 24px rgba(24,39,75,.06);
+}
+.prompt-wrap.focused{
+  border-color:#6AB8F2;
+  box-shadow:0 0 0 3px rgba(35,169,246,.12),0 8px 24px rgba(24,39,75,.06);
+}
+.prompt-ta{min-height:84px;padding:13px 14px;}
+.prompt-bar{
+  background:#F8FAFC;
+  padding:8px 10px;
+}
+.pbar-btn,.agent-sel,.platform-sel,.agent-sel-btn,.size-filter-sel{
+  border-radius:7px;
+}
+.pbar-btn.plus{
+  background:#fff;
+  border-color:#DDE6EE;
+  color:#344250;
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
+}
+.pbar-btn.plus:hover,.aa-plus-btn:hover{
+  background:#F7FAFD;
+  border-color:#C9D5E1;
+  color:#17212B;
+}
+.send-btn,.aa-send-btn{border-radius:8px;background:var(--brand-blue);}
+.send-btn.ready{background:var(--brand-blue);}
+
+.gen-post,.gen-img-card,.ad-creative-out,.creative-out,.gen-plan,.brand-mini,.gp-card,.gen-canvas{
+  border-color:var(--divider);
+  border-radius:8px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
+}
+.gen-post__header{padding:13px 14px;}
+.gen-post__copy{padding:0 14px 14px;}
+.gen-img-card__actions{background:#fff;}
+.btn{border-radius:7px;font-weight:600;}
+.btn-pri{background:var(--brand-blue);border-color:var(--brand-blue);}
+.btn-pri:hover{background:#1B9BEA;}
+.btn-out{
+  background:#F7FBFF;
+  border-color:#BBDCF7;
+  color:#0E6FC8;
+}
+.btn-sec{
+  background:#fff;
+  border-color:var(--divider);
+  color:#586675;
+}
+
+#aiAgentPage{top:64px;background:#F3F6F9;}
+.aa-history{
+  background:#fff;
+  border-right:1px solid var(--divider);
+}
+.aa-main{background:#F7FAFD;}
+.aa-main__head{
+  background:#fff;
+  border-bottom:1px solid var(--divider);
+  padding:13px 24px;
+}
+.aa-msgs{padding:24px 32px 16px;}
+.aa-input-wrap{
+  border-top:1px solid var(--divider);
+  padding:12px 18px 14px;
+}
+.aa-conv-item.aa-active{background:var(--brand-blue);}
+.aa-agent-badge{border-color:var(--divider);background:#F8FAFC;}
+
+.picker-sheet,.agent-dd,.platform-dd,.filter-dd__menu,.vp-sheet{
+  border-radius:10px;
+  border-color:var(--divider);
+  box-shadow:var(--shadow-modal);
+}
+.picker-head{padding:16px 20px;}
+.ref-slot{
+  min-height:0;
+  padding:10px;
+  border:0;
+  border-radius:8px;
+  background:#fff;
+  gap:12px;
+}
+.picker-overlay.anchored{background:transparent;}
+.picker-overlay.anchored .picker-sheet{
+  border-radius:12px;
+  padding:10px;
+  background:#fff;
+  border:1px solid rgba(15,23,42,.08);
+  box-shadow:0 18px 44px rgba(15,23,42,.16),0 2px 8px rgba(15,23,42,.08);
+}
+.picker-overlay.anchored .picker-head{display:none;}
+.picker-overlay.anchored .ref-slots{padding:0;gap:2px;}
+.picker-overlay.anchored .ref-slot:hover{
+  background:#F1F3F6;
+  border-color:transparent;
+}
+.picker-overlay.anchored .ref-slot__icon{
+  width:28px;
+  height:28px;
+  border:0;
+  border-radius:7px;
+  background:transparent;
+  color:#6B7684;
+}
+.picker-overlay.anchored .ref-slot:hover .ref-slot__icon{
+  background:transparent;
+  border-color:transparent;
+  color:#4C5968;
+}
+.picker-overlay.anchored .ref-slot.filled .ref-slot__icon{
+  background:transparent;
+  border-color:transparent;
+  color:var(--brand-blue);
+}
+.picker-overlay.anchored .ref-slot__title{
+  font-size:14px;
+  font-weight:600;
+  color:#344250;
+  letter-spacing:0;
+}
+.picker-overlay.anchored .ref-slot__sub{
+  margin-top:1px;
+  color:#6F7A88;
+  font-size:12px;
+}
+.picker-overlay.anchored .ref-slot__arrow{display:none;}
+.ref-slot.is-disabled{
+  cursor:not-allowed;
+  opacity:.62;
+}
+.picker-overlay.anchored .ref-slot.is-disabled:hover{background:#fff;}
+.coming-soon-pill{
+  margin-left:auto;
+  padding:5px 10px;
+  border-radius:999px;
+  background:#EEF1F4;
+  color:#7B8794;
+  font-size:12px;
+  font-weight:600;
+  white-space:nowrap;
+}
+.select-mode-bar,.gen-sel-bar{
+  background:var(--brand-blue);
+  box-shadow:0 12px 30px rgba(35,169,246,.24);
+}
+.select-mode-bar{transform:translateY(calc(-100% - var(--nav-h)));}
+.select-mode-bar.active{transform:translateY(0);}
+
+@media (max-width: 980px){
+  :root{--panel-w:min(100vw,430px);}
+  .sidebar{display:none;}
+  #aiAgentPage{left:0;}
+  .content{padding:18px;}
+  .creative-grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));}
+}
 </style>
 </head>
 <body>
@@ -1195,12 +1647,11 @@ svg{display:block;}
             </div>
             <div class="aa-toolbar">
               <!-- + button -->
-              <button class="aa-plus-btn" onclick="openPicker()" title="Add reference">
+              <button class="aa-plus-btn" onclick="openPicker(this)" title="Add reference">
                 <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="var(--text-secondary)" stroke-width="1.6" stroke-linecap="round"/></svg>
               </button>
               <!-- Agent selector (reuse existing dropdown) -->
               <button class="agent-sel-btn" id="aaAgentBtn" onclick="toggleAgentDD(event)" style="height:26px;padding:0 8px 0 6px;font-size:11px;gap:4px;">
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="var(--brand-blue)" stroke-width="1.2"/><circle cx="5" cy="5" r="1.5" fill="var(--brand-blue)"/></svg>
                 <span id="aaAgentLabel">Auto</span>
                 <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 3L4 5.5 6.5 3" stroke="var(--text-secondary)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </button>
@@ -1420,7 +1871,7 @@ svg{display:block;}
         onblur="setTimeout(()=>{this.closest('.prompt-wrap').classList.remove('focused')},150)"></textarea>
       <div class="prompt-bar">
         <!-- + button -->
-        <button class="pbar-btn plus" id="promptPlusBtn" title="Add reference from Buzz" onclick="openPicker()">
+        <button class="pbar-btn plus" id="promptPlusBtn" title="Add reference from Buzz" onclick="openPicker(this)">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </button>
         <!-- agent select -->
@@ -1498,8 +1949,8 @@ svg{display:block;}
           </svg>
         </div>
         <div class="ref-slot__body">
-          <div class="ref-slot__title" id="slot-posts-title">Select a Post</div>
-          <div class="ref-slot__sub" id="slot-posts-sub">Select 1 post as reference</div>
+          <div class="ref-slot__title" id="slot-posts-title">Post</div>
+          <div class="ref-slot__sub" id="slot-posts-sub">Select a post as reference</div>
         </div>
         <div class="ref-slot__arrow">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -1515,12 +1966,27 @@ svg{display:block;}
           </svg>
         </div>
         <div class="ref-slot__body">
-          <div class="ref-slot__title" id="slot-upload-title">Upload Local</div>
-          <div class="ref-slot__sub" id="slot-upload-sub">Support image, video, pdf</div>
+          <div class="ref-slot__title" id="slot-upload-title">Local Upload</div>
+          <div class="ref-slot__sub" id="slot-upload-sub">Support image, video, pdf, audio</div>
         </div>
         <div class="ref-slot__arrow">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
         </div>
+      </div>
+
+      <!-- Slot 3: Asset library (coming soon) -->
+      <div class="ref-slot is-disabled" id="slot-assets" onclick="event.stopPropagation();showToast('Asset Library — Coming soon')">
+        <div class="ref-slot__icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M3 6.5h4.2l1.4-2h2.8l1.4 2H17a1.5 1.5 0 011.5 1.5v6.5A1.5 1.5 0 0117 16H3a1.5 1.5 0 01-1.5-1.5V8A1.5 1.5 0 013 6.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+            <path d="M4.5 11h11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="ref-slot__body">
+          <div class="ref-slot__title">Asset Library</div>
+          <div class="ref-slot__sub">Reuse generated results & brand assets</div>
+        </div>
+        <span class="coming-soon-pill">Coming soon</span>
       </div>
 
     </div>
@@ -1882,7 +2348,7 @@ function aiPanelNewChat() {
 }
 
 /* ── Add Reference Modal ── */
-function openPicker() {
+function openPicker(anchorEl) {
   syncSlotStates();
   const isImgGen = currentAgentMode === 'image-gen';
   // Post selection: only for Image Gen agent
@@ -1892,21 +2358,18 @@ function openPicker() {
 
   const overlay = document.getElementById('pickerOverlay');
   const sheet = overlay.querySelector('.picker-sheet');
-  const onAiAgentPage = document.getElementById('aiAgentPage').classList.contains('on');
-  if (!onAiAgentPage) {
-    // Small AI bubble panel: dock the picker as a compact floating card
-    // directly above the "+" button (not the whole input toolbar) — same
-    // anchoring technique as .agent-dd / .platform-dd (position:fixed,
-    // bounding-rect of the trigger button itself).
-    const anchor = document.getElementById('promptPlusBtn');
-    const wrapRect = document.getElementById('promptWrap').getBoundingClientRect();
+  const anchor = anchorEl || document.getElementById('promptPlusBtn') || document.querySelector('.aa-plus-btn');
+  if (anchor) {
+    // Dock the picker as a compact floating menu directly above the "+"
+    // button. Both AI bubble and AI Agent page use the same placement.
+    const wrap = anchor.closest('.prompt-wrap,.aa-input-box') || anchor.parentElement;
+    const wrapRect = wrap.getBoundingClientRect();
     const rect = anchor.getBoundingClientRect();
     overlay.classList.add('anchored');
-    sheet.style.width = Math.min(300, wrapRect.width) + 'px';
-    sheet.style.left = rect.left + 'px';
+    sheet.style.width = Math.min(360, Math.max(300, wrapRect.width)) + 'px';
+    sheet.style.left = Math.max(12, Math.min(rect.left, window.innerWidth - parseFloat(sheet.style.width) - 12)) + 'px';
     sheet.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
   } else {
-    // Full-page AI Agent view: keep the original full-viewport bottom sheet.
     overlay.classList.remove('anchored');
     sheet.style.left = '';
     sheet.style.width = '';
@@ -1934,19 +2397,19 @@ function syncSlotStates() {
   document.getElementById('slot-posts-icon').style.color = hasPosts ? '#fff' : '';
   document.getElementById('slot-posts-title').textContent = hasPosts
     ? selectedPosts.map(p => p.label).join(', ')
-    : 'Select a Post';
+    : 'Post';
   document.getElementById('slot-posts-sub').textContent = hasPosts
     ? `1 post selected — click to change`
-    : 'Select 1 post as reference';
+    : 'Select a post as reference';
 
   // Slot: upload local
   const hasUpload = uploadedImgs.length > 0;
   const s3 = document.getElementById('slot-upload');
   s3.classList.toggle('filled', hasUpload);
-  document.getElementById('slot-upload-title').textContent = 'Upload Local';
+  document.getElementById('slot-upload-title').textContent = 'Local Upload';
   document.getElementById('slot-upload-sub').textContent = hasUpload
     ? `${uploadedImgs.length} file(s) attached — click to add more`
-    : 'Support image, video, pdf';
+    : 'Support image, video, pdf, audio';
 }
 
 /* Slot 1: close modal → enter select mode on Buzz grid */
