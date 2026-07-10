@@ -313,8 +313,14 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
 .vcp-tbl td{padding:12px;border-bottom:1px solid #F1F5F7;vertical-align:top;text-align:right;white-space:nowrap;}
 .vcp-tbl tr:last-child td{border-bottom:none;}
 .vcp-tbl tr:hover td{background:#fafcfe;}
-.vcp-post-cell{display:flex;gap:12px;align-items:flex-start;text-align:left;white-space:normal;}
-.vcp-thumb{width:52px;height:52px;border-radius:8px;background:linear-gradient(135deg,#dce7ee,#eef3f6);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.vcp-post-cell{display:flex;align-items:flex-start;gap:10px;text-align:left;white-space:normal;}
+.vcp-thumb{width:68px;height:56px;border-radius:6px;background:#E8EEF0;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;}
+.vcp-meta-wrap{flex:1;min-width:0;}
+.vcp-header-row{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
+.vcp-logo{width:22px;height:22px;border-radius:50%;background:#102532;display:flex;align-items:center;justify-content:center;color:#fff;font-size:7px;font-weight:700;flex-shrink:0;line-height:1.1;text-align:center;}
+.vcp-page-name{font-size:12px;font-weight:600;color:#102532;}
+.vcp-link-ic{margin-left:auto;color:var(--brand);flex-shrink:0;display:flex;}
+.vcp-date-row{font-size:11px;color:#828282;margin-bottom:4px;}
 .vcp-caption{font-size:12.5px;color:var(--text);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:6px;}
 .vcp-tags{display:flex;flex-wrap:wrap;gap:5px;max-height:44px;overflow:hidden;}
 .vcp-tag{font-size:10.5px;font-weight:600;padding:2px 9px;border-radius:20px;border:1.3px solid;background:#fff;white-space:nowrap;line-height:16px;}
@@ -1437,13 +1443,14 @@ function renderVideoView(){
 /* ============ VIDEO CREATIVE PERFORMANCE (per-post table) ============ */
 /* metrics.svr is null for Reels (no post_media_view/impressions field) — rendered as "-" */
 var VCP_ROWS=[
-  {th:'💆‍♀️',name:'"Honestly worth it" — full skincare routine reveal, before/after at the end',type:'video',videoCat:'Product demonstration',hook:'KOL Speaking Direct',angle:'KOL testimonial',metrics:{svr:61.4,avv:15400,avgvv:15400,eng:2779,aeng:2779,pr:138.2}},
-  {th:'💄',name:'POV: you finally find your holy grail foundation shade after 6 wrong tries',type:'reel',videoCat:'Before & after transformation',hook:'Face Close-up',angle:'Before/after transformation',metrics:{svr:null,avv:24100,avgvv:24100,eng:3120,aeng:3120,pr:169.1}},
-  {th:'🧴',name:'3 steps to fix dry skin this winter — dermatologist approved routine breakdown',type:'video',videoCat:'Product demonstration',hook:'Problem/Solution Setup',angle:'Product demo',metrics:{svr:58.2,avv:12800,avgvv:12800,eng:2393,aeng:2393,pr:116.4}},
-  {th:'✨',name:'Wait for it… the glow up is unreal',type:'reel',videoCat:'Before & after transformation',hook:'Face Close-up',angle:'Before/after transformation',metrics:{svr:null,avv:18600,avgvv:18600,eng:2525,aeng:2525,pr:101.8}},
-  {th:'🛍️',name:'Unboxing our new limited edition set — what\'s inside + first impressions',type:'video',videoCat:'Talking head / KOL endorsement',hook:'Product Display with Text',angle:'Event & launch',metrics:{svr:28.2,avv:6200,avgvv:6200,eng:1426,aeng:1426,pr:56.4}},
-  {th:'🎤',name:'MIRROR comeback concert — full recap of the night everyone\'s talking about',type:'reel',videoCat:'Talking head / KOL endorsement',hook:'Face Close-up',angle:'Brand awareness',metrics:{svr:null,avv:15800,avgvv:15800,eng:2540,aeng:2540,pr:87.3}}
+  {th:'💆‍♀️',page:'BusinessFocus',date:'07 Jul 2026 23:00',author:'Lazycat Chan',name:'"Honestly worth it" — full skincare routine reveal, before/after at the end',type:'video',videoCat:'Product demonstration',hook:'KOL Speaking Direct',angle:'KOL testimonial',metrics:{svr:61.4,avv:15400,avgvv:15400,eng:2779,aeng:2779,pr:138.2}},
+  {th:'💄',page:'BusinessFocus',date:'07 Jul 2026 22:00',author:'Chant Chiu',name:'POV: you finally find your holy grail foundation shade after 6 wrong tries',type:'reel',videoCat:'Before & after transformation',hook:'Face Close-up',angle:'Before/after transformation',metrics:{svr:null,avv:24100,avgvv:24100,eng:3120,aeng:3120,pr:169.1}},
+  {th:'🧴',page:'BusinessFocus',date:'07 Jul 2026 20:05',author:'Lazycat Chan',name:'3 steps to fix dry skin this winter — dermatologist approved routine breakdown',type:'video',videoCat:'Product demonstration',hook:'Problem/Solution Setup',angle:'Product demo',metrics:{svr:58.2,avv:12800,avgvv:12800,eng:2393,aeng:2393,pr:116.4}},
+  {th:'✨',page:'BusinessFocus',date:'07 Jul 2026 18:40',author:'Johnny Chu',name:'Wait for it… the glow up is unreal',type:'reel',videoCat:'Before & after transformation',hook:'Face Close-up',angle:'Before/after transformation',metrics:{svr:null,avv:18600,avgvv:18600,eng:2525,aeng:2525,pr:101.8}},
+  {th:'🛍️',page:'BusinessFocus',date:'07 Jul 2026 15:37',author:'Lazycat Chan',name:'Unboxing our new limited edition set — what\'s inside + first impressions',type:'video',videoCat:'Talking head / KOL endorsement',hook:'Product Display with Text',angle:'Event & launch',metrics:{svr:28.2,avv:6200,avgvv:6200,eng:1426,aeng:1426,pr:56.4}},
+  {th:'🎤',page:'BusinessFocus',date:'07 Jul 2026 15:00',author:'Chant Chiu',name:'MIRROR comeback concert — full recap of the night everyone\'s talking about',type:'reel',videoCat:'Talking head / KOL endorsement',hook:'Face Close-up',angle:'Brand awareness',metrics:{svr:null,avv:15800,avgvv:15800,eng:2540,aeng:2540,pr:87.3}}
 ];
+var VCP_LINK_ICON='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
 var vcpSortKey='eng', vcpSortDir='desc';
 var VCP_COLS=[
   {k:'svr',label:'3s View Rate',pct:true},
@@ -1476,14 +1483,23 @@ function renderVCP(){
     }).join('')+
     '</tr></thead>';
   var tbody='<tbody>'+rows.map(function(p){
+    var initials=p.page.split(/\s+/).map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
     return '<tr><td><div class="vcp-post-cell">'+
       '<div class="vcp-thumb">'+p.th+'</div>'+
-      '<div><div class="vcp-caption">'+p.name+'</div>'+
-      '<div class="vcp-tags">'+
-        '<span class="vcp-tag videocat">'+p.videoCat+'</span>'+
-        '<span class="vcp-tag hook">'+p.hook+'</span>'+
-        '<span class="vcp-tag angle">'+p.angle+'</span>'+
-      '</div></div></div></td>'+
+      '<div class="vcp-meta-wrap">'+
+        '<div class="vcp-header-row">'+
+          '<div class="vcp-logo">'+initials+'</div>'+
+          '<span class="vcp-page-name">'+p.page+'</span>'+
+          '<span class="vcp-link-ic">'+VCP_LINK_ICON+'</span>'+
+        '</div>'+
+        '<div class="vcp-date-row">'+p.date+' &nbsp;by '+p.author+'</div>'+
+        '<div class="vcp-caption">'+p.name+'</div>'+
+        '<div class="vcp-tags">'+
+          '<span class="vcp-tag videocat">'+p.videoCat+'</span>'+
+          '<span class="vcp-tag hook">'+p.hook+'</span>'+
+          '<span class="vcp-tag angle">'+p.angle+'</span>'+
+        '</div>'+
+      '</div></div></td>'+
       VCP_COLS.map(function(c){return '<td>'+vcpFmt(p.metrics[c.k],c.pct)+'</td>';}).join('')+
       '</tr>';
   }).join('')+'</tbody>';
