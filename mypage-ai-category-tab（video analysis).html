@@ -301,6 +301,27 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
 .tc-tag.cat{background:var(--brand-tint);color:var(--brand);}
 .tc-tag.sub{background:#F0ECFF;color:#6B4BD8;}
 .tc-tag.ad{background:#FFF3E8;color:#C97A1A;}
+
+/* ===== VIDEO CREATIVE PERFORMANCE TABLE ===== */
+.vcp-wrap{overflow-x:auto;}
+.vcp-tbl{width:100%;border-collapse:collapse;font-size:12.5px;}
+.vcp-tbl th{text-align:right;padding:10px 12px;font-size:10.5px;font-weight:600;color:var(--secondary);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--divider);white-space:nowrap;cursor:pointer;user-select:none;}
+.vcp-tbl th.vcp-post-col{text-align:left;min-width:280px;}
+.vcp-tbl th:hover{color:var(--brand);}
+.vcp-sort-ic{font-size:9px;margin-left:3px;opacity:.5;}
+.vcp-tbl th.active .vcp-sort-ic{opacity:1;color:var(--brand);}
+.vcp-tbl td{padding:12px;border-bottom:1px solid #F1F5F7;vertical-align:top;text-align:right;white-space:nowrap;}
+.vcp-tbl tr:last-child td{border-bottom:none;}
+.vcp-tbl tr:hover td{background:#fafcfe;}
+.vcp-post-cell{display:flex;gap:12px;align-items:flex-start;text-align:left;white-space:normal;}
+.vcp-thumb{width:52px;height:52px;border-radius:8px;background:linear-gradient(135deg,#dce7ee,#eef3f6);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.vcp-caption{font-size:12.5px;color:var(--text);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:6px;}
+.vcp-tags{display:flex;flex-wrap:wrap;gap:5px;max-height:44px;overflow:hidden;}
+.vcp-tag{font-size:10.5px;font-weight:600;padding:2px 9px;border-radius:20px;border:1.3px solid;background:#fff;white-space:nowrap;line-height:16px;}
+.vcp-tag.videocat{color:#23A9F6;border-color:#23A9F6;}
+.vcp-tag.hook{color:#8B5CF6;border-color:#8B5CF6;}
+.vcp-tag.angle{color:#10B981;border-color:#10B981;}
+.vcp-na{color:var(--secondary);}
 .tc-metrics{display:flex;gap:24px;}
 .tc-metric{text-align:right;min-width:60px;}
 .tc-metric .ml{font-size:9.5px;font-weight:600;color:var(--secondary);text-transform:uppercase;letter-spacing:.4px;}
@@ -729,7 +750,7 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
                 <button class="metric-btn" data-m="avv" onclick="setMetric('avv')">Video Views</button>
                 <button class="metric-btn" data-m="avgvv" onclick="setMetric('avgvv')">Avg Video Views</button>
                 <button class="metric-btn" data-m="svr" onclick="setMetric('svr')">3s View Rate</button>
-                <button class="metric-btn" data-m="pr" onclick="setMetric('pr')">Play Rate</button>
+                <button class="metric-btn" data-m="pr" onclick="setMetric('pr')">Replay Rate</button>
               </div>
             </div>
           </div>
@@ -884,6 +905,14 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
 
               <div class="chart-card" id="videoAngleCard"></div>
             </div>
+          </div>
+
+          <div class="card" style="margin-top:16px;">
+            <div class="card-hd">
+              <div class="card-title">Video Creative Performance</div>
+            </div>
+            <div class="card-sub">Individual video posts, filtered by the selected AI categories.</div>
+            <div class="vcp-wrap"><table class="vcp-tbl" id="vcpTbl"></table></div>
           </div>
         </div><!-- /videoView -->
 
@@ -1193,14 +1222,14 @@ var TOPPOSTS=[
   {th:'🚇',name:'Breaking: new MTR line opens ahead of schedule',fmt:'LINK',cat:'News & Current Affairs',sub:'Local & Regional News',adcat:'Text-Only Graphic',eng:1240,likes:680,comments:360,vv:2100,d:-6}
 ];
 
-var METRIC_LABEL = {aeng:'Avg Engagement',eng:'Engagement',pageer:'Page ER',avv:'Video Views',avgvv:'Avg Video Views',svr:'3s View Rate',pr:'Play Rate'};
+var METRIC_LABEL = {aeng:'Avg Engagement',eng:'Engagement',pageer:'Page ER',avv:'Video Views',avgvv:'Avg Video Views',svr:'3s View Rate',pr:'Replay Rate'};
 var METRIC_UNIT  = {aeng:'per post',eng:'total',pageer:'daily · vs followers',avv:'per post',avgvv:'video views ÷ video qty',svr:'3s video views ÷ impressions',pr:'views ÷ reach'};
 /* svr   (3s View Rate)    = 3s Video Views ÷ Impressions — Video Post only (Reels have no impressions field).
-   pr    (Play Rate)       = applies to BOTH content types, but the numerator differs per type:
+   pr    (Replay Rate)       = applies to BOTH content types, but the numerator differs per type:
      - Video Post: Video Views ÷ Reach
      - Reels:      3s Video Views ÷ Reach
    avgvv (Avg Video Views) = Video Views ÷ Video Qty — applies to BOTH Video Post and Reels.
-   Because the numerator changes per content type, Play Rate is not directly comparable to 3s View Rate. */
+   Because the numerator changes per content type, Replay Rate is not directly comparable to 3s View Rate. */
 var METRIC_SCOPE = {svr:'videos-only'};
 var METRIC_SCOPE_LABEL = {'videos-only':'Video post only'};
 
@@ -1219,7 +1248,7 @@ function metricVal(r,m){
   if(m==='avv')   return r.vv;                          /* avg video views per post */
   if(m==='avgvv') return +(r.vv/r.posts).toFixed(1);    /* Avg Video Views = video views ÷ video qty (video/reel post count) */
   if(m==='svr')   return +(r.vv/FOLLOWERS*150).toFixed(1); /* mock 3s View Rate: vv ÷ synthetic impressions (FOLLOWERS-based, same denominator pattern as ER/Page ER) */
-  if(m==='pr')    return +(r.vv/FOLLOWERS*300).toFixed(1); /* mock Play Rate: plays ÷ synthetic reach — no 3s threshold, can exceed 100% on replays */
+  if(m==='pr')    return +(r.vv/FOLLOWERS*300).toFixed(1); /* mock Replay Rate: plays ÷ synthetic reach — no 3s threshold, can exceed 100% on replays */
   return 0;
 }
 function barValText(v){
@@ -1363,7 +1392,7 @@ var METRIC_TOOLTIP={
     rows:['<b>Formula:</b> 3s Video Views ÷ Impressions.']
   },
   pr:{
-    t:'Play Rate',
+    t:'Replay Rate',
     rows:[
       '<b>Video Post:</b> Video Views ÷ Reach.',
       '<b>Reels:</b> 3s Video Views ÷ Reach.'
@@ -1402,6 +1431,63 @@ function renderVideoView(){
     '<div class="hbar-list">'+renderHbarList(angleD.items,function(){return 'linear-gradient(90deg,#0EA5E9,#38BDF8)';})+'</div>';
 
   renderVideoLengthChart();
+  renderVCP();
+}
+
+/* ============ VIDEO CREATIVE PERFORMANCE (per-post table) ============ */
+/* metrics.svr is null for Reels (no post_media_view/impressions field) — rendered as "-" */
+var VCP_ROWS=[
+  {th:'💆‍♀️',name:'"Honestly worth it" — full skincare routine reveal, before/after at the end',type:'video',videoCat:'Product demonstration',hook:'KOL Speaking Direct',angle:'KOL testimonial',metrics:{svr:61.4,avv:15400,avgvv:15400,eng:2779,aeng:2779,pr:138.2}},
+  {th:'💄',name:'POV: you finally find your holy grail foundation shade after 6 wrong tries',type:'reel',videoCat:'Before & after transformation',hook:'Face Close-up',angle:'Before/after transformation',metrics:{svr:null,avv:24100,avgvv:24100,eng:3120,aeng:3120,pr:169.1}},
+  {th:'🧴',name:'3 steps to fix dry skin this winter — dermatologist approved routine breakdown',type:'video',videoCat:'Product demonstration',hook:'Problem/Solution Setup',angle:'Product demo',metrics:{svr:58.2,avv:12800,avgvv:12800,eng:2393,aeng:2393,pr:116.4}},
+  {th:'✨',name:'Wait for it… the glow up is unreal',type:'reel',videoCat:'Before & after transformation',hook:'Face Close-up',angle:'Before/after transformation',metrics:{svr:null,avv:18600,avgvv:18600,eng:2525,aeng:2525,pr:101.8}},
+  {th:'🛍️',name:'Unboxing our new limited edition set — what\'s inside + first impressions',type:'video',videoCat:'Talking head / KOL endorsement',hook:'Product Display with Text',angle:'Event & launch',metrics:{svr:28.2,avv:6200,avgvv:6200,eng:1426,aeng:1426,pr:56.4}},
+  {th:'🎤',name:'MIRROR comeback concert — full recap of the night everyone\'s talking about',type:'reel',videoCat:'Talking head / KOL endorsement',hook:'Face Close-up',angle:'Brand awareness',metrics:{svr:null,avv:15800,avgvv:15800,eng:2540,aeng:2540,pr:87.3}}
+];
+var vcpSortKey='eng', vcpSortDir='desc';
+var VCP_COLS=[
+  {k:'svr',label:'3s View Rate',pct:true},
+  {k:'avv',label:'Video Views'},
+  {k:'avgvv',label:'Avg Video Views'},
+  {k:'eng',label:'Engagement'},
+  {k:'aeng',label:'Avg Engagements'},
+  {k:'pr',label:'Replay Rate',pct:true}
+];
+function vcpFmt(v,pct){
+  if(v===null||v===undefined) return '<span class="vcp-na">-</span>';
+  return pct?v.toFixed(1)+'%':fmtK(v);
+}
+function vcpSort(key){
+  if(vcpSortKey===key){ vcpSortDir=vcpSortDir==='desc'?'asc':'desc'; }
+  else { vcpSortKey=key; vcpSortDir='desc'; }
+  renderVCP();
+}
+function renderVCP(){
+  var rows=VCP_ROWS.slice().sort(function(a,b){
+    var av=a.metrics[vcpSortKey], bv=b.metrics[vcpSortKey];
+    av=(av===null||av===undefined)?-Infinity:av; bv=(bv===null||bv===undefined)?-Infinity:bv;
+    return vcpSortDir==='desc'?bv-av:av-bv;
+  });
+  var thead='<thead><tr><th class="vcp-post-col">Post</th>'+
+    VCP_COLS.map(function(c){
+      var active=c.k===vcpSortKey;
+      return '<th class="'+(active?'active':'')+'" onclick="vcpSort(\''+c.k+'\')">'+c.label+
+        '<span class="vcp-sort-ic">'+(active?(vcpSortDir==='desc'?'▼':'▲'):'⇅')+'</span></th>';
+    }).join('')+
+    '</tr></thead>';
+  var tbody='<tbody>'+rows.map(function(p){
+    return '<tr><td><div class="vcp-post-cell">'+
+      '<div class="vcp-thumb">'+p.th+'</div>'+
+      '<div><div class="vcp-caption">'+p.name+'</div>'+
+      '<div class="vcp-tags">'+
+        '<span class="vcp-tag videocat">'+p.videoCat+'</span>'+
+        '<span class="vcp-tag hook">'+p.hook+'</span>'+
+        '<span class="vcp-tag angle">'+p.angle+'</span>'+
+      '</div></div></div></td>'+
+      VCP_COLS.map(function(c){return '<td>'+vcpFmt(p.metrics[c.k],c.pct)+'</td>';}).join('')+
+      '</tr>';
+  }).join('')+'</tbody>';
+  document.getElementById('vcpTbl').innerHTML=thead+tbody;
 }
 
 /* ============ SUB-CAT DRILL-DOWN ============ */
