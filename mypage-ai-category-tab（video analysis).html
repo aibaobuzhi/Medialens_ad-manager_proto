@@ -128,6 +128,15 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
 .metric-btn{border:none;background:transparent;font-family:inherit;font-size:11.5px;color:var(--muted);padding:5px 11px;border-radius:6px;cursor:pointer;font-weight:500;white-space:nowrap;}
 .metric-btn.active{background:#fff;color:var(--brand);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08);}
 
+/* ===== METRIC SCOPE BADGE (which content type a metric covers) ===== */
+.metric-scope-badge{display:none;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;white-space:nowrap;}
+.metric-scope-badge.show{display:inline-flex;}
+.metric-scope-badge.videos-only{background:var(--brand-tint);color:var(--brand);}
+.metric-scope-badge.reels-only{background:#F0ECFF;color:#6B4BD8;}
+.metric-scope-note{display:inline-block;font-size:10.5px;font-weight:600;padding:1px 8px;border-radius:20px;margin-left:6px;vertical-align:middle;}
+.metric-scope-note.videos-only{background:var(--brand-tint);color:var(--brand);}
+.metric-scope-note.reels-only{background:#F0ECFF;color:#6B4BD8;}
+
 /* ===== CAT-ROW BAR CHART (reference style) ===== */
 .bars{display:flex;flex-direction:column;margin-top:4px;}
 .cat-row{padding:9px 0;border-bottom:1px solid #F0F0F0;transition:background .12s;border-radius:6px;}
@@ -376,7 +385,7 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
 .tooltip-box{display:none;}
 #tt{position:fixed;z-index:9999;display:none;background:var(--title);color:#fff;border-radius:10px;padding:13px 15px;width:300px;font-size:11.5px;line-height:1.6;box-shadow:0 8px 32px rgba(0,0,0,.28);pointer-events:none;}
 .tt-t{font-size:12.5px;font-weight:700;margin-bottom:7px;}
-.tt-r{margin-bottom:5px;color:#dbe4ea;}
+.tt-r{display:block;margin-bottom:5px;color:#dbe4ea;}
 .tt-r b{color:#9CCBF0;font-weight:600;}
 .tt-src{margin-top:9px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15);font-size:10px;font-weight:600;}
 .tt-src .s-meta{color:#7FD0FF;} .tt-src .s-ai{color:#C3B0FF;}
@@ -719,6 +728,7 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
                 <button class="metric-btn" data-m="pageer" onclick="setMetric('pageer')">Page ER</button>
                 <button class="metric-btn" data-m="avv" onclick="setMetric('avv')">Video Views</button>
                 <button class="metric-btn" data-m="svr" onclick="setMetric('svr')">3s View Rate</button>
+                <button class="metric-btn" data-m="pr" onclick="setMetric('pr')">Play Rate</button>
               </div>
             </div>
           </div>
@@ -1182,8 +1192,15 @@ var TOPPOSTS=[
   {th:'🚇',name:'Breaking: new MTR line opens ahead of schedule',fmt:'LINK',cat:'News & Current Affairs',sub:'Local & Regional News',adcat:'Text-Only Graphic',eng:1240,likes:680,comments:360,vv:2100,d:-6}
 ];
 
-var METRIC_LABEL = {aeng:'Avg Engagement',eng:'Engagement',pageer:'Page ER',avv:'Video Views',svr:'3s View Rate'};
-var METRIC_UNIT  = {aeng:'per post',eng:'total',pageer:'daily · vs followers',avv:'per post',svr:'views ÷ impressions'};
+var METRIC_LABEL = {aeng:'Avg Engagement',eng:'Engagement',pageer:'Page ER',avv:'Video Views',svr:'3s View Rate',pr:'Play Rate'};
+var METRIC_UNIT  = {aeng:'per post',eng:'total',pageer:'daily · vs followers',avv:'per post',svr:'3s video views ÷ impressions',pr:'views ÷ reach'};
+/* svr (3s View Rate) = 3s Video Views ÷ Impressions — Video Post only (Reels have no impressions field).
+   pr  (Play Rate)     = applies to BOTH content types, but the numerator differs per type:
+     - Video Post: Video Views ÷ Reach
+     - Reels:      3s Video Views ÷ Reach
+   Because the numerator changes per content type, Play Rate is not directly comparable to 3s View Rate. */
+var METRIC_SCOPE = {svr:'videos-only'};
+var METRIC_SCOPE_LABEL = {'videos-only':'Video post only'};
 
 /* ============ STATE ============ */
 var lens='content', metric='aeng', comboLevel='main';
@@ -1199,10 +1216,11 @@ function metricVal(r,m){
   if(m==='pageer')return (r.posts*r.eng)/12000000*100;
   if(m==='avv')   return r.vv;                          /* avg video views per post */
   if(m==='svr')   return +(r.vv/FOLLOWERS*150).toFixed(1); /* mock 3s View Rate: vv ÷ synthetic impressions (FOLLOWERS-based, same denominator pattern as ER/Page ER) */
+  if(m==='pr')    return +(r.vv/FOLLOWERS*300).toFixed(1); /* mock Play Rate: plays ÷ synthetic reach — no 3s threshold, can exceed 100% on replays */
   return 0;
 }
 function barValText(v){
-  if(metric==='pageer'||metric==='svr') return v.toFixed(1)+'%';
+  if(metric==='pageer'||metric==='svr'||metric==='pr') return v.toFixed(1)+'%';
   return fmt(v);
 }
 function overallAvg(d,m){ // weighted by posts
@@ -1272,7 +1290,7 @@ function videoMetricDisplay(rows, m){
     }else if(m==='eng'){
       var share=total>0?(v/total*100):0;
       displayText=fmtK(v)+' ('+share.toFixed(1)+'%)';
-    }else{ // pageer, svr
+    }else{ // pageer, svr, pr
       displayText=v.toFixed(2)+'%';
     }
     return {row:r, value:v, displayText:displayText, barPct:barPct};
@@ -1295,7 +1313,7 @@ function renderVideoLengthChart(){
   var axisMax=maxVal>0?maxVal*1.15:1;
   var total=0; vals.forEach(function(v){total+=v;});
   function fmtAxis(v){
-    if(metric==='pageer'||metric==='svr') return v.toFixed(1)+'%';
+    if(metric==='pageer'||metric==='svr'||metric==='pr') return v.toFixed(1)+'%';
     if(metric==='avv') return fmtK(v);
     return fmt(v);
   }
@@ -1324,26 +1342,55 @@ function renderVideoLengthChart(){
     '<div class="length-plot"><div class="length-grid">'+gridLines+'</div>'+
     columns+'</div></div>';
   document.getElementById('videoLengthCard').innerHTML=
-    '<div class="chart-card-title">Video Length vs Performance</div>'+
+    '<div class="chart-card-title">Video Length vs Performance'+scopeNoteHtml()+metricTooltipHtml()+'</div>'+
     '<div class="chart-card-sub">'+METRIC_LABEL[metric]+' · Short (&lt;15s) vs Medium (15-30s) vs Long (30s+)</div>'+
     chart;
+}
+/* small inline pill appended to a card title, so the metric's content-type scope
+   is visible on the page itself (not only inside a hover tooltip) */
+function scopeNoteHtml(){
+  var scope=METRIC_SCOPE[metric];
+  if(!scope) return '';
+  var label=scope==='videos-only'?'Video post only':'Reels only';
+  return '<span class="metric-scope-note '+scope+'">'+label+'</span>';
+}
+var METRIC_TOOLTIP={
+  svr:{
+    t:'3s View Rate',
+    rows:['<b>Formula:</b> 3s Video Views ÷ Impressions.']
+  },
+  pr:{
+    t:'Play Rate',
+    rows:[
+      '<b>Video Post:</b> Video Views ÷ Reach.',
+      '<b>Reels:</b> 3s Video Views ÷ Reach.'
+    ]
+  }
+};
+function metricTooltipHtml(){
+  var tip=METRIC_TOOLTIP[metric];
+  if(!tip) return '';
+  return '<span class="has-tooltip"><span class="qm">?</span>'+
+    '<span class="tooltip-box"><span class="tt-t">'+tip.t+'</span>'+
+    tip.rows.map(function(r){return '<span class="tt-r">'+r+'</span>';}).join('')+
+    '</span></span>';
 }
 function renderVideoView(){
   var hookD=videoMetricDisplay(HOOK_ROWS, metric);
   document.getElementById('videoHookCard').innerHTML=
-    '<div class="chart-card-title">3s hook type → '+METRIC_LABEL[metric]+'</div>'+
+    '<div class="chart-card-title">3s hook type → '+METRIC_LABEL[metric]+scopeNoteHtml()+metricTooltipHtml()+'</div>'+
     '<div class="chart-card-sub">Which opening pattern drives highest downstream engagement</div>'+
     '<div class="hbar-list">'+renderHbarList(hookD.items,function(){return 'linear-gradient(90deg,#EF4444,#F87171)';})+'</div>';
 
   var catD=videoMetricDisplay(VIDCAT_ROWS, metric);
   document.getElementById('videoCatCard').innerHTML=
-    '<div class="chart-card-title">Video category → '+METRIC_LABEL[metric]+'</div>'+
+    '<div class="chart-card-title">Video category → '+METRIC_LABEL[metric]+scopeNoteHtml()+metricTooltipHtml()+'</div>'+
     '<div class="chart-card-sub">Taxonomy-classified video types ranked by '+METRIC_LABEL[metric]+'</div>'+
     '<div class="hbar-list">'+renderHbarList(catD.items,function(row){return row.g;})+'</div>';
 
   var angleD=videoMetricDisplay(ANGLE_ROWS, metric);
   document.getElementById('videoAngleCard').innerHTML=
-    '<div class="chart-card-title">Video Content Angle → '+METRIC_LABEL[metric]+'</div>'+
+    '<div class="chart-card-title">Video Content Angle → '+METRIC_LABEL[metric]+scopeNoteHtml()+metricTooltipHtml()+'</div>'+
     '<div class="chart-card-sub">Creative angle ranked by '+METRIC_LABEL[metric]+'</div>'+
     '<div class="hbar-list">'+renderHbarList(angleD.items,function(){return 'linear-gradient(90deg,#0EA5E9,#38BDF8)';})+'</div>';
 
@@ -1730,11 +1777,19 @@ setLens('video');
     if(y+h+p>innerHeight)y=e.clientY-h-m;
     tt.style.left=Math.max(p,x)+'px';tt.style.top=Math.max(p,y)+'px';
   }
-  document.querySelectorAll('.has-tooltip').forEach(function(el){
+  /* delegated (not per-element) so tooltips also work on video cards, which get
+     re-rendered via innerHTML every time the metric switcher is clicked */
+  var current=null;
+  document.addEventListener('mouseover',function(e){
+    var el=e.target.closest && e.target.closest('.has-tooltip');
+    if(!el||el===current)return;
     var box=el.querySelector('.tooltip-box');if(!box)return;
-    el.addEventListener('mouseenter',function(e){tt.innerHTML=box.innerHTML;tt.style.display='block';pos(e);});
-    el.addEventListener('mousemove',pos);
-    el.addEventListener('mouseleave',function(){tt.style.display='none';});
+    current=el;tt.innerHTML=box.innerHTML;tt.style.display='block';pos(e);
+  });
+  document.addEventListener('mousemove',function(e){if(current)pos(e);});
+  document.addEventListener('mouseout',function(e){
+    var el=e.target.closest && e.target.closest('.has-tooltip');
+    if(el&&el===current&&!el.contains(e.relatedTarget)){current=null;tt.style.display='none';}
   });
 })();
 </script>
