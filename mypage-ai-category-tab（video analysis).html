@@ -727,6 +727,7 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
                 <button class="metric-btn" data-m="eng" onclick="setMetric('eng')">Engagement</button>
                 <button class="metric-btn" data-m="pageer" onclick="setMetric('pageer')">Page ER</button>
                 <button class="metric-btn" data-m="avv" onclick="setMetric('avv')">Video Views</button>
+                <button class="metric-btn" data-m="avgvv" onclick="setMetric('avgvv')">Avg Video Views</button>
                 <button class="metric-btn" data-m="svr" onclick="setMetric('svr')">3s View Rate</button>
                 <button class="metric-btn" data-m="pr" onclick="setMetric('pr')">Play Rate</button>
               </div>
@@ -1192,12 +1193,13 @@ var TOPPOSTS=[
   {th:'🚇',name:'Breaking: new MTR line opens ahead of schedule',fmt:'LINK',cat:'News & Current Affairs',sub:'Local & Regional News',adcat:'Text-Only Graphic',eng:1240,likes:680,comments:360,vv:2100,d:-6}
 ];
 
-var METRIC_LABEL = {aeng:'Avg Engagement',eng:'Engagement',pageer:'Page ER',avv:'Video Views',svr:'3s View Rate',pr:'Play Rate'};
-var METRIC_UNIT  = {aeng:'per post',eng:'total',pageer:'daily · vs followers',avv:'per post',svr:'3s video views ÷ impressions',pr:'views ÷ reach'};
-/* svr (3s View Rate) = 3s Video Views ÷ Impressions — Video Post only (Reels have no impressions field).
-   pr  (Play Rate)     = applies to BOTH content types, but the numerator differs per type:
+var METRIC_LABEL = {aeng:'Avg Engagement',eng:'Engagement',pageer:'Page ER',avv:'Video Views',avgvv:'Avg Video Views',svr:'3s View Rate',pr:'Play Rate'};
+var METRIC_UNIT  = {aeng:'per post',eng:'total',pageer:'daily · vs followers',avv:'per post',avgvv:'video views ÷ video qty',svr:'3s video views ÷ impressions',pr:'views ÷ reach'};
+/* svr   (3s View Rate)    = 3s Video Views ÷ Impressions — Video Post only (Reels have no impressions field).
+   pr    (Play Rate)       = applies to BOTH content types, but the numerator differs per type:
      - Video Post: Video Views ÷ Reach
      - Reels:      3s Video Views ÷ Reach
+   avgvv (Avg Video Views) = Video Views ÷ Video Qty — applies to BOTH Video Post and Reels.
    Because the numerator changes per content type, Play Rate is not directly comparable to 3s View Rate. */
 var METRIC_SCOPE = {svr:'videos-only'};
 var METRIC_SCOPE_LABEL = {'videos-only':'Video post only'};
@@ -1215,6 +1217,7 @@ function metricVal(r,m){
   if(m==='eng')   return r.posts*r.eng;
   if(m==='pageer')return (r.posts*r.eng)/12000000*100;
   if(m==='avv')   return r.vv;                          /* avg video views per post */
+  if(m==='avgvv') return +(r.vv/r.posts).toFixed(1);    /* Avg Video Views = video views ÷ video qty (video/reel post count) */
   if(m==='svr')   return +(r.vv/FOLLOWERS*150).toFixed(1); /* mock 3s View Rate: vv ÷ synthetic impressions (FOLLOWERS-based, same denominator pattern as ER/Page ER) */
   if(m==='pr')    return +(r.vv/FOLLOWERS*300).toFixed(1); /* mock Play Rate: plays ÷ synthetic reach — no 3s threshold, can exceed 100% on replays */
   return 0;
@@ -1283,7 +1286,7 @@ function videoMetricDisplay(rows, m){
     var v=metricVal(r,m);
     var barPct=top>0?Math.round(v/top*100):0;
     var displayText;
-    if(m==='aeng'){
+    if(m==='aeng'||m==='avgvv'){
       displayText=fmt(v);
     }else if(m==='avv'){
       displayText=fmtK(v);
@@ -1318,7 +1321,7 @@ function renderVideoLengthChart(){
     return fmt(v);
   }
   function fmtVal(v){
-    if(metric==='aeng') return fmt(v);
+    if(metric==='aeng'||metric==='avgvv') return fmt(v);
     if(metric==='avv') return fmtK(v);
     if(metric==='eng'){
       var share=total>0?(v/total*100):0;
@@ -1365,6 +1368,10 @@ var METRIC_TOOLTIP={
       '<b>Video Post:</b> Video Views ÷ Reach.',
       '<b>Reels:</b> 3s Video Views ÷ Reach.'
     ]
+  },
+  avgvv:{
+    t:'Avg Video Views',
+    rows:['<b>Formula:</b> Video Views ÷ Video Qty.']
   }
 };
 function metricTooltipHtml(){
