@@ -490,17 +490,25 @@ svg{display:block;}
 .sa-modal__grid{flex:1;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
   gap:var(--sp-md);padding:var(--sp-sm) var(--sp-lg) var(--sp-lg);align-content:start;}
 .sa-card{border:1.5px solid var(--border);border-radius:var(--r-md);overflow:hidden;cursor:pointer;
-  transition:border-color .15s,box-shadow .15s;}
+  transition:border-color .15s,box-shadow .15s;position:relative;}
 .sa-card:hover{border-color:var(--brand-blue);box-shadow:var(--shadow-float);}
+.sa-card.sel{border-color:var(--brand-blue);border-width:2px;}
 .sa-card__thumb{aspect-ratio:1/1;position:relative;display:flex;align-items:center;justify-content:center;
   padding:var(--sp-sm);text-align:center;}
 .sa-card__label{font-size:10px;font-weight:700;color:#fff;line-height:1.3;}
 .sa-card__sub{font-size:9px;color:rgba(255,255,255,.75);margin-top:3px;}
 .sa-card__play{position:absolute;top:6px;right:6px;width:18px;height:18px;border-radius:50%;
   background:rgba(255,255,255,.22);display:grid;place-items:center;backdrop-filter:blur(2px);}
+.sa-card__check{position:absolute;top:6px;left:6px;width:18px;height:18px;border-radius:50%;
+  background:rgba(255,255,255,.85);border:1.5px solid rgba(255,255,255,.9);display:grid;place-items:center;z-index:2;}
+.sa-card.sel .sa-card__check{background:var(--brand-blue);border-color:var(--brand-blue);}
 .sa-modal__empty{padding:var(--sp-2xl) var(--sp-lg);text-align:center;font-size:12px;color:var(--text-regular);grid-column:1/-1;}
 .sa-modal__foot{padding:var(--sp-sm) var(--sp-lg);border-top:1px solid var(--divider);
-  font-size:11px;color:var(--text-regular);text-align:center;flex-shrink:0;}
+  font-size:11px;color:var(--text-regular);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.sa-modal__add-btn{padding:6px 18px;border-radius:var(--r-md);font-size:12px;font-weight:600;
+  background:var(--brand-blue);color:#fff;border:none;cursor:pointer;transition:background .15s;}
+.sa-modal__add-btn:hover{background:#1b9bea;}
+.sa-modal__add-btn:disabled{background:var(--text-placeholder);cursor:not-allowed;}
 
 /* post selection mode banner */
 .select-mode-bar{position:fixed;top:var(--nav-h);left:0;right:0;z-index:550;
@@ -2094,7 +2102,10 @@ body{
       </div>
     </div>
     <div class="sa-modal__grid" id="saGrid"></div>
-    <div class="sa-modal__foot">Page 1 of 1</div>
+    <div class="sa-modal__foot">
+      <span>Page 1 of 1</span>
+      <button class="sa-modal__add-btn" id="saAddBtn" disabled onclick="confirmSAAssets()">Add</button>
+    </div>
   </div>
 </div>
 
@@ -2419,6 +2430,14 @@ let mentionOpen = false;
 let mentionBuffer = '';
 let mentionRefs = [];
 let selectedAssets = [];
+let saSelectedIds = new Set();
+// Monotonic counter tagging every image/video that enters the session's media
+// pool (local upload OR Asset Library Selection), so @ Reference → Upload can
+// number them image1/video1, image2/video2... by combined chronological order
+// regardless of source (see content-gen-agent-reference-entry-prd.md §6.2/6.4).
+let mediaSeq = 0;
+let uploadedImgSeqs = [];
+let uploadedVideoSeqs = [];
 
 const POSTS_DATA = [
   {id:0, label:'Yves Rocher HK', sub:'Top 25% · 16 Jun', bg:'linear-gradient(135deg,#b8922e,#7a5520)', initials:'YR', type:'image'},
@@ -2607,12 +2626,23 @@ function doneSelectingPosts() {
   openPanel();
 }
 
+/* Add to the session's image/video pool, tagging insertion order so @ Reference
+   → Upload can number image1/video1, image2/video2... across upload + asset sources. */
+function addUploadedImg(name) {
+  uploadedImgs.push(name);
+  uploadedImgSeqs.push(++mediaSeq);
+}
+function addUploadedVideo(name) {
+  uploadedVideos.push(name);
+  uploadedVideoSeqs.push(++mediaSeq);
+}
+
 /* Upload image */
 function triggerUpload() {
   const maxTotal = 10;
   const total = uploadedImgs.length + selectedPosts.filter(p => p.type === 'image').length;
   if (total < maxTotal) {
-    uploadedImgs.push('ref-image-' + (uploadedImgs.length + 1) + '.jpg');
+    addUploadedImg('ref-image-' + (uploadedImgs.length + 1) + '.jpg');
     renderRefStrip();
     updateSendBtn();
   }
@@ -2623,7 +2653,7 @@ function triggerUpload() {
 /* Upload video */
 function triggerVideoUpload() {
   if (uploadedVideos.length < 2) {
-    uploadedVideos.push('ref-video-' + (uploadedVideos.length + 1) + '.mp4');
+    addUploadedVideo('ref-video-' + (uploadedVideos.length + 1) + '.mp4');
     renderRefStrip();
     updateSendBtn();
   }
@@ -2637,8 +2667,12 @@ function openSelectAssetsModal() {
   saRatioFilter = 'all';
   document.getElementById('saSizeSel').value = 'all';
   document.getElementById('saRatioSel').value = 'all';
+  // Pre-check anything already confirmed in a prior "+" pass, per PRD §7.2 —
+  // re-opening the modal shouldn't let the user accidentally add a duplicate chip.
+  saSelectedIds = new Set(selectedAssets.map(a => a.id));
   renderSATabs();
   renderSAGrid();
+  updateSAAddBtn();
   document.getElementById('saOverlay').classList.add('open');
   closePickerSheet();
 }
@@ -2688,7 +2722,8 @@ function renderSAGrid() {
     return;
   }
   gridEl.innerHTML = items.map(a => `
-    <div class="sa-card" onclick="selectSAAsset('${a.id}')">
+    <div class="sa-card${saSelectedIds.has(a.id) ? ' sel' : ''}" onclick="toggleSAAsset('${a.id}')">
+      <div class="sa-card__check">${saSelectedIds.has(a.id) ? '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.2 2.2L8 3" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>' : ''}</div>
       <div class="sa-card__thumb" style="background:${a.bg};">
         ${a.type === 'video' ? '<div class="sa-card__play"><svg width="8" height="8" viewBox="0 0 8 8" fill="#fff"><path d="M1.5 0.5v7l6-3.5z"/></svg></div>' : ''}
         <div>
@@ -2698,9 +2733,28 @@ function renderSAGrid() {
       </div>
     </div>`).join('');
 }
-function selectSAAsset(id) {
-  const asset = SA_ASSETS_DATA.find(a => a.id === id);
-  selectedAssets = [asset];
+/* Multi-select (PRD §5.2): clicking a card only toggles its checked state;
+   nothing is added to the ref-strip until "Add" is confirmed. */
+function toggleSAAsset(id) {
+  if (saSelectedIds.has(id)) saSelectedIds.delete(id);
+  else saSelectedIds.add(id);
+  renderSAGrid();
+  updateSAAddBtn();
+}
+function updateSAAddBtn() {
+  const btn = document.getElementById('saAddBtn');
+  const n = saSelectedIds.size;
+  btn.textContent = n > 0 ? `Add (${n})` : 'Add';
+  btn.disabled = n === 0;
+}
+function confirmSAAssets() {
+  saSelectedIds.forEach(id => {
+    // Dedupe by entityId per PRD §7.2 — already-confirmed assets aren't re-added.
+    if (selectedAssets.some(a => a.id === id)) return;
+    const asset = SA_ASSETS_DATA.find(a => a.id === id);
+    if (!asset) return;
+    selectedAssets.push({ ...asset, seq: ++mediaSeq });
+  });
   closeSelectAssetsModal();
   renderRefStrip();
   updateSendBtn();
@@ -2746,20 +2800,22 @@ function renderRefStrip() {
         <div class="ref-chip__x" onclick="removeRef(${p.id})">✕</div>
       </div>`;
   });
-  uploadedImgs.forEach((img, i) => {
+  // Chip label uses the same imageN/videoN name as @ Reference → Upload —
+  // never the raw filename — so the two surfaces always agree (see getSessionImagePool()).
+  getSessionImagePool().filter(it => it.source === 'upload').forEach(it => {
     strip.innerHTML += `
       <div class="img-chip">
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="4" cy="4.5" r="1" fill="currentColor"/><path d="M1 9l2.5-2.5 1.5 1.5 2-2L9 9" stroke="currentColor" stroke-width="1"/></svg>
-        ${img}
-        <div class="ref-chip__x" onclick="removeUpload(${i})">✕</div>
+        ${it.name}
+        <div class="ref-chip__x" onclick="removeUpload(${it.uploadIndex})">✕</div>
       </div>`;
   });
-  uploadedVideos.forEach((vid, i) => {
+  getSessionVideoPool().filter(it => it.source === 'upload').forEach(it => {
     strip.innerHTML += `
       <div class="img-chip" style="background:#F0F9FF;border-color:#BAE6FD;color:#0369A1;">
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="8" height="8" rx="1.2" stroke="currentColor" stroke-width="1.1"/><path d="M9 5l2.5-1.5v5L9 7V5z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>
-        ${vid}
-        <div class="ref-chip__x" onclick="removeVideo(${i})">✕</div>
+        ${it.name}
+        <div class="ref-chip__x" onclick="removeVideo(${it.uploadIndex})">✕</div>
       </div>`;
   });
 }
@@ -2770,11 +2826,13 @@ function removeRef(id) {
 }
 function removeUpload(i) {
   uploadedImgs.splice(i, 1);
+  uploadedImgSeqs.splice(i, 1);
   renderRefStrip();
   updateSendBtn();
 }
 function removeVideo(i) {
   uploadedVideos.splice(i, 1);
+  uploadedVideoSeqs.splice(i, 1);
   renderRefStrip();
   updateSendBtn();
 }
@@ -2997,16 +3055,21 @@ const MYPAGE_PLATFORMS = [
   {key:'instagram', label:'Instagram'},
   {key:'threads',   label:'Threads'},
 ];
+// Mock "already connected in this org" pages — per PRD §6.5 this list (and its
+// order) should come from the same source & sort as the standalone My Page module.
 const MYPAGE_DATA = {
   facebook: [
-    {name:'BusinessFocus', sub:'@businessfocus.io', icon:'📰', platform:'facebook'},
-    {name:'GirlStyle 台灣女生日常', sub:'@girlstyle.taiwan', icon:'💄', platform:'facebook'},
+    {name:'BusinessFocus', sub:'@businessfocus.io · 128K followers', icon:'📰', platform:'facebook'},
+    {name:'GirlStyle 台灣女生日常', sub:'@girlstyle.taiwan · 312K followers', icon:'💄', platform:'facebook'},
+    {name:'Dr.Once Official', sub:'@dronce.official.fb · 86K followers', icon:'💊', platform:'facebook'},
+    {name:'ChatCommerce', sub:'@chatcommerce.hk · 45K followers', icon:'🛍️', platform:'facebook'},
   ],
   instagram: [
-    {name:'Dr.Once Official', sub:'@dronce.official', icon:'💊', platform:'instagram'},
+    {name:'Dr.Once Official', sub:'@dronce.official · 86K followers', icon:'💊', platform:'instagram'},
+    {name:'GirlStyle 女生日常', sub:'@girlstyle.ig · 198K followers', icon:'💄', platform:'instagram'},
   ],
   threads: [
-    {name:'Performance HQ', sub:'@performancehq', icon:'📈', platform:'threads'},
+    {name:'Performance HQ', sub:'@performancehq · 42K followers', icon:'📈', platform:'threads'},
   ],
 };
 let mentionActiveCategory = 'upload';
@@ -3035,7 +3098,7 @@ function onPromptInput(e) {
 function renderMentionTabs() {
   const tabsEl = document.getElementById('mentionTabs');
   tabsEl.innerHTML = MENTION_CATEGORIES.map(c => `
-    <div class="mdd-tab${c.key===mentionActiveCategory?' active':''}${c.locked?' locked':''}" onclick="switchMentionCategory('${c.key}')">
+    <div class="mdd-tab${c.key===mentionActiveCategory?' active':''}${c.locked?' locked':''}" onclick="event.stopPropagation();switchMentionCategory('${c.key}')">
       ${c.label}${c.locked ? '<svg class="mdd-tab__lock" width="10" height="10" viewBox="0 0 10 10" fill="none"><rect x="2" y="4.5" width="6" height="4.5" rx="1" stroke="currentColor" stroke-width="1"/><path d="M3.2 4.5V3.2a1.8 1.8 0 013.6 0V4.5" stroke="currentColor" stroke-width="1"/></svg>' : ''}
     </div>`
   ).join('');
@@ -3060,7 +3123,7 @@ function renderMentionSubtabs() {
   }
   subEl.classList.remove('hidden');
   subEl.innerHTML = MYPAGE_PLATFORMS.map(p => `
-    <div class="mdd-subtab${p.key===mentionActivePlatform?' active':''}" onclick="switchMentionPlatform('${p.key}')">${p.label}</div>
+    <div class="mdd-subtab${p.key===mentionActivePlatform?' active':''}" onclick="event.stopPropagation();switchMentionPlatform('${p.key}')">${p.label}</div>
   `).join('');
 }
 function platformBadge(platform) {
@@ -3070,10 +3133,44 @@ function platformBadge(platform) {
 }
 // Upload can only be @ mentioned after it's actually there this session —
 // grouped by type (Images / Videos / Posts the user selected on the Buzz page).
+// Images/Videos merge two sources — local upload AND Asset Library Selection —
+// into one pool each, numbered by combined chronological order (seq), not by
+// source (see content-gen-agent-reference-entry-prd.md §6.2/6.4).
+// uploadIndex is carried through so the ref-strip chip for a given uploadedImgs/
+// uploadedVideos entry can show the exact same imageN/videoN name as @ Reference
+// → Upload — the two surfaces must never disagree on what a session image is called.
+function getSessionImagePool() {
+  const pool = [
+    ...uploadedImgs.map((name, i) => ({ seq: uploadedImgSeqs[i], source: 'upload', uploadIndex: i })),
+    ...selectedAssets.filter(a => a.type === 'image').map(a => ({ seq: a.seq, source: 'asset', asset: a })),
+  ];
+  pool.sort((a, b) => a.seq - b.seq);
+  return pool.map((it, i) => ({
+    ...it,
+    name: 'image' + (i + 1),
+    sub: it.source === 'asset' ? ('Asset · ' + it.asset.label) : 'Image · uploaded this session',
+    icon: '🖼️',
+  }));
+}
+function getSessionVideoPool() {
+  const pool = [
+    ...uploadedVideos.map((name, i) => ({ seq: uploadedVideoSeqs[i], source: 'upload', uploadIndex: i })),
+    ...selectedAssets.filter(a => a.type === 'video').map(a => ({ seq: a.seq, source: 'asset', asset: a })),
+  ];
+  pool.sort((a, b) => a.seq - b.seq);
+  return pool.map((it, i) => ({
+    ...it,
+    name: 'video' + (i + 1),
+    sub: it.source === 'asset' ? ('Asset · ' + it.asset.label) : 'Video · uploaded this session',
+    icon: '🎬',
+  }));
+}
 function getUploadMentionGroups() {
   const groups = [];
-  if (uploadedImgs.length) groups.push({label:'Images', items: uploadedImgs.map(name => ({name, sub:'Image · uploaded this session', icon:'🖼️'}))});
-  if (uploadedVideos.length) groups.push({label:'Videos', items: uploadedVideos.map(name => ({name, sub:'Video · uploaded this session', icon:'🎬'}))});
+  const imgPool = getSessionImagePool();
+  const vidPool = getSessionVideoPool();
+  if (imgPool.length) groups.push({label:'Images', items: imgPool});
+  if (vidPool.length) groups.push({label:'Videos', items: vidPool});
   if (uploadedFiles.length) groups.push({label:'Files', items: uploadedFiles.map(name => ({name, sub:'File · uploaded this session', icon:'📄'}))});
   if (selectedPosts.length) groups.push({label:'Posts', items: selectedPosts.map(p => ({name:p.label, sub:(p.type==='image'?'Image':'Link') , icon: p.type==='image' ? '🖼️' : '🔗'}))});
   return groups;
@@ -3179,7 +3276,9 @@ function updateSendBtn() {
 function clearRefs() {
   selectedPosts = [];
   uploadedImgs = [];
+  uploadedImgSeqs = [];
   uploadedVideos = [];
+  uploadedVideoSeqs = [];
   mentionRefs = [];
   selectedAssets = [];
   renderRefStrip();
@@ -3456,7 +3555,7 @@ function sendMessage() {
 function editGenCard(btn, bg) {
   // Add the card image as a reference and open the panel
   const name = btn.closest('.gen-img-card').querySelector('.gen-img-card__name').textContent;
-  uploadedImgs.push(name);
+  addUploadedImg(name);
   renderRefStrip();
   updateSendBtn();
   openPanel();
@@ -3581,7 +3680,7 @@ function closeImgLightbox() {
 function citeGenCard(cid) {
   const c = window._genCards && window._genCards[cid];
   if (!c) return;
-  uploadedImgs.push(c.name);
+  addUploadedImg(c.name);
   renderRefStrip();
   updateSendBtn();
   openPanel();
@@ -3813,9 +3912,9 @@ function confirmGenSel() {
 
   // Add asset as reference chip
   if (assetType === 'video') {
-    uploadedVideos.push('ai-asset.mp4');
+    addUploadedVideo('ai-asset.mp4');
   } else {
-    uploadedImgs.push('ai-asset.jpg');
+    addUploadedImg('ai-asset.jpg');
   }
   renderRefStrip();
   updateSendBtn();
@@ -3837,9 +3936,9 @@ function chatWithAsset(card) {
   const assetType = card ? card.dataset.type : 'image';
   closeGenPage();
   if (assetType === 'video') {
-    uploadedVideos.push('ai-asset.mp4');
+    addUploadedVideo('ai-asset.mp4');
   } else {
-    uploadedImgs.push('ai-asset.jpg');
+    addUploadedImg('ai-asset.jpg');
   }
   renderRefStrip();
   updateSendBtn();
