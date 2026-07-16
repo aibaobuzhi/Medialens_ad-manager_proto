@@ -2776,14 +2776,6 @@ function renderRefStrip() {
   }
   strip.style.display = 'flex';
   strip.innerHTML = '';
-  selectedAssets.forEach(a => {
-    strip.innerHTML += `
-      <div class="ref-chip">
-        <div class="ref-chip__thumb" style="background:${a.bg};"></div>
-        Asset：${a.label}
-        <div class="ref-chip__x" onclick="removeSelectedAsset('${a.id}')">✕</div>
-      </div>`;
-  });
   mentionRefs.forEach((m, i) => {
     strip.innerHTML += `
       <div class="ref-chip">
@@ -2801,21 +2793,23 @@ function renderRefStrip() {
       </div>`;
   });
   // Chip label uses the same imageN/videoN name as @ Reference → Upload —
-  // never the raw filename — so the two surfaces always agree (see getSessionImagePool()).
-  getSessionImagePool().filter(it => it.source === 'upload').forEach(it => {
+  // regardless of source (local upload OR an image/video picked via Asset
+  // Library Selection) — so ref-strip and the @ mention list always agree,
+  // and an Asset that's an image is never labeled "Asset：{name}" up here.
+  getSessionImagePool().forEach(it => {
     strip.innerHTML += `
       <div class="img-chip">
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="4" cy="4.5" r="1" fill="currentColor"/><path d="M1 9l2.5-2.5 1.5 1.5 2-2L9 9" stroke="currentColor" stroke-width="1"/></svg>
         ${it.name}
-        <div class="ref-chip__x" onclick="removeUpload(${it.uploadIndex})">✕</div>
+        <div class="ref-chip__x" onclick="${it.source === 'upload' ? `removeUpload(${it.uploadIndex})` : `removeSelectedAsset('${it.asset.id}')`}">✕</div>
       </div>`;
   });
-  getSessionVideoPool().filter(it => it.source === 'upload').forEach(it => {
+  getSessionVideoPool().forEach(it => {
     strip.innerHTML += `
       <div class="img-chip" style="background:#F0F9FF;border-color:#BAE6FD;color:#0369A1;">
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="8" height="8" rx="1.2" stroke="currentColor" stroke-width="1.1"/><path d="M9 5l2.5-1.5v5L9 7V5z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>
         ${it.name}
-        <div class="ref-chip__x" onclick="removeVideo(${it.uploadIndex})">✕</div>
+        <div class="ref-chip__x" onclick="${it.source === 'upload' ? `removeVideo(${it.uploadIndex})` : `removeSelectedAsset('${it.asset.id}')`}">✕</div>
       </div>`;
   });
 }
