@@ -112,9 +112,8 @@ button { font-family: inherit; cursor: pointer; }
   display: flex; flex-direction: column; overflow: hidden;
 }
 .modal__body { flex: 1 1 auto; overflow-y: auto; padding: var(--sp-2xl) var(--sp-2xl) var(--sp-xl); text-align: center; }
-.modal__icon { margin: 0 auto var(--sp-sm); width: 96px; height: 96px; }
-.modal__title { font-size: var(--fs-title-lg); line-height: var(--lh-title-lg); font-weight: 700; color: var(--title); margin-bottom: var(--sp-xs); }
-.modal__desc { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--text-regular); max-width: 360px; margin: 0 auto var(--sp-xl); }
+.modal__eyebrow { font-size: var(--fs-title-lg); line-height: var(--lh-title-lg); font-weight: 700; color: var(--brand-blue); margin-bottom: var(--sp-xs); }
+.modal__title { font-size: var(--fs-title-lg); line-height: var(--lh-title-lg); font-weight: 700; color: var(--title); margin-bottom: var(--sp-xl); }
 
 .form { display: flex; flex-direction: column; gap: var(--sp-md); text-align: left; }
 .field__label { display: block; font-size: var(--fs-body); font-weight: 500; color: var(--text-primary); margin-bottom: var(--sp-xs); }
@@ -132,28 +131,17 @@ button { font-family: inherit; cursor: pointer; }
 .field.has-error .field__error { display: block; }
 .field.has-error .input { border-color: var(--danger); }
 
-.quick-options { display: flex; flex-wrap: wrap; gap: var(--sp-xs); margin-top: var(--sp-xs); }
-.quick-opt {
-  font-family: inherit; font-size: var(--fs-label); font-weight: 500;
-  color: var(--text-regular); background: transparent;
-  border: 1px solid var(--border); border-radius: var(--r-tag);
-  padding: var(--sp-xxs) var(--sp-sm); transition: background .15s, color .15s, border-color .15s;
-}
-.quick-opt:hover { background: var(--surface-page); border-color: var(--text-secondary); }
-.quick-opt.is-selected { background: var(--surface-page); border-color: var(--text-regular); color: var(--text-primary); }
-
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-xs);
   width: 100%; height: 46px;
   font-size: var(--fs-body); font-weight: 600;
-  border-radius: var(--r-full); border: none;
-  background: var(--brand-blue); color: #fff;
-  box-shadow: 0 4px 14px rgba(35,169,246,0.35);
-  transition: background .15s;
+  border-radius: var(--r-md); border: none;
+  background: linear-gradient(90deg, var(--brand-blue), var(--brand-light-blue)); color: #fff;
+  transition: opacity .15s;
   margin-top: var(--sp-xs);
 }
-.btn:hover { background: #1a9ee0; }
-.btn:disabled { background: var(--btn-primary-disabled); box-shadow: none; cursor: not-allowed; }
+.btn:hover { opacity: .92; }
+.btn:disabled { background: var(--btn-primary-disabled); opacity: .7; cursor: not-allowed; }
 
 .modal__foot-note { margin-top: var(--sp-md); font-size: var(--fs-label); color: var(--text-secondary); }
 </style>
@@ -181,48 +169,38 @@ button { font-family: inherit; cursor: pointer; }
 <div class="overlay" id="modal">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
     <div class="modal__body">
-      <svg class="modal__icon" viewBox="0 0 130 118" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="65" cy="108" rx="50" ry="6" fill="#EAF2FF"/>
-        <path d="M20 30h90v58a6 6 0 0 1-6 6H26a6 6 0 0 1-6-6V30z" fill="#FFFFFF" stroke="#23A9F6" stroke-width="3"/>
-        <path d="M20 30l45 32 45-32" stroke="#23A9F6" stroke-width="3" stroke-linejoin="round" fill="none"/>
-        <path d="M78 18l14-8m0 0l6 12" stroke="#FFBA33" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        <circle cx="98" cy="78" r="17" fill="#52C41A"/>
-        <path d="M90 78l6 6 12-13" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-      </svg>
-      <h2 class="modal__title" id="m-title">Access Shared Report</h2>
-      <p class="modal__desc">Enter your details to view this MediaLens report. No verification needed — you'll get instant access.</p>
+      <div class="modal__eyebrow">Welcome!</div>
+      <h2 class="modal__title" id="m-title">Let's set up your profile</h2>
 
       <form class="form" id="lead-form" onsubmit="return submitForm(event)" novalidate>
         <div class="field" id="f-name">
           <label class="field__label" for="in-name">Name <span class="req">*</span></label>
-          <input class="input" id="in-name" placeholder="Please enter your name" autocomplete="name">
+          <input class="input" id="in-name" placeholder="Please enter" autocomplete="name">
           <div class="field__error">Please enter your name.</div>
         </div>
         <div class="field" id="f-position">
           <label class="field__label" for="in-position">Position <span class="req">*</span></label>
-          <input class="input" id="in-position" placeholder="e.g. Marketing Manager" autocomplete="organization-title">
-          <div class="quick-options">
-            <button type="button" class="quick-opt" data-value="Owner / Co-Founder">Owner / Co-Founder</button>
-            <button type="button" class="quick-opt" data-value="Director">Director</button>
-            <button type="button" class="quick-opt" data-value="Manager">Manager</button>
-            <button type="button" class="quick-opt" data-value="Staff">Staff</button>
-          </div>
+          <input class="input" id="in-position" placeholder="Please enter" autocomplete="organization-title">
           <div class="field__error">Please enter your position.</div>
+        </div>
+        <div class="field" id="f-company">
+          <label class="field__label" for="in-company">Company <span class="req">*</span></label>
+          <input class="input" id="in-company" placeholder="Please enter" autocomplete="organization">
+          <div class="field__error">Please enter your company.</div>
         </div>
         <div class="field" id="f-phone">
           <label class="field__label" for="in-phone">Phone Number <span class="req">*</span></label>
-          <input class="input" id="in-phone" placeholder="Please enter your phone number" autocomplete="tel" inputmode="numeric">
+          <input class="input" id="in-phone" placeholder="Please enter" autocomplete="tel" inputmode="numeric">
           <div class="field__error">Please enter a valid phone number (numbers only).</div>
         </div>
         <div class="field" id="f-email">
           <label class="field__label" for="in-email">Email <span class="req">*</span></label>
-          <input class="input" id="in-email" placeholder="Please enter your email" autocomplete="email" inputmode="email">
+          <input class="input" id="in-email" placeholder="Please enter" autocomplete="email" inputmode="email">
           <div class="field__error">Please enter a valid email.</div>
         </div>
 
-        <button class="btn" type="submit" id="submit-btn" disabled>View Report</button>
+        <button class="btn" type="submit" id="submit-btn" disabled>Submit</button>
       </form>
-      <p class="modal__foot-note">By continuing you agree to receive this report via the details above.</p>
     </div>
   </div>
 </div>
@@ -253,13 +231,14 @@ button { font-family: inherit; cursor: pointer; }
     var allFilled = [
       isFilled('f-name', document.getElementById('in-name').value),
       isFilled('f-position', document.getElementById('in-position').value),
+      isFilled('f-company', document.getElementById('in-company').value),
       isFilled('f-phone', document.getElementById('in-phone').value),
       isFilled('f-email', document.getElementById('in-email').value)
     ].every(Boolean);
     document.getElementById('submit-btn').disabled = !allFilled;
   }
 
-  ['in-name', 'in-position', 'in-phone', 'in-email'].forEach(function(id) {
+  ['in-name', 'in-position', 'in-company', 'in-phone', 'in-email'].forEach(function(id) {
     document.getElementById(id).addEventListener('input', updateSubmitState);
   });
 
@@ -268,32 +247,18 @@ button { font-family: inherit; cursor: pointer; }
     e.target.value = e.target.value.replace(/[^0-9]/g, '');
   });
 
-  // Position — quick-select chips fill the input
-  document.querySelectorAll('.quick-opt').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var input = document.getElementById('in-position');
-      input.value = btn.dataset.value;
-      document.querySelectorAll('.quick-opt').forEach(function(b) { b.classList.remove('is-selected'); });
-      btn.classList.add('is-selected');
-      document.getElementById('f-position').classList.remove('has-error');
-      updateSubmitState();
-    });
-  });
-  document.getElementById('in-position').addEventListener('input', function() {
-    document.querySelectorAll('.quick-opt').forEach(function(b) { b.classList.remove('is-selected'); });
-  });
-
   function submitForm(e) {
     e.preventDefault();
     var checks = [
       validateField('f-name', document.getElementById('in-name').value),
       validateField('f-position', document.getElementById('in-position').value),
+      validateField('f-company', document.getElementById('in-company').value),
       validateField('f-phone', document.getElementById('in-phone').value),
       validateField('f-email', document.getElementById('in-email').value)
     ];
     if (checks.every(Boolean)) {
       // Prototype only — no verification step. In production this submits
-      // name/position/phone/email and immediately unlocks the report view.
+      // name/position/company/phone/email and immediately unlocks the report view.
       document.getElementById('modal').hidden = true;
     }
     return false;
