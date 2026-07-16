@@ -631,9 +631,11 @@ svg{display:block;}
 .filter-dd.open .filter-dd__caret{transform:rotate(180deg);}
 .filter-dd__menu{position:absolute;top:calc(100% + 6px);left:0;background:#fff;border:1px solid var(--border);border-radius:var(--r-md);box-shadow:var(--shadow-float);padding:4px;min-width:110px;z-index:50;display:none;flex-direction:column;gap:1px;}
 .filter-dd.open .filter-dd__menu{display:flex;}
-.filter-dd__opt{padding:6px 10px;font-size:12px;border-radius:6px;color:var(--text-primary);cursor:pointer;white-space:nowrap;}
+.filter-dd__opt{padding:6px 10px;font-size:12px;border-radius:6px;color:var(--text-primary);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;}
 .filter-dd__opt:hover{background:var(--surface-page);}
 .filter-dd__opt.active{color:var(--brand-blue);font-weight:600;background:var(--brand-blue-tint);}
+.filter-dd__opt.disabled{cursor:not-allowed;color:var(--text-placeholder);}
+.filter-dd__opt.disabled:hover{background:none;}
 .assets-sort-lbl{font-size:12px;color:var(--text-regular);margin-left:auto;}
 
 /* ── Asset card (every thumbnail forced to a 1:1 grid tile; ratio badge still shows the real ratio) ── */
@@ -667,32 +669,143 @@ svg{display:block;}
 .assets-empty-state__clear{margin-top:4px;font-size:12px;font-weight:600;color:var(--brand-blue);cursor:pointer;padding:5px 14px;border:1px solid var(--brand-blue);border-radius:var(--r-full);}
 
 /* ── Publish module ── */
-.pub-platform-tabs{display:flex;gap:var(--sp-xs);padding:var(--sp-md) var(--sp-xl) 0;background:var(--surface-white);}
-.pub-ptab{display:flex;align-items:center;gap:6px;padding:8px 16px;font-size:13px;font-weight:500;color:var(--text-regular);border-radius:var(--r-md) var(--r-md) 0 0;cursor:pointer;border:1px solid transparent;border-bottom:none;}
-.pub-ptab.active{color:var(--brand-blue);font-weight:600;background:var(--brand-blue-tint);border-color:var(--border);}
-.pub-ptab.disabled{cursor:not-allowed;color:var(--text-placeholder);}
-.pub-ptab .coming-soon-pill{margin-left:0;padding:1px 8px;font-size:10px;}
-.pub-status-tabs{display:flex;gap:2px;padding:0 var(--sp-xl);border-bottom:1px solid var(--divider);background:var(--surface-white);flex-shrink:0;}
-.pub-stab{padding:7px 14px;font-size:12.5px;font-weight:500;color:var(--text-regular);border-bottom:2px solid transparent;cursor:pointer;display:flex;align-items:center;gap:5px;}
+.pub-status-tabs{display:flex;gap:2px;padding:var(--sp-md) var(--sp-xl) 0;border-bottom:1px solid var(--divider);background:var(--surface-white);flex-shrink:0;}
+.pub-stab{padding:7px 14px;font-size:13px;font-weight:500;color:var(--text-regular);border-bottom:2px solid transparent;cursor:pointer;display:flex;align-items:center;gap:5px;}
 .pub-stab.active{color:var(--brand-blue);border-bottom-color:var(--brand-blue);font-weight:600;}
-.pub-stab.disabled{cursor:not-allowed;color:var(--text-placeholder);}
 .pub-stab__count{font-size:10px;color:var(--text-regular);background:var(--surface-page);border:1px solid var(--border);padding:1px 6px;border-radius:var(--r-tag);}
 .pub-stab.active .pub-stab__count{background:var(--brand-blue-tint);border-color:#B3DEFF;color:var(--brand-blue);}
-.pub-list{overflow-y:auto;flex:1;padding:var(--sp-md) var(--sp-xl);display:flex;flex-direction:column;gap:var(--sp-sm);}
-.pub-row{display:flex;align-items:center;gap:var(--sp-md);background:var(--surface-white);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-sm) var(--sp-md);}
-.pub-row__thumb{width:52px;height:52px;border-radius:var(--r-sm);flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:9px;color:#fff;text-align:center;line-height:1.2;padding:4px;}
-.pub-row__body{flex:1;min-width:0;}
-.pub-row__caption{font-size:12.5px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.pub-row__meta{display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap;}
-.pub-tag{font-size:10px;font-weight:600;padding:1px 7px;border-radius:3px;background:var(--surface-page);border:1px solid var(--border);color:var(--text-regular);}
-.pub-tag.media{background:rgba(35,169,246,.1);border-color:rgba(35,169,246,.3);color:var(--brand-blue);}
-.pub-tag.status-unstarted{background:rgba(249,115,22,.1);border-color:rgba(249,115,22,.3);color:#C2650A;}
-.pub-tag.status-draft{background:rgba(147,51,234,.1);border-color:rgba(147,51,234,.3);color:#9333EA;}
-.pub-tag.status-published{background:rgba(82,196,26,.1);border-color:rgba(82,196,26,.3);color:#3B8C11;}
-.pub-row__time{font-size:11px;color:var(--text-regular);flex-shrink:0;}
-.pub-row__actions{display:flex;gap:6px;flex-shrink:0;}
-.pub-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:60px 20px;color:var(--text-regular);text-align:center;flex:1;}
+/* Sub-status filter — only shown under the "Published" top tab */
+.pub-substatus-tabs{display:flex;gap:6px;flex-wrap:wrap;padding:var(--sp-sm) var(--sp-xl) 0;background:var(--surface-white);}
+.pub-substab{font-size:12px;font-weight:500;color:var(--text-regular);padding:5px 12px;border-radius:var(--r-tag);border:1px solid var(--border);cursor:pointer;transition:all .12s;}
+.pub-substab:hover{border-color:var(--brand-blue);color:var(--brand-blue);}
+.pub-substab.active{background:var(--brand-blue);border-color:var(--brand-blue);color:#fff;font-weight:600;}
+/* Publish list — reuses the Buzz post card (.cc) look from the reference feed:
+   avatar+name+date header, tag row, media area, caption, footer. */
+.pub-list{overflow-y:auto;flex:1;padding:var(--sp-md) var(--sp-xl);
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:var(--sp-md);align-content:start;}
+.pub-card{cursor:default;}
+.pub-card .cc__img{background:var(--surface-page);}
+.pub-card .cc__img .mini-play{position:absolute;bottom:8px;right:8px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.45);display:grid;place-items:center;}
+.pub-card .cc__img .ratio-flag{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.35);color:#fff;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;}
+.pub-card .cc__cap{-webkit-line-clamp:2;}
+
+/* Status bar — a dedicated full-width strip at the very top of the card (NOT
+   the reused .cc__badge, which a later override turns into an absolute-positioned
+   floating pill and would clip/overlap the header instead of spanning the card). */
+.pub-card__statusbar{padding:6px var(--sp-sm);font-size:11px;font-weight:700;color:#fff;line-height:1.3;}
+.statusbar-draft{background:var(--text-regular);}              /* gray — not yet sent to Meta */
+.statusbar-asdraft{background:var(--brand-blue);}               /* blue — Published as Draft */
+.statusbar-published{background:var(--success);}                /* green — live on Meta */
+.statusbar-scheduled{background:#9333EA;}                       /* purple — scheduled */
+.statusbar-processing{background:var(--warning);color:#7A5000;} /* yellow — being processed by Meta */
+.statusbar-failed{background:var(--danger);}                    /* red — publish call failed */
+
+/* Media Type + Platform — small icon badges moved to the right of the account name,
+   mirroring the reference Buzz card's top-right type icons. */
+.pub-card__typebadges{display:flex;gap:4px;margin-left:auto;flex-shrink:0;}
+.tbadge{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tbadge.tb-platform{background:var(--brand-blue-tint);color:var(--brand-blue);}
+.tbadge.tb-media{background:#FDF2F8;color:#DB2777;}
+
+.pub-card__actions{display:flex;flex-wrap:wrap;gap:6px;padding:var(--sp-xs) var(--sp-sm);border-top:1px solid var(--divider);}
+.pub-card__edit-disabled{position:relative;}
+.pub-card__edit-disabled button[disabled]{opacity:.45;cursor:not-allowed;}
+.pub-card__edit-disabled:hover .pub-card__edit-tip{opacity:1;visibility:visible;}
+.pub-card__edit-tip{position:absolute;bottom:calc(100% + 6px);left:var(--sp-sm);background:var(--title);color:#fff;font-size:11px;padding:5px 9px;border-radius:6px;white-space:nowrap;opacity:0;visibility:hidden;transition:opacity .12s;z-index:5;}
+.pub-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:60px 20px;color:var(--text-regular);text-align:center;grid-column:1/-1;}
 .pub-empty__title{font-size:14px;font-weight:600;color:var(--text-primary);}
+
+/* ── Edit Post modal — mimics Meta's native "Create post" composer, with a live preview
+   and an AI agent hand-off box so the user doesn't have to click Post/Schedule themselves ── */
+.ep-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+.ep-overlay.open{opacity:1;pointer-events:auto;}
+.ep-sheet{background:#fff;border-radius:var(--r-card);width:min(960px,94vw);max-height:90vh;box-shadow:0 20px 60px rgba(0,0,0,.22);display:flex;overflow:hidden;}
+.ep-col{overflow-y:auto;}
+.ep-col--form{width:420px;flex-shrink:0;border-right:1px solid var(--divider);padding:0 0 var(--sp-md);}
+.ep-col--preview{flex:1;min-width:0;background:var(--surface-page);display:flex;flex-direction:column;padding:0;}
+.ep-head{display:flex;align-items:center;gap:10px;padding:var(--sp-md) var(--sp-lg);border-bottom:1px solid var(--divider);}
+.ep-head__close{width:28px;height:28px;border-radius:50%;background:var(--surface-page);color:var(--text-regular);display:grid;place-items:center;cursor:pointer;flex-shrink:0;}
+.ep-head__close:hover{background:var(--border);}
+.ep-head__fbicon{width:26px;height:26px;border-radius:50%;background:var(--brand-blue);color:#fff;display:grid;place-items:center;font-size:14px;font-weight:700;flex-shrink:0;}
+.ep-head__title{font-size:16px;font-weight:700;color:var(--title);}
+.ep-body{padding:var(--sp-md) var(--sp-lg);}
+.ep-pillrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:var(--sp-md);}
+.ep-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;border:1px solid var(--border);font-size:12.5px;font-weight:600;color:var(--text-primary);background:#fff;}
+.ep-caption{width:100%;min-height:90px;border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-sm);font-size:14px;line-height:1.6;font-family:inherit;color:var(--text-primary);resize:vertical;}
+.ep-caption:focus{outline:none;border-color:var(--brand-blue);}
+.ep-section-label{display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:700;color:var(--title);margin:var(--sp-md) 0 8px;}
+.ep-section-label a{font-size:12.5px;font-weight:600;color:var(--brand-blue);cursor:pointer;}
+.ep-media-row{display:flex;gap:8px;flex-wrap:wrap;}
+.ep-media-thumb{position:relative;width:120px;height:120px;border-radius:var(--r-md);overflow:hidden;border:1px solid var(--border);background:var(--surface-page);}
+.ep-media-thumb__badge{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.55);color:#fff;font-size:10px;font-weight:600;padding:2px 7px;border-radius:5px;}
+.ep-media-thumb__x{position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;display:grid;place-items:center;cursor:pointer;}
+.ep-quickrow{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;}
+.ep-quick{flex-shrink:0;width:110px;border:1px solid var(--border);border-radius:var(--r-md);padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--text-primary);text-align:center;}
+.ep-share-row{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-top:1px solid var(--divider);}
+.ep-share-row__icon{width:20px;height:20px;color:var(--text-regular);flex-shrink:0;margin-top:1px;}
+.ep-share-row__body{flex:1;min-width:0;}
+.ep-share-row__title{font-size:14px;font-weight:600;color:var(--title);}
+.ep-share-row__sub{font-size:12px;color:var(--text-regular);margin-top:2px;line-height:1.5;}
+.ep-share-row__sub a{color:var(--brand-blue);}
+.ep-switch{position:relative;width:36px;height:20px;flex-shrink:0;margin-top:2px;}
+.ep-switch input{opacity:0;width:100%;height:100%;position:absolute;margin:0;cursor:pointer;z-index:1;}
+.ep-switch__track{position:absolute;inset:0;background:var(--border);border-radius:999px;transition:background .15s;}
+.ep-switch__thumb{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .15s;}
+.ep-switch input:checked + .ep-switch__track{background:var(--brand-blue);}
+.ep-switch input:checked ~ .ep-switch__thumb{transform:translateX(16px);}
+.ep-foot{display:flex;gap:10px;padding:var(--sp-md) var(--sp-lg) 0;}
+.ep-foot .btn{flex:1;justify-content:center;}
+
+/* Account selection (required) — same pill-dropdown pattern as the Publish filters */
+.ep-acct-field{display:inline-flex;align-items:center;gap:7px;cursor:pointer;
+  background:var(--surface-page);border:1px solid var(--border);border-radius:999px;
+  padding:7px 14px;transition:all .12s;max-width:100%;}
+.ep-acct-field:hover{border-color:var(--brand-blue);background:var(--brand-blue-tint);}
+.ep-acct-field span{font-size:13px;font-weight:600;color:var(--title);}
+.ep-acct-field svg{flex-shrink:0;color:var(--text-regular);}
+.ep-acct-field.error{border-color:var(--danger);background:var(--danger-light);}
+.ep-acct-error{display:none;font-size:11.5px;color:var(--danger);margin-top:6px;}
+.ep-acct-error.show{display:block;}
+
+/* Preview half (top ~50% of the right column) — the card is capped narrower than the
+   column so the 1:1 media doesn't out-grow the available height; that's what leaves
+   room to see the full image plus a few lines of caption without cropping/scrolling. */
+.ep-preview-half{flex:0 0 62%;min-height:0;overflow-y:auto;padding:var(--sp-md) var(--sp-lg);display:flex;flex-direction:column;align-items:center;}
+.ep-preview-label{font-size:14px;font-weight:700;color:var(--title);margin-bottom:8px;align-self:flex-start;}
+.ep-preview-card{width:100%;max-width:260px;background:#fff;border:1px solid var(--border);border-radius:var(--r-card);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);flex-shrink:0;}
+.ep-preview-head{display:flex;align-items:center;gap:8px;padding:var(--sp-sm) var(--sp-md);}
+.ep-preview-name{font-size:13.5px;font-weight:700;color:var(--title);}
+.ep-preview-meta{font-size:11.5px;color:var(--text-regular);}
+.ep-preview-cap{padding:0 var(--sp-md) var(--sp-sm);font-size:12.5px;line-height:1.5;color:var(--text-primary);white-space:pre-wrap;}
+.ep-preview-media{width:100%;aspect-ratio:1/1;position:relative;overflow:hidden;}
+.ep-preview-foot{display:flex;align-items:center;gap:var(--sp-md);padding:8px var(--sp-md);border-top:1px solid var(--divider);color:var(--text-regular);}
+
+/* AI agent half (bottom ~50%) — ONE cohesive bordered panel (chat log + input + toolbar),
+   mirroring the real composer's .prompt-wrap/.prompt-bar pattern used in the Buzz page's
+   AI panel, instead of two separately-boxed pieces with a gap between them. */
+.ep-agent-half{flex:0 0 38%;min-height:0;display:flex;flex-direction:column;border-top:1px solid var(--divider);background:#fff;padding:var(--sp-sm) var(--sp-lg) var(--sp-md);}
+.ep-agent-panel{flex:1;min-height:0;display:flex;flex-direction:column;border:1.5px solid var(--border);border-radius:var(--r-md);overflow:hidden;background:var(--surface-white);}
+.ep-agent-panelhead{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--divider);flex-shrink:0;}
+.ep-agent-panelhead__icon{width:26px;height:26px;border-radius:var(--r-sm);border:1px solid var(--border);display:grid;place-items:center;color:var(--text-regular);flex-shrink:0;}
+.ep-agent-panelhead__title{font-size:13.5px;font-weight:700;color:var(--title);}
+.ep-agent-chat{flex:1;min-height:0;overflow-y:auto;padding:var(--sp-sm);display:flex;align-items:center;justify-content:center;}
+.ep-agent-chat__empty{text-align:center;padding:var(--sp-sm) var(--sp-md);font-size:11.5px;color:var(--text-regular);line-height:1.6;}
+.ep-agent-bar__input{width:100%;height:34px;flex-shrink:0;border:none;border-top:1px solid var(--divider);background:var(--surface-white);padding:0 var(--sp-sm);font-size:13px;font-family:inherit;color:var(--text-primary);}
+.ep-agent-bar__input:focus{outline:none;}
+.ep-agent-toolbar{display:flex;align-items:center;gap:6px;padding:5px var(--sp-xs);flex-shrink:0;background:var(--surface-page);border-top:1px solid var(--divider);}
+.ep-agent-pill{display:inline-flex;align-items:center;padding:4px 10px;border-radius:var(--r-md);font-size:11px;font-weight:500;background:var(--surface-white);border:1px solid var(--border);color:var(--text-primary);cursor:pointer;white-space:nowrap;max-width:130px;overflow:hidden;text-overflow:ellipsis;}
+.ep-agent-charct{font-size:10px;color:var(--text-placeholder);margin-left:auto;flex-shrink:0;}
+.ep-agent-send{width:26px;height:26px;border-radius:50%;background:var(--brand-blue);color:#fff;display:grid;place-items:center;flex-shrink:0;cursor:pointer;transition:background .15s;}
+.ep-agent-send:hover{background:#1b9bea;}
+/* Account filter (top-right of the Publish header) — multi-select of connected Pages/IG accounts */
+.pub-acct-filter-sel{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--r-md);
+  font-size:13px;font-weight:500;background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.4);
+  cursor:pointer;white-space:nowrap;transition:background .12s;}
+.pub-acct-filter-sel:hover,.pub-acct-filter-sel.open{background:rgba(255,255,255,.3);}
+.pub-acct-opt{display:flex;align-items:center;gap:8px;padding:8px var(--sp-md);font-size:12.5px;color:var(--text-primary);cursor:pointer;}
+.pub-acct-opt:hover{background:var(--surface-page);}
+.pub-acct-opt.disabled{cursor:not-allowed;color:var(--text-placeholder);}
+.pub-acct-opt input[type="checkbox"]{cursor:pointer;accent-color:var(--brand-blue);}
 
 /* ── Selection mode bar (bottom of gen-page) ── */
 .gen-sel-bar{position:fixed;bottom:0;left:0;right:0;z-index:800;background:var(--brand-blue);color:#fff;padding:var(--sp-sm) var(--sp-xl);display:flex;align-items:center;gap:var(--sp-md);font-size:13px;transform:translateY(100%);transition:transform .25s;}
@@ -1458,26 +1571,12 @@ body{
         Assets
         <span class="nav-ai-gen__count">7</span>
       </div>
-      <div class="nav-ai-gen__item" onclick="openGenPage()">
-        <div class="nav-ai-gen__icon" style="background:#FFF7ED;">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x=".5" y="2" width="11" height="8" rx="1.5" stroke="#F97316" stroke-width="1.1"/><path d="M3 5.5h4M3 7.5h2.5" stroke="#F97316" stroke-width="1" stroke-linecap="round"/><rect x="8" y="4" width="2.5" height="4" rx=".8" fill="#F97316" opacity=".6"/></svg>
-        </div>
-        AI Ad Creative
-        <span class="nav-ai-gen__count">2</span>
-      </div>
-      <div class="nav-ai-gen__item" onclick="openGenPage()">
-        <div class="nav-ai-gen__icon" style="background:#F0FDF4;">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="1.5" stroke="#22C55E" stroke-width="1.1"/><path d="M3.5 4h5M3.5 6.5h3.5M3.5 9h2" stroke="#22C55E" stroke-width="1" stroke-linecap="round"/></svg>
-        </div>
-        AI Post
-        <span class="nav-ai-gen__count">1</span>
-      </div>
       <div class="nav-ai-gen__item" onclick="openGenPage('publish')">
         <div class="nav-ai-gen__icon" style="background:#EEF2FF;">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v7" stroke="#6366F1" stroke-width="1.1" stroke-linecap="round"/><path d="M3.5 3.5L6 1l2.5 2.5" stroke="#6366F1" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/><path d="M1.5 8v1.5A1 1 0 002.5 10.5h7a1 1 0 001-1V8" stroke="#6366F1" stroke-width="1.1" stroke-linecap="round"/></svg>
         </div>
         Publish
-        <span class="nav-ai-gen__count">5</span>
+        <span class="nav-ai-gen__count">8</span>
       </div>
       <!-- Recent thumbnails -->
       <div class="nav-ai-thumbs" onclick="openGenPage()">
@@ -2133,9 +2232,7 @@ body{
       Back to Buzz
     </div>
     <span style="opacity:.4;margin:0 4px;">/</span>
-    <span class="gp-section-tab active" id="gpSectionAssets" onclick="switchGenSection('assets')" style="font-size:16px;font-weight:600;cursor:pointer;">AI Assets</span>
-    <span style="opacity:.4;margin:0 6px;">·</span>
-    <span class="gp-section-tab" id="gpSectionPublish" onclick="switchGenSection('publish')" style="font-size:16px;font-weight:600;cursor:pointer;opacity:.6;">Publish</span>
+    <span id="gpBreadcrumbTitle" style="font-size:16px;font-weight:600;">AI Assets</span>
     <div style="margin-left:auto;display:flex;gap:var(--sp-sm);" id="gpAssetActions">
       <button class="btn" style="background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.4);" onclick="enterGenSelMode('ad-creative-ai')">
         <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="margin-right:4px;"><rect x="1" y="2.5" width="11" height="8" rx="1.5" stroke="#fff" stroke-width="1.2"/><path d="M3 6h4M3 8h2" stroke="#fff" stroke-width="1" stroke-linecap="round"/><rect x="8.5" y="4" width="2.5" height="4" rx=".8" fill="#fff" opacity=".7"/></svg>
@@ -2151,12 +2248,17 @@ body{
       </button>
       <button class="btn" style="background:#fff;color:var(--brand-blue);font-weight:600;" onclick="downloadSelected()">Download</button>
     </div>
+    <div style="margin-left:auto;" class="hidden" id="gpPublishActions">
+      <div class="pub-acct-filter-sel" id="pubAcctFilterSel" onclick="togglePubAcctFilterDD(event)">
+        <span id="pubAcctFilterLabel">Select account</span>
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.4"/></svg>
+      </div>
+    </div>
   </nav>
 
   <!-- Tab bar (Assets section only — content-type filters) -->
   <div class="gp-tab-bar" id="gpAssetTabBar">
-    <div class="gp-tab active" onclick="switchAssetTab('all',this)">All <span class="gp-tab__count" id="tabCountAll">9</span></div>
-    <div class="gp-tab" onclick="switchAssetTab('fullpost',this)">Full Post <span class="gp-tab__count" id="tabCountFullpost">2</span></div>
+    <div class="gp-tab active" onclick="switchAssetTab('all',this)">All <span class="gp-tab__count" id="tabCountAll">7</span></div>
     <div class="gp-tab" onclick="switchAssetTab('images',this)">Images <span class="gp-tab__count" id="tabCountImages">4</span></div>
     <div class="gp-tab" onclick="switchAssetTab('videos',this)">Videos <span class="gp-tab__count" id="tabCountVideos">3</span></div>
   </div>
@@ -2214,70 +2316,6 @@ body{
   <div style="overflow-y:auto;flex:1;" id="assetGridWrap">
     <div class="asset-grid" id="assetGrid">
 
-      <!-- Full Post 1 — image + caption — 5s ago -->
-      <div class="asset-card" data-type="fullpost" data-ratio-bucket="1:1" data-size-mb="3.4"
-           data-caption="醫美級防脫髮爆水修護智慧 | dr.once 專業護理系列 — 不論頭髮稀疏定脫落，dr.once 醫美級成分深層滋養髮根，強化髮絲，重現豐盈健康頭髮。限時體驗套裝，即日起至7月31日。#DrOnce #防脫髮 #爆水修護"
-           onclick="toggleAssetCard(this)">
-        <div class="asset-card__sel-badge">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </div>
-        <div class="asset-card__thumb" style="aspect-ratio:1/1;background:linear-gradient(160deg,#0a2218,#134526);" ondblclick="event.stopPropagation();openAssetLightbox(this.closest('.asset-card'))">
-          <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:16px;">
-            <div><div style="font-size:14px;font-weight:700;color:#fff;line-height:1.3;">醫美級<br>防脫髮爆水修護</div><div style="font-size:10px;color:rgba(255,255,255,.75);margin-top:3px;">dr.once 專業護理</div></div>
-            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.85);">dr.once</div>
-          </div>
-          <div class="asset-card__hover">
-            <button class="ah-btn" onclick="event.stopPropagation();chatWithAsset(this.closest('.asset-card'))">
-              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M9.5 1.5h-8a1 1 0 00-1 1v5a1 1 0 001 1h1v2l2.5-2h4.5a1 1 0 001-1v-5a1 1 0 00-1-1z" stroke="#fff" stroke-width="1.1"/></svg>
-              Chat with Agent
-            </button>
-            <button class="ah-btn pri" onclick="event.stopPropagation();downloadAsset(this)">
-              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1v6M2.5 5l3 3 3-3M1 9.5h9" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg>
-              Download
-            </button>
-          </div>
-        </div>
-        <div class="asset-card__caption">醫美級防脫髮爆水修護智慧 | dr.once 專業護理系列 — 不論頭髮稀疏定脫落，dr.once 醫美級成分深層滋養髮根，強化髮絲，重現豐盈健康頭髮。</div>
-        <div class="asset-card__meta">
-          <div class="asset-card__tags">
-            <span class="asset-tag fullpost">Full Post</span>
-            <span class="asset-tag ratio">1:1</span>
-            <span class="asset-tag size">3.4 MB</span>
-          </div>
-          <div class="asset-card__time">5s ago</div>
-        </div>
-      </div>
-
-      <!-- Full Post 2 — image + caption — 8 min ago -->
-      <div class="asset-card" data-type="fullpost" data-ratio-bucket="4:5" data-size-mb="2.6"
-           data-caption="強韌髮根 無懼脫落 | dr.once Advanced Hair — 高端配方深層修護，24小時鎖水，重建健康髮質。立即體驗 dr.once Advanced Hair 系列。#DrOnce #AdvancedHair #頭髮健康"
-           onclick="toggleAssetCard(this)">
-        <div class="asset-card__sel-badge">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </div>
-        <div class="asset-card__thumb" style="aspect-ratio:1/1;background:linear-gradient(145deg,#1a0533,#3b0f6e);display:flex;align-items:center;justify-content:center;padding:16px;" ondblclick="event.stopPropagation();openAssetLightbox(this.closest('.asset-card'))">
-          <div style="text-align:center;"><div style="font-size:13px;font-weight:700;color:#fff;line-height:1.3;">強韌髮根<br>無懼脫落</div><div style="font-size:9px;color:rgba(255,255,255,.6);margin-top:5px;">dr.once</div></div>
-          <div class="asset-card__hover">
-            <button class="ah-btn" onclick="event.stopPropagation();chatWithAsset(this.closest('.asset-card'))">
-              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M9.5 1.5h-8a1 1 0 00-1 1v5a1 1 0 001 1h1v2l2.5-2h4.5a1 1 0 001-1v-5a1 1 0 00-1-1z" stroke="#fff" stroke-width="1.1"/></svg>
-              Chat with Agent
-            </button>
-            <button class="ah-btn pri" onclick="event.stopPropagation();downloadAsset(this)">
-              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1v6M2.5 5l3 3 3-3M1 9.5h9" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg>
-              Download
-            </button>
-          </div>
-        </div>
-        <div class="asset-card__caption">強韌髮根 無懼脫落 | dr.once Advanced Hair — 高端配方深層修護，24小時鎖水，重建健康髮質。</div>
-        <div class="asset-card__meta">
-          <div class="asset-card__tags">
-            <span class="asset-tag fullpost">Full Post</span>
-            <span class="asset-tag ratio">4:5</span>
-            <span class="asset-tag size">2.6 MB</span>
-          </div>
-          <div class="asset-card__time">8 min ago</div>
-        </div>
-      </div>
 
       <!-- Image 1 — 1:1 — 20s ago -->
       <div class="asset-card" data-type="image" data-ratio-bucket="1:1" data-size-mb="3.2" onclick="toggleAssetCard(this)">
@@ -2491,20 +2529,33 @@ body{
 
   <!-- ═══ Publish module — every asset published or queued via agent / manual publish ═══ -->
   <div id="publishModule" style="flex:1;display:none;flex-direction:column;overflow:hidden;">
-    <div class="pub-platform-tabs">
-      <div class="pub-ptab active" id="pubplat-fb" onclick="switchPublishPlatform('facebook',this)">Facebook Post</div>
-      <div class="pub-ptab disabled" id="pubplat-ig" title="Instagram publishing is planned for a later phase">Instagram Post <span class="coming-soon-pill">Coming soon</span></div>
-      <div class="pub-ptab disabled" id="pubplat-ad" title="Meta Ad publishing is planned for a later phase">Meta Ad <span class="coming-soon-pill">Coming soon</span></div>
+    <div class="pub-status-tabs">
+      <div class="pub-stab active" onclick="switchPublishTopTab('draft',this)">Draft <span class="pub-stab__count" id="pubCountDraftTab">2</span></div>
+      <div class="pub-stab" onclick="switchPublishTopTab('published',this)">Published <span class="pub-stab__count" id="pubCountPublishedTab">6</span></div>
     </div>
 
-    <div class="pub-status-tabs">
-      <div class="pub-stab active" onclick="switchPublishStatus('unstarted',this)">Unstarted <span class="pub-stab__count" id="pubCountUnstarted">2</span></div>
-      <div class="pub-stab" onclick="switchPublishStatus('draft',this)">Published as Draft <span class="pub-stab__count" id="pubCountDraft">1</span></div>
-      <div class="pub-stab" onclick="switchPublishStatus('published',this)">Published <span class="pub-stab__count" id="pubCountPublished">2</span></div>
-      <div class="pub-stab disabled" title="Scheduled publishing is planned for a later phase">Scheduled <span class="coming-soon-pill">Coming soon</span></div>
+    <!-- Sub-status filter, only relevant under "Published" -->
+    <div class="pub-substatus-tabs hidden" id="pubSubStatusTabs">
+      <div class="pub-substab active" onclick="switchPublishSubStatus('all',this)">All</div>
+      <div class="pub-substab" onclick="switchPublishSubStatus('draft',this)">Published as Draft</div>
+      <div class="pub-substab" onclick="switchPublishSubStatus('published',this)">Published</div>
+      <div class="pub-substab" onclick="switchPublishSubStatus('scheduled',this)">Scheduled</div>
+      <div class="pub-substab" onclick="switchPublishSubStatus('processing',this)">Processing</div>
+      <div class="pub-substab" onclick="switchPublishSubStatus('failed',this)">Failed</div>
     </div>
 
     <div class="assets-filter-bar">
+      <div class="filter-dd" id="ddPubPlatform">
+        <div class="size-filter-sel" onclick="event.stopPropagation();toggleFilterDD('ddPubPlatform')">
+          <span id="ddPubPlatformLabel">Platform: All</span>
+          <svg class="filter-dd__caret" width="9" height="6" viewBox="0 0 9 6" fill="none"><path d="M1 1l3.5 3.5L8 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="filter-dd__menu">
+          <div class="filter-dd__opt active" onclick="setPublishPlatformFilter('all','All',this)">All</div>
+          <div class="filter-dd__opt" onclick="setPublishPlatformFilter('facebook','Facebook',this)">Facebook</div>
+          <div class="filter-dd__opt disabled" title="Instagram publishing is planned for a later phase">Instagram <span class="coming-soon-pill">Coming soon</span></div>
+        </div>
+      </div>
       <div class="filter-dd" id="ddPubMedia">
         <div class="size-filter-sel" onclick="event.stopPropagation();toggleFilterDD('ddPubMedia')">
           <span id="ddPubMediaLabel">Media Type: All</span>
@@ -2514,8 +2565,8 @@ body{
           <div class="filter-dd__opt active" onclick="setPublishMediaFilter('all','All',this)">All</div>
           <div class="filter-dd__opt" onclick="setPublishMediaFilter('reels','Reels',this)">Reels</div>
           <div class="filter-dd__opt" onclick="setPublishMediaFilter('story','Story',this)">Story</div>
-          <div class="filter-dd__opt" onclick="setPublishMediaFilter('image','Image Post',this)">Image Post</div>
-          <div class="filter-dd__opt" onclick="setPublishMediaFilter('video','Video Post',this)">Video Post</div>
+          <div class="filter-dd__opt" onclick="setPublishMediaFilter('image','Image',this)">Image</div>
+          <div class="filter-dd__opt" onclick="setPublishMediaFilter('video','Video',this)">Video</div>
           <div class="filter-dd__opt" onclick="setPublishMediaFilter('status','Status',this)">Status</div>
           <div class="filter-dd__opt" onclick="setPublishMediaFilter('link','Link',this)">Link</div>
         </div>
@@ -2525,94 +2576,186 @@ body{
 
     <div class="pub-list" id="pubList">
 
-      <!-- Unstarted — waiting to be sent through the Meta publish API -->
-      <div class="pub-row" data-status="unstarted" data-media="image">
-        <div class="pub-row__thumb" style="background:linear-gradient(160deg,#0a2218,#134526);">醫美級<br>防脫髮</div>
-        <div class="pub-row__body">
-          <div class="pub-row__caption">醫美級防脫髮爆水修護智慧 | dr.once 專業護理系列</div>
-          <div class="pub-row__meta">
-            <span class="pub-tag status-unstarted">Unstarted</span>
-            <span class="pub-tag media">Image Post</span>
-            <span class="pub-tag">Dr.Once – Hair</span>
-            <span class="pub-tag">Via Full Post Gen agent</span>
+      <!-- ═══ Draft — not yet sent through the Meta publish API — gray status bar ═══ -->
+      <!-- Media type: Image -->
+      <div class="cc pub-card" data-top="draft" data-platform="facebook" data-media="image" data-account="Dr.Once – Hair">
+        <div class="pub-card__statusbar statusbar-draft">Draft</div>
+        <div class="cc__head">
+          <div class="pav" style="background:linear-gradient(135deg,#0d3320,#1a6640);">dr</div>
+          <div><div class="cc__name">Dr.Once – Hair</div><div class="cc__date">Generated 5s ago</div></div>
+          <div class="pub-card__typebadges">
+            <span class="tbadge tb-platform" title="Facebook">f</span>
+            <span class="tbadge tb-media" title="Image"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.1"/><circle cx="4" cy="4.5" r="1" fill="currentColor"/><path d="M2 8.5l2.5-2.5 2 2 1.5-1.5L10 9" stroke="currentColor" stroke-width="1.1"/></svg></span>
           </div>
         </div>
-        <div class="pub-row__time">Generated 5s ago</div>
-        <div class="pub-row__actions">
-          <button class="btn btn-out" style="font-size:11px;padding:4px 10px;" onclick="openGenPage()">Edit</button>
+        <div class="cc__img" style="background:linear-gradient(160deg,#0a2218,#134526);display:flex;align-items:center;justify-content:center;">
+          <div style="text-align:center;padding:16px;"><div style="font-size:15px;font-weight:700;color:#fff;line-height:1.3;">醫美級<br>防脫髮爆水修護</div><div style="font-size:10px;color:rgba(255,255,255,.75);margin-top:4px;">dr.once 專業護理</div></div>
+        </div>
+        <div class="cc__cap">醫美級防脫髮爆水修護智慧 | dr.once 專業護理系列</div>
+        <div class="pub-card__actions">
+          <button class="btn btn-out" style="font-size:11px;padding:4px 10px;" onclick="openEditPostModal(this)">Edit</button>
           <button class="btn btn-pri" style="font-size:11px;padding:4px 10px;">Publish Now</button>
         </div>
       </div>
 
-      <div class="pub-row" data-status="unstarted" data-media="link">
-        <div class="pub-row__thumb" style="background:var(--surface-page);color:var(--text-regular);border:1px solid var(--border);">🔗 Link</div>
-        <div class="pub-row__body">
-          <div class="pub-row__caption">立即選購 dr.once 防脫髮爆水修護系列 — dronce.hk/hair-care</div>
-          <div class="pub-row__meta">
-            <span class="pub-tag status-unstarted">Unstarted</span>
-            <span class="pub-tag media">Link</span>
-            <span class="pub-tag">Dr.Once – Hair</span>
-            <span class="pub-tag">Manual publish</span>
+      <!-- Media type: Link -->
+      <div class="cc pub-card" data-top="draft" data-platform="facebook" data-media="link" data-account="Dr.Once – Hair">
+        <div class="pub-card__statusbar statusbar-draft">Draft</div>
+        <div class="cc__head">
+          <div class="pav" style="background:linear-gradient(135deg,#0d3320,#1a6640);">dr</div>
+          <div><div class="cc__name">Dr.Once – Hair</div><div class="cc__date">Created 2 hr ago</div></div>
+          <div class="pub-card__typebadges">
+            <span class="tbadge tb-platform" title="Facebook">f</span>
+            <span class="tbadge tb-media" title="Link"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M5 8a2 2 0 002.8 0l1.7-1.7a2 2 0 00-2.8-2.8L6 4.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M7 4a2 2 0 00-2.8 0L2.5 5.7a2 2 0 002.8 2.8L6 7.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span>
           </div>
         </div>
-        <div class="pub-row__time">Created 2 hr ago</div>
-        <div class="pub-row__actions">
-          <button class="btn btn-out" style="font-size:11px;padding:4px 10px;">Edit</button>
+        <div class="cc__img" style="background:var(--surface-page);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px;">
+          <svg width="26" height="26" viewBox="0 0 20 20" fill="none"><path d="M8 12a3 3 0 004.24 0l2.83-2.83a3 3 0 00-4.24-4.24l-1 1" stroke="var(--text-regular)" stroke-width="1.6" stroke-linecap="round"/><path d="M12 8a3 3 0 00-4.24 0L4.93 10.83a3 3 0 004.24 4.24l1-1" stroke="var(--text-regular)" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <div style="font-size:11px;color:var(--text-regular);text-align:center;">dronce.hk/hair-care</div>
+        </div>
+        <div class="cc__cap">立即選購 dr.once 防脫髮爆水修護系列 — dronce.hk/hair-care</div>
+        <div class="pub-card__actions">
+          <button class="btn btn-out" style="font-size:11px;padding:4px 10px;" onclick="openEditPostModal(this)">Edit</button>
           <button class="btn btn-pri" style="font-size:11px;padding:4px 10px;">Publish Now</button>
         </div>
       </div>
 
-      <!-- Published as Draft — pushed to Meta but left in draft state -->
-      <div class="pub-row" data-status="draft" data-media="video" style="display:none;">
-        <div class="pub-row__thumb" style="background:linear-gradient(135deg,#1a0533,#3b0f6e);">影片<br>草稿</div>
-        <div class="pub-row__body">
-          <div class="pub-row__caption">強韌髮根 無懼脫落 | dr.once Advanced Hair（影片版）</div>
-          <div class="pub-row__meta">
-            <span class="pub-tag status-draft">Published as Draft</span>
-            <span class="pub-tag media">Video Post</span>
-            <span class="pub-tag">Dr.Once – Hair</span>
-            <span class="pub-tag">Via Ad Advisor agent</span>
+      <!-- ═══ Published — anything already sent to Meta, in any sub-state ═══ -->
+      <!-- Media type: Video — blue status bar (Published as Draft) -->
+      <div class="cc pub-card" data-top="published" data-substatus="draft" data-platform="facebook" data-media="video" style="display:none;" data-account="Dr.Once – Hair">
+        <div class="pub-card__statusbar statusbar-asdraft">Published as Draft</div>
+        <div class="cc__head">
+          <div class="pav" style="background:linear-gradient(135deg,#0d3320,#1a6640);">dr</div>
+          <div><div class="cc__name">Dr.Once – Hair</div><div class="cc__date">Saved as draft 8 min ago</div></div>
+          <div class="pub-card__typebadges">
+            <span class="tbadge tb-platform" title="Facebook">f</span>
+            <span class="tbadge tb-media" title="Video"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2.5" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.1"/><path d="M8.5 5l2.5-1.5v5L8.5 7" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg></span>
           </div>
         </div>
-        <div class="pub-row__time">Saved as draft · 8 min ago</div>
-        <div class="pub-row__actions">
+        <div class="cc__img" style="background:linear-gradient(135deg,#1a0533,#3b0f6e);display:flex;align-items:center;justify-content:center;">
+          <div style="text-align:center;"><div style="font-size:14px;font-weight:700;color:#fff;line-height:1.3;">強韌髮根<br>無懼脫落</div></div>
+          <div class="mini-play"><svg width="9" height="9" viewBox="0 0 16 16" fill="none"><path d="M5 3l9 5-9 5V3z" fill="#fff"/></svg></div>
+        </div>
+        <div class="cc__cap">強韌髮根 無懼脫落 | dr.once Advanced Hair（影片版）</div>
+        <div class="pub-card__actions pub-card__edit-disabled">
+          <button class="btn btn-out" disabled>Edit</button>
+          <span class="pub-card__edit-tip">Edit this post in Meta</span>
           <button class="btn btn-out" style="font-size:11px;padding:4px 10px;">View on Meta</button>
           <button class="btn btn-pri" style="font-size:11px;padding:4px 10px;">Publish Now</button>
         </div>
       </div>
 
-      <!-- Published — live on Meta -->
-      <div class="pub-row" data-status="published" data-media="status" style="display:none;">
-        <div class="pub-row__thumb" style="background:var(--surface-page);color:var(--text-regular);border:1px solid var(--border);">📝 Status</div>
-        <div class="pub-row__body">
-          <div class="pub-row__caption">新年送禮，就送 dr.once 醫美級護髮套裝！全店85折。</div>
-          <div class="pub-row__meta">
-            <span class="pub-tag status-published">Published</span>
-            <span class="pub-tag media">Status</span>
-            <span class="pub-tag">Dr.Once Global</span>
-            <span class="pub-tag">Manual publish</span>
+      <!-- Media type: Status — green status bar (Published) -->
+      <div class="cc pub-card" data-top="published" data-substatus="published" data-platform="facebook" data-media="status" style="display:none;" data-account="Dr.Once Global">
+        <div class="pub-card__statusbar statusbar-published">Published</div>
+        <div class="cc__head">
+          <div class="pav" style="background:linear-gradient(135deg,#1a0533,#3b0f6e);">DG</div>
+          <div><div class="cc__name">Dr.Once Global</div><div class="cc__date">Published 1 day ago</div></div>
+          <div class="pub-card__typebadges">
+            <span class="tbadge tb-platform" title="Facebook">f</span>
+            <span class="tbadge tb-media" title="Status"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1.5 2.5h9v5.5h-5l-2 2v-2h-2v-5.5z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg></span>
           </div>
         </div>
-        <div class="pub-row__time">Published 1 day ago</div>
-        <div class="pub-row__actions">
+        <div class="cc__img" style="background:linear-gradient(160deg,#0A1F2C,#102532);display:flex;align-items:center;justify-content:center;padding:16px;">
+          <div style="font-size:14px;font-weight:700;color:#fff;text-align:center;line-height:1.4;">新年送禮<br>就送 dr.once<br>醫美級護髮套裝！</div>
+        </div>
+        <div class="cc__cap">新年送禮，就送 dr.once 醫美級護髮套裝！全店85折。</div>
+        <div class="pub-card__actions pub-card__edit-disabled">
+          <button class="btn btn-out" disabled>Edit</button>
+          <span class="pub-card__edit-tip">Edit this post in Meta</span>
           <button class="btn btn-out" style="font-size:11px;padding:4px 10px;">View on Meta</button>
         </div>
       </div>
 
-      <div class="pub-row" data-status="published" data-media="reels" style="display:none;">
-        <div class="pub-row__thumb" style="background:linear-gradient(160deg,#3a1a0a,#5a2a10);">Reels</div>
-        <div class="pub-row__body">
-          <div class="pub-row__caption">15秒防脫護理日常 Reels — dr.once</div>
-          <div class="pub-row__meta">
-            <span class="pub-tag status-published">Published</span>
-            <span class="pub-tag media">Reels</span>
-            <span class="pub-tag">Dr.Once – Hair</span>
-            <span class="pub-tag">Manual publish</span>
+      <!-- Media type: Reels — green status bar (Published) -->
+      <div class="cc pub-card" data-top="published" data-substatus="published" data-platform="facebook" data-media="reels" style="display:none;" data-account="Dr.Once – Hair">
+        <div class="pub-card__statusbar statusbar-published">Published</div>
+        <div class="cc__head">
+          <div class="pav" style="background:linear-gradient(135deg,#0d3320,#1a6640);">dr</div>
+          <div><div class="cc__name">Dr.Once – Hair</div><div class="cc__date">Published 3 days ago</div></div>
+          <div class="pub-card__typebadges">
+            <span class="tbadge tb-platform" title="Facebook">f</span>
+            <span class="tbadge tb-media" title="Reels"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2.5" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.1"/><path d="M8.5 5l2.5-1.5v5L8.5 7" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg></span>
           </div>
         </div>
-        <div class="pub-row__time">Published 3 days ago</div>
-        <div class="pub-row__actions">
+        <div class="cc__img" style="background:linear-gradient(160deg,#3a1a0a,#5a2a10);display:flex;align-items:center;justify-content:center;">
+          <div style="text-align:center;"><div style="font-size:14px;font-weight:700;color:#fff;line-height:1.3;">15秒防脫<br>護理日常</div></div>
+          <span class="ratio-flag">Reels</span>
+          <div class="mini-play"><svg width="9" height="9" viewBox="0 0 16 16" fill="none"><path d="M5 3l9 5-9 5V3z" fill="#fff"/></svg></div>
+        </div>
+        <div class="cc__cap">15秒防脫護理日常 Reels — dr.once</div>
+        <div class="pub-card__actions pub-card__edit-disabled">
+          <button class="btn btn-out" disabled>Edit</button>
+          <span class="pub-card__edit-tip">Edit this post in Meta</span>
           <button class="btn btn-out" style="font-size:11px;padding:4px 10px;">View on Meta</button>
+        </div>
+      </div>
+
+      <!-- Media type: Story — purple status bar (Scheduled) -->
+      <div class="cc pub-card" data-top="published" data-substatus="scheduled" data-platform="facebook" data-media="story" style="display:none;" data-account="Dr.Once – Hair">
+        <div class="pub-card__statusbar statusbar-scheduled">Scheduled</div>
+        <div class="cc__head">
+          <div class="pav" style="background:linear-gradient(135deg,#0d3320,#1a6640);">dr</div>
+          <div><div class="cc__name">Dr.Once – Hair</div><div class="cc__date">Scheduled 14 Feb 2027 09:00</div></div>
+          <div class="pub-card__typebadges">
+            <span class="tbadge tb-platform" title="Facebook">f</span>
+            <span class="tbadge tb-media" title="Story"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.3"/><circle cx="6" cy="6" r="1.3" fill="currentColor"/></svg></span>
+          </div>
+        </div>
+        <div class="cc__img" style="background:linear-gradient(135deg,#7a0d1f,#c2273f);display:flex;align-items:center;justify-content:center;">
+          <div style="text-align:center;"><div style="font-size:14px;font-weight:700;color:#fff;line-height:1.3;">情人節<br>限定禮盒</div></div>
+          <span class="ratio-flag">Story</span>
+        </div>
+        <div class="cc__cap">情人節限定禮盒 | dr.once — 送禮自用兩相宜</div>
+        <div class="pub-card__actions pub-card__edit-disabled">
+          <button class="btn btn-out" disabled>Edit</button>
+          <span class="pub-card__edit-tip">Edit this post in Meta</span>
+          <button class="btn btn-out" style="font-size:11px;padding:4px 10px;">View on Meta</button>
+        </div>
+      </div>
+
+      <!-- Media type: Video — yellow status bar (Processing) -->
+      <div class="cc pub-card" data-top="published" data-substatus="processing" data-platform="facebook" data-media="video" style="display:none;" data-account="Dr.Once Global">
+        <div class="pub-card__statusbar statusbar-processing">Processing</div>
+        <div class="cc__head">
+          <div class="pav" style="background:linear-gradient(135deg,#1a0533,#3b0f6e);">DG</div>
+          <div><div class="cc__name">Dr.Once Global</div><div class="cc__date">Submitted 40s ago</div></div>
+          <div class="pub-card__typebadges">
+            <span class="tbadge tb-platform" title="Facebook">f</span>
+            <span class="tbadge tb-media" title="Video"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2.5" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.1"/><path d="M8.5 5l2.5-1.5v5L8.5 7" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg></span>
+          </div>
+        </div>
+        <div class="cc__img" style="background:linear-gradient(135deg,#3b2f0d,#6e5a0f);display:flex;align-items:center;justify-content:center;">
+          <div style="text-align:center;"><div style="font-size:14px;font-weight:700;color:#fff;line-height:1.3;">頭皮護理<br>深層清潔</div></div>
+          <div class="mini-play"><svg width="9" height="9" viewBox="0 0 16 16" fill="none"><path d="M5 3l9 5-9 5V3z" fill="#fff"/></svg></div>
+        </div>
+        <div class="cc__cap">頭皮護理深層清潔系列 — dr.once（影片版）</div>
+        <div class="pub-card__actions pub-card__edit-disabled">
+          <button class="btn btn-out" disabled>Edit</button>
+          <span class="pub-card__edit-tip">Edit this post in Meta</span>
+          <button class="btn btn-out" disabled style="opacity:.45;">View on Meta</button>
+        </div>
+      </div>
+
+      <!-- Media type: Image — red status bar (Failed) -->
+      <div class="cc pub-card" data-top="published" data-substatus="failed" data-platform="facebook" data-media="image" style="display:none;" data-account="Dr.Once – Hair">
+        <div class="pub-card__statusbar statusbar-failed">Failed</div>
+        <div class="cc__head">
+          <div class="pav" style="background:linear-gradient(135deg,#0d3320,#1a6640);">dr</div>
+          <div><div class="cc__name">Dr.Once – Hair</div><div class="cc__date">Failed 12 min ago</div></div>
+          <div class="pub-card__typebadges">
+            <span class="tbadge tb-platform" title="Facebook">f</span>
+            <span class="tbadge tb-media" title="Image"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.1"/><circle cx="4" cy="4.5" r="1" fill="currentColor"/><path d="M2 8.5l2.5-2.5 2 2 1.5-1.5L10 9" stroke="currentColor" stroke-width="1.1"/></svg></span>
+          </div>
+        </div>
+        <div class="cc__img" style="background:var(--surface-page);display:flex;align-items:center;justify-content:center;">
+          <div style="text-align:center;color:var(--danger);"><div style="font-size:22px;">⚠</div><div style="font-size:11px;font-weight:600;margin-top:4px;">Page token expired</div></div>
+        </div>
+        <div class="cc__cap">夏日新品椰子水 | 清爽解渴系列</div>
+        <div class="pub-card__actions pub-card__edit-disabled">
+          <button class="btn btn-out" disabled>Edit</button>
+          <span class="pub-card__edit-tip">Edit this post in Meta</span>
+          <button class="btn btn-pri" style="font-size:11px;padding:4px 10px;">Retry</button>
         </div>
       </div>
 
@@ -3324,6 +3467,8 @@ document.addEventListener('click', e => {
   if (!e.target.closest('#platformSel') && !e.target.closest('#aaPlatformSel')) closePlatformDD();
   if (!e.target.closest('#accountSel')) closeAccountDD();
   if (!e.target.closest('#fpPostSettingsSel') && !e.target.closest('#fpSettingsPanel')) closeFpSettingsPanel();
+  if (!e.target.closest('#pubAcctFilterSel') && !e.target.closest('#pubAcctFilterDD')) closePubAcctFilterDD();
+  if (!e.target.closest('#epAcctField') && !e.target.closest('#epAgentAcctPill') && !e.target.closest('#epAcctDD')) closeEpAcctDD();
   if (!e.target.closest('#promptWrap')) closeMentionDD();
 });
 
@@ -3643,7 +3788,7 @@ function sendMessage() {
               <button class="btn btn-out" style="font-size:11px;padding:4px 10px;" onclick="openGenPage()">Edit in Generator</button>
               <button class="btn btn-sec" style="font-size:11px;padding:4px 10px;">Regenerate</button>
               <button class="btn btn-sec" style="font-size:11px;padding:4px 10px;">Try Video</button>
-              <button class="btn btn-pri" style="font-size:11px;padding:4px 10px;margin-left:auto;" onclick="addFullPostToAssets(this)">Use This Post</button>
+              <button class="btn btn-pri" style="font-size:11px;padding:4px 10px;margin-left:auto;" onclick="addFullPostToPublish(this)">Use This Post</button>
             </div>
           </div>`;
       }
@@ -3808,6 +3953,142 @@ function copyVpPrompt() {
   showToast('Prompt copied');
 }
 
+/* ── Edit Post modal (mimics Meta's native composer) ──
+   Opened from a Draft pub-card's "Edit" button. Pulls the card's existing
+   caption + media + account straight into the form and mirrors them live
+   into the preview, exactly like Meta's own "Create post" dialog does. */
+let epSourceCard = null;
+// Account selection is required before publishing — multi-select, shared between
+// the form's "Account" field and the agent toolbar's account pill.
+let epSelectedAccounts = new Set();
+let epAcctDDOpen = false;
+
+function openEditPostModal(btn) {
+  const card = btn.closest('.pub-card');
+  if (!card) return;
+  epSourceCard = card;
+
+  const caption = card.querySelector('.cc__cap').textContent.trim();
+  const acctName = card.querySelector('.cc__name').textContent.trim();
+  const pav = card.querySelector('.pav');
+  const mediaHTML = card.querySelector('.cc__img').innerHTML;
+  const mediaStyle = card.querySelector('.cc__img').getAttribute('style') || '';
+
+  // 1. Pre-fill caption
+  document.getElementById('epCaption').value = caption;
+
+  // 2. Pre-fill Uploaded media with the AI-generated image/video from the card
+  document.getElementById('epMediaRow').innerHTML = `
+    <div class="ep-media-thumb" style="${mediaStyle}">
+      <span class="ep-media-thumb__badge">Edit</span>
+      <span class="ep-media-thumb__x" onclick="this.closest('.ep-media-thumb').remove()">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1l8 8M9 1L1 9" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </span>
+      ${mediaHTML}
+    </div>`;
+
+  // 3. "Add AI label" always defaults to off when the modal opens
+  document.getElementById('epAiLabelToggle').checked = false;
+  document.getElementById('epBoostToggle').checked = false;
+
+  // Account selection — default to the Page this draft was already tagged with,
+  // but it's still an explicit selection the user can change or clear.
+  const EP_ACCT_CHECKBOX_IDS = { 'Dr.Once – Hair': 'epacct-dronce-hair', 'Dr.Once Global': 'epacct-dronce-global' };
+  epSelectedAccounts = new Set([acctName]);
+  document.querySelectorAll('#epAcctDD input[type="checkbox"]').forEach(cb => {
+    cb.checked = (cb.id === EP_ACCT_CHECKBOX_IDS[acctName]);
+  });
+  epUpdateAcctLabels();
+  document.getElementById('epAcctField').classList.remove('error');
+  document.getElementById('epAcctError').classList.remove('show');
+
+  // Preview: account identity
+  document.getElementById('epPreviewAvatar').setAttribute('style', pav.getAttribute('style') + ';width:32px;height:32px;');
+  document.getElementById('epPreviewAvatar').textContent = pav.textContent;
+  document.getElementById('epPreviewName').textContent = acctName;
+  document.getElementById('epPreviewMedia').innerHTML = `<div style="width:100%;height:100%;${mediaStyle}">${mediaHTML}</div>`;
+
+  // 4. Render the preview from whatever is currently in the form
+  epSyncPreview();
+
+  document.getElementById('epAgentInput').value = 'Post this to my account';
+  epSyncAgentCharCt();
+  document.getElementById('epOverlay').classList.add('open');
+}
+
+function closeEditPostModal() {
+  document.getElementById('epOverlay').classList.remove('open');
+  closeEpAcctDD();
+  epSourceCard = null;
+}
+
+/* Keeps the preview caption in sync as the user edits the composer textarea —
+   same "what you type is what gets posted" behaviour as Meta's own dialog. */
+function epSyncPreview() {
+  document.getElementById('epPreviewCaption').textContent = document.getElementById('epCaption').value;
+}
+
+function epSyncAgentCharCt() {
+  const len = document.getElementById('epAgentInput').value.length;
+  document.getElementById('epAgentCharCt').textContent = len + ' / 4000';
+}
+
+/* ── Account selection dropdown (required before Post / agent hand-off) ── */
+function toggleEpAcctDD(e, anchor) {
+  if (e) e.stopPropagation();
+  epAcctDDOpen = !epAcctDDOpen;
+  const dd = document.getElementById('epAcctDD');
+  dd.classList.toggle('hidden', !epAcctDDOpen);
+  if (epAcctDDOpen) {
+    const rect = anchor.getBoundingClientRect();
+    dd.style.top = (rect.bottom + 6) + 'px';
+    dd.style.left = rect.left + 'px';
+  }
+}
+function closeEpAcctDD() {
+  epAcctDDOpen = false;
+  document.getElementById('epAcctDD').classList.add('hidden');
+}
+function toggleEpAcctFilter(name, checked) {
+  if (checked) epSelectedAccounts.add(name); else epSelectedAccounts.delete(name);
+  epUpdateAcctLabels();
+  if (epSelectedAccounts.size > 0) {
+    document.getElementById('epAcctField').classList.remove('error');
+    document.getElementById('epAcctError').classList.remove('show');
+  }
+}
+function epUpdateAcctLabels() {
+  let label;
+  if (epSelectedAccounts.size === 0) label = 'Select account';
+  else if (epSelectedAccounts.size === 1) label = [...epSelectedAccounts][0];
+  else label = epSelectedAccounts.size + ' accounts';
+  document.getElementById('epAcctFieldLabel').textContent = label;
+  document.getElementById('epAgentAcctPill').textContent = label;
+}
+/* Returns false (and shows the validation error) if no account has been picked yet. */
+function epValidateAccount() {
+  if (epSelectedAccounts.size > 0) return true;
+  document.getElementById('epAcctField').classList.add('error');
+  document.getElementById('epAcctError').classList.add('show');
+  showToast('Please select at least one account to publish to');
+  return false;
+}
+
+function epMockPublish() {
+  if (!epValidateAccount()) return;
+  showToast('Post updated — draft saved');
+  closeEditPostModal();
+}
+
+/* Hands the whole thing off to the agent instead of the user clicking Post/Schedule themselves. */
+function epSendToAgent() {
+  if (!epValidateAccount()) return;
+  const prompt = document.getElementById('epAgentInput').value.trim();
+  if (!prompt) return;
+  showToast('Agent is publishing this post for you…');
+  closeEditPostModal();
+}
+
 /* ── Generator page ── */
 function openGenPage(section) {
   document.getElementById('gen-page').classList.add('on');
@@ -3829,7 +4110,7 @@ function switchAssetTab(tab, el) {
   document.querySelectorAll('.gp-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   // Duration filter is video-only: hide it entirely on the Images / Full Post tabs
-  document.getElementById('ddDuration').classList.toggle('dd-disabled', tab === 'images' || tab === 'fullpost');
+  document.getElementById('ddDuration').classList.toggle('dd-disabled', tab === 'images');
   applyAssetFilters();
 }
 
@@ -3839,12 +4120,10 @@ function switchGenSection(section) {
   currentGenSection = section;
   const isPublish = section === 'publish';
 
-  document.getElementById('gpSectionAssets').classList.toggle('active', !isPublish);
-  document.getElementById('gpSectionAssets').style.opacity = isPublish ? '.6' : '1';
-  document.getElementById('gpSectionPublish').classList.toggle('active', isPublish);
-  document.getElementById('gpSectionPublish').style.opacity = isPublish ? '1' : '.6';
+  document.getElementById('gpBreadcrumbTitle').textContent = isPublish ? 'Publish' : 'AI Assets';
 
   document.getElementById('gpAssetActions').style.display = isPublish ? 'none' : '';
+  document.getElementById('gpPublishActions').classList.toggle('hidden', !isPublish);
   document.getElementById('gpAssetTabBar').style.display = isPublish ? 'none' : '';
   document.getElementById('assetsFilterBar').style.display = isPublish ? 'none' : '';
   document.getElementById('assetGridWrap').style.display = isPublish ? 'none' : '';
@@ -3853,21 +4132,87 @@ function switchGenSection(section) {
   if (isPublish) applyPublishFilters(); else applyAssetFilters();
 }
 
-/* ── Publish module ── */
-let currentPublishStatus = 'unstarted';
+/* ── Publish module ──
+   Two-level status model:
+   - Top tab: Draft (not yet sent to Meta) vs Published (sent to Meta in any sub-state)
+   - Sub-status (only under "Published"): All / Published as Draft / Published / Scheduled / Processing / Failed
+   Platform + Media Type filters apply within either top tab. */
+let currentPublishTopTab = 'draft';
+let currentPublishSubStatus = 'all';
+let publishPlatformFilter = 'all';
 let publishMediaFilter = 'all';
+// Account filter (top-right of the Publish header) — multi-select of connected Pages/IG accounts.
+// Empty selection always means "don't filter by account" — only the displayed label differs by tab:
+// Draft defaults to the "Select account" placeholder, Published defaults to "All".
+let pubSelectedAccounts = new Set();
 
-function switchPublishPlatform(platform, el) {
-  if (el.classList.contains('disabled')) return; // Instagram Post / Meta Ad — coming soon
-  document.querySelectorAll('.pub-ptab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-}
-
-function switchPublishStatus(status, el) {
-  if (el.classList.contains('disabled')) return; // Scheduled — coming soon
-  currentPublishStatus = status;
+function switchPublishTopTab(tab, el) {
+  currentPublishTopTab = tab;
   document.querySelectorAll('.pub-stab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
+  document.getElementById('pubSubStatusTabs').classList.toggle('hidden', tab !== 'published');
+  if (tab !== 'published') {
+    currentPublishSubStatus = 'all';
+    document.querySelectorAll('.pub-substab').forEach((t, i) => t.classList.toggle('active', i === 0));
+  }
+  // Reset the account filter whenever the top tab changes — Draft and Published
+  // each get their own default label even though both mean "show everything".
+  pubSelectedAccounts.clear();
+  document.querySelectorAll('#pubAcctFilterDD input[type="checkbox"]').forEach(cb => cb.checked = false);
+  updatePubAcctFilterLabel();
+  applyPublishFilters();
+}
+
+/* ── Publish → Account filter dropdown ── */
+let pubAcctFilterDDOpen = false;
+function togglePubAcctFilterDD(e) {
+  if (e) e.stopPropagation();
+  pubAcctFilterDDOpen = !pubAcctFilterDDOpen;
+  const anchor = document.getElementById('pubAcctFilterSel');
+  const dd = document.getElementById('pubAcctFilterDD');
+  dd.classList.toggle('hidden', !pubAcctFilterDDOpen);
+  anchor.classList.toggle('open', pubAcctFilterDDOpen);
+  if (pubAcctFilterDDOpen) {
+    const rect = anchor.getBoundingClientRect();
+    dd.style.top = (rect.bottom + 6) + 'px';
+    dd.style.right = (window.innerWidth - rect.right) + 'px';
+  }
+}
+function closePubAcctFilterDD() {
+  pubAcctFilterDDOpen = false;
+  document.getElementById('pubAcctFilterDD').classList.add('hidden');
+  document.getElementById('pubAcctFilterSel').classList.remove('open');
+}
+function togglePubAcctFilter(name, checked) {
+  if (checked) pubSelectedAccounts.add(name); else pubSelectedAccounts.delete(name);
+  updatePubAcctFilterLabel();
+  applyPublishFilters();
+}
+function updatePubAcctFilterLabel() {
+  const label = document.getElementById('pubAcctFilterLabel');
+  if (pubSelectedAccounts.size === 0) {
+    label.textContent = currentPublishTopTab === 'published' ? 'All' : 'Select account';
+  } else if (pubSelectedAccounts.size === 1) {
+    label.textContent = [...pubSelectedAccounts][0];
+  } else {
+    label.textContent = pubSelectedAccounts.size + ' accounts';
+  }
+}
+
+function switchPublishSubStatus(status, el) {
+  currentPublishSubStatus = status;
+  document.querySelectorAll('.pub-substab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  applyPublishFilters();
+}
+
+function setPublishPlatformFilter(value, label, el) {
+  if (el.classList.contains('disabled')) return; // Instagram — coming soon
+  publishPlatformFilter = value;
+  document.getElementById('ddPubPlatformLabel').textContent = 'Platform: ' + label;
+  el.closest('.filter-dd__menu').querySelectorAll('.filter-dd__opt').forEach(o => o.classList.remove('active'));
+  el.classList.add('active');
+  el.closest('.filter-dd').classList.remove('open');
   applyPublishFilters();
 }
 
@@ -3881,21 +4226,37 @@ function setPublishMediaFilter(value, label, el) {
 }
 
 const PUB_EMPTY_LABELS = {
-  unstarted: 'No unstarted posts — everything has been sent to Meta',
-  draft: 'No posts published as draft yet',
-  published: 'No published posts yet'
+  draft: 'No drafts — everything has been sent to Meta',
+  'published:all': 'No published posts yet',
+  'published:draft': 'No posts published as draft yet',
+  'published:published': 'Nothing live yet',
+  'published:scheduled': 'Nothing scheduled yet',
+  'published:processing': 'Nothing processing right now',
+  'published:failed': 'No failed posts — nice'
 };
 
 function applyPublishFilters() {
   let visibleCount = 0;
-  document.querySelectorAll('#pubList .pub-row').forEach(row => {
-    const visible = row.dataset.status === currentPublishStatus &&
-      (publishMediaFilter === 'all' || row.dataset.media === publishMediaFilter);
+  document.querySelectorAll('#pubList .pub-card').forEach(row => {
+    let visible = row.dataset.top === currentPublishTopTab;
+    if (visible && currentPublishTopTab === 'published' && currentPublishSubStatus !== 'all') {
+      visible = row.dataset.substatus === currentPublishSubStatus;
+    }
+    if (visible && publishPlatformFilter !== 'all') {
+      visible = row.dataset.platform === publishPlatformFilter;
+    }
+    if (visible && publishMediaFilter !== 'all') {
+      visible = row.dataset.media === publishMediaFilter;
+    }
+    if (visible && pubSelectedAccounts.size > 0) {
+      visible = pubSelectedAccounts.has(row.dataset.account);
+    }
     row.style.display = visible ? '' : 'none';
     if (visible) visibleCount++;
   });
   const empty = document.getElementById('pubEmptyState');
-  document.getElementById('pubEmptyTitle').textContent = PUB_EMPTY_LABELS[currentPublishStatus] || 'No posts in this tab yet';
+  const key = currentPublishTopTab === 'published' ? ('published:' + currentPublishSubStatus) : 'draft';
+  document.getElementById('pubEmptyTitle').textContent = PUB_EMPTY_LABELS[key] || 'No posts in this tab yet';
   empty.style.display = visibleCount === 0 ? 'flex' : 'none';
 }
 
@@ -3961,7 +4322,6 @@ function applyAssetFilters() {
     let visible = true;
     if (currentAssetTab === 'images') visible = type === 'image';
     else if (currentAssetTab === 'videos') visible = type === 'video';
-    else if (currentAssetTab === 'fullpost') visible = type === 'fullpost';
 
     if (visible && assetFilters.size !== 'all') {
       visible = inSizeBucket(parseFloat(card.dataset.sizeMb), assetFilters.size);
@@ -4145,53 +4505,50 @@ function bumpAssetCount(id, delta) {
   if (el) el.textContent = (parseInt(el.textContent, 10) || 0) + delta;
 }
 
-/* "Use This Post" on a generated full post (image + caption) → saves it into
-   Assets → Full Post tab, so it's reusable alongside Images and Videos. */
-function addFullPostToAssets(btn) {
-  const grid = document.getElementById('assetGrid');
-  const caption = '醫美級防脫髮爆水修護智慧 | dr.once 專業護理系列 — 不論頭髮稀疏定脫落，dr.once 醫美級成分深層滋養髮根，強化髮絲，重現豐盈健康頭髮。限時優惠：防脫髮爆水修護體驗套裝，即日至7月31日。#DrOnce #防脫髮 #爆水修護 #醫美護髮 #頭髮健康';
-  const card = document.createElement('div');
-  card.className = 'asset-card';
-  card.dataset.type = 'fullpost';
-  card.dataset.ratioBucket = '1:1';
-  card.dataset.sizeMb = '3.1';
-  card.dataset.caption = caption;
-  card.onclick = function() { toggleAssetCard(card); };
-  card.innerHTML = `
-    <div class="asset-card__sel-badge">
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
-    </div>
-    <div class="asset-card__thumb" style="aspect-ratio:1/1;background:linear-gradient(160deg,#0a2218,#134526);" ondblclick="event.stopPropagation();openAssetLightbox(this.closest('.asset-card'))">
-      <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:16px;">
-        <div><div style="font-size:14px;font-weight:700;color:#fff;line-height:1.3;">醫美級<br>防脫髮爆水修護</div><div style="font-size:10px;color:rgba(255,255,255,.75);margin-top:3px;">dr.once 專業護理</div></div>
-        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.85);">dr.once</div>
-      </div>
-      <div class="asset-card__hover">
-        <button class="ah-btn" onclick="event.stopPropagation();chatWithAsset(this.closest('.asset-card'))">
-          <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M9.5 1.5h-8a1 1 0 00-1 1v5a1 1 0 001 1h1v2l2.5-2h4.5a1 1 0 001-1v-5a1 1 0 00-1-1z" stroke="#fff" stroke-width="1.1"/></svg>
-          Chat with Agent
-        </button>
-        <button class="ah-btn pri" onclick="event.stopPropagation();downloadAsset(this)">
-          <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1v6M2.5 5l3 3 3-3M1 9.5h9" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg>
-          Download
-        </button>
+/* Every post generated in the ai bubble — regardless of agent — lands in
+   Publish → Draft, never in Assets. Assets is for reusable creative material
+   (images/videos); Publish is the single place to track "did this actually
+   go out to Meta yet". */
+function addFullPostToPublish(btn) {
+  const list = document.getElementById('pubList');
+  const caption = '醫美級防脫髮爆水修護智慧 | dr.once 專業護理系列 — 不論頭髮稀疏定脫落，dr.once 醫美級成分深層滋養髮根，強化髮絲，重現豐盈健康頭髮。限時優惠：防脫髮爆水修護體驗套裝，即日至7月31日。#DrOnce #防脫髮 #爆水修護 #醫美護理 #頭髮健康';
+  const acct = selectedAccount ? selectedAccount.name : 'Select account';
+  const mediaType = (typeof currentMediaType !== 'undefined' && currentMediaType) ? currentMediaType : 'image';
+  const mediaLabel = mediaType === 'video' ? 'Video' : 'Image';
+
+  const row = document.createElement('div');
+  row.className = 'cc pub-card';
+  row.dataset.top = 'draft';
+  row.dataset.platform = 'facebook';
+  row.dataset.media = mediaType;
+  row.dataset.account = acct;
+  const mediaIcon = mediaType === 'video'
+    ? '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2.5" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.1"/><path d="M8.5 5l2.5-1.5v5L8.5 7" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>'
+    : '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.1"/><circle cx="4" cy="4.5" r="1" fill="currentColor"/><path d="M2 8.5l2.5-2.5 2 2 1.5-1.5L10 9" stroke="currentColor" stroke-width="1.1"/></svg>';
+  row.innerHTML = `
+    <div class="pub-card__statusbar statusbar-draft">Draft</div>
+    <div class="cc__head">
+      <div class="pav" style="background:linear-gradient(135deg,#0d3320,#1a6640);">dr</div>
+      <div><div class="cc__name">${acct}</div><div class="cc__date">Generated just now</div></div>
+      <div class="pub-card__typebadges">
+        <span class="tbadge tb-platform" title="Facebook">f</span>
+        <span class="tbadge tb-media" title="${mediaLabel}">${mediaIcon}</span>
       </div>
     </div>
-    <div class="asset-card__caption">${caption}</div>
-    <div class="asset-card__meta">
-      <div class="asset-card__tags">
-        <span class="asset-tag fullpost">Full Post</span>
-        <span class="asset-tag ratio">1:1</span>
-        <span class="asset-tag size">3.1 MB</span>
-      </div>
-      <div class="asset-card__time">Just now</div>
+    <div class="cc__img" style="background:linear-gradient(160deg,#0a2218,#134526);display:flex;align-items:center;justify-content:center;">
+      <div style="text-align:center;padding:16px;"><div style="font-size:15px;font-weight:700;color:#fff;line-height:1.3;">醫美級<br>防脫髮爆水修護</div></div>
+    </div>
+    <div class="cc__cap">${caption}</div>
+    <div class="pub-card__actions">
+      <button class="btn btn-out" style="font-size:11px;padding:4px 10px;" onclick="openEditPostModal(this)">Edit</button>
+      <button class="btn btn-pri" style="font-size:11px;padding:4px 10px;">Publish Now</button>
     </div>`;
-  grid.insertBefore(card, grid.firstChild);
-  bumpAssetCount('tabCountAll', 1);
-  bumpAssetCount('tabCountFullpost', 1);
-  showToast('Saved to Assets → Full Post');
+  list.insertBefore(row, list.firstChild);
+  bumpAssetCount('pubCountDraftTab', 1);
+  applyPublishFilters();
+  showToast('Saved to Publish → Draft');
   if (btn) {
-    btn.textContent = '✓ Added to Assets';
+    btn.textContent = '✓ Sent to Publish';
     btn.disabled = true;
     btn.style.opacity = '.7';
     btn.style.cursor = 'default';
@@ -4412,6 +4769,152 @@ function aaInitCards() {
   </div>
 </div>
 
+<!-- Edit Post modal — mimics Meta's native "Create post" composer + live preview + AI agent hand-off -->
+<div class="ep-overlay" id="epOverlay" onclick="if(event.target===this)closeEditPostModal()">
+  <div class="ep-sheet">
+
+    <!-- LEFT: composer form -->
+    <div class="ep-col ep-col--form">
+      <div class="ep-head">
+        <div class="ep-head__close" onclick="closeEditPostModal()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="ep-head__fbicon">f</div>
+        <div class="ep-head__title">Edit Post</div>
+      </div>
+      <div class="ep-body">
+        <div class="ep-pillrow">
+          <span class="ep-pill">👤 People</span>
+          <span class="ep-pill">📍 Location</span>
+          <span class="ep-pill">😊 Feeling/activity</span>
+        </div>
+
+        <textarea class="ep-caption" id="epCaption" oninput="epSyncPreview()"></textarea>
+
+        <div class="ep-section-label">Uploaded media <a onclick="showToast('Add more media — coming soon')">Add more</a></div>
+        <div class="ep-media-row" id="epMediaRow"><!-- populated by openEditPostModal() --></div>
+
+        <div class="ep-section-label" style="margin-top:var(--sp-lg);">Account <span style="color:var(--danger);">*</span></div>
+        <div class="ep-acct-field" id="epAcctField" onclick="toggleEpAcctDD(event, this)">
+          <span id="epAcctFieldLabel">Select account</span>
+          <svg width="9" height="6" viewBox="0 0 9 6" fill="none"><path d="M1 1l3.5 3.5L8 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="ep-acct-error" id="epAcctError">Please select at least one account before publishing.</div>
+
+        <div class="ep-section-label" style="margin-top:var(--sp-lg);">Add to feed post</div>
+        <div class="ep-quickrow">
+          <div class="ep-quick">💬<br>Get messages</div>
+          <div class="ep-quick">🟢<br>Get WhatsApp messages</div>
+          <div class="ep-quick">📞<br>Get calls</div>
+        </div>
+
+        <div class="ep-section-label" style="margin-top:var(--sp-lg);">Share</div>
+        <div class="ep-share-row">
+          <svg class="ep-share-row__icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.4"/><path d="M2 10h16M10 2a12 12 0 010 16 12 12 0 010-16z" stroke="currentColor" stroke-width="1.2"/></svg>
+          <div class="ep-share-row__body">
+            <div class="ep-share-row__title">Post audience</div>
+            <div class="ep-share-row__sub">Public</div>
+          </div>
+        </div>
+        <div class="ep-share-row">
+          <svg class="ep-share-row__icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.4"/><path d="M10 6v4l3 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <div class="ep-share-row__body">
+            <div class="ep-share-row__title">Add AI label</div>
+            <div class="ep-share-row__sub">We require you to label certain realistic content that's made with AI. <a>Learn more</a></div>
+          </div>
+          <label class="ep-switch">
+            <input type="checkbox" id="epAiLabelToggle">
+            <span class="ep-switch__track"></span>
+            <span class="ep-switch__thumb"></span>
+          </label>
+        </div>
+        <div class="ep-share-row">
+          <svg class="ep-share-row__icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="7" cy="8" r="3" stroke="currentColor" stroke-width="1.3"/><circle cx="14" cy="8" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 17c0-2.8 2.2-5 5-5s5 2.2 5 5M9 17c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="currentColor" stroke-width="1.2"/></svg>
+          <div class="ep-share-row__body">
+            <div class="ep-share-row__title">Share to groups</div>
+            <div class="ep-share-row__sub">Reach more people when you share your post in relevant groups.</div>
+          </div>
+        </div>
+        <div class="ep-share-row">
+          <svg class="ep-share-row__icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="4" y="2" width="12" height="16" rx="2" stroke="currentColor" stroke-width="1.3"/></svg>
+          <div class="ep-share-row__body">
+            <div class="ep-share-row__title">Share to story</div>
+            <div class="ep-share-row__sub">Off</div>
+          </div>
+        </div>
+        <div class="ep-share-row">
+          <svg class="ep-share-row__icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M2 11l6-9 2 5 8-3-6 9-2-5-8 3z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          <div class="ep-share-row__body">
+            <div class="ep-share-row__title">Boost post</div>
+            <div class="ep-share-row__sub">You'll choose settings after you click Post.</div>
+          </div>
+          <label class="ep-switch">
+            <input type="checkbox" id="epBoostToggle">
+            <span class="ep-switch__track"></span>
+            <span class="ep-switch__thumb"></span>
+          </label>
+        </div>
+      </div>
+      <div class="ep-foot">
+        <button class="btn btn-out" onclick="showToast('Saved — schedule flow coming soon')">Schedule</button>
+        <button class="btn btn-pri" onclick="epMockPublish()">Post</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: live preview + AI agent hand-off -->
+    <div class="ep-col ep-col--preview">
+      <div class="ep-preview-half">
+        <div class="ep-preview-label">Preview</div>
+        <div class="ep-preview-card">
+          <div class="ep-preview-head">
+            <div class="pav" id="epPreviewAvatar" style="width:32px;height:32px;">dr</div>
+            <div>
+              <div class="ep-preview-name" id="epPreviewName">Dr.Once – Hair</div>
+              <div class="ep-preview-meta">Just now · 🌐</div>
+            </div>
+          </div>
+          <div class="ep-preview-cap" id="epPreviewCaption"></div>
+          <div class="ep-preview-media" id="epPreviewMedia"><!-- mirrors epMediaRow --></div>
+          <div class="ep-preview-foot">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 7h3v7H2V7zm3 0l2-6a1.5 1.5 0 013 1v3h3.5a1.5 1.5 0 011.45 1.87l-1.2 5A1.5 1.5 0 0112.3 14H5V7z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.5 8a6.5 6.5 0 1112.6 2.2L15 14l-4-1.1A6.5 6.5 0 011.5 8z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8l12-5.5-4 5.5 4 5.5L2 8z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI agent hand-off — compact chat-panel style (compressed history + single-line input bar),
+           lets the user just tell the agent to publish instead of clicking Post themselves -->
+      <div class="ep-agent-half">
+        <div class="ep-agent-panel">
+          <div class="ep-agent-panelhead">
+            <div class="ep-agent-panelhead__icon">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1.5 3.5h10M1.5 6.5h10M1.5 9.5h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            </div>
+            <div class="ep-agent-panelhead__title">AI Agent</div>
+          </div>
+          <div class="ep-agent-chat" id="epAgentChat">
+            <div class="ep-agent-chat__empty">
+              <svg width="16" height="16" viewBox="0 0 13 13" fill="none" style="margin-bottom:4px;"><path d="M6.5 1l1.2 2.4 2.6.38-1.9 1.85.45 2.6L6.5 7.1 4.15 8.23l.45-2.6L2.7 3.78l2.6-.38L6.5 1z" fill="var(--brand-blue)"/></svg>
+              <div>Post Pub agent · tell it what to do and it'll handle publishing for you</div>
+            </div>
+          </div>
+          <input class="ep-agent-bar__input" id="epAgentInput" placeholder="Describe your idea… Use @ to select a product" value="Post this to my account" oninput="epSyncAgentCharCt()" />
+          <div class="ep-agent-toolbar">
+            <span class="ep-agent-pill">Post Pub</span>
+            <span class="ep-agent-pill" id="epAgentAcctPill" onclick="toggleEpAcctDD(event, this)">Select account</span>
+            <span class="ep-agent-charct" id="epAgentCharCt">24 / 4000</span>
+            <div class="ep-agent-send" onclick="epSendToAgent()">
+              <svg width="12" height="12" viewBox="0 0 13 13" fill="none"><path d="M1.5 11.5L11.5 6.5L1.5 1.5V5.5L8.5 6.5L1.5 7.5V11.5Z" fill="#fff"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <!-- Agent dropdown — lifted to body to escape ai-panel transform -->
 <div class="agent-dd hidden" id="agentDD" onclick="event.stopPropagation()">
   <div style="font-size:10px;font-weight:600;color:var(--text-placeholder);text-transform:uppercase;letter-spacing:.5px;padding:var(--sp-xs) var(--sp-md) 2px;">Select Agent</div>
@@ -4461,6 +4964,34 @@ function aaInitCards() {
   <div class="plat-opt" id="acct-dronce-global" onclick="setAccount({name:'Dr.Once Global', initials:'DG', bg:'linear-gradient(135deg,#1a0533,#3b0f6e)'},'acct-dronce-global')">
     <span class="plat-opt__name">Dr.Once Global</span><span class="plat-ratio">Page</span>
   </div>
+</div>
+
+<!-- Publish → Account filter (multi-select of connected Pages/IG accounts) — lifted to body -->
+<div class="platform-dd hidden" id="pubAcctFilterDD" onclick="event.stopPropagation()">
+  <div class="plat-group-label">Facebook</div>
+  <label class="pub-acct-opt">
+    <input type="checkbox" id="pubacctfilter-dronce-hair" onchange="togglePubAcctFilter('Dr.Once – Hair', this.checked)"> Dr.Once – Hair
+  </label>
+  <label class="pub-acct-opt">
+    <input type="checkbox" id="pubacctfilter-dronce-global" onchange="togglePubAcctFilter('Dr.Once Global', this.checked)"> Dr.Once Global
+  </label>
+  <div style="height:1px;background:var(--divider);"></div>
+  <div class="plat-group-label">Instagram</div>
+  <div class="pub-acct-opt disabled" title="Instagram publishing is planned for a later phase">No accounts connected yet <span class="coming-soon-pill">Coming soon</span></div>
+</div>
+
+<!-- Edit Post → Account selection (required, multi-select: my Facebook Pages + my Instagram accounts) -->
+<div class="platform-dd hidden" id="epAcctDD" onclick="event.stopPropagation()">
+  <div class="plat-group-label">Facebook</div>
+  <label class="pub-acct-opt">
+    <input type="checkbox" id="epacct-dronce-hair" onchange="toggleEpAcctFilter('Dr.Once – Hair', this.checked)"> Dr.Once – Hair
+  </label>
+  <label class="pub-acct-opt">
+    <input type="checkbox" id="epacct-dronce-global" onchange="toggleEpAcctFilter('Dr.Once Global', this.checked)"> Dr.Once Global
+  </label>
+  <div style="height:1px;background:var(--divider);"></div>
+  <div class="plat-group-label">Instagram</div>
+  <div class="pub-acct-opt disabled" title="Instagram publishing is planned for a later phase">No accounts connected yet <span class="coming-soon-pill">Coming soon</span></div>
 </div>
 
 <!-- Merged Post Settings panel (Full Post Gen only) — lifted to body to escape ai-panel transform -->
