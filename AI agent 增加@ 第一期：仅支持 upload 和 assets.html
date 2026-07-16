@@ -3250,10 +3250,15 @@ function selectMentionItem(category, index) {
   ta.focus();
   ta.selectionStart = ta.selectionEnd = replaced.length;
 
-  // Only add a new reference chip if this exact item isn't already shown above the input.
-  const alreadyRef = mentionRefs.some(m => m.category === category && m.name === item.name);
-  if (!alreadyRef) {
-    mentionRefs.push({category, categoryLabel, name: item.name, icon: item.icon, platform: item.platform});
+  // Upload-category items (Images/Videos/Posts) already have their own dedicated
+  // chip in the ref-strip (img-chip / video-chip / Asset chip / Post chip) — @
+  // mentioning them must never add a second, duplicate mentionRefs chip on top.
+  // Only categories without an existing chip representation (e.g. My Page) get one.
+  if (category !== 'upload') {
+    const alreadyRef = mentionRefs.some(m => m.category === category && m.name === item.name);
+    if (!alreadyRef) {
+      mentionRefs.push({category, categoryLabel, name: item.name, icon: item.icon, platform: item.platform});
+    }
   }
   renderRefStrip();
   updateSendBtn();
