@@ -417,6 +417,428 @@ body{background:#F7F7F7!important;padding:40px!important;min-height:100vh;box-si
 #ad-intelligence-root>.fl-gate-wrapper{display:block;padding:1.5rem 4rem 4rem;box-sizing:border-box;}
 .section-ai-summary .section-content{background:#fff;border:1px solid #e5e9ef;border-radius:0.625rem;box-shadow:rgba(6,29,34,0.08) 2px 1px 20px;}
 .section-ai-summary .p-card-content{padding:20px 24px;}
+/* Report-capture layout: stable visual rhythm for section-by-section PDF screenshots. */
+:root{
+  --report-blue:#23A9F6;
+  --report-blue-light:#73DFFF;
+  --report-ink:#061D22;
+  --report-muted:#637280;
+  --report-line:#E5E9EF;
+  --report-surface:#FFFFFF;
+  --report-section-gap:44px;
+  --report-card-radius:10px;
+  --report-card-shadow:0 8px 24px rgba(6,29,34,.08);
+}
+
+html,body,#ad-intelligence-root,#ad-intelligence-root *{box-sizing:border-box;}
+html body{
+  color:var(--report-ink)!important;
+  font-family:'Poppins','Noto Sans HK',Arial,sans-serif!important;
+  font-size:16px;
+  line-height:1.45;
+}
+
+#ad-intelligence-root{max-width:1200px;}
+#ad-intelligence-root>.fl-gate-wrapper{padding:28px 48px 48px;}
+#ad-intelligence-root .page-categories-analytics{gap:var(--report-section-gap);}
+#ad-intelligence-root .page-categories-analytics .component-page-section{padding:0;}
+
+/* A single typographic scale keeps headings, labels, values, charts and tables aligned. */
+#ad-intelligence-root .component-page-section>.header,
+#ad-intelligence-root .component-root.component-page-section .header,
+#ad-intelligence-root h3.header{
+  color:var(--report-ink)!important;
+  font-size:22px!important;
+  font-weight:600!important;
+  letter-spacing:0!important;
+  line-height:32px!important;
+  margin:0!important;
+}
+#ad-intelligence-root .data-box-header,
+#ad-intelligence-root .chart-title,
+#ad-intelligence-root .category-table th{
+  color:var(--report-muted)!important;
+  font-size:13px!important;
+  font-weight:500!important;
+  letter-spacing:0!important;
+  line-height:20px!important;
+}
+
+/* Overview cards always form one evenly sized row, regardless of the value length. */
+#categories-overview>.content{
+  background:var(--report-surface);
+  border:1px solid var(--report-line);
+  border-bottom:0;
+  border-radius:var(--report-card-radius) var(--report-card-radius) 0 0;
+  box-shadow:none;
+  gap:0!important;
+  overflow:visible;
+}
+#categories-overview>.content .component-data-box{
+  align-content:space-between;
+  background:transparent;
+  border:0;
+  border-radius:0!important;
+  box-shadow:none!important;
+  height:128px;
+  margin:0!important;
+  min-height:128px!important;
+  padding:20px!important;
+}
+#categories-overview .data-box-header{padding-bottom:0!important;}
+#categories-overview .data-box-header{
+  align-items:center;
+  display:flex;
+  gap:10px;
+}
+#categories-overview .data-box-header::before{
+  align-items:center;
+  background:var(--report-blue);
+  border-radius:8px;
+  color:#fff;
+  display:inline-flex;
+  flex:0 0 30px;
+  font-family:"Font Awesome 5 Pro","Font Awesome 5 Free";
+  font-size:15px;
+  font-weight:300;
+  height:30px;
+  justify-content:center;
+  line-height:1;
+  width:30px;
+}
+#categories-overview .component-data-box:nth-child(1) .data-box-header::before{content:"\f15c";}
+#categories-overview .component-data-box:nth-child(2) .data-box-header::before{content:"\f005";}
+#categories-overview .component-data-box:nth-child(3) .data-box-header::before{content:"\f03d";}
+#categories-overview .component-data-box:nth-child(4) .data-box-header::before{content:"\f155";}
+#categories-overview .component-data-box:nth-child(5) .data-box-header::before{content:"\f201";}
+#categories-overview .data-box-data-curr,
+#categories-overview .data-box-data .data-box-data-val{
+  color:#001983!important;
+  font-size:24px!important;
+  font-variant-numeric:tabular-nums;
+  font-weight:600!important;
+  letter-spacing:.01em!important;
+  line-height:30px!important;
+  white-space:nowrap;
+}
+
+/* Shared report cards use a single radius, border and shadow instead of mixed treatments. */
+#ad-intelligence-root .component-chart,
+#ad-intelligence-root .component-top-table,
+#ad-intelligence-root .section-ai-summary .section-content{
+  border:1px solid var(--report-line)!important;
+  border-radius:var(--report-card-radius)!important;
+  box-shadow:var(--report-card-shadow)!important;
+}
+#ad-intelligence-root .section-ai-summary{
+  background:var(--report-surface);
+  border:1px solid var(--report-line);
+  border-radius:0 0 var(--report-card-radius) var(--report-card-radius);
+  border-top:1px dashed #C8D4DE;
+  box-shadow:var(--report-card-shadow);
+  margin-top:calc(-1 * var(--report-section-gap))!important;
+  padding:28px 24px 24px;
+}
+#ad-intelligence-root .section-ai-summary .section-content{
+  background:transparent;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  padding:0 32px 28px!important;
+}
+#ad-intelligence-root .section-ai-summary .section-header{
+  padding:26px 32px 16px!important;
+}
+#ad-intelligence-root .section-ai-summary .p-card-content{padding:0!important;}
+
+/* Overview and AI Summary are separate capture cards with a shared left edge. */
+#categories-overview>.content{
+  border-bottom:1px solid var(--report-line)!important;
+  border-radius:var(--report-card-radius)!important;
+  box-shadow:var(--report-card-shadow)!important;
+}
+#ad-intelligence-root .section-ai-summary{
+  border:1px solid var(--report-line)!important;
+  border-radius:var(--report-card-radius)!important;
+  box-shadow:var(--report-card-shadow)!important;
+  margin-top:var(--report-section-gap)!important;
+  padding:20px 8px 24px!important;
+}
+#ad-intelligence-root .section-ai-summary .section-header{
+  padding:0 0 16px!important;
+}
+#ad-intelligence-root .section-ai-summary .section-content{
+  padding:0!important;
+}
+
+/* Let AI Summary use the same standalone title pattern as Overview. */
+#ad-intelligence-root .section-ai-summary{
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  margin-top:-24px!important;
+  padding:0!important;
+}
+#ad-intelligence-root .section-ai-summary .section-header{
+  color:var(--report-ink)!important;
+  font-size:22px!important;
+  font-weight:600!important;
+  line-height:32px!important;
+  padding:0 0 16px!important;
+}
+#ad-intelligence-root .section-ai-summary .section-header span{
+  font-size:inherit!important;
+  font-weight:inherit!important;
+  line-height:inherit!important;
+}
+#ad-intelligence-root .section-ai-summary .section-content{
+  background:var(--report-surface)!important;
+  border:1px solid var(--report-line)!important;
+  border-radius:var(--report-card-radius)!important;
+  box-shadow:var(--report-card-shadow)!important;
+  padding:24px!important;
+}
+
+/* Capture canvases: each chart family has a predictable height, while content remains visible. */
+#categories-treemap>.content{
+  background:transparent;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  min-height:0;
+  padding:0;
+}
+#categories-treemap .chart-treemap{
+  height:420px!important;
+  overflow:hidden;
+}
+#categories-treemap .chart-treemap .chart-display{
+  align-items:center;
+  display:flex!important;
+  justify-content:center;
+  min-height:0!important;
+  overflow:hidden;
+}
+#categories-treemap .chart-treemap .treemap{
+  aspect-ratio:auto;
+  height:100%!important;
+  margin:0;
+  max-height:100%!important;
+  max-width:100%;
+  min-height:0!important;
+  width:100%!important;
+}
+#categories-treemap .chart-treemap .treemap>div,
+#categories-treemap .chart-treemap .treemap svg{
+  height:100%!important;
+  max-height:100%!important;
+  min-height:0!important;
+  width:100%!important;
+}
+/* The treemap fills its wide report canvas; scale labels back to natural proportions. */
+#categories-treemap .chart-treemap .treemap svg text{
+  transform:scale(.72,1.39);
+  transform-box:fill-box;
+  transform-origin:center;
+}
+
+/* Keep paired comparison charts centred and give their controls a consistent inset. */
+#categories-summary .top-categories-engagement,
+#categories-summary .top-categories-view{
+  align-items:stretch;
+}
+#categories-summary .component-chart{padding:20px!important;}
+#categories-summary .component-chart .chart-display{
+  align-items:stretch;
+  justify-items:stretch;
+  min-height:0!important;
+  overflow:visible;
+}
+#categories-summary .top-categories-engagement .chart-action,
+#categories-summary .top-categories-view .chart-action{
+  height:auto;
+  padding:0!important;
+  position:absolute;
+  right:20px;
+  top:20px;
+  z-index:80;
+}
+#categories-summary .top-categories-engagement,
+#categories-summary .top-categories-view{
+  position:relative;
+}
+/* Move the complete bar-chart plot area left, keeping title and legend in place. */
+#categories-summary .chart-top-categories-engagement-bar g[transform="translate(0,39)"],
+#categories-summary .chart-top-categories-average g[transform="translate(0,39)"],
+#categories-summary .chart-top-categories-view-bar g[transform="translate(0,39)"]{
+  translate:-36px 0!important;
+}
+
+/* Ad-value pie: reserve separate label and value columns, and keep the ring circular. */
+#categories-spending .chart-top-advertisers-ad-cost-pie [aria-label="Legend"]{
+  translate:-14px 0;
+}
+#categories-spending .chart-top-advertisers-ad-cost-pie [aria-label="Legend"] text{
+  font-size:13px!important;
+}
+#categories-spending .chart-top-advertisers-ad-cost-pie [aria-label="Legend"] text[text-anchor="end"]{
+  translate:22px 0;
+}
+#categories-spending .chart-top-advertisers-ad-cost-pie .chart-display{
+  align-items:stretch;
+  justify-content:stretch;
+}
+#categories-spending .chart-top-advertisers-ad-cost-pie .chart,
+#categories-spending .chart-top-advertisers-ad-cost-pie .chart>div,
+#categories-spending .chart-top-advertisers-ad-cost-pie .chart svg{
+  aspect-ratio:auto;
+  height:100%!important;
+  width:100%!important;
+}
+#categories-spending .chart-top-advertisers-ad-cost-pie .amcharts-PieSeries-group{
+  transform:scaleY(.785)!important;
+  transform-box:fill-box;
+  transform-origin:center;
+}
+#categories-summary .top-categories-summary-details{gap:24px!important;}
+#categories-summary .categories-engagement-compare,
+#categories-summary .categories-views-ad-type-compare{gap:24px!important;min-height:360px;}
+#categories-summary .top-categories-engagement,
+#categories-summary .top-categories-view{min-height:360px;}
+#categories-summary .component-chart{height:360px;min-height:360px;}
+#categories-spending .advertisers-ad-cost-compare{gap:24px!important;}
+#categories-spending .chart-top-advertisers-ad-cost-bar,
+#categories-spending .chart-top-advertisers-ad-cost-pie{
+  border:1px solid var(--report-line);
+  border-radius:var(--report-card-radius)!important;
+  box-shadow:var(--report-card-shadow)!important;
+  height:360px!important;
+  padding:24px!important;
+}
+
+/* Table rows use a fixed vertical rhythm, preventing an uneven final screenshot. */
+#categories-table>.content{
+  border:1px solid var(--report-line);
+  border-radius:var(--report-card-radius)!important;
+  box-shadow:var(--report-card-shadow)!important;
+  min-height:640px;
+  padding:24px!important;
+}
+#categories-table .search-bar{margin:0 0 16px!important;}
+#categories-table .el-table__header-wrapper th{height:48px!important;}
+#categories-table .el-table__body tr{height:50px!important;}
+#categories-table .el-table td,
+#categories-table .el-table th{padding:8px 0!important;}
+#categories-table .el-table .cell{font-size:13px;line-height:20px;}
+#categories-table .rank{font-variant-numeric:tabular-nums;}
+
+/* Keep the search field and data table within one padded surface. */
+#categories-table .category-table{
+  background:transparent;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  padding:0;
+}
+#categories-table .search-bar{
+  align-self:flex-end;
+  float:none;
+  margin:0!important;
+  width:300px;
+}
+#categories-table .component-top-table{
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  margin:0!important;
+}
+
+/* Full-width header labels stay on one line with their info and sort controls. */
+#categories-table .el-table__header th .cell{
+  align-items:center;
+  display:flex;
+  flex-wrap:nowrap;
+  font-size:12px!important;
+  gap:4px;
+  line-height:18px!important;
+  overflow:visible;
+  white-space:nowrap;
+}
+#categories-table .el-table__header th .cell>span{white-space:nowrap;}
+#categories-table .el-table__header .caret-wrapper{
+  flex:0 0 auto;
+  margin-left:0;
+}
+#categories-table .el-table__header .info-icon{
+  background:transparent!important;
+  border-radius:0;
+  color:var(--report-blue)!important;
+  flex:0 0 14px;
+  font-size:14px;
+  height:14px;
+  width:14px;
+}
+
+/* Keep sort controls visible on the two long, text-only headers. */
+#categories-table .el-table__header th.el-table_1_column_2 .cell,
+#categories-table .el-table__header th.el-table_1_column_6 .cell{
+  padding-right:0!important;
+  position:static;
+}
+#categories-table .el-table__header th.el-table_1_column_2 .cell{
+  font-size:11px!important;
+  letter-spacing:-.01em;
+}
+#categories-table .el-table__header th.el-table_1_column_2 .caret-wrapper,
+#categories-table .el-table__header th.el-table_1_column_6 .caret-wrapper{
+  display:inline-flex!important;
+  height:22px!important;
+  margin-left:5px!important;
+  position:relative!important;
+  right:auto;
+  top:auto;
+  transform:none;
+  width:16px!important;
+}
+#categories-table .el-table__header th.el-table_1_column_2 .sort-caret,
+#categories-table .el-table__header th.el-table_1_column_6 .sort-caret{
+  left:3px!important;
+}
+#categories-table .el-table__header th.el-table_1_column_6 .info-icon{
+  display:none!important;
+}
+
+/* Align the six analysis cards with the treemap card's actual 420px CSS height. */
+#categories-summary .component-chart,
+#categories-spending .chart-top-advertisers-ad-cost-bar,
+#categories-spending .chart-top-advertisers-ad-cost-pie{
+  height:420px!important;
+  min-height:420px!important;
+}
+#categories-summary .categories-engagement-compare,
+#categories-summary .categories-views-ad-type-compare,
+#categories-spending .advertisers-ad-cost-compare{
+  min-height:420px!important;
+}
+
+@media (max-width:900px){
+  html body{padding:20px!important;}
+  #ad-intelligence-root>.fl-gate-wrapper{padding:24px;}
+  #categories-overview>.content{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  #categories-treemap>.content,
+  #categories-summary .categories-engagement-compare,
+  #categories-summary .categories-views-ad-type-compare,
+  #categories-spending .advertisers-ad-cost-compare{min-height:0;}
+  #categories-treemap .chart-treemap,
+  #categories-summary .component-chart,
+  #categories-spending .chart-top-advertisers-ad-cost-bar,
+  #categories-spending .chart-top-advertisers-ad-cost-pie{height:auto!important;min-height:320px;}
+}
 </style></head>
 <body>
 <div id="__nuxt"><div id="__layout"><section class="el-container layout-default" data-v-f60d5d14=""> <section class="el-container" data-v-f60d5d14=""><main class="el-main" data-v-f60d5d14=""><div class="plan" data-v-f60d5d14=""><div class="content-container" data-v-f60d5d14=""><!-- --> <!-- --></div></div> <div class="index-area no-select page-ad-intelligence-root main" data-v-4fd62ad3="" data-v-f60d5d14="" id="ad-intelligence-root"><section class="category-report-header" style="width:100%;box-sizing:border-box;margin:0 0 20px 0;position:relative;padding:44px 44px 36px;background-color:rgb(235,245,255);border-radius:1.25rem;font-family:'Poppins',sans-serif;">
