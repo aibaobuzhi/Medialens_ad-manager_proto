@@ -631,7 +631,7 @@ img.ProseMirror-separator {
     <h3 class="ml-share-title">Share category Report</h3>
 
     <div id="ml-share-live-block" style="display:none;">
-      <div class="ml-live-banner"><span>&#10022; This Category report is live. Expired on <b>2026-10-16</b></span></div>
+      <div class="ml-live-banner" id="ml-live-banner" style="display:none;"><span>&#10022; This Category report is live. Expired on <b>2026-10-16</b></span></div>
       <div class="ml-live-link">
         <input type="text" readonly value="https://demo.medialens.io/ad-intelligence/campa...">
         <button onclick="mlCopyLink()">&#10063;</button>
@@ -682,7 +682,8 @@ var mlDateRanges = [
 ];
 var mlDateRangeIdx = 0;
 var mlIsPublished = false;
-var mlLastPublished = null; // { category, dateRange }
+var mlHasBeenPublishedOnce = false; // becomes true only after an actual Publish click
+var mlLastPublished = null; // { category, dateRange } as of the last real Publish
 
 function mlCurrentSelection(){
   return {
@@ -701,6 +702,7 @@ function mlOpenShareModal(e){
     document.getElementById('ml-share-footer-note-initial').style.display = 'none';
     document.getElementById('ml-share-footer-note-live').style.display = 'block';
     document.getElementById('ml-category-select').disabled = true;
+    document.getElementById('ml-live-banner').style.display = mlHasBeenPublishedOnce ? 'flex' : 'none';
     mlEvaluatePublishState();
   } else {
     document.getElementById('ml-share-live-block').style.display = 'none';
@@ -734,29 +736,32 @@ function mlEvaluatePublishState(){
   btn.disabled = unchanged;
 }
 function mlPublishShare(){
-  // First-time Share: create the sharing link
-  mlLastPublished = mlCurrentSelection();
+  // First-time Share: generates the link, but it is NOT live yet — the "live" banner
+  // only appears once the user actually clicks Publish below.
   mlIsPublished = true;
   document.getElementById('ml-share-live-block').style.display = 'block';
+  document.getElementById('ml-live-banner').style.display = 'none';
   document.getElementById('ml-share-actions-initial').style.display = 'none';
   document.getElementById('ml-share-actions-live').style.display = 'flex';
   document.getElementById('ml-share-footer-note-initial').style.display = 'none';
   document.getElementById('ml-share-footer-note-live').style.display = 'block';
   document.getElementById('ml-category-select').disabled = true;
-  // Sharing for the first time (or re-sharing a previously expired category) makes it
-  // active immediately, but Publish should still read as "actionable" here — it only
-  // greys out once a live, non-expired share genuinely has nothing left to update.
+  // Nothing has actually been published yet, so Publish stays actionable/highlighted.
   document.getElementById('ml-publish-btn').disabled = false;
 }
 function mlPublishUpdate(){
   var btn = document.getElementById('ml-publish-btn');
   if(btn.disabled) return;
-  // Re-publish with the changed filter conditions (URL unchanged)
+  // Actually goes live here (first Publish) or re-syncs an already-live share.
   mlLastPublished = mlCurrentSelection();
+  mlHasBeenPublishedOnce = true;
+  document.getElementById('ml-live-banner').style.display = 'flex';
   btn.disabled = true;
 }
 function mlUnpublish(){
   mlIsPublished = false;
+  mlHasBeenPublishedOnce = false;
+  mlLastPublished = null;
   mlCloseShareModal();
 }
 function mlViewReport(){

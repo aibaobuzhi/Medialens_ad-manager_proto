@@ -1011,20 +1011,31 @@ function mlExportSlidesReport(){
   btn.disabled = true;
 
   setTimeout(function(){
-    var blob = new Blob(['MediaLens Category Report Export (mock)\nCategory: Jewellery, Watches & Luxury Products\nDate Range: 2026-07-08 to 2026-07-14'], {type:'text/plain'});
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = 'Category-Report-Export.txt';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    mlShowToast('Slides exported — check your downloads folder.');
 
     label.textContent = originalLabel;
     mlExportInProgress = false;
     mlSetExportBtnState(true);
   }, 1500);
+}
+
+function mlShowToast(message){
+  var existing = document.getElementById('ml-toast');
+  if(existing) existing.remove();
+  var toast = document.createElement('div');
+  toast.id = 'ml-toast';
+  toast.textContent = message;
+  toast.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);background:#061D22;color:#fff;font-family:"Poppins",sans-serif;font-size:14px;font-weight:500;padding:12px 22px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:99999;opacity:0;transition:opacity .25s ease,transform .25s ease;';
+  document.body.appendChild(toast);
+  requestAnimationFrame(function(){
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+  });
+  setTimeout(function(){
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(20px)';
+    setTimeout(function(){ toast.remove(); }, 250);
+  }, 2500);
 }
 
 // Simulate AI summary generation + page render finishing
