@@ -601,6 +601,8 @@ img.ProseMirror-separator {
 .ml-date-box b{font-weight:700;}
 .ml-date-box .ml-cal{color:#409eff;}
 .ml-date-box .ml-help{margin-left:auto;color:#c0c4cc;}
+.ml-category-box{flex:1;margin-left:16px;}
+.ml-category-box select{width:100%;border:1px solid #dcdfe6;border-radius:8px;padding:10px 14px;font-size:14px;color:#303133;font-family:inherit;background:#fff;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23909399' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:right 12px center;background-size:14px;}
 .ml-toggle{position:relative;width:40px;height:22px;border-radius:11px;background:#dcdfe6;cursor:pointer;flex-shrink:0;transition:background .2s;}
 .ml-toggle.on{background:#409eff;}
 .ml-toggle .knob{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3);transition:left .2s;}
@@ -624,13 +626,26 @@ img.ProseMirror-separator {
   <div class="ml-share-card">
     <button class="ml-share-close" onclick="mlCloseShareModal()">&#10005;</button>
 
-    <h3 class="ml-share-title"><span class="ml-label">Share category:</span><span class="ml-value">Jewellery, Watches &amp; Luxury Products</span></h3>
+    <h3 class="ml-share-title">Share category Report</h3>
 
     <div id="ml-share-live-block" style="display:none;">
       <div class="ml-live-banner"><span>&#10022; This Category report is live. Expired on <b>2026-10-16</b></span><button type="button" class="ml-export-slides" onclick="mlExportSlides()">Export Slides</button></div>
       <div class="ml-live-link">
         <input type="text" readonly value="https://demo.medialens.io/ad-intelligence/campa...">
         <button onclick="mlCopyLink()">&#10063;</button>
+      </div>
+    </div>
+
+    <div class="ml-share-row">
+      <span class="ml-share-row-label">Category</span>
+      <div class="ml-category-box">
+        <select id="ml-category-select">
+          <option selected>Jewellery, Watches &amp; Luxury Products</option>
+          <option>Beauty &amp; Personal Care</option>
+          <option>Fashion &amp; Apparel</option>
+          <option>Food &amp; Beverage</option>
+          <option>Electronics &amp; Gadgets</option>
+        </select>
       </div>
     </div>
 
