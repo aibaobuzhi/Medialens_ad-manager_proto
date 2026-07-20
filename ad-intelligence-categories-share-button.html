@@ -682,8 +682,7 @@ var mlDateRanges = [
 ];
 var mlDateRangeIdx = 0;
 var mlIsPublished = false;
-var mlHasBeenPublishedOnce = false; // becomes true only after an actual Publish click
-var mlLastPublished = null; // { category, dateRange } as of the last real Publish
+var mlLastPublished = null; // { category, dateRange } as of the last Share/Publish save
 
 function mlCurrentSelection(){
   return {
@@ -702,7 +701,7 @@ function mlOpenShareModal(e){
     document.getElementById('ml-share-footer-note-initial').style.display = 'none';
     document.getElementById('ml-share-footer-note-live').style.display = 'block';
     document.getElementById('ml-category-select').disabled = true;
-    document.getElementById('ml-live-banner').style.display = mlHasBeenPublishedOnce ? 'flex' : 'none';
+    document.getElementById('ml-live-banner').style.display = 'flex';
     mlEvaluatePublishState();
   } else {
     document.getElementById('ml-share-live-block').style.display = 'none';
@@ -736,31 +735,33 @@ function mlEvaluatePublishState(){
   btn.disabled = unchanged;
 }
 function mlPublishShare(){
-  // First-time Share: generates the link, but it is NOT live yet — the "live" banner
-  // only appears once the user actually clicks Publish below.
+  // Clicking Share creates the sharing record and makes it live immediately —
+  // this is the moment the "Shared" badge would appear, no Publish needed.
   mlIsPublished = true;
+  mlLastPublished = mlCurrentSelection();
   document.getElementById('ml-share-live-block').style.display = 'block';
-  document.getElementById('ml-live-banner').style.display = 'none';
+  document.getElementById('ml-live-banner').style.display = 'flex';
   document.getElementById('ml-share-actions-initial').style.display = 'none';
   document.getElementById('ml-share-actions-live').style.display = 'flex';
   document.getElementById('ml-share-footer-note-initial').style.display = 'none';
   document.getElementById('ml-share-footer-note-live').style.display = 'block';
   document.getElementById('ml-category-select').disabled = true;
-  // Nothing has actually been published yet, so Publish stays actionable/highlighted.
-  document.getElementById('ml-publish-btn').disabled = false;
+  // Nothing has changed relative to what was just shared, so Publish starts grey.
+  document.getElementById('ml-publish-btn').disabled = true;
 }
 function mlPublishUpdate(){
   var btn = document.getElementById('ml-publish-btn');
   if(btn.disabled) return;
-  // Actually goes live here (first Publish) or re-syncs an already-live share.
+  // Publish only saves the edited settings (Date Range) — it never touches
+  // whether the report is live, and never issues a new link.
   mlLastPublished = mlCurrentSelection();
-  mlHasBeenPublishedOnce = true;
-  document.getElementById('ml-live-banner').style.display = 'flex';
   btn.disabled = true;
 }
 function mlUnpublish(){
+  // Unpublish fully retires this sharing record (not just a state flip) —
+  // there is no path back to "Shared" without clicking Share again to create
+  // a brand-new record (new link, new expiry).
   mlIsPublished = false;
-  mlHasBeenPublishedOnce = false;
   mlLastPublished = null;
   mlCloseShareModal();
 }
