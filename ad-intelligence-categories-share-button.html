@@ -590,8 +590,6 @@ img.ProseMirror-separator {
 .ml-share-title .ml-value{font-weight:700;color:#303133;display:block;margin-top:2px;}
 .ml-live-banner{color:#409eff;font-size:13px;margin:14px 0 10px;display:flex;align-items:center;justify-content:space-between;gap:6px;}
 .ml-live-banner b{font-weight:600;}
-.ml-export-slides{color:#409eff;font-weight:500;cursor:pointer;background:none;border:none;font-size:13px;font-family:inherit;padding:0;}
-.ml-export-slides:hover{text-decoration:underline;}
 .ml-live-link{display:flex;align-items:center;gap:8px;border:1px solid #dcdfe6;border-radius:6px;padding:9px 12px;margin-bottom:18px;}
 .ml-live-link input{border:none;outline:none;flex:1;font-size:13px;color:#606266;background:transparent;font-family:inherit;}
 .ml-live-link button{border:1px solid #dcdfe6;background:#fff;border-radius:5px;padding:6px 8px;cursor:pointer;color:#606266;}
@@ -603,6 +601,10 @@ img.ProseMirror-separator {
 .ml-date-box .ml-help{margin-left:auto;color:#c0c4cc;}
 .ml-category-box{flex:1;margin-left:16px;}
 .ml-category-box select{width:100%;border:1px solid #dcdfe6;border-radius:8px;padding:10px 14px;font-size:14px;color:#303133;font-family:inherit;background:#fff;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23909399' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:right 12px center;background-size:14px;}
+.ml-category-box select:disabled{background-color:#f5f7fa;color:#303133;cursor:not-allowed;background-image:none;-webkit-text-fill-color:#303133;opacity:1;}
+.ml-date-box.ml-date-editable{cursor:pointer;}
+.ml-date-box.ml-date-editable:hover{border-color:#409eff;}
+.ml-btn-primary:disabled{background:#c8d7fb;border-color:#c8d7fb;color:#fff;cursor:not-allowed;}
 .ml-toggle{position:relative;width:40px;height:22px;border-radius:11px;background:#dcdfe6;cursor:pointer;flex-shrink:0;transition:background .2s;}
 .ml-toggle.on{background:#409eff;}
 .ml-toggle .knob{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3);transition:left .2s;}
@@ -629,7 +631,7 @@ img.ProseMirror-separator {
     <h3 class="ml-share-title">Share category Report</h3>
 
     <div id="ml-share-live-block" style="display:none;">
-      <div class="ml-live-banner"><span>&#10022; This Category report is live. Expired on <b>2026-10-16</b></span><button type="button" class="ml-export-slides" onclick="mlExportSlides()">Export Slides</button></div>
+      <div class="ml-live-banner"><span>&#10022; This Category report is live. Expired on <b>2026-10-16</b></span></div>
       <div class="ml-live-link">
         <input type="text" readonly value="https://demo.medialens.io/ad-intelligence/campa...">
         <button onclick="mlCopyLink()">&#10063;</button>
@@ -639,7 +641,7 @@ img.ProseMirror-separator {
     <div class="ml-share-row">
       <span class="ml-share-row-label">Category</span>
       <div class="ml-category-box">
-        <select id="ml-category-select">
+        <select id="ml-category-select" onchange="mlEvaluatePublishState()">
           <option selected>Jewellery, Watches &amp; Luxury Products</option>
           <option>Beauty &amp; Personal Care</option>
           <option>Fashion &amp; Apparel</option>
@@ -651,26 +653,9 @@ img.ProseMirror-separator {
 
     <div class="ml-share-row">
       <span class="ml-share-row-label">Date Range</span>
-      <div class="ml-date-box">
-        <span class="ml-cal">&#128197;</span> <b>2026-07-08</b> to <b>2026-07-14</b>
+      <div class="ml-date-box ml-date-editable" id="ml-date-box" onclick="mlCycleDateRange()">
+        <span class="ml-cal">&#128197;</span> <b id="ml-date-start">2026-07-08</b> to <b id="ml-date-end">2026-07-14</b>
         <span class="ml-help">&#9432;</span>
-      </div>
-    </div>
-
-    <div class="ml-share-row">
-      <span class="ml-share-row-label">PL Pages Only</span>
-      <div class="ml-toggle" id="ml-pl-toggle" onclick="this.classList.toggle('on')"><div class="knob"></div></div>
-    </div>
-
-    <div class="ml-share-row">
-      <span class="ml-share-row-label">Posts Limit</span>
-      <div class="ml-posts-limit">
-        <div class="ml-stepper">
-          <button onclick="mlStep(-1)">&minus;</button>
-          <input id="ml-posts-input" type="text" value="6">
-          <button onclick="mlStep(1)">+</button>
-        </div>
-        <label class="ml-unlimited"><input type="checkbox" id="ml-unlimited-check"> Unlimited</label>
       </div>
     </div>
 
@@ -681,7 +666,7 @@ img.ProseMirror-separator {
     <div class="ml-share-actions" id="ml-share-actions-live" style="display:none;">
       <a class="ml-btn ml-btn-view" style="text-decoration:none;" href="https://v0-medialens-ad-manager-proto.vercel.app/ad-intelligence-category-report.html" target="_blank" rel="noopener">&#127760; View</a>
       <button class="ml-btn ml-btn-danger" onclick="mlUnpublish()">Unpublish</button>
-      <button class="ml-btn ml-btn-primary" onclick="mlPublishShare()">Publish</button>
+      <button class="ml-btn ml-btn-primary" id="ml-publish-btn" onclick="mlPublishUpdate()">Publish</button>
     </div>
 
     <div class="ml-share-footer-note" id="ml-share-footer-note-initial">Each share will generate a new AI summary</div>
@@ -690,39 +675,88 @@ img.ProseMirror-separator {
 </div>
 
 <script>
+var mlDateRanges = [
+  ['2026-07-08', '2026-07-14'],
+  ['2026-07-01', '2026-07-07'],
+  ['2026-06-24', '2026-06-30']
+];
+var mlDateRangeIdx = 0;
+var mlIsPublished = false;
+var mlLastPublished = null; // { category, dateRange }
+
+function mlCurrentSelection(){
+  return {
+    category: document.getElementById('ml-category-select').value,
+    dateRange: document.getElementById('ml-date-start').textContent + ' to ' + document.getElementById('ml-date-end').textContent
+  };
+}
+
 function mlOpenShareModal(e){
   if(e) e.preventDefault();
   document.getElementById('ml-share-overlay').classList.add('open');
-  document.getElementById('ml-share-live-block').style.display = 'none';
-  document.getElementById('ml-share-actions-initial').style.display = 'flex';
-  document.getElementById('ml-share-actions-live').style.display = 'none';
-  document.getElementById('ml-share-footer-note-initial').style.display = 'block';
-  document.getElementById('ml-share-footer-note-live').style.display = 'none';
+  if(mlIsPublished){
+    document.getElementById('ml-share-live-block').style.display = 'block';
+    document.getElementById('ml-share-actions-initial').style.display = 'none';
+    document.getElementById('ml-share-actions-live').style.display = 'flex';
+    document.getElementById('ml-share-footer-note-initial').style.display = 'none';
+    document.getElementById('ml-share-footer-note-live').style.display = 'block';
+    document.getElementById('ml-category-select').disabled = true;
+    mlEvaluatePublishState();
+  } else {
+    document.getElementById('ml-share-live-block').style.display = 'none';
+    document.getElementById('ml-share-actions-initial').style.display = 'flex';
+    document.getElementById('ml-share-actions-live').style.display = 'none';
+    document.getElementById('ml-share-footer-note-initial').style.display = 'block';
+    document.getElementById('ml-share-footer-note-live').style.display = 'none';
+    document.getElementById('ml-category-select').disabled = false;
+  }
 }
 function mlCloseShareModal(){
   document.getElementById('ml-share-overlay').classList.remove('open');
-}
-function mlStep(delta){
-  var input = document.getElementById('ml-posts-input');
-  var v = parseInt(input.value, 10) || 0;
-  v = Math.max(1, v + delta);
-  input.value = v;
 }
 function mlCopyLink(){
   var input = document.querySelector('#ml-share-live-block input');
   if(input){ input.select(); document.execCommand('copy'); }
 }
+function mlCycleDateRange(){
+  mlDateRangeIdx = (mlDateRangeIdx + 1) % mlDateRanges.length;
+  document.getElementById('ml-date-start').textContent = mlDateRanges[mlDateRangeIdx][0];
+  document.getElementById('ml-date-end').textContent = mlDateRanges[mlDateRangeIdx][1];
+  mlEvaluatePublishState();
+}
+function mlEvaluatePublishState(){
+  if(!mlIsPublished) return;
+  var btn = document.getElementById('ml-publish-btn');
+  var current = mlCurrentSelection();
+  var unchanged = mlLastPublished
+    && current.category === mlLastPublished.category
+    && current.dateRange === mlLastPublished.dateRange;
+  btn.disabled = unchanged;
+}
 function mlPublishShare(){
+  // First-time Share: create the sharing link
+  mlLastPublished = mlCurrentSelection();
+  mlIsPublished = true;
   document.getElementById('ml-share-live-block').style.display = 'block';
   document.getElementById('ml-share-actions-initial').style.display = 'none';
   document.getElementById('ml-share-actions-live').style.display = 'flex';
   document.getElementById('ml-share-footer-note-initial').style.display = 'none';
   document.getElementById('ml-share-footer-note-live').style.display = 'block';
+  document.getElementById('ml-category-select').disabled = true;
+  // Sharing for the first time (or re-sharing a previously expired category) makes it
+  // active immediately, but Publish should still read as "actionable" here — it only
+  // greys out once a live, non-expired share genuinely has nothing left to update.
+  document.getElementById('ml-publish-btn').disabled = false;
 }
-function mlExportSlides(){
-  alert('Export Slides (to be implemented)');
+function mlPublishUpdate(){
+  var btn = document.getElementById('ml-publish-btn');
+  if(btn.disabled) return;
+  // Re-publish with the changed filter conditions (URL unchanged)
+  mlLastPublished = mlCurrentSelection();
+  btn.disabled = true;
 }
 function mlUnpublish(){
+  mlIsPublished = false;
   mlCloseShareModal();
 }
 function mlViewReport(){
