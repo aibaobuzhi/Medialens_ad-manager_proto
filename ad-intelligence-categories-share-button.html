@@ -666,7 +666,7 @@ img.ProseMirror-separator {
     <div class="ml-share-actions" id="ml-share-actions-live" style="display:none;">
       <a class="ml-btn ml-btn-view" style="text-decoration:none;" href="https://v0-medialens-ad-manager-proto.vercel.app/ad-intelligence-category-report.html" target="_blank" rel="noopener">&#127760; View</a>
       <button class="ml-btn ml-btn-danger" onclick="mlUnpublish()">Unpublish</button>
-      <button class="ml-btn ml-btn-primary" id="ml-publish-btn" onclick="mlPublishUpdate()">Publish</button>
+      <button class="ml-btn ml-btn-primary" id="ml-publish-btn" style="display:none;" onclick="mlPublishUpdate()">Publish</button>
     </div>
 
     <div class="ml-share-footer-note" id="ml-share-footer-note-initial">Each share will generate a new AI summary</div>
@@ -732,6 +732,8 @@ function mlEvaluatePublishState(){
   var unchanged = mlLastPublished
     && current.category === mlLastPublished.category
     && current.dateRange === mlLastPublished.dateRange;
+  // Publish only appears once the Filter (Date Range) actually changed; hide when unchanged.
+  btn.style.display = unchanged ? 'none' : '';
   btn.disabled = unchanged;
 }
 function mlPublishShare(){
@@ -746,7 +748,8 @@ function mlPublishShare(){
   document.getElementById('ml-share-footer-note-initial').style.display = 'none';
   document.getElementById('ml-share-footer-note-live').style.display = 'block';
   document.getElementById('ml-category-select').disabled = true;
-  // Nothing has changed relative to what was just shared, so Publish starts grey.
+  // Nothing has changed relative to what was just shared, so Publish stays hidden.
+  document.getElementById('ml-publish-btn').style.display = 'none';
   document.getElementById('ml-publish-btn').disabled = true;
 }
 function mlPublishUpdate(){
@@ -755,6 +758,8 @@ function mlPublishUpdate(){
   // Publish only saves the edited settings (Date Range) — it never touches
   // whether the report is live, and never issues a new link.
   mlLastPublished = mlCurrentSelection();
+  // Saved values become the new clean baseline, so Publish hides again.
+  btn.style.display = 'none';
   btn.disabled = true;
 }
 function mlUnpublish(){
