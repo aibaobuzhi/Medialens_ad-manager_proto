@@ -161,6 +161,8 @@ svg{display:block;}
   cursor:pointer;border:3px solid #fff;transition:transform .2s,box-shadow .2s,opacity .3s;}
 .ai-fab:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(35,169,246,.55);}
 .ai-fab.hidden{opacity:0;pointer-events:none;}
+/* The AI Agent full page is itself an agent surface — never float the AI bubble over it. */
+body.on-ai-agent .ai-fab{display:none!important;}
 .fab-pulse{position:absolute;inset:-6px;border-radius:20px;
   border:2px solid rgba(35,169,246,.35);animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{transform:scale(1);opacity:.7;}50%{transform:scale(1.18);opacity:0;}}
@@ -277,6 +279,68 @@ svg{display:block;}
 .gen-post__img-label{padding:var(--sp-xs) var(--sp-sm);background:var(--surface-page);
   font-size:11px;color:var(--text-regular);display:flex;align-items:center;gap:4px;border-top:1px solid var(--divider);}
 .gen-post__actions{display:flex;gap:var(--sp-xs);padding:var(--sp-xs) var(--sp-sm) var(--sp-sm);flex-wrap:wrap;}
+
+/* ── Publish task cards (AI Agent · Auto) — Review (图2) & Published (图3) ── */
+.pubc,.publog{border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--surface-white);box-shadow:0 6px 22px rgba(15,23,42,.08);}
+.pubc__head,.publog__head{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:15px 18px;background:linear-gradient(90deg,#23A9F6 0%,#73DFFF 100%);}
+.pubc__title,.publog__title{font-size:16px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px;}
+.pubc__pill,.publog__pill{font-size:11px;font-weight:600;color:#fff;padding:3px 13px;border-radius:var(--r-full);
+  border:1px solid rgba(255,255,255,.7);background:rgba(255,255,255,.14);white-space:nowrap;}
+.pubc__pill--draft{border-style:dashed;}
+.publog__pill{background:rgba(255,255,255,.26);border-style:solid;}
+.publog__pill--fail{background:rgba(255,63,65,.24);border-color:rgba(255,255,255,.6);}
+.pubc__row,.publog__row{display:flex;align-items:center;gap:16px;padding:12px 18px;border-bottom:1px solid var(--divider);font-size:13px;}
+.pubc__row--content{align-items:flex-start;}
+.pubc__k,.publog__k{color:var(--text-secondary);width:88px;flex-shrink:0;}
+.pubc__v,.publog__v{color:var(--text-primary);font-weight:500;display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0;}
+.pubc__dest{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:var(--r-tag);
+  background:#EEF6FF;border:1px solid #B3DEFF;color:var(--brand-blue);font-weight:600;font-size:12px;}
+/* content-to-publish preview (added on the review card) */
+.pubc__preview{display:flex;gap:12px;align-items:flex-start;padding:11px;background:var(--surface-page);border-radius:10px;width:100%;}
+.pubc__preview.is-clickable{cursor:pointer;transition:box-shadow .15s,background .15s;}
+.pubc__preview.is-clickable:hover{background:#F4F8FF;box-shadow:inset 0 0 0 1px rgba(35,169,246,.25);}
+.pubc__thumb{width:66px;height:66px;border-radius:8px;flex-shrink:0;background:linear-gradient(160deg,#0a2218,#134526);display:flex;align-items:flex-end;padding:7px;}
+.pubc__thumb span{font-size:8px;font-weight:700;color:rgba(255,255,255,.8);}
+.pubc__cap-wrap{flex:1;min-width:0;}
+.pubc__cap{font-size:12px;line-height:1.55;color:var(--text-regular);font-weight:400;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.pubc__cap-hint{font-size:10.5px;color:var(--brand-blue);font-weight:600;margin-top:5px;display:flex;align-items:center;gap:4px;}
+.pubc__foot,.publog__foot{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:14px 18px;background:var(--surface-page);}
+.pubc__note{margin-right:auto;font-size:12px;color:var(--text-regular);display:flex;align-items:center;gap:8px;}
+.pubc__note--ok{color:var(--success);font-weight:600;}
+.pubc__btn,.publog__btn{background:linear-gradient(90deg,#23A9F6,#41C0F5);color:#fff;font-weight:700;font-size:13px;
+  padding:9px 24px;border-radius:var(--r-full);border:none;cursor:pointer;box-shadow:0 4px 12px rgba(35,169,246,.32);transition:filter .15s;}
+.pubc__btn:hover,.publog__btn:hover{filter:brightness(1.06);}
+.pubc__btn--ghost{background:none;color:var(--text-regular);box-shadow:none;font-weight:600;padding:9px 12px;}
+.pubc__btn--ghost:hover{filter:none;color:var(--text-primary);}
+/* publish log body */
+.publog__ok{color:var(--success);font-weight:700;}
+.publog__fail{color:var(--danger);font-weight:700;}
+.publog__id{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:var(--text-primary);}
+.publog__list{display:flex;flex-direction:column;gap:8px;padding:12px 18px 2px;}
+.publog__entry{background:var(--surface-page);border:1px solid var(--divider);border-radius:8px;padding:10px 12px;}
+.publog__entry-head{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:11px;font-weight:700;margin-bottom:8px;}
+.publog__entry-head .ok{color:var(--success);}
+.publog__entry-head .fail{color:var(--danger);}
+.publog__entry-meta{font-size:10px;color:var(--text-regular);font-weight:500;}
+.publog__entry .publog__row{padding:3px 0;border-bottom:none;font-size:12px;}
+.publog__entry .publog__k{width:52px;}
+
+/* publish setup — account chips + timing buttons */
+.pubopt-chips{display:flex;gap:8px;flex-wrap:wrap;}
+.pubopt-chips--stack{flex-direction:column;align-items:flex-start;gap:10px;}
+.pubchip{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:var(--r-tag);
+  border:1.5px solid var(--border);background:var(--surface-white);font-size:12.5px;font-weight:600;color:var(--text-primary);cursor:pointer;transition:all .15s;}
+.pubopt-chips--stack .pubchip,
+.pubopt-chips--stack .pubmethod{width:fit-content;min-width:214px;justify-content:flex-start;}
+.pubchip:hover{border-color:var(--brand-blue);color:var(--brand-blue);}
+.pubchip.sel{border-color:var(--brand-blue);background:var(--brand-blue-tint);color:var(--brand-blue);}
+.pubchip__av{width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0;}
+.pubmethod{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--r-full);border:none;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;}
+.pubmethod--now{background:linear-gradient(90deg,#23A9F6,#41C0F5);color:#fff;box-shadow:0 4px 12px rgba(35,169,246,.3);}
+.pubmethod--now:hover{filter:brightness(1.06);}
+.pubmethod--sch{background:var(--surface-white);border:1.5px solid var(--border);color:var(--text-primary);}
+.pubmethod--sch:hover{border-color:var(--brand-blue);color:var(--brand-blue);}
 
 /* ai typing */
 .typing{display:flex;align-items:center;gap:4px;padding:var(--sp-xs) var(--sp-sm);}
@@ -909,6 +973,29 @@ svg{display:block;}
 .vp-meta-item__key{color:var(--text-regular);min-width:110px;}
 .vp-meta-item__val{color:var(--text-primary);font-weight:500;}
 
+/* ── Post Preview modal ── */
+.pp-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1250;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+.pp-overlay.open{opacity:1;pointer-events:auto;}
+.pp-sheet{background:#fff;border-radius:var(--r-modal);width:min(760px,94vw);max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.18);}
+.pp-post{transform:scale(1.02);transform-origin:center top;}
+.pp-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid var(--divider);}
+.pp-head__title{font-size:16px;font-weight:700;color:var(--title);}
+.pp-section{padding:16px 20px;border-bottom:1px solid var(--divider);}
+.pp-section:last-child{border-bottom:none;}
+.pp-post{border:1px solid var(--border);border-radius:var(--r-card);overflow:hidden;background:var(--surface-white);}
+.pp-post__head{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--divider);}
+.pp-post__av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:12px;flex-shrink:0;}
+.pp-post__name{font-size:13px;font-weight:700;color:var(--title);}
+.pp-post__meta{font-size:11px;color:var(--text-regular);}
+.pp-post__cap{padding:12px 14px 10px;font-size:13px;line-height:1.65;color:var(--text-primary);white-space:pre-wrap;}
+.pp-post__img{width:100%;background:linear-gradient(160deg,#0a2218,#134526);}
+.pp-post__img img{display:block;width:100%;height:auto;}
+.pp-post__footer{display:flex;gap:18px;padding:10px 14px 12px;color:var(--text-regular);}
+.pp-post__footer svg{opacity:.8;}
+.pp-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;}
+.pp-link{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:var(--r-tag);border:1px solid #B3DEFF;background:#EEF6FF;color:var(--brand-blue);font-size:12px;font-weight:700;cursor:pointer;}
+.pp-link:hover{background:#E3F2FF;}
+
 /* ── VP Reference Post card ── */
 .vp-ref-post{border:1px solid var(--border);border-radius:var(--r-card);overflow:hidden;background:var(--surface-white);max-width:240px;}
 .vp-ref-post__head{display:flex;align-items:center;gap:8px;padding:10px 12px 8px;}
@@ -1334,6 +1421,14 @@ body{
   background:#fff;
   border-color:var(--divider);
   border-radius:10px 10px 10px 3px;
+}
+/* Plain agent text — opt a bubble out of ALL bubble styling (bg / border / shadow),
+   so publish-flow prose reads as plain chat and only real data cards look boxed. */
+.msg__bubble.plain-text{
+  background:transparent !important;
+  border:none !important;
+  box-shadow:none !important;
+  padding:0 !important;
 }
 .panel-foot,.aa-foot{
   padding:12px 18px 16px;
@@ -3530,6 +3625,83 @@ function clearRefs() {
   renderRefStrip();
   updateSendBtn();
 }
+/* ── Shared Full Post Gen card builder ──
+   Used by both the AI bubble panel (sendMessage) and the AI Agent full page
+   (aaSend), so the generated post card is identical in both surfaces. */
+const FULL_POST_INTRO = '已為你生成一篇完整 dr.once 品牌貼文，包含文案與視覺。視覺完全複刻參考 creative 的沙龍構圖，文案替換為防脫髮爆水修護主題，品牌更新為 dr.once。';
+
+function fullPostImgBlock() {
+  return `
+        <div class="gen-post__img">
+          <div style="width:100%;height:100%;position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:24px;background:linear-gradient(160deg,#0a2218 0%,#134526 60%,#0d3320 100%);">
+            <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 40% 60%,rgba(255,220,150,.18) 0%,transparent 65%);"></div>
+            <div style="position:relative;">
+              <div style="font-size:20px;font-weight:700;color:#fff;line-height:1.3;">醫美級 防脫髮<br>爆水修護</div>
+              <div style="font-size:12px;color:rgba(255,255,255,.75);margin-top:6px;">dr.once 專業護理</div>
+            </div>
+            <div style="position:relative;display:flex;flex-direction:column;gap:6px;align-items:flex-start;">
+              <div style="background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.28);border-radius:7px;padding:6px 10px;font-size:10px;color:#fff;font-weight:600;">頭髮提升 · 回復頭髮密度</div>
+              <div style="background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.28);border-radius:7px;padding:6px 10px;font-size:10px;color:#fff;font-weight:600;">減少洗髮時 · 導入修復療程</div>
+            </div>
+            <div style="position:relative;font-size:13px;font-weight:700;color:rgba(255,255,255,.9);">dr.once
+              <span style="margin-left:6px;font-size:10px;font-weight:400;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);padding:2px 8px;border-radius:4px;">專業護理</span>
+            </div>
+          </div>
+          <div class="gen-post__img-hover">
+            <button class="gen-img-btn primary" onclick="openGenPostEditFlow()">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 11l3.5-3.5 1.5 1.5 3.5-5.5" stroke="#fff" stroke-width="1.4"/></svg>
+              Edit
+            </button>
+            <button class="gen-img-btn" onclick="openPostPreviewModal()">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="#fff" stroke-width="1.4"/><circle cx="6.5" cy="6.5" r="2" fill="#fff"/></svg>
+              Check Original
+            </button>
+          </div>
+        </div>`;
+}
+
+/* withActions=false → drop the bottom action row. extraStyle → optional inline style on the card root. */
+function fullPostCardHTML(withActions, extraStyle) {
+  const acct = selectedAccount || { name: 'Your Brand Page', initials: '?', bg: null };
+  const acctAvatarStyle = selectedAccount
+    ? `background:${acct.bg};color:#fff;`
+    : `background:var(--border);color:var(--text-regular);`;
+  const actionsHTML = withActions ? `
+            <div class="gen-post__actions">
+              <button class="btn btn-out" style="font-size:11px;padding:4px 10px;" onclick="openGenPostEditFlow()">Edit</button>
+              <button class="btn btn-pri" style="font-size:11px;padding:4px 10px;margin-left:auto;" onclick="openPostPreviewModal()">Check Original</button>
+            </div>` : '';
+  return `
+          <div class="gen-post"${extraStyle ? ` style="${extraStyle}"` : ''}>
+            <div class="gen-post__header">
+              <div class="gen-post__av" style="${acctAvatarStyle}">${acct.initials}</div>
+              <div>
+                <div class="gen-post__brand">${acct.name}</div>
+                <div class="gen-post__meta">Sponsored · Hong Kong</div>
+              </div>
+            </div>
+            <div class="gen-post__copy">
+              <strong>醫美級防脫髮爆水修護智慧 | dr.once 專業護理系列</strong><br><br>
+              不論頭髮稀疏定脫落，當你識用醫美級護髮智慧，就唔使再擔心每日洗頭時的脫髮困擾，都可以重現當下最豐盈嘅健康頭髮狀態！<br><br>
+              dr.once 深諳現代人對頭髮健康嘅追求，透過醫美級成分科研，成功發揮「防脫髮 · 爆水修護」—— 深層滋養髮根、強化髮絲、鎖住水份，並將專業護理力量引入全新「防脫髮爆水修護系列」。<br><br>
+              <strong>[限時優惠]</strong> 防脫髮爆水修護體驗套裝<br>
+              醫美級成分：蘊含2倍濃縮防脫因子 + 爆水修護技術，強韌髮根、減少脫髮<br>
+              頭皮護理：深層清潔 + 舒緩頭皮，回復健康頭皮環境<br><br>
+              了解更多或立即選購：<span class="highlight">dronce.hk/hair-care</span><br><br>
+              優惠期：即日至7月31日<br><br>
+              #DrOnce #防脫髮 #爆水修護 #醫美護髮 #頭髮健康 #HairCare #DrOnceHK #專業護理
+            </div>
+            <div class="gen-post__img-wrap" onclick="openPostPreviewModal()">
+              ${fullPostImgBlock()}
+              <div class="gen-post__img-label">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1l1 2.2 2.4.35-1.75 1.7.41 2.4L6 6.5 3.84 7.65l.41-2.4L2.5 3.55l2.4-.35L6 1z" fill="#F59E0B"/></svg>
+                AI Generated · GPT-image-2 · 1:1
+                <span style="margin-left:auto;color:var(--brand-blue);cursor:pointer;" onclick="openPostPreviewModal()">Check Original</span>
+              </div>
+            </div>${actionsHTML}
+          </div>`;
+}
+
 function sendMessage() {
   const ta = document.getElementById('promptTA');
   const prompt = ta.value.trim();
@@ -3591,35 +3763,6 @@ function sendMessage() {
 
     setTimeout(() => {
       document.querySelector('.status-row').remove();
-
-      // ── Shared image block (reused in all branches) ──
-      const imgBlock = `
-        <div class="gen-post__img">
-          <div style="width:100%;height:100%;position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:24px;background:linear-gradient(160deg,#0a2218 0%,#134526 60%,#0d3320 100%);">
-            <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 40% 60%,rgba(255,220,150,.18) 0%,transparent 65%);"></div>
-            <div style="position:relative;">
-              <div style="font-size:20px;font-weight:700;color:#fff;line-height:1.3;">醫美級 防脫髮<br>爆水修護</div>
-              <div style="font-size:12px;color:rgba(255,255,255,.75);margin-top:6px;">dr.once 專業護理</div>
-            </div>
-            <div style="position:relative;display:flex;flex-direction:column;gap:6px;align-items:flex-start;">
-              <div style="background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.28);border-radius:7px;padding:6px 10px;font-size:10px;color:#fff;font-weight:600;">頭髮提升 · 回復頭髮密度</div>
-              <div style="background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.28);border-radius:7px;padding:6px 10px;font-size:10px;color:#fff;font-weight:600;">減少洗髮時 · 導入修復療程</div>
-            </div>
-            <div style="position:relative;font-size:13px;font-weight:700;color:rgba(255,255,255,.9);">dr.once
-              <span style="margin-left:6px;font-size:10px;font-weight:400;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);padding:2px 8px;border-radius:4px;">專業護理</span>
-            </div>
-          </div>
-          <div class="gen-post__img-hover">
-            <button class="gen-img-btn primary" onclick="openGenPage()">
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 11l3.5-3.5 1.5 1.5 3.5-5.5" stroke="#fff" stroke-width="1.4"/></svg>
-              Edit
-            </button>
-            <button class="gen-img-btn" onclick="openGenPage()">
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="#fff" stroke-width="1.4"/><circle cx="6.5" cy="6.5" r="2" fill="#fff"/></svg>
-              Check Original
-            </button>
-          </div>
-        </div>`;
 
       if (agent === 'Image Gen') {
         // ── Image Gen: one card per image, with generating → reveal animation ──
@@ -3745,52 +3888,16 @@ function sendMessage() {
 
       } else {
         // ── Full Post Gen agent (and Auto's default routing): full post = copy + image, generated together ──
-        // No publish account picked → fall back to a placeholder page name + placeholder avatar
-        const acct = selectedAccount || { name: 'Your Brand Page', initials: '?', bg: null };
-        const acctAvatarStyle = selectedAccount
-          ? `background:${acct.bg};color:#fff;`
-          : `background:var(--border);color:var(--text-regular);`;
+        // Card carries only the two hover actions (Edit / Check Original); no bottom action row.
         conv.innerHTML += `
           <div class="msg msg--ai">
             <div class="msg__bubble" style="max-width:100%;width:100%;padding:0;background:transparent;border:none;">
-              <div style="font-size:12px;color:var(--text-regular);padding:var(--sp-xs) var(--sp-sm) var(--sp-xs);">已為你生成一篇完整 dr.once 品牌貼文，包含文案與視覺。視覺完全複刻參考 creative 的沙龍構圖，文案替換為防脫髮爆水修護主題，品牌更新為 dr.once。</div>
+              <div style="font-size:12px;color:var(--text-regular);padding:var(--sp-xs) var(--sp-sm) var(--sp-xs);">${FULL_POST_INTRO}</div>
             </div>
           </div>
-
-          <div class="gen-post">
-            <div class="gen-post__header">
-              <div class="gen-post__av" style="${acctAvatarStyle}">${acct.initials}</div>
-              <div>
-                <div class="gen-post__brand">${acct.name}</div>
-                <div class="gen-post__meta">Sponsored · Hong Kong</div>
-              </div>
-            </div>
-            <div class="gen-post__copy">
-              <strong>醫美級防脫髮爆水修護智慧 | dr.once 專業護理系列</strong><br><br>
-              不論頭髮稀疏定脫落，當你識用醫美級護髮智慧，就唔使再擔心每日洗頭時的脫髮困擾，都可以重現當下最豐盈嘅健康頭髮狀態！<br><br>
-              dr.once 深諳現代人對頭髮健康嘅追求，透過醫美級成分科研，成功發揮「防脫髮 · 爆水修護」—— 深層滋養髮根、強化髮絲、鎖住水份，並將專業護理力量引入全新「防脫髮爆水修護系列」。<br><br>
-              <strong>[限時優惠]</strong> 防脫髮爆水修護體驗套裝<br>
-              醫美級成分：蘊含2倍濃縮防脫因子 + 爆水修護技術，強韌髮根、減少脫髮<br>
-              頭皮護理：深層清潔 + 舒緩頭皮，回復健康頭皮環境<br><br>
-              了解更多或立即選購：<span class="highlight">dronce.hk/hair-care</span><br><br>
-              優惠期：即日至7月31日<br><br>
-              #DrOnce #防脫髮 #爆水修護 #醫美護髮 #頭髮健康 #HairCare #DrOnceHK #專業護理
-            </div>
-            <div class="gen-post__img-wrap" onclick="openGenPage()">
-              ${imgBlock}
-              <div class="gen-post__img-label">
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1l1 2.2 2.4.35-1.75 1.7.41 2.4L6 6.5 3.84 7.65l.41-2.4L2.5 3.55l2.4-.35L6 1z" fill="#F59E0B"/></svg>
-                AI Generated · GPT-image-2 · 1:1
-                <span style="margin-left:auto;color:var(--brand-blue);cursor:pointer;" onclick="openGenPage()">Open in Generator →</span>
-              </div>
-            </div>
-            <div class="gen-post__actions">
-              <button class="btn btn-out" style="font-size:11px;padding:4px 10px;" onclick="openGenPage()">Edit in Generator</button>
-              <button class="btn btn-sec" style="font-size:11px;padding:4px 10px;">Regenerate</button>
-              <button class="btn btn-sec" style="font-size:11px;padding:4px 10px;">Try Video</button>
-              <button class="btn btn-pri" style="font-size:11px;padding:4px 10px;margin-left:auto;" onclick="addFullPostToPublish(this)">Use This Post</button>
-            </div>
-          </div>`;
+          ${fullPostCardHTML(false)}`;
+        // Every generated post auto-lands in Publish → Draft (no "Use This Post" step).
+        addFullPostToPublish();
       }
 
       cb.scrollTop = cb.scrollHeight;
@@ -3974,10 +4081,10 @@ function openEditPostModal(btn) {
   const mediaHTML = card.querySelector('.cc__img').innerHTML;
   const mediaStyle = card.querySelector('.cc__img').getAttribute('style') || '';
 
-  // 1. Pre-fill caption
+  // Pre-fill caption
   document.getElementById('epCaption').value = caption;
 
-  // 2. Pre-fill Uploaded media with the AI-generated image/video from the card
+  // Pre-fill media with the AI-generated image/video from the card
   document.getElementById('epMediaRow').innerHTML = `
     <div class="ep-media-thumb" style="${mediaStyle}">
       <span class="ep-media-thumb__badge">Edit</span>
@@ -3986,10 +4093,6 @@ function openEditPostModal(btn) {
       </span>
       ${mediaHTML}
     </div>`;
-
-  // 3. "Add AI label" always defaults to off when the modal opens
-  document.getElementById('epAiLabelToggle').checked = false;
-  document.getElementById('epBoostToggle').checked = false;
 
   // Account selection — default to the Page this draft was already tagged with,
   // but it's still an explicit selection the user can change or clear.
@@ -4008,11 +4111,7 @@ function openEditPostModal(btn) {
   document.getElementById('epPreviewName').textContent = acctName;
   document.getElementById('epPreviewMedia').innerHTML = `<div style="width:100%;height:100%;${mediaStyle}">${mediaHTML}</div>`;
 
-  // 4. Render the preview from whatever is currently in the form
   epSyncPreview();
-
-  document.getElementById('epAgentInput').value = 'Post this to my account';
-  epSyncAgentCharCt();
   document.getElementById('epOverlay').classList.add('open');
 }
 
@@ -4509,7 +4608,13 @@ function bumpAssetCount(id, delta) {
    Publish → Draft, never in Assets. Assets is for reusable creative material
    (images/videos); Publish is the single place to track "did this actually
    go out to Meta yet". */
+// Tracks the Publish → Draft card created from the currently generated demo post
+// (if any), so "Use This Post" and "Edit / Edit in Generator" share one draft
+// instead of inserting a duplicate row every time either path is used.
+let fpGenPostCard = null;
+
 function addFullPostToPublish(btn) {
+  if (fpGenPostCard) return fpGenPostCard;
   const list = document.getElementById('pubList');
   const caption = '醫美級防脫髮爆水修護智慧 | dr.once 專業護理系列 — 不論頭髮稀疏定脫落，dr.once 醫美級成分深層滋養髮根，強化髮絲，重現豐盈健康頭髮。限時優惠：防脫髮爆水修護體驗套裝，即日至7月31日。#DrOnce #防脫髮 #爆水修護 #醫美護理 #頭髮健康';
   const acct = selectedAccount ? selectedAccount.name : 'Select account';
@@ -4544,6 +4649,7 @@ function addFullPostToPublish(btn) {
       <button class="btn btn-pri" style="font-size:11px;padding:4px 10px;">Publish Now</button>
     </div>`;
   list.insertBefore(row, list.firstChild);
+  fpGenPostCard = row;
   bumpAssetCount('pubCountDraftTab', 1);
   applyPublishFilters();
   showToast('Saved to Publish → Draft');
@@ -4553,6 +4659,20 @@ function addFullPostToPublish(btn) {
     btn.style.opacity = '.7';
     btn.style.cursor = 'default';
   }
+  return row;
+}
+
+/* Edit / Edit in Generator on the just-generated post — hands the demo post
+   straight to Publish → Draft (creating it if "Use This Post" wasn't clicked
+   yet) and opens the same edit modal a Publish draft card uses, so both entry
+   points land the user on one consistent editing flow. */
+function openGenPostEditFlow() {
+  if (!fpGenPostCard) {
+    addFullPostToPublish();
+  }
+  openGenPage('publish');
+  const editBtn = fpGenPostCard.querySelector('.pub-card__actions .btn-out');
+  if (editBtn) openEditPostModal(editBtn);
 }
 
 /* ── Init: apply default agent state on load ── */
@@ -4565,6 +4685,11 @@ document.addEventListener('keydown', e => {
     if (document.getElementById('gen-page').classList.contains('on')) closeGenPage();
   }
   if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) sendMessage();
+  // AI Agent full page: Enter (without Shift) sends
+  if (e.key === 'Enter' && !e.shiftKey && document.activeElement === document.getElementById('aaTextarea')) {
+    e.preventDefault();
+    aaSend();
+  }
 });
 
 /* ── AI Agent page ── */
@@ -4573,7 +4698,8 @@ function openAiAgentPage() {
   document.getElementById('navAiAgent').classList.add('active');
   const page = document.getElementById('aiAgentPage');
   page.classList.add('on');
-  // Hide the floating AI bubble on the AI Agent full page
+  // Hide the floating AI bubble on the AI Agent full page (JS + CSS guard)
+  document.body.classList.add('on-ai-agent');
   document.getElementById('aiFAB').classList.add('hidden');
   // Neutralise mainContent padding so overlay fills edge-to-edge
   document.getElementById('mainContent').style.padding = '0';
@@ -4584,6 +4710,7 @@ function openAiAgentPage() {
 function closeAiAgentPage() {
   document.getElementById('aiAgentPage').classList.remove('on');
   // Restore the floating AI bubble when leaving the AI Agent page
+  document.body.classList.remove('on-ai-agent');
   document.getElementById('aiFAB').classList.remove('hidden');
   document.getElementById('mainContent').style.padding = '';
   // Restore Buzz as active
@@ -4658,6 +4785,337 @@ function aaUpdateSend() {
   btn.style.opacity = active ? '1' : '.4';
 }
 
+// Auto mode routes a "generate post" intent to the Full Post Gen card
+function aaWantsFullPost(txt) {
+  return /post|貼文|貼子|帖子|文/i.test(txt);
+}
+// Auto mode routes a "publish" intent to the publish-confirmation flow
+function aaWantsPublish(txt) {
+  return /發布|发布|發佈|publish|上架|出稿/i.test(txt);
+}
+// Publish flow state (AI Agent · Auto). First publish defaults to the Meta platform, as a draft.
+let aaPubAccount = 'Dr.Once – Hair';
+const AA_PUB_ACCOUNTS = {
+  'Dr.Once – Hair': { initials: 'dr', bg: 'linear-gradient(135deg,#0d3320,#1a6640)' },
+  'Dr.Once Global': { initials: 'DG', bg: 'linear-gradient(135deg,#1a0533,#3b0f6e)' }
+};
+let aaPendingPublish = null; // { cardEl, mode, scheduleTime } while a confirmation card awaits Confirm
+let aaPublishIntake = null; // { awaiting:'account_mode'|'schedule_time', mode?, scheduleTime? } while waiting for text input
+function aaPubAccountMeta() {
+  const m = AA_PUB_ACCOUNTS[aaPubAccount] || AA_PUB_ACCOUNTS['Dr.Once – Hair'];
+  return { name: aaPubAccount, initials: m.initials, bg: m.bg };
+}
+// Typed affirmations / cancellations that stand in for clicking the Confirm / Cancel buttons
+function aaIsConfirmWord(txt) {
+  return /^(confirm|confirm publish|confirmed|確認|确认|確認發布|确认发布|ok|okay|yes|好|可以)$/i.test(txt.trim());
+}
+function aaIsCancelWord(txt) {
+  return /^(cancel|取消|唔要|不要|no)$/i.test(txt.trim());
+}
+
+function aaParsePublishModeText(txt) {
+  const s = txt.trim().toLowerCase();
+  if (!s) return null;
+  if (/(排期|预约|預約|schedule|scheduled|later|tomorrow|明天|今晚 20|明早|本週|本周)/i.test(s)) return 'scheduled';
+  if (/(立即|now|immediate|马上|馬上|立刻|today)/i.test(s)) return 'immediate';
+  return null;
+}
+
+function aaFindPubAccountInText(txt) {
+  const s = txt.trim().toLowerCase();
+  if (!s) return null;
+  if (s.includes('global')) return 'Dr.Once Global';
+  if (s.includes('hair')) return 'Dr.Once – Hair';
+  return Object.keys(AA_PUB_ACCOUNTS).find(name => s.includes(name.toLowerCase())) || null;
+}
+
+function aaGetPublishContent() {
+  const caption = (fpGenPostCard && fpGenPostCard.querySelector('.cc__cap'))
+    ? fpGenPostCard.querySelector('.cc__cap').textContent.trim()
+    : '醫美級防脫髮爆水修護智慧 | dr.once 專業護理系列 — 不論頭髮稀疏定脫落，dr.once 醫美級成分深層滋養髮根，強化髮絲，重現豐盈健康頭髮。#DrOnce #防脫髮 #爆水修護';
+  return {
+    caption,
+    brand: (selectedAccount && selectedAccount.name) ? selectedAccount.name : 'Your Brand Page',
+    avatar: (selectedAccount && selectedAccount.initials) ? selectedAccount.initials : 'dr',
+    avatarStyle: (selectedAccount && selectedAccount.bg) ? `background:${selectedAccount.bg};color:#fff;` : 'background:linear-gradient(135deg,#0d3320,#1a6640);color:#fff;'
+  };
+}
+
+function aaOpenPublishContentEditor() {
+  if (!fpGenPostCard) addFullPostToPublish();
+  if (fpGenPostCard) {
+    const editBtn = fpGenPostCard.querySelector('.pub-card__actions .btn-out');
+    if (editBtn) {
+      openEditPostModal(editBtn);
+      return;
+    }
+  }
+  // Fallback keeps the edit flow available even if the publish draft card has not been materialized yet.
+  const fallback = document.querySelector('.cc.pub-card');
+  if (fallback) openEditPostModal(fallback.querySelector('.pub-card__actions .btn-out') || fallback);
+}
+
+function aaGetPublishPreviewData() {
+  if (!fpGenPostCard) addFullPostToPublish();
+  const card = fpGenPostCard;
+  const caption = card ? card.querySelector('.cc__cap').textContent.trim() : aaGetPublishContent().caption;
+  const img = card ? card.querySelector('.cc__img') : null;
+  return {
+    brand: aaGetPublishContent().brand,
+    avatar: aaGetPublishContent().avatar,
+    avatarStyle: aaGetPublishContent().avatarStyle,
+    caption,
+    mediaHTML: img ? img.innerHTML : '<div style="aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;background:linear-gradient(160deg,#0a2218,#134526);">Preview</div>'
+  };
+}
+
+function openPostPreviewModal() {
+  const data = aaGetPublishPreviewData();
+  document.getElementById('ppTitle').textContent = 'Original Preview';
+  document.getElementById('ppBrand').textContent = data.brand;
+  document.getElementById('ppAvatar').textContent = data.avatar;
+  document.getElementById('ppAvatar').setAttribute('style', data.avatarStyle + 'width:34px;height:34px;');
+  document.getElementById('ppMeta').textContent = 'Draft preview · Just now';
+  document.getElementById('ppCaption').textContent = data.caption;
+  document.getElementById('ppMedia').innerHTML = data.mediaHTML;
+  document.getElementById('ppOverlay').classList.add('open');
+}
+
+function closePostPreviewModal() {
+  document.getElementById('ppOverlay').classList.remove('open');
+}
+
+function openPublishedPost() {
+  closePostPreviewModal();
+  if (typeof showToast === 'function') showToast('Opening published post…');
+}
+
+/* Step 1 — a "publish" intent now asks for the account + publish mode in one text answer.
+   No preset buttons are shown; the user types the full answer. */
+function aaRenderPublishSetup() {
+  const msgs = document.getElementById('aaMsgs');
+  aaRenderPublishAccountPrompt(msgs);
+}
+
+function aaAppendUserChoice(text) {
+  const msgs = document.getElementById('aaMsgs');
+  const um = document.createElement('div');
+  um.className = 'msg msg--user';
+  um.innerHTML = '<div class="msg__bubble" style="max-width:460px;">' + text.replace(/</g,'&lt;') + '</div>';
+  msgs.appendChild(um);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function aaRenderPublishAccountPrompt(msgs) {
+  const wrap = document.createElement('div');
+  wrap.className = 'msg msg--ai';
+  wrap.innerHTML = `
+    <div class="msg__bubble plain-text" style="max-width:560px;padding:14px 16px 12px;">
+      <div style="font-size:13px;line-height:1.7;color:var(--text-primary);margin-bottom:10px;">
+        请在一条文本里告诉我两个信息：
+        <br>1. 你使用哪个平台哪个账号进行发布
+        <br>2. 你是立即发布，还是排期发布
+        <br><br>例如：<b>Facebook Dr.Once Global，立即发布</b>；或者 <b>Facebook Dr.Once – Hair，排期发布到今晚 20:00</b>
+      </div>
+      <div class="pubc__row" style="margin-top:10px;align-items:flex-start;">
+        <span class="pubc__k" style="min-width:72px;">账号 / 方式</span>
+        <span class="pubc__v" style="flex:1;color:var(--text-secondary);font-size:12px;">请输入纯文本，不用点选按钮</span>
+      </div>
+    </div>`;
+  msgs.appendChild(wrap);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function aaRenderPublishModePrompt() {
+  return aaRenderPublishAccountPrompt(document.getElementById('aaMsgs'));
+}
+
+function aaRenderSchedulePicker() {
+  const msgs = document.getElementById('aaMsgs');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg msg--ai';
+  wrap.innerHTML = `
+    <div class="msg__bubble plain-text" style="max-width:520px;width:100%;">
+      <div style="font-size:13px;color:var(--text-primary);margin-bottom:10px;">请直接输入排期发布时间，例如：<b>今晚 20:00</b>、<b>明早 09:00</b>、<b>本週六 10:00</b></div>
+      <div class="pubc__row" style="margin-top:10px;align-items:flex-start;">
+        <span class="pubc__k" style="min-width:72px;">排期时间</span>
+        <span class="pubc__v" style="flex:1;color:var(--text-secondary);font-size:12px;">请输入纯文本时间，不用点选按钮</span>
+      </div>
+    </div>`;
+  msgs.appendChild(wrap);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+/* Step 2 — confirmation card + explanatory text below it. The first publish always
+   goes to Meta as a Draft. The user can click Confirm OR just type "Confirm". */
+function aaRenderPublishConfirm(mode, scheduleTime) {
+  const msgs = document.getElementById('aaMsgs');
+  const content = aaGetPublishContent();
+  const acct = aaPubAccountMeta();
+  const scheduled = mode === 'scheduled';
+  const statusLabel = scheduled ? '排程 · Draft' : '草稿 · Draft';
+  const methodLabel = scheduled ? ('排程發布 · ' + scheduleTime) : '立即發布 (Publish now)';
+  const introText = scheduled
+    ? `已為你準備好發布內容。我會以 <b>Scheduled</b> 狀態排程送去 <b>Meta</b> 平台，到指定時間自動發佈。請檢視並確認：`
+    : `已為你準備好發布內容。首次發布會以 <b>草稿 (Draft)</b> 狀態送去 <b>Meta</b> 平台。請檢視並確認：`;
+  const headPill = scheduled
+    ? `<span class="pubc__pill pubc__pill--draft">Scheduled · Draft</span>`
+    : `<span class="pubc__pill pubc__pill--draft">Draft</span>`;
+  const wrap = document.createElement('div');
+  wrap.className = 'msg msg--ai';
+  wrap.innerHTML = `
+    <div class="msg__bubble plain-text" style="max-width:520px;width:100%;">
+      <div style="font-size:13px;color:var(--text-primary);margin-bottom:10px;">${introText}</div>
+      <div class="pubc" data-mode="${mode}" data-schedule="${scheduleTime || ''}">
+        <div class="pubc__head">
+          <span class="pubc__title">Review Your Post · 發布確認</span>
+          ${headPill}
+        </div>
+        <div class="pubc__row"><span class="pubc__k">平台</span><span class="pubc__v"><span class="pubc__dest">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6.5l2.5 2.5L10 3" stroke="#23A9F6" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Meta</span><span style="font-size:11px;color:var(--text-secondary);font-weight:400;">Facebook Page</span></span></div>
+        <div class="pubc__row"><span class="pubc__k">發布帳號</span><span class="pubc__v"><span class="pubchip__av" style="width:18px;height:18px;background:${acct.bg};">${acct.initials}</span>${acct.name}</span></div>
+        <div class="pubc__row"><span class="pubc__k">發布方式</span><span class="pubc__v">${methodLabel}</span></div>
+        <div class="pubc__row"><span class="pubc__k">狀態</span><span class="pubc__v"><span class="pubc__dest" style="background:var(--warning-light);border-color:#FFE0A3;color:#B45309;">${statusLabel}</span></span></div>
+        <div class="pubc__row pubc__row--content"><span class="pubc__k" style="margin-top:2px;">內容</span>
+          <div class="pubc__v" style="flex:1;">
+            <div class="pubc__preview is-clickable" onclick="openPostPreviewModal()" title="Click to preview post">
+              <div class="pubc__thumb"><span>${acct.initials}</span></div>
+              <div class="pubc__cap-wrap">
+                <div class="pubc__cap">${content.caption}</div>
+                <div class="pubc__cap-hint">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 8.5h7M2 6.5l4.8-4.8a1 1 0 0 1 1.4 0l.1.1a1 1 0 0 1 0 1.4L3.5 8.5H2v-2z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/></svg>
+                  點擊查看 Post preview
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="pubc__foot">
+          <button class="pubc__btn pubc__btn--ghost" onclick="aaCancelPublish(this)">取消</button>
+          <button class="pubc__btn" onclick="aaConfirmPublish(this)">Confirm</button>
+        </div>
+      </div>
+    </div>`;
+  msgs.appendChild(wrap);
+  aaPendingPublish = { cardEl: wrap.querySelector('.pubc'), mode, scheduleTime: scheduleTime || '' };
+
+  // Explanatory text below the card (文案说明) + typed-Confirm hint
+  const schedLine = scheduled
+    ? `我會將貼文<b>排程喺 ${scheduleTime}</b>，以草稿狀態建立喺 <b>Meta</b> 平台（${acct.name}），到時自動送出。`
+    : `首次發布會以 <b>草稿 (Draft)</b> 狀態送去 <b>Meta</b> 平台（${acct.name}），你可以喺 Meta 端檢查冇問題後再正式發佈。`;
+  const expl = document.createElement('div');
+  expl.className = 'msg msg--ai';
+  expl.innerHTML = `
+    <div class="msg__bubble plain-text" style="max-width:520px;">
+      收到！我已根據內容準備好發布流程。<br>
+      ${schedLine}<br><br>
+      👉 檢查冇問題後，<b>直接喺對話框輸入「Confirm」</b>（或㩒下方按鈕）即可發布。
+    </div>`;
+  msgs.appendChild(expl);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function aaCancelPublish(btn) {
+  aaCancelPublishCard(btn.closest('.pubc'));
+}
+function aaCancelPublishCard(card) {
+  if (!card) return;
+  const foot = card.querySelector('.pubc__foot');
+  if (foot) foot.innerHTML = '<span class="pubc__note">已取消發布，貼文保留為草稿。</span>';
+  const pill = card.querySelector('.pubc__pill');
+  if (pill) { pill.textContent = '已取消'; pill.className = 'pubc__pill'; }
+  card.style.opacity = '.85';
+  if (aaPendingPublish && aaPendingPublish.cardEl === card) aaPendingPublish = null;
+}
+
+function aaConfirmPublish(btn) {
+  aaFinalizePublish(btn.closest('.pubc'));
+}
+// Typed "Confirm" / "Cancel" in the chat, standing in for the buttons
+function aaExecutePendingConfirm() { if (aaPendingPublish) aaFinalizePublish(aaPendingPublish.cardEl); }
+function aaExecutePendingCancel() { if (aaPendingPublish) aaCancelPublishCard(aaPendingPublish.cardEl); }
+
+function aaFinalizePublish(card) {
+  if (!card || card.dataset.done === '1') return;
+  card.dataset.done = '1';
+  const mode = card.dataset.mode || 'immediate';
+  const scheduleTime = card.dataset.schedule || '';
+  const scheduled = mode === 'scheduled';
+  const foot = card.querySelector('.pubc__foot');
+  const msgs = document.getElementById('aaMsgs');
+  if (aaPendingPublish && aaPendingPublish.cardEl === card) aaPendingPublish = null;
+  if (foot) foot.innerHTML = '<span class="pubc__note"><div class="spinner"></div>' + (scheduled ? '正在建立草稿並排程…' : '正在建立 Meta 草稿…') + '</span>';
+  msgs.scrollTop = msgs.scrollHeight;
+  setTimeout(() => {
+    const pill = card.querySelector('.pubc__pill');
+    if (pill) { pill.textContent = scheduled ? '已排程' : '已建立草稿'; pill.className = 'pubc__pill'; }
+    if (foot) foot.innerHTML = '<span class="pubc__note pubc__note--ok"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#52C41A" stroke-width="1.4"/><path d="M5 8l2 2 4-4.5" stroke="#52C41A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' + (scheduled ? '已排程並建立 Meta 草稿' : '已以草稿狀態建立到 Meta') + '</span>';
+    card.style.opacity = '.94';
+    aaAppendPublishLog('Meta', 'success', mode, scheduleTime);
+    if (typeof showToast === 'function') showToast(scheduled ? '已排程發布' : '已建立 Meta 草稿');
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 1600);
+}
+
+function aaAppendPublishLog(dest, outcome, mode, scheduleTime) {
+  const msgs = document.getElementById('aaMsgs');
+  const now = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  const ts = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()) + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes());
+  const postId = 'PL-' + now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate()) + '-' + pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds());
+  const content = aaGetPublishContent();
+  const acct = aaPubAccountMeta();
+  const scheduled = mode === 'scheduled';
+  const ok = outcome !== 'failure';
+  const cardTitle = ok ? (scheduled ? 'Scheduled on Meta · 已排程' : 'Meta Draft Created! · 草稿已建立') : 'Publish Failed · 發布失敗';
+  const pillText = ok ? (scheduled ? '已排程' : '草稿') : '失敗';
+  const pillClass = ok ? 'publog__pill' : 'publog__pill publog__pill--fail';
+  const statusText = ok ? (scheduled ? '✓ 已排程 · 草稿 (Draft)' : '✓ 已建立草稿 (Draft)') : '✕ 發布失敗';
+  const statusClass = ok ? 'publog__ok' : 'publog__fail';
+  const methodLabel = scheduled ? ('排程發布 · ' + scheduleTime) : '立即發布 (Publish now)';
+  const logTitle = ok ? (scheduled ? 'Scheduled on Meta' : 'Draft created on Meta') : 'Publish failed';
+  const detail = ok ? ('Draft delivered to Meta · ' + acct.name) : 'Retry recommended';
+  const wrap = document.createElement('div');
+  wrap.className = 'msg msg--ai';
+  wrap.innerHTML = `
+    <div class="msg__bubble plain-text" style="max-width:520px;width:100%;">
+      <div style="font-size:13px;color:var(--text-primary);margin-bottom:10px;">發布完成，已為你生成發布日誌：</div>
+      <div class="publog">
+        <div class="publog__head">
+          <span class="publog__title">${cardTitle}</span>
+          <span class="${pillClass}">${pillText}</span>
+        </div>
+        <div class="publog__row"><span class="publog__k">時間</span><span class="publog__v">${ts}</span></div>
+        <div class="publog__row"><span class="publog__k">操作</span><span class="publog__v">發布貼文 (Publish Post)</span></div>
+        <div class="publog__row"><span class="publog__k">平台</span><span class="publog__v">Meta (Facebook)</span></div>
+        <div class="publog__row"><span class="publog__k">發布帳號</span><span class="publog__v">${acct.name}</span></div>
+        <div class="publog__row"><span class="publog__k">發布方式</span><span class="publog__v">${methodLabel}</span></div>
+        <div class="publog__row"><span class="publog__k">Post ID</span><span class="publog__v publog__id">${postId}</span></div>
+        <div class="publog__row"><span class="publog__k">狀態</span><span class="publog__v ${statusClass}">${statusText}</span></div>
+        <div class="publog__list">
+          <div class="publog__entry">
+            <div class="publog__entry-head"><span class="${ok ? 'ok' : 'fail'}">${logTitle}</span><span class="publog__entry-meta">${ts}</span></div>
+            <div class="publog__row"><span class="publog__k">內容</span><span class="publog__v">${content.caption}</span></div>
+            <div class="publog__row"><span class="publog__k">結果</span><span class="publog__v ${statusClass}">${detail}</span></div>
+          </div>
+          ${ok ? '' : `
+          <div class="publog__entry">
+            <div class="publog__entry-head"><span class="fail">Retry blocked</span><span class="publog__entry-meta">${ts}</span></div>
+            <div class="publog__row"><span class="publog__k">原因</span><span class="publog__v publog__fail">Meta API temporarily unavailable</span></div>
+            <div class="publog__row"><span class="publog__k">建議</span><span class="publog__v">請稍後再試或檢查連線狀態</span></div>
+          </div>`}
+        </div>
+        <div class="publog__foot">
+          ${ok
+            ? '<button class="pubc__btn pubc__btn--ghost" onclick="openPostPreviewModal()">查看草稿</button><button class="publog__btn" onclick="openPublishedPost()">前往 Meta 草稿 →</button>'
+            : '<button class="publog__btn" onclick="showToast(\'正在重試發布…\')">重試發布 →</button>'}
+        </div>
+      </div>
+    </div>`;
+  msgs.appendChild(wrap);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
 function aaSend() {
   const ta = document.getElementById('aaTextarea');
   const txt = ta.value.trim();
@@ -4671,7 +5129,88 @@ function aaSend() {
   ta.value = '';
   aaUpdateSend();
   msgs.scrollTop = msgs.scrollHeight;
-  // Append AI thinking indicator
+
+  // Typed "Confirm" / "Cancel" while a publish confirmation card is awaiting — no button click needed.
+  if (currentAgentMode === 'auto' && aaPendingPublish && aaIsConfirmWord(txt)) {
+    aaExecutePendingConfirm();
+    return;
+  }
+  if (currentAgentMode === 'auto' && aaPendingPublish && aaIsCancelWord(txt)) {
+    aaExecutePendingCancel();
+    return;
+  }
+
+  if (currentAgentMode === 'auto' && aaPublishIntake) {
+    const pickedAccount = aaFindPubAccountInText(txt);
+    const pickedMode = aaParsePublishModeText(txt);
+    if (aaPublishIntake.awaiting === 'account_mode') {
+      if (pickedAccount) aaPubAccount = pickedAccount;
+      if (pickedAccount || pickedMode) {
+        aaAppendUserChoice(txt);
+        if (pickedMode === 'scheduled') {
+          aaPublishIntake = { awaiting: 'schedule_time', mode: 'scheduled' };
+          setTimeout(aaRenderSchedulePicker, 180);
+        } else {
+          aaPublishIntake = null;
+          setTimeout(() => aaRenderPublishConfirm('immediate'), 180);
+        }
+      }
+      return;
+    }
+    if (aaPublishIntake.awaiting === 'schedule_time') {
+      if (!txt) return;
+      aaAppendUserChoice(txt);
+      const scheduleTime = txt.trim();
+      aaPublishIntake = null;
+      setTimeout(() => aaRenderPublishConfirm('scheduled', scheduleTime), 180);
+    }
+    return;
+  }
+
+  // In Auto mode, a "publish" intent first asks for account + timing as plain text (no preset buttons).
+  // Checked before the generate branch because "發布 post" also matches the post keyword.
+  if (currentAgentMode === 'auto' && aaWantsPublish(txt)) {
+    const status = document.createElement('div');
+    status.className = 'msg msg--ai';
+    status.innerHTML = '<div class="msg__bubble" style="max-width:320px;"><span style="color:var(--text-secondary);font-size:12px;">Preparing to publish…</span></div>';
+    msgs.appendChild(status);
+    msgs.scrollTop = msgs.scrollHeight;
+    setTimeout(() => {
+      status.remove();
+      aaPublishIntake = { awaiting: 'account_mode' };
+      aaRenderPublishSetup();
+    }, 600);
+    return;
+  }
+
+  // In Auto mode, "生成 post" → generate a full post card (same as the AI bubble),
+  // rendered without the bottom action row.
+  if (currentAgentMode === 'auto' && aaWantsFullPost(txt)) {
+    const status = document.createElement('div');
+    status.className = 'msg msg--ai';
+    status.innerHTML = '<div class="msg__bubble" style="max-width:320px;"><div class="status-row" style="margin:0;"><div class="spinner"></div>Generating…</div></div>';
+    msgs.appendChild(status);
+    msgs.scrollTop = msgs.scrollHeight;
+
+    setTimeout(() => {
+      status.remove();
+      const intro = document.createElement('div');
+      intro.className = 'msg msg--ai';
+      intro.innerHTML = '<div class="msg__bubble" style="max-width:460px;">' + FULL_POST_INTRO + '</div>';
+      msgs.appendChild(intro);
+
+      const card = document.createElement('div');
+      card.style.alignSelf = 'flex-start';
+      card.style.width = '100%';
+      card.style.maxWidth = '440px';
+      card.innerHTML = fullPostCardHTML(false);
+      msgs.appendChild(card);
+      msgs.scrollTop = msgs.scrollHeight;
+    }, 2000);
+    return;
+  }
+
+  // Fallback: generic thinking indicator
   const aim = document.createElement('div');
   aim.className = 'msg msg--ai';
   aim.innerHTML = '<div class="msg__bubble" style="max-width:320px;"><span style="color:var(--text-secondary);font-size:12px;">Thinking…</span></div>';
@@ -4769,7 +5308,43 @@ function aaInitCards() {
   </div>
 </div>
 
-<!-- Edit Post modal — mimics Meta's native "Create post" composer + live preview + AI agent hand-off -->
+<!-- ═══ POST PREVIEW MODAL ═══ -->
+<div class="pp-overlay" id="ppOverlay" onclick="if(event.target===this)closePostPreviewModal()">
+  <div class="pp-sheet">
+    <div class="pp-head">
+      <div class="pp-head__title" id="ppTitle">Post Preview</div>
+      <button class="vp-close" onclick="closePostPreviewModal()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="pp-section">
+      <div class="pp-post">
+        <div class="pp-post__head">
+          <div class="pp-post__av" id="ppAvatar" style="background:linear-gradient(135deg,#0d3320,#1a6640);color:#fff;">dr</div>
+          <div>
+            <div class="pp-post__name" id="ppBrand">Your Brand Page</div>
+            <div class="pp-post__meta" id="ppMeta">Draft preview · Just now</div>
+          </div>
+        </div>
+        <div class="pp-post__cap" id="ppCaption"></div>
+        <div class="pp-post__img" id="ppMedia"></div>
+        <div class="pp-post__footer">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 7h3v7H2V7zm3 0l2-6a1.5 1.5 0 013 1v3h3.5a1.5 1.5 0 011.45 1.87l-1.2 5A1.5 1.5 0 0112.3 14H5V7z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.5 8a6.5 6.5 0 1112.6 2.2L15 14l-4-1.1A6.5 6.5 0 011.5 8z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8l12-5.5-4 5.5 4 5.5L2 8z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </div>
+    <div class="pp-section">
+      <div class="pp-actions">
+        <button class="btn btn-sec" onclick="closePostPreviewModal()">Close</button>
+        <button class="btn btn-pri" onclick="openPublishedPost()">View Published Post</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Post modal — slimmed to caption, media, account, and publish/schedule actions -->
 <div class="ep-overlay" id="epOverlay" onclick="if(event.target===this)closeEditPostModal()">
   <div class="ep-sheet">
 
@@ -4783,15 +5358,9 @@ function aaInitCards() {
         <div class="ep-head__title">Edit Post</div>
       </div>
       <div class="ep-body">
-        <div class="ep-pillrow">
-          <span class="ep-pill">👤 People</span>
-          <span class="ep-pill">📍 Location</span>
-          <span class="ep-pill">😊 Feeling/activity</span>
-        </div>
-
         <textarea class="ep-caption" id="epCaption" oninput="epSyncPreview()"></textarea>
 
-        <div class="ep-section-label">Uploaded media <a onclick="showToast('Add more media — coming soon')">Add more</a></div>
+        <div class="ep-section-label">Media section</div>
         <div class="ep-media-row" id="epMediaRow"><!-- populated by openEditPostModal() --></div>
 
         <div class="ep-section-label" style="margin-top:var(--sp-lg);">Account <span style="color:var(--danger);">*</span></div>
@@ -4800,64 +5369,10 @@ function aaInitCards() {
           <svg width="9" height="6" viewBox="0 0 9 6" fill="none"><path d="M1 1l3.5 3.5L8 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
         </div>
         <div class="ep-acct-error" id="epAcctError">Please select at least one account before publishing.</div>
-
-        <div class="ep-section-label" style="margin-top:var(--sp-lg);">Add to feed post</div>
-        <div class="ep-quickrow">
-          <div class="ep-quick">💬<br>Get messages</div>
-          <div class="ep-quick">🟢<br>Get WhatsApp messages</div>
-          <div class="ep-quick">📞<br>Get calls</div>
-        </div>
-
-        <div class="ep-section-label" style="margin-top:var(--sp-lg);">Share</div>
-        <div class="ep-share-row">
-          <svg class="ep-share-row__icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.4"/><path d="M2 10h16M10 2a12 12 0 010 16 12 12 0 010-16z" stroke="currentColor" stroke-width="1.2"/></svg>
-          <div class="ep-share-row__body">
-            <div class="ep-share-row__title">Post audience</div>
-            <div class="ep-share-row__sub">Public</div>
-          </div>
-        </div>
-        <div class="ep-share-row">
-          <svg class="ep-share-row__icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.4"/><path d="M10 6v4l3 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-          <div class="ep-share-row__body">
-            <div class="ep-share-row__title">Add AI label</div>
-            <div class="ep-share-row__sub">We require you to label certain realistic content that's made with AI. <a>Learn more</a></div>
-          </div>
-          <label class="ep-switch">
-            <input type="checkbox" id="epAiLabelToggle">
-            <span class="ep-switch__track"></span>
-            <span class="ep-switch__thumb"></span>
-          </label>
-        </div>
-        <div class="ep-share-row">
-          <svg class="ep-share-row__icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="7" cy="8" r="3" stroke="currentColor" stroke-width="1.3"/><circle cx="14" cy="8" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 17c0-2.8 2.2-5 5-5s5 2.2 5 5M9 17c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="currentColor" stroke-width="1.2"/></svg>
-          <div class="ep-share-row__body">
-            <div class="ep-share-row__title">Share to groups</div>
-            <div class="ep-share-row__sub">Reach more people when you share your post in relevant groups.</div>
-          </div>
-        </div>
-        <div class="ep-share-row">
-          <svg class="ep-share-row__icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="4" y="2" width="12" height="16" rx="2" stroke="currentColor" stroke-width="1.3"/></svg>
-          <div class="ep-share-row__body">
-            <div class="ep-share-row__title">Share to story</div>
-            <div class="ep-share-row__sub">Off</div>
-          </div>
-        </div>
-        <div class="ep-share-row">
-          <svg class="ep-share-row__icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M2 11l6-9 2 5 8-3-6 9-2-5-8 3z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
-          <div class="ep-share-row__body">
-            <div class="ep-share-row__title">Boost post</div>
-            <div class="ep-share-row__sub">You'll choose settings after you click Post.</div>
-          </div>
-          <label class="ep-switch">
-            <input type="checkbox" id="epBoostToggle">
-            <span class="ep-switch__track"></span>
-            <span class="ep-switch__thumb"></span>
-          </label>
-        </div>
       </div>
       <div class="ep-foot">
         <button class="btn btn-out" onclick="showToast('Saved — schedule flow coming soon')">Schedule</button>
-        <button class="btn btn-pri" onclick="epMockPublish()">Post</button>
+        <button class="btn btn-pri" onclick="epMockPublish()">Publish</button>
       </div>
     </div>
 
