@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campaign Performance · Results 列方案</title>
+<style>
+  :root{
+    --bg:#f4f6f9; --card:#fff; --ink:#1c1e21; --sub:#606770; --line:#dfe3e8;
+    --blue:#1877f2; --green:#e6f4ea; --green-b:#137333; --amber:#fef7e0; --amber-b:#9a6700;
+    --rec:#e7f3ff; --rec-b:#1877f2; --grey:#f0f2f5;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.5;padding:32px 20px}
+  .wrap{max-width:1120px;margin:0 auto}
+  h1{font-size:24px;margin:0 0 4px}
+  .lede{color:var(--sub);font-size:14px;margin:0 0 8px}
+  .src{background:#fff;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--sub);margin:16px 0 24px}
+  .src b{color:var(--ink)}
+  h2{font-size:18px;margin:32px 0 6px;padding-top:8px}
+  h2 .tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;vertical-align:middle;margin-left:8px}
+  .tag-fixed{background:var(--green);color:var(--green-b)}
+  .tag-custom{background:var(--amber);color:var(--amber-b)}
+  .tag-fb{background:var(--grey);color:var(--sub)}
+  .note{color:var(--sub);font-size:13px;margin:2px 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:18px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+
+  .cell{display:inline-flex;flex-direction:column;align-items:flex-start;min-width:120px}
+  .cell .num{font-size:16px;font-weight:600;color:var(--ink);line-height:1.1}
+  .cell .lbl{font-size:12px;color:var(--sub);margin-top:3px}
+
+  .demo-table{border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:8px}
+  .demo-row{display:grid;grid-template-columns:1.6fr 1fr 1fr;padding:12px 16px;border-top:1px solid var(--line);background:#fff;align-items:center}
+  .demo-row:first-child{border-top:none}
+  .demo-row.head{background:#f7f8fa;font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;padding:8px 16px}
+  .adname{font-size:13px}.adname small{display:block;color:var(--sub);font-size:11px}
+
+  table.map{width:100%;border-collapse:collapse;font-size:13px}
+  table.map th,table.map td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  table.map th{background:#f7f8fa;color:var(--sub);font-size:11px;text-transform:uppercase;letter-spacing:.4px;font-weight:700;position:sticky;top:0}
+  table.map code{background:var(--grey);padding:1px 5px;border-radius:4px;font-size:11.5px;color:#333;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  table.map .label{font-weight:600;white-space:nowrap}
+  .grp{font-weight:700;color:var(--blue);font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+  .seen{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green-b);margin-right:5px;vertical-align:middle}
+  .prep{font-size:10px;font-weight:700;color:var(--sub);background:var(--grey);padding:1px 6px;border-radius:8px}
+  .cnt{color:var(--sub);font-size:11px;font-variant-numeric:tabular-nums}
+
+  .schemes{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .scheme{border:1px solid var(--line);border-radius:10px;padding:16px;background:#fff;position:relative}
+  .scheme.rec{border-color:var(--rec-b);box-shadow:0 0 0 2px var(--rec)}
+  .scheme h3{margin:0 0 2px;font-size:15px}
+  .scheme .desc{color:var(--sub);font-size:12px;margin:0 0 12px;min-height:32px}
+  .rec-badge{position:absolute;top:-10px;right:12px;background:var(--rec-b);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:8px}
+  .ex{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-top:1px dashed var(--line)}
+  .ex:first-of-type{border-top:none}
+  .ex .in{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--sub);max-width:52%;word-break:break-all}
+  .ex .arrow{color:var(--line)}
+  .ex .out{font-size:13px;font-weight:600;text-align:right}
+  .ex .out.warn{color:var(--amber-b)}.ex .out.muted{color:var(--sub);font-weight:500}
+
+  .callout{background:var(--rec);border:1px solid #bcdcff;border-radius:10px;padding:16px 18px;font-size:14px;margin-top:8px}
+  .callout b{color:var(--rec-b)}
+  .callout2{background:var(--green);border:1px solid #b7e0c4;border-radius:10px;padding:16px 18px;font-size:14px}
+  .callout2 b{color:var(--green-b)}
+  ul.tight{margin:8px 0 0;padding-left:20px}ul.tight li{margin:4px 0}
+  .legend{font-size:12px;color:var(--sub);margin:6px 0 10px}
+  .footer{color:var(--sub);font-size:12px;margin-top:28px;text-align:center}
+  @media(max-width:760px){.schemes{grid-template-columns:1fr}.demo-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Ad Manager · Campaign Performance —— 新增 “Results” 列</h1>
+  <p class="lede">格式照 Meta Ads Manager：上面数字，下面小字是该结果的类型。数据已在库，本页请 PM 确认<b>结果类型的文案</b>。</p>
+
+  <div class="src">
+    <b>清单来源（求齐全）：</b> ① 我们生产库 <code>admanager_daily_insights</code> <b>全时段</b>实测 —— 所有账户跑出过的 <b>27 种</b> resultType；
+    ② 交叉核对 <b>Meta 官方 Ad Set <code>optimization_goal</code> 全枚举（v25.0，33 个值）</b>，把我们还没跑到、但 Meta 支持的类型也预先纳入（标 <span class="prep">预留</span>）；
+    ③ 加一条<b>结构化兜底</b>，保证 Meta 以后新增的、或没枚举到的任何类型都能优雅显示，不会露原始 id、不会错标。<br>
+    <span class="seen"></span> = 我们数据已出现（附出现行数）；<span class="prep">预留</span> = Meta 文档有、我们暂未跑到。
+  </div>
+
+  <!-- 目标样子 -->
+  <div class="card">
+    <div style="font-size:12px;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-bottom:8px">目标样子（对照 Meta 截图 · PM 给的两个真实广告）</div>
+    <div class="demo-table">
+      <div class="demo-row head"><div>Ad / Campaign</div><div>Results</div><div>Cost per result</div></div>
+      <div class="demo-row"><div class="adname">20260707 BA-CL-…-70 (C)<small>OUTCOME_SALES</small></div><div class="cell"><span class="num">1</span><span class="lbl">Purchases</span></div><div class="cell"><span class="num">$1,388.98</span><span class="lbl">per Purchase</span></div></div>
+      <div class="demo-row"><div class="adname">Video 素材 A<small>OUTCOME_AWARENESS</small></div><div class="cell"><span class="num">1,197</span><span class="lbl">ThruPlays</span></div><div class="cell"><span class="num">$0.38</span><span class="lbl">per ThruPlay</span></div></div>
+    </div>
+  </div>
+
+  <!-- 第一类：固定 -->
+  <h2>① 固定标准类型 <span class="tag tag-fixed">FIXED · 全量枚举</span></h2>
+  <p class="legend">按 Meta 优化目标（optimization_goal）归类。左侧圆点=我们数据已出现。</p>
+  <div class="card" style="overflow-x:auto">
+    <table class="map">
+      <thead><tr><th style="width:12%">分组</th><th style="width:20%">显示文案</th><th style="width:44%">Meta resultType（原始 id）</th><th style="width:24%">优化目标 / 出现</th></tr></thead>
+      <tbody>
+        <!-- SALES -->
+        <tr><td class="grp" rowspan="5">Sales /<br>Conversions</td>
+          <td class="label">Purchases</td>
+          <td><code>offsite_conversion.fb_pixel_purchase</code> <code>purchase</code> <code>omni_purchase</code> <code>onsite_conversion.purchase</code></td>
+          <td><span class="seen"></span><span class="cnt">8,680 / 248</span> · OFFSITE_CONVERSIONS</td></tr>
+        <tr><td class="label">Adds to Cart</td><td><code>offsite_conversion.fb_pixel_add_to_cart</code></td><td><span class="seen"></span><span class="cnt">15</span></td></tr>
+        <tr><td class="label">Content Views</td><td><code>offsite_conversion.fb_pixel_view_content</code></td><td><span class="seen"></span><span class="cnt">2,494</span></td></tr>
+        <tr><td class="label">Registrations Completed</td><td><code>offsite_conversion.fb_pixel_complete_registration</code></td><td><span class="seen"></span><span class="cnt">264</span></td></tr>
+        <tr><td class="label">Purchase Value <span class="prep">ROAS 型</span></td><td><code>purchase</code>（VALUE 优化）</td><td><span class="prep">预留</span> · VALUE / ADVERTISER_SILOED_VALUE / IN_APP_VALUE</td></tr>
+
+        <!-- LEADS -->
+        <tr><td class="grp" rowspan="2">Leads</td>
+          <td class="label">Leads</td>
+          <td><code>onsite_conversion.lead_grouped</code> <code>lead</code> <code>lead_grouped</code> <code>leadgen.other</code> <code>offsite_conversion.fb_pixel_lead</code></td>
+          <td><span class="seen"></span><span class="cnt">6,308 / 1,012</span> · LEAD_GENERATION / QUALITY_LEAD</td></tr>
+        <tr><td class="label">Applications Submitted</td><td><code>submit_application_website</code></td><td><span class="seen"></span><span class="cnt">688</span></td></tr>
+
+        <!-- TRAFFIC -->
+        <tr><td class="grp" rowspan="4">Traffic /<br>Visits</td>
+          <td class="label">Link Clicks</td><td><code>link_click</code></td><td><span class="seen"></span><span class="cnt">88,803</span> · LINK_CLICKS</td></tr>
+        <tr><td class="label">Landing Page Views</td><td><code>omni_landing_page_view</code> <code>landing_page_view</code></td><td><span class="seen"></span><span class="cnt">33,307</span> · LANDING_PAGE_VIEWS</td></tr>
+        <tr><td class="label">Profile Visits</td><td><code>profile_visit_view</code></td><td><span class="seen"></span><span class="cnt">6,902</span> · PROFILE_VISIT / VISIT_INSTAGRAM_PROFILE</td></tr>
+        <tr><td class="label">Page Visits</td><td><code>page_visit_view</code></td><td><span class="seen"></span><span class="cnt">409</span> · ENGAGED_PAGE_VIEWS</td></tr>
+
+        <!-- VIDEO / AWARENESS -->
+        <tr><td class="grp" rowspan="6">Video /<br>Awareness</td>
+          <td class="label">ThruPlays</td><td><code>video_thruplay_watched_actions</code></td><td><span class="seen"></span><span class="cnt">22,501</span> · THRUPLAY</td></tr>
+        <tr><td class="label">2-Sec Video Plays</td><td><code>video_continuous_2_sec_watched_actions</code></td><td><span class="seen"></span><span class="cnt">17,460</span></td></tr>
+        <tr><td class="label">Video Views <span class="prep">3秒</span></td><td><code>video_view</code></td><td><span class="prep">预留</span> · VIDEO_VIEWS</td></tr>
+        <tr><td class="label">Reach</td><td><code>reach</code></td><td><span class="seen"></span><span class="cnt">108,545</span> · REACH</td></tr>
+        <tr><td class="label">Impressions</td><td><code>impressions</code></td><td><span class="seen"></span><span class="cnt">24</span> · IMPRESSIONS</td></tr>
+        <tr><td class="label">Estimated Ad Recall Lift</td><td><code>estimated_ad_recallers</code></td><td><span class="seen"></span><span class="cnt">115</span> · AD_RECALL_LIFT</td></tr>
+
+        <!-- ENGAGEMENT -->
+        <tr><td class="grp" rowspan="4">Engagement</td>
+          <td class="label">Post Engagements</td><td><code>post_engagement</code> <code>post_interaction_gross</code></td><td><span class="seen"></span><span class="cnt">95,118</span> · POST_ENGAGEMENT</td></tr>
+        <tr><td class="label">Page Likes</td><td><code>like</code></td><td><span class="seen"></span><span class="cnt">3,747</span> · PAGE_LIKES</td></tr>
+        <tr><td class="label">Event Responses</td><td><code>rsvp</code></td><td><span class="seen"></span><span class="cnt">38</span> · EVENT_RESPONSES</td></tr>
+        <tr><td class="label">Profile &amp; Page Engagement</td><td>（页面/主页互动）</td><td><span class="prep">预留</span> · PROFILE_AND_PAGE_ENGAGEMENT</td></tr>
+
+        <!-- MESSAGING -->
+        <tr><td class="grp" rowspan="4">Messaging</td>
+          <td class="label">Messaging Conversations</td><td><code>onsite_conversion.messaging_conversation_started_7d</code></td><td><span class="seen"></span><span class="cnt">7,381</span> · CONVERSATIONS</td></tr>
+        <tr><td class="label">Messaging Purchases</td><td>（messaging 购买）</td><td><span class="prep">预留</span> · MESSAGING_PURCHASE_CONVERSION</td></tr>
+        <tr><td class="label">Messaging Appointments</td><td>（messaging 预约）</td><td><span class="prep">预留</span> · MESSAGING_APPOINTMENT_CONVERSION</td></tr>
+        <tr><td class="label">Messaging Follows</td><td>（深度对话/关注）</td><td><span class="prep">预留</span> · MESSAGING_DEEP_CONVERSATION_AND_FOLLOW</td></tr>
+
+        <!-- OTHER -->
+        <tr><td class="grp" rowspan="8">App / Calls /<br>其它</td>
+          <td class="label">App Installs</td><td><code>mobile_app_install</code> <code>app_install</code></td><td><span class="seen"></span><span class="cnt">256 / 94</span> · APP_INSTALLS</td></tr>
+        <tr><td class="label">App Installs &amp; Conversions</td><td>（安装 + 转化）</td><td><span class="prep">预留</span> · APP_INSTALLS_AND_OFFSITE_CONVERSIONS</td></tr>
+        <tr><td class="label">App Events</td><td>（应用内行为）</td><td><span class="prep">预留</span> · ENGAGED_USERS</td></tr>
+        <tr><td class="label">App Retention</td><td>（留存 / 再打开）</td><td><span class="prep">预留</span> · DERIVED_EVENTS</td></tr>
+        <tr><td class="label">Calls</td><td>（通话）</td><td><span class="prep">预留</span> · QUALITY_CALL / MEANINGFUL_CALL_ATTEMPT</td></tr>
+        <tr><td class="label">Subscribers</td><td>（订阅）</td><td><span class="prep">预留</span> · SUBSCRIBERS</td></tr>
+        <tr><td class="label">Reminders Set</td><td>（提醒）</td><td><span class="prep">预留</span> · REMINDERS_SET</td></tr>
+        <tr><td class="label" style="color:var(--sub)">按实际事件（走兜底）</td><td><code>AUTOMATIC_OBJECTIVE</code> · <code>NONE</code>（legacy 只读）</td><td><span class="prep">兜底</span> · Advantage+ 自动</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout2" style="margin-top:-6px">
+    <b>✓ Meta 官方 33 个 <code>optimization_goal</code> 已 100% 核对覆盖</b>（v25.0，人工核对）：29 个给了明确文案；4 个（App Retention / 安装+转化 / App Events / Advantage+ 自动）结果事件不固定，走 ③ 结构化兜底。
+  </div>
+
+  <!-- 第二类：自定义 -->
+  <h2>② 自定义转化 <span class="tag tag-custom">CUSTOM · 无限</span></h2>
+  <p class="note">客户自建的转化事件，名字随意（也可能只有数字 id）。无法穷举 → 需要兜底显示规则。下面 4 个方案用真实例子演示，请 PM 挑一个。</p>
+  <div class="schemes">
+    <div class="scheme rec">
+      <span class="rec-badge">已选定</span>
+      <h3>方案 A · 统一标签</h3>
+      <p class="desc">全部自定义转化都显示同一个词，不区分。最保守。</p>
+      <div class="ex"><span class="in">…fb_pixel_custom.GSHK-Award-Submit</span><span class="arrow">→</span><span class="out muted">Custom Conversion</span></div>
+      <div class="ex"><span class="in">…fb_pixel_custom.purchase</span><span class="arrow">→</span><span class="out muted">Custom Conversion</span></div>
+      <div class="ex"><span class="in">…custom.3088433004699049</span><span class="arrow">→</span><span class="out muted">Custom Conversion</span></div>
+    </div>
+    <div class="scheme">
+      <h3>方案 B · 剥前缀 + Title-Case</h3>
+      <p class="desc">去掉命名空间前缀，事件名转人类可读。信息最全，但纯数字 id 会露丑。</p>
+      <div class="ex"><span class="in">…fb_pixel_custom.GSHK-Award-Submit</span><span class="arrow">→</span><span class="out">GSHK Award Submit</span></div>
+      <div class="ex"><span class="in">…fb_pixel_custom.purchase</span><span class="arrow">→</span><span class="out">Purchase</span></div>
+      <div class="ex"><span class="in">…custom.3088433004699049</span><span class="arrow">→</span><span class="out warn">3088433004699049 ⚠</span></div>
+    </div>
+    <div class="scheme">
+      <h3>方案 C · 智能兜底（B 改良）</h3>
+      <p class="desc">可读名 → Title-Case；纯数字/不可读 id → 退回 “Custom Conversion”。兼顾可读与不露丑。<b>这条规则同时也兜底所有「未来新标准类型」。</b></p>
+      <div class="ex"><span class="in">…fb_pixel_custom.GSHK-Award-Submit</span><span class="arrow">→</span><span class="out">GSHK Award Submit</span></div>
+      <div class="ex"><span class="in">…fb_pixel_custom.purchase</span><span class="arrow">→</span><span class="out">Purchase</span></div>
+      <div class="ex"><span class="in">…custom.3088433004699049</span><span class="arrow">→</span><span class="out muted">Custom Conversion</span></div>
+    </div>
+    <div class="scheme">
+      <h3>方案 D · 加 “Custom:” 前缀</h3>
+      <p class="desc">在 C 基础上显式标注，避免和标准事件混淆。</p>
+      <div class="ex"><span class="in">…fb_pixel_custom.GSHK-Award-Submit</span><span class="arrow">→</span><span class="out">Custom: GSHK Award Submit</span></div>
+      <div class="ex"><span class="in">…fb_pixel_custom.purchase</span><span class="arrow">→</span><span class="out">Custom: Purchase</span></div>
+      <div class="ex"><span class="in">…custom.3088433004699049</span><span class="arrow">→</span><span class="out muted">Custom Conversion</span></div>
+    </div>
+  </div>
+
+  <!-- 第三类：兜底 -->
+  <h2>③ 未来 / 未知类型 <span class="tag tag-fb">FALLBACK · 保证齐全</span></h2>
+  <div class="callout2">
+    <b>这条让清单永远「齐全」：</b> Meta 时不时新增优化目标。凡是没进上面固定表的标准类型，一律走方案 A 同款规则，统一显示 “Custom Conversion”，不做剥前缀/Title-Case。
+    → 好处：即使明天 Meta 冒出个 <code>new_awesome_goal</code>，也不会显示原始 id，<b>永远不会错标成 Impressions/Engagements（现在的 objective 兜底会）</b>；坏处：看不出具体是哪个新类型，只知道"有一个未分类的结果"——如果后续发现这类情况频繁出现、需要拆分辨认，再考虑升级到方案 B/C。
+  </div>
+
+  <div class="callout">
+    <b>进阶选项（方案 E，成本更高）：</b> 数字 id 那类能通过 Meta <code>custom_conversions</code> 接口换成客户起的真名，需多一次接口调用 + 落库缓存。当前已选定方案 A，暂不需要，等有需求再评估 E。
+  </div>
+
+  <!-- 待确认 -->
+  <h2>需要 PM 拍板</h2>
+  <div class="card">
+    <ul class="tight">
+      <li><b>决策 1（固定文案）：</b>已选定 <b>“Purchases”</b>（简洁版，不用贴近 Meta 界面的 “Website Purchases”）。</li>
+      <li><b>决策 2（自定义 + 兜底规则）：</b>已选定 <b>方案 A · 统一标签</b>——所有自定义转化事件和未来/未知的新增类型统一显示 “Custom Conversion”，不做剥前缀/Title-Case 处理。</li>
+    </ul>
+  </div>
+
+  <p class="footer">MediaLens · Ad Manager · Campaign Performance · Results 列方案 · 数据已在库 · 固定表 = 我们全时段实测 27 种 + Meta 官方 optimization_goal 枚举 + 结构化兜底</p>
+</div>
+</body>
+</html>
