@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ad Manager — Performance</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Poppins', sans-serif; background: #F7F7F7; color: #102532; font-size: 13px; }
+
+  /* NAV */
+  .nav { background: #23A9F6; height: 60px; display: flex; align-items: center; padding: 0 24px; gap: 16px; position: sticky; top: 0; z-index: 100; }
+  .nav-logo { color: #fff; font-weight: 700; font-size: 18px; }
+  .nav-tabs { display: flex; gap: 4px; margin-left: 32px; }
+  .nav-tab { color: rgba(255,255,255,0.75); font-size: 13px; padding: 6px 14px; border-radius: 20px; cursor: pointer; transition: all 0.2s; }
+  .nav-tab.active { background: rgba(255,255,255,0.2); color: #fff; font-weight: 600; }
+  .nav-tab:hover { color: #fff; }
+  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+
+  /* DEMO TOGGLE */
+  .demo-toggle { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.15); border-radius: 24px; padding: 4px 6px 4px 14px; }
+  .demo-toggle span { color: #fff; font-size: 12px; font-weight: 500; }
+  .toggle-btn { width: 44px; height: 24px; background: rgba(255,255,255,0.3); border-radius: 12px; border: none; cursor: pointer; position: relative; transition: background 0.3s; }
+  .toggle-btn.on { background: #fff; }
+  .toggle-btn::after { content: ''; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; background: #23A9F6; border-radius: 50%; transition: transform 0.3s; }
+  .toggle-btn.on::after { transform: translateX(20px); background: #23A9F6; }
+  .toggle-btn:not(.on)::after { background: rgba(255,255,255,0.7); }
+
+  /* FILTER BAR */
+  .filter-bar { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 10px 24px; display: flex; align-items: center; gap: 12px; }
+  .filter-chip { background: #F7F7F7; border: 1px solid #e5e7eb; border-radius: 20px; padding: 5px 14px; font-size: 12px; color: #102532; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .filter-chip.active { border-color: #23A9F6; color: #23A9F6; background: #EBF7FF; }
+  .filter-chip svg { width: 13px; height: 13px; }
+
+  /* RESULTS TYPE FILTER */
+  .rt-filter { position: relative; }
+  .rt-chip { user-select: none; }
+  .rt-chip.has-selection { border-color: #23A9F6; color: #23A9F6; background: #EBF7FF; }
+  .rt-chip .rt-caret { width: 10px; height: 10px; transition: transform 0.2s; }
+  .rt-chip.open .rt-caret { transform: rotate(180deg); }
+  .rt-panel { display: none; position: absolute; top: calc(100% + 8px); left: 0; width: 320px; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.14); z-index: 200; padding: 10px 0; }
+  .rt-panel.open { display: block; }
+  .rt-panel-head { display: flex; align-items: center; justify-content: space-between; padding: 4px 14px 8px; border-bottom: 1px solid #f0f0f0; margin-bottom: 4px; }
+  .rt-panel-title { font-size: 11px; font-weight: 700; color: #707070; text-transform: uppercase; letter-spacing: 0.4px; }
+  .rt-panel-actions { display: flex; gap: 10px; }
+  .rt-panel-actions span { font-size: 11px; color: #23A9F6; cursor: pointer; font-weight: 600; }
+  #rtOptionsMount { max-height: 360px; overflow-y: auto; }
+  .rt-group-label { font-size: 10.5px; font-weight: 700; color: #23A9F6; text-transform: uppercase; letter-spacing: 0.4px; padding: 6px 14px 4px; }
+  .rt-divider { border-top: 1px solid #f0f0f0; margin: 4px 0; }
+  .rt-option { display: flex; align-items: center; gap: 9px; padding: 6px 14px; cursor: pointer; }
+  .rt-option:hover { background: #f7f9fc; }
+  .rt-option input[type="checkbox"] { width: 14px; height: 14px; accent-color: #23A9F6; cursor: pointer; flex: none; }
+  .rt-option-label { font-size: 12.5px; color: #102532; flex: 1; }
+  .rt-option-meta { font-size: 11px; color: #909399; }
+  .rt-panel-foot { padding: 8px 14px 2px; font-size: 11px; color: #909399; border-top: 1px solid #f0f0f0; margin-top: 6px; }
+
+  /* MAIN */
+  .main { padding: 20px 24px; max-width: 1400px; margin: 0 auto; }
+
+  /* CARD */
+  .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .card-title { font-size: 13px; font-weight: 600; color: #102532; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+  /* KPI CARDS */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  .kpi-card { background: #fff; border-radius: 12px; padding: 16px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); cursor: default; transition: box-shadow 0.2s; position: relative; }
+  .kpi-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+  .kpi-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .kpi-label { font-size: 11px; font-weight: 600; color: #707070; letter-spacing: 0.5px; text-transform: uppercase; display: flex; align-items: center; gap: 5px; }
+  .kpi-value { font-size: 28px; font-weight: 700; color: #102532; margin: 4px 0 2px; line-height: 1.1; }
+  .kpi-delta { font-size: 11px; font-weight: 600; }
+  .kpi-delta.up { color: #52C41A; }
+  .kpi-delta.down { color: #FF3F41; }
+  .kpi-delta.neutral { color: #707070; }
+  /* Benchmark bar (slider style) */
+  .kpi-bench { margin-top: 10px; }
+  .kpi-bench-track { height: 4px; background: #e5e7eb; border-radius: 2px; position: relative; }
+  .kpi-bench-fill { height: 4px; border-radius: 2px; position: absolute; left: 0; top: 0; }
+  .kpi-bench-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); position: absolute; top: -4px; transform: translateX(-50%); }
+  .kpi-bench-label { font-size: 10px; font-weight: 700; text-align: right; margin-top: 4px; }
+
+  /* ROW */
+  .dm-row { display: grid; gap: 16px; margin-bottom: 16px; }
+  .dm-row.cols-2 { grid-template-columns: 2fr 1fr; }
+  .dm-row.cols-equal { grid-template-columns: 1fr 1fr; }
+
+  /* TREND CHART */
+  .trend-chart-area { height: 220px; position: relative; }
+  .chart-svg { width: 100%; height: 100%; }
+  .chart-legend { display: flex; gap: 20px; margin-bottom: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #707070; }
+  .legend-dot { width: 10px; height: 3px; border-radius: 2px; }
+
+  /* HEATMAP */
+  .heatmap-wrap { overflow-x: auto; margin-bottom: 16px; }
+  .heatmap-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .heatmap-table th { padding: 8px 10px; text-align: center; font-size: 10px; font-weight: 600; color: #707070; letter-spacing: 0.4px; text-transform: uppercase; border-bottom: 2px solid #f0f0f0; white-space: nowrap; cursor: default; }
+  .heatmap-table th.date-col { text-align: left; min-width: 70px; }
+  .heatmap-table td { padding: 7px 10px; text-align: center; font-size: 11px; font-weight: 500; border-bottom: 1px solid #f9f9f9; transition: opacity 0.2s; }
+  .heatmap-table td.date-cell { text-align: left; color: #707070; font-size: 10px; }
+  .heatmap-table tr:hover td { opacity: 0.85; }
+
+  /* BAR CHART */
+  .bar-chart-area { display: flex; flex-direction: column; gap: 8px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; }
+  .bar-name { width: 120px; font-size: 10px; color: #707070; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-track { flex: 1; height: 20px; background: #f0f4f8; border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; background: #23A9F6; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; font-size: 10px; color: #fff; font-weight: 600; transition: width 0.8s ease; }
+  .bar-val { width: 40px; font-size: 11px; font-weight: 600; color: #102532; }
+
+  /* PIE CHART */
+  .pie-legend { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .pie-legend-item { display: flex; align-items: center; gap: 8px; font-size: 11px; }
+  .pie-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .pie-name { flex: 1; color: #707070; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pie-pct { font-weight: 600; color: #102532; }
+
+  /* CAMPAIGNS TABLE */
+  .campaigns-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .campaigns-table th { padding: 10px 12px; text-align: left; font-size: 10px; font-weight: 600; color: #707070; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid #f0f0f0; white-space: nowrap; cursor: default; }
+  .campaigns-table td { padding: 10px 12px; border-bottom: 1px solid #f5f5f5; }
+  .campaigns-table tr:hover td { background: #fafafa; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+  .status-active { background: #52C41A; }
+  .status-paused { background: #FFC960; }
+  .obj-tag { background: #F7F7F7; border-radius: 20px; padding: 2px 10px; font-size: 10px; color: #707070; font-weight: 500; }
+
+  /* AI CARD */
+  .ai-card { background: #F6F8FD; border: 1px solid #dbe6ff; border-radius: 12px; padding: 20px; }
+  .ai-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .ai-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #23A9F6, #7c3aed); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; }
+  .ai-insights-list { display: flex; flex-direction: column; gap: 10px; }
+  .ai-insight-item { background: #fff; border-radius: 8px; padding: 12px 14px; border-left: 3px solid #23A9F6; font-size: 12px; line-height: 1.6; color: #102532; }
+  .ai-insight-item.warn { border-left-color: #FFC960; }
+  .ai-insight-item.alert { border-left-color: #FF3F41; }
+
+  /* TOOLTIP — rendered by JS floater, static boxes hidden */
+  .has-tooltip { position: relative; cursor: help; }
+  .has-tooltip::after { content: '?'; display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; background: #e0e0e0; border-radius: 50%; font-size: 9px; font-weight: 700; color: #707070; margin-left: 5px; vertical-align: middle; }
+  .tooltip-box { display: none !important; } /* all rendering done by #tt-floater */
+  #tt-floater { position: fixed; z-index: 99999; display: none; background: #102532; color: #fff; border-radius: 10px; padding: 14px 16px; width: 320px; font-size: 11px; line-height: 1.65; box-shadow: 0 8px 32px rgba(0,0,0,0.3); pointer-events: none; word-break: break-word; overflow-wrap: break-word; white-space: normal; }
+  .tt-title { font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+  .tt-row { display: flex; gap: 8px; margin-bottom: 5px; flex-wrap: wrap; }
+  .tt-label { color: #93c5fd; font-weight: 600; min-width: 70px; flex-shrink: 0; }
+  .tt-value { color: #e2e8f0; flex: 1; min-width: 0; }
+  .tt-divider { border: none; border-top: 1px solid rgba(255,255,255,0.15); margin: 8px 0; }
+  .tt-cn { color: #fde68a; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+
+  /* DEMO MODE */
+  .demo-overlay { display: none; position: fixed; inset: 0; background: rgba(16,37,50,0.7); z-index: 200; overflow-y: auto; }
+  .demo-overlay.visible { display: block; padding: 40px 20px 60px; }
+  .demo-panel { background: #fff; border-radius: 16px; width: 100%; max-width: 960px; margin: 0 auto; overflow: visible; }
+  .demo-header { background: linear-gradient(135deg, #23A9F6, #1e40af); padding: 24px 32px; color: #fff; }
+  .demo-header h2 { font-size: 20px; font-weight: 700; }
+  .demo-header p { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+  .demo-questions { padding: 24px 32px; display: flex; flex-direction: column; gap: 32px; }
+  .demo-q { border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; }
+  .demo-q-header { background: #f8fafc; padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
+  .demo-q-num { width: 32px; height: 32px; background: #23A9F6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px; flex-shrink: 0; }
+  .demo-q-text { font-size: 15px; font-weight: 700; color: #102532; }
+  .demo-q-sub { font-size: 12px; color: #707070; margin-top: 2px; }
+  .demo-callouts { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+  .demo-callout { border-radius: 10px; overflow: hidden; border: 1px solid #e5e7eb; }
+  .demo-callout-title { background: #102532; color: #fff; padding: 10px 14px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .callout-tag { background: #FF3F41; border-radius: 4px; padding: 2px 8px; font-size: 10px; }
+  .callout-tag.warn { background: #FFC960; color: #102532; }
+  .callout-tag.info { background: #23A9F6; }
+  .demo-callout-body { padding: 14px; background: #fafafa; }
+  .demo-mini-ui { background: #fff; border-radius: 8px; padding: 12px; border: 2px solid #FF3F41; position: relative; }
+  .demo-mini-ui.warn-border { border-color: #FFC960; }
+  .demo-mini-ui.info-border { border-color: #23A9F6; }
+  .callout-arrow { position: absolute; top: -10px; right: 20px; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 10px solid #FF3F41; }
+  .callout-arrow.warn { border-bottom-color: #FFC960; }
+  .callout-arrow.info { border-bottom-color: #23A9F6; }
+  .mini-kpi { display: inline-flex; flex-direction: column; padding: 10px 16px; background: #fff; border-radius: 8px; border: 2px solid #FF3F41; }
+  .mini-kpi.warn { border-color: #FFC960; }
+  .mini-label-sm { font-size: 9px; font-weight: 600; text-transform: uppercase; color: #707070; }
+  .mini-val-sm { font-size: 22px; font-weight: 700; color: #102532; }
+  .mini-warn-sm { font-size: 10px; color: #FF3F41; font-weight: 600; }
+  .mini-warn-sm.warn { color: #FFC960; }
+  .callout-explain { margin-top: 10px; font-size: 12px; color: #374151; line-height: 1.6; padding: 10px 12px; background: #fffbeb; border-radius: 6px; border-left: 3px solid #FFC960; }
+  .callout-explain.red { background: #fff5f5; border-left-color: #FF3F41; }
+  .callout-explain.blue { background: #eff8ff; border-left-color: #23A9F6; }
+  .highlight-label { display: inline-block; background: #FF3F41; color: #fff; border-radius: 4px; padding: 1px 6px; font-size: 10px; font-weight: 700; margin-right: 4px; }
+  .highlight-label.warn { background: #FFC960; color: #102532; }
+  .highlight-label.blue { background: #23A9F6; }
+
+  /* MINI CHART SVG */
+  .mini-chart { width: 100%; height: 100px; }
+  .mini-heatmap-row { display: flex; gap: 3px; align-items: center; margin-bottom: 4px; }
+  .mini-heatmap-label { font-size: 9px; color: #707070; width: 60px; }
+  .mini-heatmap-cell { height: 18px; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: rgba(0,0,0,0.5); flex: 1; }
+
+  .section-mb { margin-bottom: 16px; }
+  .info-badge { background: #EBF7FF; color: #23A9F6; border-radius: 20px; font-size: 10px; font-weight: 600; padding: 2px 10px; display: inline-block; }
+
+  /* ===== SCENARIO SYSTEM ===== */
+  /* Badge — hidden by default, visible in demo-active mode */
+  .scenario-badge {
+    display: none;
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(90deg, #102532, #1e3a5f);
+    color: #fff; font-size: 10px; font-weight: 600;
+    padding: 7px 12px; cursor: pointer;
+    border-radius: 0 0 12px 12px;
+    align-items: center; justify-content: space-between;
+    gap: 8px; user-select: none;
+    transition: opacity 0.15s;
+    z-index: 5;
+  }
+  .scenario-badge:hover { background: linear-gradient(90deg, #23A9F6, #1e40af); }
+  .sb-q-pill { background: rgba(255,255,255,0.18); border-radius: 10px; padding: 1px 7px; font-size: 9px; font-weight: 700; }
+  .sb-q-pill.q1 { background: rgba(35,169,246,0.35); }
+  .sb-q-pill.q2 { background: rgba(245,158,11,0.35); }
+  .sb-q-pill.q3 { background: rgba(255,63,65,0.35); }
+
+  /* Card active state in demo mode */
+  body.demo-active .has-scenarios { padding-bottom: 36px !important; }
+  body.demo-active .scenario-badge { display: flex !important; }
+  body.demo-active .has-scenarios.scenario-open { outline: 2.5px solid #23A9F6; outline-offset: 1px; }
+
+  /* Scenario Flyout Panel */
+  #scenario-flyout {
+    position: absolute;
+    width: 360px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.22);
+    border: 2px solid #23A9F6;
+    z-index: 160;
+    display: none;
+    flex-direction: column;
+    max-height: 80vh;
+    overflow: hidden;
+  }
+  #scenario-flyout.open { display: flex; }
+  #sf-header {
+    background: linear-gradient(135deg, #102532, #1e3a5f);
+    color: #fff; padding: 14px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  #sf-header-left { display: flex; align-items: center; gap: 10px; }
+  #sf-icon { font-size: 18px; }
+  #sf-title { font-size: 13px; font-weight: 700; line-height: 1.3; }
+  #sf-subtitle { font-size: 10px; opacity: 0.7; margin-top: 2px; }
+  #sf-close {
+    background: rgba(255,255,255,0.15); border: none; color: #fff;
+    border-radius: 8px; width: 28px; height: 28px; cursor: pointer;
+    font-size: 14px; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: background 0.2s;
+  }
+  #sf-close:hover { background: rgba(255,255,255,0.3); }
+  #sf-body { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+  .sf-scenario { border-radius: 10px; overflow: hidden; border: 1px solid #e5e7eb; }
+  .sf-scenario-hd {
+    padding: 10px 14px; display: flex; align-items: flex-start; gap: 10px;
+    background: #f8fafc; border-bottom: 1px solid #e5e7eb;
+  }
+  .sf-q-badge {
+    border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 700;
+    color: #fff; flex-shrink: 0; margin-top: 1px;
+  }
+  .sf-q-text { font-size: 12px; font-weight: 700; color: #102532; line-height: 1.4; }
+  .sf-scenario-bd { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+  .sf-block-label {
+    font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    margin-bottom: 3px;
+  }
+  .sf-block-text { font-size: 11px; color: #374151; line-height: 1.65; }
+  .sf-block-label.blue { color: #23A9F6; }
+  .sf-block-label.purple { color: #7c3aed; }
+  .sf-action-box {
+    border-radius: 7px; padding: 9px 11px;
+    font-size: 11px; line-height: 1.6; border-left: 3px solid;
+  }
+  .sf-action-box.q1 { background: #eff8ff; color: #1e40af; border-color: #23A9F6; }
+  .sf-action-box.q2 { background: #fffbeb; color: #92400e; border-color: #f59e0b; }
+  .sf-action-box.q3 { background: #fff5f5; color: #991b1b; border-color: #FF3F41; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-logo">MediaLens</div>
+  <div class="nav-tabs">
+    <div class="nav-tab active">Performance</div>
+    <div class="nav-tab">Angle / Topic</div>
+    <div class="nav-tab">Ad Set Analysis</div>
+    <div class="nav-tab">Benchmarks</div>
+    <div class="nav-tab">Content Intelligence</div>
+    <div class="nav-tab">Creative Intelligence</div>
+    <div class="nav-tab">Video Intelligence</div>
+  </div>
+  <div class="nav-right">
+    <div class="demo-toggle">
+      <span id="toggle-label">Normal View</span>
+      <button class="toggle-btn" id="demoToggle" onclick="toggleDemo()"></button>
+      <span style="color:#fff;font-size:11px;opacity:0.8">Demonstrate</span>
+    </div>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="filter-chip active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+    Last 7 Days
+  </div>
+  <div class="filter-chip">vs Prev 7D</div>
+  <div class="filter-chip">All Campaigns</div>
+  <div class="filter-chip">All Objectives</div>
+
+  <!-- RESULTS TYPE FILTER -->
+  <div class="rt-filter">
+    <div class="filter-chip rt-chip" id="rtChip" onclick="toggleResultsTypePanel()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+      <span id="rtChipLabel">Results Type: All</span>
+      <svg class="rt-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="rt-panel" id="rtPanel">
+      <div class="rt-panel-head">
+        <span class="rt-panel-title">Results Type</span>
+        <div class="rt-panel-actions">
+          <span onclick="rtSelectAll()">Select All</span>
+          <span onclick="rtClearAll()">Clear</span>
+        </div>
+      </div>
+      <div id="rtOptionsMount"></div>
+      <div class="rt-panel-foot">RESULTS and COST/RESULT below reflect only the selected type(s). SPEND is unaffected.</div>
+    </div>
+  </div>
+
+  <div class="filter-chip" style="margin-left:auto; background:#23A9F6; color:#fff; border-color:#23A9F6;">+ Export</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- KPI CARDS -->
+  <div class="kpi-grid section-mb">
+
+    <!-- SPEND -->
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <div class="kpi-label">SPEND
+          
+        </div>
+        <div class="kpi-delta down">↙ -8.7% vs prev</div>
+      </div>
+      <div class="kpi-value">$18.1K</div>
+    </div>
+
+    <!-- ROAS -->
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <div class="kpi-label">ROAS
+          
+        </div>
+        <div class="kpi-delta neutral">-0.0% vs prev</div>
+      </div>
+      <div class="kpi-value">0.00x</div>
+    </div>
+
+    <!-- CTR -->
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <div class="kpi-label">CTR
+          
+        </div>
+        <div class="kpi-delta down">↙ -26.0% vs prev</div>
+      </div>
+      <div class="kpi-value">1.19%</div>
+      <div class="kpi-bench">
+        <div class="kpi-bench-track">
+          <div class="kpi-bench-fill" style="width:64%;background:#f59e0b;"></div>
+          <div class="kpi-bench-dot" style="left:64%;background:#f59e0b;"></div>
+        </div>
+        <div class="kpi-bench-label" style="color:#f59e0b;">Top 64%</div>
+      </div>
+    </div>
+
+    <!-- CPC -->
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <div class="kpi-label">CPC
+          
+        </div>
+        <div class="kpi-delta up">↗ +10.7% vs prev</div>
+      </div>
+      <div class="kpi-value">$4.63</div>
+      <div class="kpi-bench">
+        <div class="kpi-bench-track">
+          <div class="kpi-bench-fill" style="width:50%;background:#10b981;"></div>
+          <div class="kpi-bench-dot" style="left:50%;background:#10b981;"></div>
+        </div>
+        <div class="kpi-bench-label" style="color:#10b981;">Top 50%</div>
+      </div>
+    </div>
+
+    <!-- CPM -->
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <div class="kpi-label">CPM
+          
+        </div>
+        <div class="kpi-delta up">↙ -18.1% vs prev</div>
+      </div>
+      <div class="kpi-value">$55.03</div>
+      <div class="kpi-bench">
+        <div class="kpi-bench-track">
+          <div class="kpi-bench-fill" style="width:63%;background:#f59e0b;"></div>
+          <div class="kpi-bench-dot" style="left:63%;background:#f59e0b;"></div>
+        </div>
+        <div class="kpi-bench-label" style="color:#f59e0b;">Top 63%</div>
+      </div>
+    </div>
+
+    <!-- COST/RESULT -->
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <div class="kpi-label">COST/RESULT
+          
+        </div>
+        <div class="kpi-delta neutral" id="kpiCostResultDelta">-0.0% vs prev</div>
+      </div>
+      <div class="kpi-value" id="kpiCostResultValue">$0.00</div>
+    </div>
+
+    <!-- CONVERSIONS -->
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <div class="kpi-label">CONVERSIONS
+          
+        </div>
+        <div class="kpi-delta neutral">-0.0% vs prev</div>
+      </div>
+      <div class="kpi-value">0</div>
+    </div>
+
+    <!-- CONV VALUE -->
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <div class="kpi-label">CONV VALUE
+          
+        </div>
+        <div class="kpi-delta neutral">-0.0% vs prev</div>
+      </div>
+      <div class="kpi-value">$0.00</div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <div class="kpi-label has-tooltip">RESULTS
+          <div class="tooltip-box bottom-right"><div class="tt-row"><span class="tt-value">Sum of the selected result types across all campaigns</span></div></div>
+        </div>
+        <div class="kpi-delta neutral" id="kpiResultsDelta">-0.0% vs prev</div>
+      </div>
+      <div class="kpi-value" id="kpiResultsValue">0</div>
+    </div>
+
+  </div><!-- /kpi-grid -->
+
+
+  <!-- ROW 1: TREND + FUNNEL -->
+  <div class="dm-row cols-2 section-mb">
+    <div class="card">
+      <div class="card-title">
+        <span>Daily Performance Trend
+          
+        </span>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#23A9F6;height:3px;"></div> <span>CTR </span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#0d9488;height:3px;"></div> <span>CPC </span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#e5e7eb;height:8px;border-radius:2px;"></div> <span>CTR Benchmark Band (P25–P75) </span></div>
+      </div>
+      <div class="trend-chart-area">
+        <svg class="chart-svg" viewBox="0 0 600 180" preserveAspectRatio="none">
+          <!-- benchmark band -->
+          <polygon points="0,110 80,105 160,108 240,100 320,95 400,92 480,90 560,88 560,130 480,128 400,125 320,120 240,118 160,122 80,124 0,128" fill="#e5e7eb" opacity="0.7"/>
+          <!-- CPC line (teal, right axis) -->
+          <polyline points="0,145 80,142 160,148 240,140 320,135 400,130 480,128 560,125" fill="none" stroke="#0d9488" stroke-width="2" stroke-dasharray="4 3"/>
+          <!-- CTR line (blue) -->
+          <polyline points="0,120 80,112 160,118 240,108 320,90 400,85 480,80 560,75" fill="none" stroke="#23A9F6" stroke-width="2.5"/>
+          <!-- dots -->
+          <circle cx="0" cy="120" r="3" fill="#23A9F6"/>
+          <circle cx="80" cy="112" r="3" fill="#23A9F6"/>
+          <circle cx="160" cy="118" r="3" fill="#23A9F6"/>
+          <circle cx="240" cy="108" r="3" fill="#23A9F6"/>
+          <circle cx="320" cy="90" r="4" fill="#23A9F6" stroke="#fff" stroke-width="2"/>
+          <circle cx="400" cy="85" r="3" fill="#23A9F6"/>
+          <circle cx="480" cy="80" r="3" fill="#23A9F6"/>
+          <circle cx="560" cy="75" r="3" fill="#23A9F6"/>
+          <!-- x labels -->
+          <text x="0" y="175" font-size="9" fill="#9ca3af" font-family="Poppins">May 9</text>
+          <text x="70" y="175" font-size="9" fill="#9ca3af" font-family="Poppins">May 10</text>
+          <text x="150" y="175" font-size="9" fill="#9ca3af" font-family="Poppins">May 11</text>
+          <text x="230" y="175" font-size="9" fill="#9ca3af" font-family="Poppins">May 12</text>
+          <text x="310" y="175" font-size="9" fill="#9ca3af" font-family="Poppins">May 13</text>
+          <text x="390" y="175" font-size="9" fill="#9ca3af" font-family="Poppins">May 14</text>
+          <text x="470" y="175" font-size="9" fill="#9ca3af" font-family="Poppins">May 15</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>Funnel Distribution
+          
+        </span>
+      </div>
+      <svg viewBox="0 0 200 200" style="width:140px;height:140px;display:block;margin:0 auto;">
+        <circle cx="100" cy="100" r="70" fill="none" stroke="#3b82f6" stroke-width="30" stroke-dasharray="175 264" stroke-dashoffset="0"/>
+        <circle cx="100" cy="100" r="70" fill="none" stroke="#f59e0b" stroke-width="30" stroke-dasharray="88 264" stroke-dashoffset="-175"/>
+        <circle cx="100" cy="100" r="70" fill="none" stroke="#10b981" stroke-width="30" stroke-dasharray="66 264" stroke-dashoffset="-263"/>
+        <circle cx="100" cy="100" r="55" fill="white"/>
+        <text x="100" y="96" text-anchor="middle" font-size="13" font-weight="700" font-family="Poppins" fill="#102532">18</text>
+        <text x="100" y="112" text-anchor="middle" font-size="9" fill="#707070" font-family="Poppins">campaigns</text>
+      </svg>
+      <div class="pie-legend">
+        <div class="pie-legend-item"><div class="pie-dot" style="background:#3b82f6"></div><span class="pie-name">TOFU</span><span class="pie-pct">50% (9)</span></div>
+        <div class="pie-legend-item"><div class="pie-dot" style="background:#f59e0b"></div><span class="pie-name">MOFU</span><span class="pie-pct">28% (5)</span></div>
+        <div class="pie-legend-item"><div class="pie-dot" style="background:#10b981"></div><span class="pie-name">BOFU</span><span class="pie-pct">22% (4)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEATMAP -->
+  <div class="card section-mb">
+    <div class="card-title">
+      <span>Daily Performance Heatmap
+        
+      </span>
+    </div>
+    <div class="heatmap-wrap">
+      <table class="heatmap-table">
+        <thead>
+          <tr>
+            <th class="date-col">DATE</th>
+            <th>SPEND</th>
+            <th>CPM</th>
+            <th>CPC</th>
+            <th>CTR</th>
+            <th>ROAS</th>
+            <th>CONV</th>
+            <th class="has-tooltip">RESULTS<div class="tooltip-box bottom"><div class="tt-row"><span class="tt-value">Sum of the selected result types across all campaigns</span></div></div></th>
+            <th>3S VIDEO</th>
+            <th>THRUPLAY</th>
+          </tr>
+        </thead>
+        <tbody id="heatmap-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ROW 3: BAR + PIE -->
+  <div class="dm-row cols-equal section-mb">
+    <div class="card">
+      <div class="card-title">
+        <span>Top Campaigns by CTR
+          
+        </span>
+      </div>
+      <div class="bar-chart-area" id="bar-chart"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>Budget Distribution
+          
+        </span>
+      </div>
+      <svg viewBox="0 0 200 200" style="width:140px;height:140px;display:block;margin:0 auto;" id="budget-pie-svg">
+        <circle cx="100" cy="100" r="70" fill="none" stroke="#23A9F6" stroke-width="30" stroke-dasharray="120 264" stroke-dashoffset="0"/>
+        <circle cx="100" cy="100" r="70" fill="none" stroke="#7c3aed" stroke-width="30" stroke-dasharray="66 264" stroke-dashoffset="-120"/>
+        <circle cx="100" cy="100" r="70" fill="none" stroke="#f59e0b" stroke-width="30" stroke-dasharray="44 264" stroke-dashoffset="-186"/>
+        <circle cx="100" cy="100" r="70" fill="none" stroke="#10b981" stroke-width="30" stroke-dasharray="34 264" stroke-dashoffset="-230"/>
+        <circle cx="100" cy="100" r="55" fill="white"/>
+        <text x="100" y="96" text-anchor="middle" font-size="11" font-weight="700" font-family="Poppins" fill="#102532">$3,240</text>
+        <text x="100" y="110" text-anchor="middle" font-size="8" fill="#707070" font-family="Poppins">daily budget</text>
+      </svg>
+      <div class="pie-legend">
+        <div class="pie-legend-item"><div class="pie-dot" style="background:#23A9F6"></div><span class="pie-name">Summer Sale 2025</span><span class="pie-pct">34%</span></div>
+        <div class="pie-legend-item"><div class="pie-dot" style="background:#7c3aed"></div><span class="pie-name">Brand Awareness Q2</span><span class="pie-pct">25%</span></div>
+        <div class="pie-legend-item"><div class="pie-dot" style="background:#f59e0b"></div><span class="pie-name">Retargeting — Cart</span><span class="pie-pct">17%</span></div>
+        <div class="pie-legend-item"><div class="pie-dot" style="background:#10b981"></div><span class="pie-name">New Product Launch</span><span class="pie-pct">13%</span></div>
+        <div class="pie-legend-item"><div class="pie-dot" style="background:#e5e7eb"></div><span class="pie-name">Others (4)</span><span class="pie-pct">11%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAMPAIGNS TABLE -->
+  <div class="card section-mb">
+    <div class="card-title">Campaign Performance</div>
+    <table class="campaigns-table">
+      <thead>
+        <tr>
+          <th>CAMPAIGN</th>
+          <th>STATUS</th>
+          <th>OBJECTIVE</th>
+          <th>BUDGET/DAY</th>
+          <th>SPEND</th>
+          <th>IMPRESSIONS</th>
+          <th>CLICKS</th>
+          <th>CTR</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:600;color:#102532">Summer Sale 2025</td>
+          <td><span class="status-dot status-active"></span>Active</td>
+          <td><span class="obj-tag">Sales</span></td>
+          <td>$800</td>
+          <td style="font-weight:600">$5,420</td>
+          <td>128,600</td>
+          <td>3,012</td>
+          <td style="color:#23A9F6;font-weight:700">2.34%</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#102532">Brand Awareness Q2</td>
+          <td><span class="status-dot status-active"></span>Active</td>
+          <td><span class="obj-tag">Awareness</span></td>
+          <td>$600</td>
+          <td style="font-weight:600">$3,918</td>
+          <td>246,000</td>
+          <td>2,460</td>
+          <td style="color:#23A9F6;font-weight:700">1.00%</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#102532">Retargeting — Cart</td>
+          <td><span class="status-dot status-active"></span>Active</td>
+          <td><span class="obj-tag">Sales</span></td>
+          <td>$400</td>
+          <td style="font-weight:600">$2,750</td>
+          <td>42,000</td>
+          <td>1,680</td>
+          <td style="color:#52C41A;font-weight:700">4.00%</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#102532">New Product Launch</td>
+          <td><span class="status-dot status-active"></span>Active</td>
+          <td><span class="obj-tag">Traffic</span></td>
+          <td>$350</td>
+          <td style="font-weight:600">$2,100</td>
+          <td>87,500</td>
+          <td>1,575</td>
+          <td style="color:#23A9F6;font-weight:700">1.80%</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;color:#102532">Lookalike — Purchasers</td>
+          <td><span class="status-dot status-paused"></span>Paused</td>
+          <td><span class="obj-tag">Sales</span></td>
+          <td>$250</td>
+          <td style="font-weight:600">$980</td>
+          <td>32,400</td>
+          <td>680</td>
+          <td style="color:#707070;font-weight:700">2.10%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- AI INSIGHTS -->
+  <div class="ai-card section-mb">
+    <div class="ai-card-header">
+      <div class="ai-icon">✦</div>
+      <div>
+        <div style="font-weight:700;font-size:14px;">AI Advisor — Performance Insights</div>
+        <div style="font-size:11px;color:#707070;">Based on your last 7 days of data · Updated 2 hours ago</div>
+      </div>
+    </div>
+    <div class="ai-insights-list">
+      <div class="ai-insight-item alert">
+        <strong>⚠ Audience Fatigue Detected:</strong> Average frequency reached <strong>3.8×</strong> — above the 3.5 warning threshold. Campaigns "Summer Sale 2025" and "Brand Awareness Q2" are most affected. Consider refreshing creatives or expanding audience targeting this week.
+      </div>
+      <div class="ai-insight-item warn">
+        <strong>Budget Imbalance:</strong> BOFU campaigns account for only 22% of budget but are generating 68% of conversions. Consider shifting 15–20% of budget from TOFU to BOFU retargeting for immediate ROAS improvement.
+      </div>
+      <div class="ai-insight-item">
+        <strong>CTR Trending Up:</strong> CTR improved from 1.93% to 2.34% over the past 7 days, now within the P50–P75 benchmark band. The "Retargeting — Cart" campaign at 4.0% CTR is your top performer — study its creative formula.
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- SCENARIO FLYOUT PANEL -->
+<div id="scenario-flyout">
+  <div id="sf-header">
+    <div id="sf-header-left">
+      <div id="sf-icon">📊</div>
+      <div>
+        <div id="sf-title">使用場景</div>
+        <div id="sf-subtitle">Demonstrate Mode — 銷售培訓</div>
+      </div>
+    </div>
+    <button id="sf-close" onclick="closeFlyout()">✕</button>
+  </div>
+  <div id="sf-body"></div>
+</div>
+
+<!-- DEMO OVERLAY -->
+<div class="demo-overlay" id="demoOverlay">
+  <div class="demo-panel">
+    <div class="demo-header">
+      <h2>Performance Page — How to Read It</h2>
+      <p>3 core questions a marketer should answer every time they open this page</p>
+    </div>
+    <div class="demo-questions">
+
+      <!-- Q1 -->
+      <div class="demo-q">
+        <div class="demo-q-header">
+          <div class="demo-q-num">1</div>
+          <div>
+            <div class="demo-q-text">本週廣告整體跑得好不好？</div>
+            <div class="demo-q-sub">Is overall ad performance good this week?</div>
+          </div>
+        </div>
+        <div class="demo-callouts">
+          <div class="demo-callout">
+            <div class="demo-callout-title">
+              <span class="callout-tag info">看這裡</span>
+              KPI Cards — CTR / ROAS / CPA 的數值與趨勢箭頭
+            </div>
+            <div class="demo-callout-body">
+              <div class="demo-mini-ui info-border" style="display:flex;gap:12px;flex-wrap:wrap;position:relative;">
+                <div class="callout-arrow info"></div>
+                <div style="text-align:center;">
+                  <div class="mini-label-sm">CTR</div>
+                  <div class="mini-val-sm" style="color:#23A9F6">2.34%</div>
+                  <div style="font-size:10px;color:#52C41A;">↑ +0.41%</div>
+                </div>
+                <div style="text-align:center;">
+                  <div class="mini-label-sm">ROAS</div>
+                  <div class="mini-val-sm">3.72×</div>
+                  <div style="font-size:10px;color:#52C41A;">↑ +0.31×</div>
+                </div>
+                <div style="text-align:center;">
+                  <div class="mini-label-sm">CPA</div>
+                  <div class="mini-val-sm">$18.4</div>
+                  <div style="font-size:10px;color:#52C41A;">↓ -$2.1</div>
+                </div>
+              </div>
+              <div class="callout-explain blue">
+                <span class="highlight-label blue">判斷方法</span>
+                看三個箭頭方向：CTR↑ = 廣告越來越吸引人；ROAS↑ = 投資回報在改善；CPA↓ = 每次轉換花得越來越少。三個同時往好的方向，代表本週廣告整體健康。
+              </div>
+            </div>
+          </div>
+
+          <div class="demo-callout">
+            <div class="demo-callout-title">
+              <span class="callout-tag info">看這裡</span>
+              Trend Chart — CTR 線 vs 灰色 Benchmark Band
+            </div>
+            <div class="demo-callout-body">
+              <div class="demo-mini-ui info-border" style="position:relative;">
+                <div class="callout-arrow info"></div>
+                <svg width="100%" height="80" viewBox="0 0 400 80">
+                  <polygon points="0,52 80,50 160,51 240,48 320,45 400,42 400,62 320,60 240,56 160,58 80,59 0,61" fill="#e5e7eb" opacity="0.8"/>
+                  <polyline points="0,54 80,50 160,53 240,46 320,38 400,33" fill="none" stroke="#23A9F6" stroke-width="2.5"/>
+                  <text x="5" y="28" font-size="8" fill="#52C41A" font-family="Poppins" font-weight="700">✓ CTR 在灰帶內甚至高於 P50</text>
+                  <line x1="0" y1="30" x2="0" y2="54" stroke="#52C41A" stroke-width="1" stroke-dasharray="2"/>
+                  <text x="200" y="72" font-size="8" fill="#9ca3af" font-family="Poppins">→ 日期</text>
+                  <text x="2" y="46" font-size="7" fill="#9ca3af" font-family="Poppins">P25</text>
+                  <text x="2" y="62" font-size="7" fill="#9ca3af" font-family="Poppins">P75</text>
+                </svg>
+              </div>
+              <div class="callout-explain blue">
+                <span class="highlight-label blue">判斷方法</span>
+                灰帶 = 本帳號歷史正常區間（P25–P75）。CTR 藍線在帶內 = 正常；持續高於帶 = 超常發揮；持續低於帶 = 需警惕。
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="demo-q">
+        <div class="demo-q-header">
+          <div class="demo-q-num">2</div>
+          <div>
+            <div class="demo-q-text">錢花在哪裡，花得值不值？</div>
+            <div class="demo-q-sub">Where is budget going, and is it worth it?</div>
+          </div>
+        </div>
+        <div class="demo-callouts">
+          <div class="demo-callout">
+            <div class="demo-callout-title">
+              <span class="callout-tag warn">看這裡</span>
+              Budget Distribution Pie — 各活動預算佔比
+            </div>
+            <div class="demo-callout-body">
+              <div class="demo-mini-ui warn-border" style="display:flex;align-items:center;gap:16px;position:relative;">
+                <div class="callout-arrow warn"></div>
+                <svg viewBox="0 0 100 100" width="80" height="80">
+                  <circle cx="50" cy="50" r="35" fill="none" stroke="#23A9F6" stroke-width="15" stroke-dasharray="66 220" stroke-dashoffset="0"/>
+                  <circle cx="50" cy="50" r="35" fill="none" stroke="#7c3aed" stroke-width="15" stroke-dasharray="33 220" stroke-dashoffset="-66"/>
+                  <circle cx="50" cy="50" r="35" fill="none" stroke="#f59e0b" stroke-width="15" stroke-dasharray="22 220" stroke-dashoffset="-99"/>
+                  <circle cx="50" cy="50" r="35" fill="none" stroke="#10b981" stroke-width="15" stroke-dasharray="17 220" stroke-dashoffset="-121"/>
+                  <circle cx="50" cy="50" r="27" fill="white"/>
+                </svg>
+                <div style="font-size:11px;">
+                  <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><div style="width:10px;height:10px;border-radius:50%;background:#23A9F6;"></div> Summer Sale 34%</div>
+                  <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><div style="width:10px;height:10px;border-radius:50%;background:#7c3aed;"></div> Brand Awareness 25%</div>
+                  <div style="display:flex;align-items:center;gap:6px;"><div style="width:10px;height:10px;border-radius:50%;background:#10b981;"></div> <strong>BOFU only 13%</strong> ⚠</div>
+                </div>
+              </div>
+              <div class="callout-explain">
+                <span class="highlight-label warn">判斷方法</span>
+                BOFU（轉換）活動佔預算比例太低，但它們的 ROAS 最高。這種分配方式代表大量預算在「讓人知道」，但沒有足夠的預算「讓人買」。
+              </div>
+            </div>
+          </div>
+
+          <div class="demo-callout">
+            <div class="demo-callout-title">
+              <span class="callout-tag warn">看這裡</span>
+              Campaign Table — 對比 SPEND 與 CTR 欄位
+            </div>
+            <div class="demo-callout-body">
+              <div class="demo-mini-ui warn-border" style="position:relative;overflow-x:auto;">
+                <div class="callout-arrow warn"></div>
+                <table style="width:100%;font-size:11px;border-collapse:collapse;">
+                  <thead>
+                    <tr style="border-bottom:2px solid #f0f0f0;">
+                      <th style="text-align:left;padding:6px;font-size:10px;color:#707070;">CAMPAIGN</th>
+                      <th style="padding:6px;font-size:10px;color:#707070;">SPEND ↓</th>
+                      <th style="padding:6px;font-size:10px;color:#707070;background:#fffbeb;">CTR</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td style="padding:6px;">Summer Sale 2025</td><td style="text-align:center;font-weight:600;padding:6px;">$5,420</td><td style="text-align:center;color:#23A9F6;font-weight:700;background:#fffbeb;padding:6px;">2.34%</td></tr>
+                    <tr><td style="padding:6px;">Brand Awareness Q2</td><td style="text-align:center;font-weight:600;padding:6px;">$3,918</td><td style="text-align:center;color:#707070;font-weight:700;background:#fffbeb;padding:6px;">1.00%</td></tr>
+                    <tr style="background:#f0fdf4;"><td style="padding:6px;">Retargeting — Cart</td><td style="text-align:center;font-weight:600;padding:6px;">$2,750</td><td style="text-align:center;color:#52C41A;font-weight:700;background:#fffbeb;padding:6px;">4.00% ★</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="callout-explain">
+                <span class="highlight-label warn">判斷方法</span>
+                看 Spend 最多的活動，其 CTR 是否匹配其預算比重？"Brand Awareness Q2" 花費 $3,918 但 CTR 只有 1.00%，而 "Retargeting — Cart" 以更少預算跑出 4.0% CTR — 這提示預算可以往高 CTR 活動傾斜。
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="demo-q">
+        <div class="demo-q-header">
+          <div class="demo-q-num">3</div>
+          <div>
+            <div class="demo-q-text">有没有预警信号需要立刻处理？</div>
+            <div class="demo-q-sub">Are there warning signals that need immediate action?</div>
+          </div>
+        </div>
+        <div class="demo-callouts">
+
+          <!-- Callout 3a: Frequency -->
+          <div class="demo-callout">
+            <div class="demo-callout-title">
+              <span class="callout-tag">警示 A</span>
+              KPI Card — Frequency 值超過 3.5
+            </div>
+            <div class="demo-callout-body">
+              <div class="demo-mini-ui" style="display:inline-block;position:relative;">
+                <div class="callout-arrow"></div>
+                <div class="mini-label-sm">FREQUENCY</div>
+                <div class="mini-val-sm" style="color:#FF3F41;font-size:28px;">3.8</div>
+                <div class="mini-warn-sm">⚠ Above 3.5 — fatigue risk</div>
+              </div>
+              <div class="callout-explain red">
+                <span class="highlight-label">立刻行動</span>
+                Frequency &gt; 3.5 代表每個用戶平均看到你的廣告接近 4 次。研究顯示，超過 3 次後 CTR 往往開始下滑。<br><br>
+                <strong>行動建議：</strong> ① 更換創意素材 ② 擴大受眾（Lookalike 比例）③ 暫停表現最差的廣告組
+              </div>
+            </div>
+          </div>
+
+          <!-- Callout 3b: CTR trend -->
+          <div class="demo-callout">
+            <div class="demo-callout-title">
+              <span class="callout-tag">警示 B</span>
+              Trend Chart — CTR 趨勢線向下突破 Benchmark Band
+            </div>
+            <div class="demo-callout-body">
+              <div class="demo-mini-ui" style="position:relative;">
+                <div class="callout-arrow"></div>
+                <svg width="100%" height="90" viewBox="0 0 400 90">
+                  <!-- benchmark band -->
+                  <polygon points="0,42 80,40 160,42 240,40 320,38 400,36 400,58 320,56 240,55 160,54 80,52 0,54" fill="#e5e7eb" opacity="0.8"/>
+                  <!-- CTR line dropping below band -->
+                  <polyline points="0,46 80,48 160,52 240,60 320,70 400,78" fill="none" stroke="#FF3F41" stroke-width="2.5"/>
+                  <!-- dots -->
+                  <circle cx="320" cy="70" r="4" fill="#FF3F41" stroke="#fff" stroke-width="2"/>
+                  <circle cx="400" cy="78" r="4" fill="#FF3F41" stroke="#fff" stroke-width="2"/>
+                  <!-- alert text -->
+                  <text x="230" y="82" font-size="9" fill="#FF3F41" font-family="Poppins" font-weight="700">⚠ CTR 跌破 P25 下緣</text>
+                  <line x1="320" y1="58" x2="320" y2="68" stroke="#FF3F41" stroke-width="1.5" stroke-dasharray="2"/>
+                  <!-- band labels -->
+                  <text x="2" y="38" font-size="7" fill="#9ca3af" font-family="Poppins">P25</text>
+                  <text x="2" y="60" font-size="7" fill="#9ca3af" font-family="Poppins">P75</text>
+                  <text x="200" y="88" font-size="8" fill="#9ca3af" font-family="Poppins">→ 日期（最近 7 天）</text>
+                </svg>
+              </div>
+              <div class="callout-explain red">
+                <span class="highlight-label">判斷方法</span>
+                當 CTR 線（紅線）從灰帶內部向下穿越帶的下緣（P25），代表當前表現已低於歷史下四分位數。這通常預示受眾疲勞或競爭加劇。<br><br>
+                <strong>行動建議：</strong> ① 查看哪個廣告活動的 CTR 下滑最快（Campaign Table）② 重新審視受眾設定 ③ A/B 測試新創意
+              </div>
+            </div>
+          </div>
+
+          <!-- Callout 3c: Heatmap CPM orange -->
+          <div class="demo-callout">
+            <div class="demo-callout-title">
+              <span class="callout-tag">警示 C</span>
+              Daily Heatmap — CPM 欄位橙色加深
+            </div>
+            <div class="demo-callout-body">
+              <div class="demo-mini-ui" style="position:relative;">
+                <div class="callout-arrow"></div>
+                <table style="width:100%;border-collapse:collapse;font-size:10px;">
+                  <thead>
+                    <tr>
+                      <th style="text-align:left;padding:4px 8px;color:#707070;font-size:9px;border-bottom:2px solid #f0f0f0;">DATE</th>
+                      <th style="padding:4px 8px;color:#707070;font-size:9px;border-bottom:2px solid #f0f0f0;">SPEND</th>
+                      <th style="padding:4px 8px;color:#FF3F41;font-size:9px;font-weight:700;border-bottom:2px solid #FF3F41;">CPM ↑</th>
+                      <th style="padding:4px 8px;color:#707070;font-size:9px;border-bottom:2px solid #f0f0f0;">CTR</th>
+                      <th style="padding:4px 8px;color:#707070;font-size:9px;border-bottom:2px solid #f0f0f0;">ROAS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td style="padding:4px 8px;color:#707070;">May 11</td><td style="text-align:center;padding:4px 8px;background:rgba(167,139,250,0.2);">$820</td><td style="text-align:center;padding:4px 8px;background:rgba(234,88,12,0.18);font-weight:600;">$38.2</td><td style="text-align:center;padding:4px 8px;background:rgba(125,211,252,0.3);color:#102532;">2.1%</td><td style="text-align:center;padding:4px 8px;background:rgba(125,211,252,0.25);">3.4</td></tr>
+                    <tr><td style="padding:4px 8px;color:#707070;">May 12</td><td style="text-align:center;padding:4px 8px;background:rgba(167,139,250,0.25);">$890</td><td style="text-align:center;padding:4px 8px;background:rgba(234,88,12,0.38);font-weight:600;color:#7c2d12;">$47.5</td><td style="text-align:center;padding:4px 8px;background:rgba(125,211,252,0.2);">1.8%</td><td style="text-align:center;padding:4px 8px;background:rgba(125,211,252,0.15);">2.9</td></tr>
+                    <tr style="background:#fff9f9;"><td style="padding:4px 8px;color:#707070;">May 13</td><td style="text-align:center;padding:4px 8px;background:rgba(167,139,250,0.3);">$940</td><td style="text-align:center;padding:4px 8px;background:rgba(234,88,12,0.6);font-weight:600;color:#fff;border-radius:4px;">$58.1 ⚠</td><td style="text-align:center;padding:4px 8px;background:rgba(125,211,252,0.1);">1.5%</td><td style="text-align:center;padding:4px 8px;background:rgba(125,211,252,0.08);">2.4</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="callout-explain red">
+                <span class="highlight-label">判斷方法</span>
+                CPM 欄位橙色越深 = 每千次曝光成本越貴。對比同日的 CTR 和 ROAS：如果 CPM 上漲但 CTR 和 ROAS 同步下滑，代表「花得更多、換來更少」。<br><br>
+                May 13 的 CPM $58.1 比 May 11 的 $38.2 上漲了 52%，同時 CTR 從 2.1% 跌至 1.5%，ROAS 從 3.4 跌至 2.4 — 這是三重警報。<br><br>
+                <strong>可能原因：</strong> 競拍競爭加劇（如節日、大促）、受眾過窄、廣告 Relevance Score 下滑。<strong>行動：</strong> 擴大受眾或暫停高 CPM 廣告組。
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /demo-callouts -->
+      </div><!-- /Q3 -->
+
+    </div><!-- /demo-questions -->
+    <div style="padding:16px 32px 24px;text-align:center;display:flex;gap:12px;justify-content:center;">
+      <button onclick="closePopupEnterPage()" style="background:#102532;color:#fff;border:none;border-radius:10px;padding:10px 28px;font-family:Poppins;font-size:13px;font-weight:600;cursor:pointer;">進入頁面查看 →</button>
+      <button onclick="toggleDemo()" style="background:#fff;color:#707070;border:1px solid #e5e7eb;border-radius:10px;padding:10px 28px;font-family:Poppins;font-size:13px;font-weight:500;cursor:pointer;">關閉 Demonstrate Mode</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---------- HEATMAP DATA ----------
+const heatmapData = [
+  { date: 'May 9',  spend: 880,  cpm: 40.2, cpc: 1.72, ctr: 2.34, roas: 3.8, conv: 98,  results: 112, v3s: 28400, thru: 8200 },
+  { date: 'May 10', spend: 910,  cpm: 42.1, cpc: 1.80, ctr: 2.18, roas: 3.6, conv: 102, results: 118, v3s: 29100, thru: 8500 },
+  { date: 'May 11', spend: 820,  cpm: 38.2, cpc: 1.68, ctr: 2.10, roas: 3.4, conv: 94,  results: 108, v3s: 26800, thru: 7800 },
+  { date: 'May 12', spend: 890,  cpm: 47.5, cpc: 1.92, ctr: 1.80, roas: 2.9, conv: 88,  results: 100, v3s: 24200, thru: 7100 },
+  { date: 'May 13', spend: 940,  cpm: 58.1, cpc: 2.10, ctr: 1.50, roas: 2.4, conv: 76,  results: 90,  v3s: 21000, thru: 6200 },
+  { date: 'May 14', spend: 1020, cpm: 44.0, cpc: 1.85, ctr: 2.28, roas: 3.5, conv: 110, results: 126, v3s: 30100, thru: 8900 },
+  { date: 'May 15', spend: 1100, cpm: 41.0, cpc: 1.78, ctr: 2.44, roas: 3.9, conv: 120, results: 138, v3s: 32400, thru: 9400 },
+];
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+function toHex(r,g,b) { return '#'+[r,g,b].map(v=>Math.round(v).toString(16).padStart(2,'0')).join(''); }
+
+function purpleCell(val, min, max) {
+  const t = Math.max(0, Math.min(1, (val - min) / (max - min)));
+  // transparent to #a78bfa
+  const r = lerp(247, 167, t), g = lerp(247, 139, t), b = lerp(247, 250, t);
+  return { bg: `rgba(167,139,250,${(t*0.6).toFixed(2)})`, text: `$${val.toLocaleString()}` };
+}
+function orangeCell(val, min, max) {
+  const t = Math.max(0, Math.min(1, (val - min) / (max - min)));
+  return { bg: `rgba(234,88,12,${(t*0.65).toFixed(2)})`, text: `$${val.toFixed(1)}` };
+}
+function blueCell(val, min, max, fmt) {
+  const t = Math.max(0, Math.min(1, (val - min) / (max - min)));
+  let text;
+  if (fmt==='pct') text = val.toFixed(2)+'%';
+  else if (fmt==='dec') text = val.toFixed(1)+'×';
+  else text = val.toLocaleString();
+  return { bg: `rgba(125,211,252,${(t*0.55).toFixed(2)})`, text };
+}
+
+function buildHeatmap() {
+  const spends = heatmapData.map(d=>d.spend);
+  const cpms   = heatmapData.map(d=>d.cpm);
+  const cpcs   = heatmapData.map(d=>d.cpc);
+  const ctrs   = heatmapData.map(d=>d.ctr);
+  const roass  = heatmapData.map(d=>d.roas);
+  const convs  = heatmapData.map(d=>d.conv);
+  const ress   = heatmapData.map(d=>d.results);
+  const v3s    = heatmapData.map(d=>d.v3s);
+  const thrus  = heatmapData.map(d=>d.thru);
+
+  const minMax = arr => [Math.min(...arr), Math.max(...arr)];
+  const [sMin, sMax] = minMax(spends);
+  const [cpmMin, cpmMax] = minMax(cpms);
+  const [cpcMin, cpcMax] = minMax(cpcs);
+  const [ctrMin, ctrMax] = minMax(ctrs);
+  const [roasMin, roasMax] = minMax(roass);
+  const [convMin, convMax] = minMax(convs);
+  const [resMin, resMax] = minMax(ress);
+  const [v3Min, v3Max] = minMax(v3s);
+  const [thMin, thMax] = minMax(thrus);
+
+  const tbody = document.getElementById('heatmap-body');
+  heatmapData.forEach(d => {
+    const sp = purpleCell(d.spend, sMin, sMax);
+    const cm = orangeCell(d.cpm, cpmMin, cpmMax);
+    const cp = orangeCell(d.cpc, cpcMin, cpcMax);
+    const ct = blueCell(d.ctr, ctrMin, ctrMax, 'pct');
+    const ro = blueCell(d.roas, roasMin, roasMax, 'dec');
+    const co = blueCell(d.conv, convMin, convMax, 'int');
+    const re = blueCell(d.results, resMin, resMax, 'int');
+    const v3 = blueCell(d.v3s, v3Min, v3Max, 'int');
+    const th = blueCell(d.thru, thMin, thMax, 'int');
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="date-cell">${d.date}</td>
+      <td style="background:${sp.bg}">${sp.text}</td>
+      <td style="background:${cm.bg}">${cm.text}</td>
+      <td style="background:${cp.bg}">${cp.text}</td>
+      <td style="background:${ct.bg}">${ct.text}</td>
+      <td style="background:${ro.bg}">${ro.text}</td>
+      <td style="background:${co.bg}">${co.text}</td>
+      <td style="background:${re.bg}">${re.text}</td>
+      <td style="background:${v3.bg}">${v3.text.toLocaleString()}</td>
+      <td style="background:${th.bg}">${th.text.toLocaleString()}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ---------- BAR CHART ----------
+const barData = [
+  { name: 'Retargeting — Cart', ctr: 4.00 },
+  { name: 'DABA — Catalog', ctr: 3.21 },
+  { name: 'Lookalike 3%', ctr: 2.88 },
+  { name: 'Summer Sale 2025', ctr: 2.34 },
+  { name: 'New Product Launch', ctr: 1.80 },
+  { name: 'Brand Awareness Q2', ctr: 1.00 },
+];
+
+function buildBarChart() {
+  const maxCtr = Math.max(...barData.map(d=>d.ctr));
+  const container = document.getElementById('bar-chart');
+  barData.forEach(d => {
+    const pct = (d.ctr / maxCtr * 100).toFixed(0);
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML = `
+      <div class="bar-name" title="${d.name}">${d.name}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${pct}%">${d.ctr >= 2 ? d.ctr.toFixed(2)+'%' : ''}</div>
+      </div>
+      <div class="bar-val">${d.ctr.toFixed(2)}%</div>
+    `;
+    container.appendChild(row);
+  });
+}
+
+// ========== SCENARIO DATA ==========
+const SCENARIOS = {
+  'kpi-spend': [
+    { q: 2, qText: '錢花在哪裡，花得值不值？',
+      how: '看花費數字和 vs prev 箭頭。↓ 代表本週花費比上週少，↑ 代表更多。SPEND 是所有分析的基準數字。',
+      present: '「這是您這週花了多少廣告費。我們接下來一起看這筆錢帶回來了多少。」',
+      action: '單看 SPEND 無法判斷好壞，必須搭配 ROAS 或 CONV VALUE 才能說這筆錢花得值不值。' }
+  ],
+  'kpi-roas': [
+    { q: 1, qText: '本週廣告整體跑得好不好？',
+      how: '看 vs prev 箭頭：↑ = 回報在改善，↓ = 回報惡化。ROAS 是整體廣告健康度最直觀的指標。',
+      present: '「ROAS 代表每花 $1 廣告費帶來幾元收入。這週 ROAS 是 X，比上週改善了 / 下滑了。」',
+      action: 'ROAS > 3 通常健康；< 2 考慮暫停或調整；> 4 可考慮加預算。' },
+    { q: 2, qText: '錢花在哪裡，花得值不值？',
+      how: 'ROAS 直接回答「花得值不值」。= 1 代表收支平衡（未計成本）；> 1 才有盈利空間。',
+      present: '「這個數字告訴您，每一塊廣告費換回了幾塊錢的營收。」',
+      action: '若 Objective 非 Sales，ROAS 顯示 0.00x —— 此時改看 Cost/Result 或 CONV VALUE。' }
+  ],
+  'kpi-ctr': [
+    { q: 1, qText: '本週廣告整體跑得好不好？',
+      how: 'CTR ↑ = 廣告越來越吸引人。注意 Benchmark 滑桿位置 —— 黃色在左邊偏低，綠色在右邊偏高，越右越好。',
+      present: '「這是廣告的點擊率。每 100 次曝光中，有 X 個人點了廣告，這週比上週好了 / 差了 X%。」',
+      action: 'CTR < 1% 通常需優化創意或受眾；2–3% 為電商良好區間；持續低於 Benchmark Band 下緣需警戒。' },
+    { q: 3, qText: '有沒有預警信號需要立刻處理？',
+      how: 'CTR 大幅下滑（↓ 跌幅 > 15%）+ Benchmark 滑桿偏左，是受眾疲勞或創意失效的警示信號。',
+      present: '「您看 CTR 比上週跌了 26%，這通常代表廣告吸引力下降，受眾可能已看膩了相同的廣告。」',
+      action: '① 查看 Campaign Table 哪個活動 CTR 跌幅最大 ② 更換創意素材 ③ 擴大受眾（Ad Set Analysis 頁）' }
+  ],
+  'kpi-cpc': [
+    { q: 1, qText: '本週廣告整體跑得好不好？',
+      how: 'CPC ↓ = 每個點擊越來越便宜，廣告效率提升。搭配 CTR 一起看 —— 兩者通常成反比。',
+      present: '「這是每帶來一個用戶點擊您廣告的費用。這週每次點擊花了 $X，比上週便宜了 / 貴了。」',
+      action: 'CPC 高 + CTR 低 → 廣告缺乏吸引力；CPC 高 + CTR 高 → 競拍激烈，需評估 ROAS 是否值得。' }
+  ],
+  'kpi-cpm': [
+    { q: 3, qText: '有沒有預警信號需要立刻處理？',
+      how: 'CPM ↑（尤其 +20% 以上）= 市場競拍成本上升。Benchmark 滑桿越往右代表越貴（成本指標，越高越差）。',
+      present: '「CPM 代表觸及 1,000 個用戶的成本。這週 CPM 漲了，代表廣告競爭更激烈或受眾過窄。」',
+      action: '① 看 Heatmap CPM 欄，找哪幾天橙色最深 ② 考慮擴大受眾 ③ 提高廣告相關性（更換創意）' }
+  ],
+  'kpi-cost-result': [
+    { q: 1, qText: '本週廣告整體跑得好不好？',
+      how: 'Cost/Result ↓ = 每達成一次目標越來越便宜。注意：不同 Objective 的 Result 定義不同，不可跨目標比較。',
+      present: '「這是帶來一個結果（購買 / 點擊 / 線索）的平均成本。Sales Objective = CPA（每次購買成本）。」',
+      action: '對比上週箭頭：↓ = 效率提升（好）；↑ = 效率下滑（需查原因）。先確認 Result 的定義再向客人解釋。' }
+  ],
+  'kpi-conversions': [
+    { q: 1, qText: '本週廣告整體跑得好不好？',
+      how: 'Conversions ↑ = 廣告帶來更多轉換。若為 0 且有 Spend，通常代表 Pixel / CAPI 未正確設定。',
+      present: '「這是廣告帶來的轉換次數，例如購買或填表。這週達成了 X 次，比上週多了 / 少了。」',
+      action: '若 Conversions = 0：① 確認 Pixel 是否正常回傳事件 ② 確認 Campaign Objective 是 Sales / Leads ③ 排查歸因視窗設定' }
+  ],
+  'kpi-conv-value': [
+    { q: 2, qText: '錢花在哪裡，花得值不值？',
+      how: 'CONV VALUE = 廣告帶來的總營收。直接對比 SPEND：CONV VALUE ÷ SPEND = ROAS。最直觀的「值不值」指標。',
+      present: '「這是您廣告這週帶來的總銷售額。您花了 $X 廣告費，帶回了 $Y 的營收。」',
+      action: '若 CONV VALUE = $0，通常 Objective 不是 Sales 或 Pixel 未回傳購買金額。需先解決追蹤問題再評估效益。' }
+  ],
+  'card-trend': [
+    { q: 1, qText: '本週廣告整體跑得好不好？',
+      how: 'CTR 藍線在灰色 Benchmark Band（P25–P75）內且向上 = 表現正常且改善中。CPC 青虛線向下 = 點擊成本在降低。',
+      present: '「這張圖看的是每天廣告的點擊率趨勢。灰色區域是這個帳號的歷史正常範圍，藍線在帶內就是正常，高於帶就是超水準。」',
+      action: 'CTR 線在帶內且向上，是向客人報告「廣告整體往好的方向走」的有力視覺依據。' },
+    { q: 3, qText: '有沒有預警信號需要立刻處理？',
+      how: 'CTR 藍線向下穿破灰帶下緣（P25），是重要預警。若同時 CPC 虛線上升，代表「點擊越來越少且越來越貴」。',
+      present: '「您看這條藍線跌到灰色區間以下了，代表廣告表現已低於這個帳號歷史的下四分位，這是需要行動的信號。」',
+      action: '① 找出哪個 Campaign CTR 跌幅最大（Campaign Table）② 查 Ad Set 頁面確認 Frequency 是否過高 ③ 更換創意' }
+  ],
+  'card-heatmap': [
+    { q: 3, qText: '有沒有預警信號需要立刻處理？',
+      how: 'CPM 欄橙色：哪天最深 = 那天競拍成本最貴。再看那天 CTR 欄是否同步變淺（藍色淺）= 「花更多、效果更差」的雙重警訊。',
+      present: '「這張熱力圖讓您一眼看出每天廣告起伏。CPM 橙色越深代表那天越貴，如果 CTR 同時變淺，就是需要警惕的組合。」',
+      action: '找出連續 2–3 天 CPM 深橙 + CTR 淺藍的段落，優先排查那幾天的受眾重疊或競拍競爭情況。' }
+  ],
+  'card-budget': [
+    { q: 2, qText: '錢花在哪裡，花得值不值？',
+      how: '看哪個 Campaign 佔最大比例預算，再對照其 ROAS / CTR（Campaign Table），判斷錢是否花在最值得的活動上。',
+      present: '「這個圖讓您看到預算的分配。X% 的預算花在了「Campaign A」上，我們來看這個活動的 ROAS 是否對得起這個比例。」',
+      action: '若高預算活動 ROAS 低、低預算活動 ROAS 高 → 建議重新分配預算比例，把錢移到高效活動。' }
+  ],
+  'card-campaigns': [
+    { q: 2, qText: '錢花在哪裡，花得值不值？',
+      how: '表格預設按 SPEND 降序。重點：找出 SPEND 最高但 CTR 最低的活動 —— 這就是「最花錢但最不吸引人」的廣告。',
+      present: '「我們來看花最多錢的幾個活動，它們的點擊率是多少？高 Spend + 低 CTR 代表您的預算花在沒吸引力的廣告上。」',
+      action: '① 找 Spend 最高的前 3 個活動 ② 比較它們的 CTR ③ CTR 明顯偏低的考慮暫停並把預算移給高 CTR 活動' }
+  ],
+  'card-funnel': [
+    { q: 2, qText: '錢花在哪裡，花得值不值？',
+      how: 'BOFU（綠）= 轉換導向預算比例；TOFU（藍）= 認知導向。BOFU 比例低但 ROAS 高，代表轉換活動效率好但資源不足。',
+      present: '「這個圖看廣告預算在三個漏斗階段的分配。X% 在認知，Y% 在轉換。如果轉換活動 ROAS 很好但預算只有 Y%，有加大空間。」',
+      action: '若 BOFU 活動 ROAS > 3 但預算 < 20%，建議增加 BOFU 比例，同比降低低效 TOFU 活動的預算。' }
+  ]
+};
+
+// ========== SCENARIO SYSTEM ==========
+let activeCardEl = null;
+let scenariosInitialized = false;
+
+function findKpiByLabel(text) {
+  for (const label of document.querySelectorAll('.kpi-label')) {
+    if (label.textContent.replace(/[?？]/g,'').trim().toUpperCase().startsWith(text.toUpperCase())) {
+      return label.closest('.kpi-card');
+    }
+  }
+  return null;
+}
+
+function findCardByTitle(text) {
+  for (const title of document.querySelectorAll('.card-title')) {
+    if (title.textContent.includes(text)) return title.closest('.card');
+  }
+  return null;
+}
+
+function initScenarios() {
+  if (scenariosInitialized) return;
+  scenariosInitialized = true;
+
+  const cardMap = [
+    { find: () => findKpiByLabel('SPEND'),        key: 'kpi-spend' },
+    { find: () => findKpiByLabel('ROAS'),         key: 'kpi-roas' },
+    { find: () => findKpiByLabel('CTR'),          key: 'kpi-ctr' },
+    { find: () => findKpiByLabel('CPC'),          key: 'kpi-cpc' },
+    { find: () => findKpiByLabel('CPM'),          key: 'kpi-cpm' },
+    { find: () => findKpiByLabel('COST/RESULT'),  key: 'kpi-cost-result' },
+    { find: () => findKpiByLabel('CONVERSIONS'),  key: 'kpi-conversions' },
+    { find: () => findKpiByLabel('CONV VALUE'),   key: 'kpi-conv-value' },
+    { find: () => findCardByTitle('Daily Performance Trend'),   key: 'card-trend' },
+    { find: () => findCardByTitle('Daily Performance Heatmap'), key: 'card-heatmap' },
+    { find: () => findCardByTitle('Budget Distribution'),       key: 'card-budget' },
+    { find: () => findCardByTitle('Campaign Performance'),      key: 'card-campaigns' },
+    { find: () => findCardByTitle('Funnel Distribution'),       key: 'card-funnel' },
+  ];
+
+  cardMap.forEach(({ find, key }) => {
+    const el = find();
+    if (!el || !SCENARIOS[key]) return;
+    el.classList.add('has-scenarios');
+    el.dataset.scenarioKey = key;
+    if (!el.style.position || el.style.position === 'static') el.style.position = 'relative';
+
+    const scenarios = SCENARIOS[key];
+    const qNums = [...new Set(scenarios.map(s => s.q))].sort();
+    const qColors = { 1: '#23A9F6', 2: '#f59e0b', 3: '#FF3F41' };
+
+    const badge = document.createElement('div');
+    badge.className = 'scenario-badge';
+    badge.innerHTML = `
+      <div style="display:flex;align-items:center;gap:7px;">
+        <span style="font-size:13px;">📊</span>
+        <span style="letter-spacing:0.3px;">使用場景 · 怎麼向客人展示</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;">
+        ${qNums.map(q => `<span class="sb-q-pill q${q}" style="border:1px solid ${qColors[q]}40;">Q${q}</span>`).join('')}
+        <span style="font-size:11px;margin-left:2px;">▸</span>
+      </div>`;
+    badge.addEventListener('click', e => { e.stopPropagation(); openFlyout(key, el); });
+    el.appendChild(badge);
+  });
+
+  // Close flyout on outside click
+  document.addEventListener('click', e => {
+    const flyout = document.getElementById('scenario-flyout');
+    if (flyout.classList.contains('open') && !flyout.contains(e.target)) closeFlyout();
+  });
+}
+
+function openFlyout(key, cardEl) {
+  const flyout = document.getElementById('scenario-flyout');
+  const scenarios = SCENARIOS[key];
+
+  // Toggle off same card
+  if (activeCardEl === cardEl && flyout.classList.contains('open')) { closeFlyout(); return; }
+  if (activeCardEl) activeCardEl.classList.remove('scenario-open');
+
+  activeCardEl = cardEl;
+  cardEl.classList.add('scenario-open');
+
+  const qColors = { 1: '#23A9F6', 2: '#f59e0b', 3: '#FF3F41' };
+  const qClass  = { 1: 'q1', 2: 'q2', 3: 'q3' };
+
+  document.getElementById('sf-title').textContent =
+    scenarios.length > 1 ? `${scenarios.length} 個使用場景` : '使用場景';
+
+  document.getElementById('sf-body').innerHTML = scenarios.map(s => `
+    <div class="sf-scenario">
+      <div class="sf-scenario-hd">
+        <span class="sf-q-badge" style="background:${qColors[s.q]}">Q${s.q}</span>
+        <span class="sf-q-text">${s.qText}</span>
+      </div>
+      <div class="sf-scenario-bd">
+        <div>
+          <div class="sf-block-label blue">怎麼看</div>
+          <div class="sf-block-text">${s.how}</div>
+        </div>
+        <div>
+          <div class="sf-block-label purple">怎麼介紹給客人</div>
+          <div class="sf-block-text">${s.present}</div>
+        </div>
+        <div class="sf-action-box ${qClass[s.q]}"><strong>決策建議：</strong>${s.action}</div>
+      </div>
+    </div>`).join('');
+
+  flyout.classList.add('open');
+  positionFlyout(cardEl);
+}
+
+function positionFlyout(cardEl) {
+  const flyout = document.getElementById('scenario-flyout');
+  const rect = cardEl.getBoundingClientRect();
+  const scrollY = window.scrollY;
+  const flyW = 360;
+  void flyout.offsetHeight;
+  const flyH = flyout.offsetHeight;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  // Prefer right of card; fallback left; fallback fixed right
+  let left = rect.right + window.scrollX + 16;
+  if (left + flyW > vw - 12) left = rect.left + window.scrollX - flyW - 16;
+  if (left < 12) left = vw - flyW - 20;
+
+  // Align top to card, clamp within viewport
+  let top = rect.top + scrollY;
+  const maxTop = scrollY + vh - flyH - 20;
+  const minTop = scrollY + 80;
+  top = Math.max(minTop, Math.min(top, maxTop));
+
+  flyout.style.left = left + 'px';
+  flyout.style.top  = top + 'px';
+}
+
+function closeFlyout() {
+  document.getElementById('scenario-flyout').classList.remove('open');
+  if (activeCardEl) { activeCardEl.classList.remove('scenario-open'); activeCardEl = null; }
+}
+
+// ========== DEMO TOGGLE ==========
+function closePopupEnterPage() {
+  // Close the popup overlay but keep demo-active mode (badges stay visible)
+  const overlay = document.getElementById('demoOverlay');
+  overlay.classList.remove('visible');
+  document.body.classList.add('demo-active');
+  initScenarios();
+}
+
+// ---------- DEMO TOGGLE ----------
+function toggleDemo() {
+  const overlay = document.getElementById('demoOverlay');
+  const btn = document.getElementById('demoToggle');
+  const label = document.getElementById('toggle-label');
+  const isCurrentlyOn = overlay.classList.contains('visible') || document.body.classList.contains('demo-active');
+
+  if (isCurrentlyOn) {
+    // Turn off everything
+    overlay.classList.remove('visible');
+    document.body.classList.remove('demo-active');
+    closeFlyout();
+    btn.classList.remove('on');
+    label.textContent = 'Normal View';
+  } else {
+    // Turn on: show popup
+    overlay.classList.add('visible');
+    overlay.scrollTop = 0;
+    document.body.classList.add('demo-active');
+    btn.classList.add('on');
+    label.textContent = 'Demonstrate Mode';
+    initScenarios();
+  }
+}
+
+// Close popup on backdrop click → enter page mode (keep badges)
+document.getElementById('demoOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closePopupEnterPage();
+});
+
+// ESC: close popup → enter page mode; if no popup, turn off demo entirely
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (document.getElementById('scenario-flyout').classList.contains('open')) { closeFlyout(); return; }
+  if (document.getElementById('demoOverlay').classList.contains('visible')) { closePopupEnterPage(); return; }
+  if (document.body.classList.contains('demo-active')) toggleDemo();
+});
+
+// ---------- TOOLTIP FLOATER ----------
+(function() {
+  const floater = document.createElement('div');
+  floater.id = 'tt-floater';
+  document.body.appendChild(floater);
+
+  function positionFloater(e) {
+    const margin = 16;
+    const pad = 12;
+    const w = floater.offsetWidth || 320;
+    const h = floater.offsetHeight || 100;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    // Prefer: right of cursor, below cursor; flip if overflows
+    let x = e.clientX + margin;
+    let y = e.clientY + margin;
+    if (x + w + pad > vw) x = e.clientX - w - margin;
+    if (y + h + pad > vh) y = e.clientY - h - margin;
+    floater.style.left = Math.max(pad, x) + 'px';
+    floater.style.top  = Math.max(pad, y) + 'px';
+  }
+
+  document.querySelectorAll('.has-tooltip').forEach(el => {
+    const tip = el.querySelector('.tooltip-box');
+    if (!tip) return;
+    el.addEventListener('mouseenter', function(e) {
+      floater.innerHTML = tip.innerHTML;
+      floater.style.display = 'block';
+      // Force synchronous layout so offsetHeight is accurate before positioning
+      void floater.offsetHeight;
+      positionFloater(e);
+    });
+    el.addEventListener('mousemove', positionFloater);
+    el.addEventListener('mouseleave', function() {
+      floater.style.display = 'none';
+    });
+  });
+})();
+
+buildHeatmap();
+buildBarChart();
+</script>
+
+<!-- RESULTS TYPE FILTER LOGIC -->
+<script>
+// Full enumeration per "results type 枚举.html" (PM-confirmed): 32 fixed Meta optimization_goal-mapped
+// display labels, grouped exactly as in that doc (Sales/Conversions, Leads, Traffic/Visits, Video/Awareness,
+// Engagement, Messaging, App/Calls/Other), plus one catch-all fallback row "Custom Conversion" (决策2 · 方案A)
+// that also covers any future/unrecognized Meta result type. spend/cur/prev are mocked demo data.
+const RESULT_TYPES = [
+  // Sales / Conversions
+  { key: 'purchases',            label: 'Purchases',                    grp: 'Sales / Conversions', cur: 1,    prev: 2,    spend: 2400, prevSpend: 1900 },
+  { key: 'add_to_cart',          label: 'Adds to Cart',                 grp: 'Sales / Conversions', cur: 15,   prev: 12,   spend: 300,  prevSpend: 260 },
+  { key: 'content_view',         label: 'Content Views',                grp: 'Sales / Conversions', cur: 2494, prev: 2280, spend: 1100, prevSpend: 980 },
+  { key: 'registration',         label: 'Registrations Completed',      grp: 'Sales / Conversions', cur: 264,  prev: 240,  spend: 900,  prevSpend: 830 },
+  { key: 'purchase_value',       label: 'Purchase Value',               grp: 'Sales / Conversions', cur: 0,    prev: 0,    spend: 0,    prevSpend: 0 },
+
+  // Leads
+  { key: 'leads',                label: 'Leads',                        grp: 'Leads', cur: 6,   prev: 9,   spend: 1400, prevSpend: 1150 },
+  { key: 'application_submitted',label: 'Applications Submitted',       grp: 'Leads', cur: 688, prev: 640, spend: 700,  prevSpend: 660 },
+
+  // Traffic / Visits
+  { key: 'link_click',           label: 'Link Clicks',                  grp: 'Traffic / Visits', cur: 512,  prev: 590,  spend: 3200, prevSpend: 3600 },
+  { key: 'landing_page_view',    label: 'Landing Page Views',           grp: 'Traffic / Visits', cur: 210,  prev: 240,  spend: 2200, prevSpend: 2500 },
+  { key: 'profile_visit',        label: 'Profile Visits',               grp: 'Traffic / Visits', cur: 6902, prev: 6400, spend: 500,  prevSpend: 470 },
+  { key: 'page_visit',           label: 'Page Visits',                  grp: 'Traffic / Visits', cur: 409,  prev: 380,  spend: 250,  prevSpend: 230 },
+
+  // Video / Awareness
+  { key: 'thruplay',             label: 'ThruPlays',                    grp: 'Video / Awareness', cur: 340,   prev: 300,   spend: 600,  prevSpend: 550 },
+  { key: 'video_2s',             label: '2-Sec Video Plays',            grp: 'Video / Awareness', cur: 610,   prev: 560,   spend: 400,  prevSpend: 430 },
+  { key: 'video_view',           label: 'Video Views',                  grp: 'Video / Awareness', cur: 0,     prev: 0,     spend: 0,    prevSpend: 0 },
+  { key: 'reach',                label: 'Reach',                        grp: 'Video / Awareness', cur: 24500, prev: 26800, spend: 4200, prevSpend: 4600 },
+  { key: 'impressions',          label: 'Impressions',                  grp: 'Video / Awareness', cur: 31000, prev: 33500, spend: 1200, prevSpend: 1300 },
+  { key: 'ad_recall_lift',       label: 'Estimated Ad Recall Lift',     grp: 'Video / Awareness', cur: 115,   prev: 100,   spend: 350,  prevSpend: 320 },
+
+  // Engagement
+  { key: 'post_engagement',      label: 'Post Engagements',             grp: 'Engagement', cur: 95118, prev: 88000, spend: 1600, prevSpend: 1500 },
+  { key: 'page_like',            label: 'Page Likes',                   grp: 'Engagement', cur: 37,    prev: 42,    spend: 150,  prevSpend: 170 },
+  { key: 'event_response',       label: 'Event Responses',              grp: 'Engagement', cur: 0,     prev: 1,     spend: 0,    prevSpend: 20 },
+  { key: 'profile_page_engagement', label: 'Profile & Page Engagement', grp: 'Engagement', cur: 0,     prev: 0,     spend: 0,    prevSpend: 0 },
+
+  // Messaging
+  { key: 'conversation',         label: 'Messaging Conversations',      grp: 'Messaging', cur: 9,  prev: 11, spend: 900, prevSpend: 1050 },
+  { key: 'messaging_purchase',   label: 'Messaging Purchases',          grp: 'Messaging', cur: 0,  prev: 0,  spend: 0,   prevSpend: 0 },
+  { key: 'messaging_appointment',label: 'Messaging Appointments',       grp: 'Messaging', cur: 0,  prev: 0,  spend: 0,   prevSpend: 0 },
+  { key: 'messaging_follow',     label: 'Messaging Follows',            grp: 'Messaging', cur: 0,  prev: 0,  spend: 0,   prevSpend: 0 },
+
+  // App / Calls / Other
+  { key: 'app_install',          label: 'App Installs',                 grp: 'App / Calls / Other', cur: 0, prev: 0, spend: 0, prevSpend: 0 },
+  { key: 'app_install_and_conv', label: 'App Installs & Conversions',   grp: 'App / Calls / Other', cur: 0, prev: 0, spend: 0, prevSpend: 0 },
+  { key: 'app_events',           label: 'App Events',                   grp: 'App / Calls / Other', cur: 0, prev: 0, spend: 0, prevSpend: 0 },
+  { key: 'app_retention',        label: 'App Retention',                grp: 'App / Calls / Other', cur: 0, prev: 0, spend: 0, prevSpend: 0 },
+  { key: 'calls',                label: 'Calls',                        grp: 'App / Calls / Other', cur: 0, prev: 0, spend: 0, prevSpend: 0 },
+  { key: 'subscribers',          label: 'Subscribers',                  grp: 'App / Calls / Other', cur: 0, prev: 0, spend: 0, prevSpend: 0 },
+  { key: 'reminders_set',        label: 'Reminders Set',                grp: 'App / Calls / Other', cur: 0, prev: 0, spend: 0, prevSpend: 0 },
+
+  // Fallback — custom conversions + any future/unrecognized Meta result type (决策2 · 方案A)
+  { key: 'custom_conversion',    label: 'Custom Conversion',            grp: '__fallback__', cur: 145, prev: 160, spend: 800, prevSpend: 900 },
+];
+let rtSelected = new Set(RESULT_TYPES.map(t => t.key)); // default = All
+
+function fmtCount(n) {
+  if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+  return String(n);
+}
+function fmtDelta(cur, prev) {
+  if (prev === 0) return { text: '-0.0% vs prev', cls: 'neutral' };
+  const pct = ((cur - prev) / prev) * 100;
+  const cls = pct > 0.05 ? 'up' : pct < -0.05 ? 'down' : 'neutral';
+  const arrow = cls === 'up' ? '↗ +' : cls === 'down' ? '↙ ' : '';
+  return { text: `${arrow}${pct.toFixed(1)}% vs prev`, cls };
+}
+
+function renderResultsTypeOptions() {
+  const mount = document.getElementById('rtOptionsMount');
+  let lastGrp = null;
+  mount.innerHTML = RESULT_TYPES.map((t) => {
+    let header = '';
+    if (t.grp !== lastGrp) {
+      const divider = lastGrp !== null ? '<div class="rt-divider"></div>' : '';
+      const grpLabel = t.grp === '__fallback__' ? 'Other / Unrecognized' : t.grp;
+      header = `${divider}<div class="rt-group-label">${grpLabel}</div>`;
+      lastGrp = t.grp;
+    }
+    return `${header}<label class="rt-option">
+        <input type="checkbox" data-key="${t.key}" ${rtSelected.has(t.key) ? 'checked' : ''} onchange="rtToggle('${t.key}', this.checked)">
+        <span class="rt-option-label">${t.label}</span>
+        <span class="rt-option-meta">${fmtCount(t.cur)}</span>
+      </label>`;
+  }).join('');
+}
+
+function rtToggle(key, checked) {
+  if (checked) rtSelected.add(key); else rtSelected.delete(key);
+  recomputeResults();
+}
+function rtSelectAll() {
+  rtSelected = new Set(RESULT_TYPES.map(t => t.key));
+  renderResultsTypeOptions();
+  recomputeResults();
+}
+function rtClearAll() {
+  rtSelected = new Set();
+  renderResultsTypeOptions();
+  recomputeResults();
+}
+function toggleResultsTypePanel() {
+  document.getElementById('rtPanel').classList.toggle('open');
+  document.getElementById('rtChip').classList.toggle('open');
+}
+document.addEventListener('click', function(e) {
+  const filter = document.querySelector('.rt-filter');
+  if (filter && !filter.contains(e.target)) {
+    document.getElementById('rtPanel').classList.remove('open');
+    document.getElementById('rtChip').classList.remove('open');
+  }
+});
+
+function recomputeResults() {
+  const selected = RESULT_TYPES.filter(t => rtSelected.has(t.key));
+  const chipLabel = document.getElementById('rtChipLabel');
+  const chip = document.getElementById('rtChip');
+  if (selected.length === 0) {
+    chipLabel.textContent = 'Results Type: None';
+    chip.classList.remove('has-selection');
+  } else if (selected.length === RESULT_TYPES.length) {
+    chipLabel.textContent = 'Results Type: All';
+    chip.classList.remove('has-selection');
+  } else if (selected.length === 1) {
+    chipLabel.textContent = `Results Type: ${selected[0].label}`;
+    chip.classList.add('has-selection');
+  } else {
+    chipLabel.textContent = `Results Type: ${selected.length} selected`;
+    chip.classList.add('has-selection');
+  }
+
+  const curTotal = selected.reduce((s, t) => s + t.cur, 0);
+  const prevTotal = selected.reduce((s, t) => s + t.prev, 0);
+  const spendTotal = selected.reduce((s, t) => s + t.spend, 0);
+
+  document.getElementById('kpiResultsValue').textContent = selected.length === 0 ? '–' : fmtCount(curTotal);
+  const rDelta = selected.length === 0 ? { text: '—', cls: 'neutral' } : fmtDelta(curTotal, prevTotal);
+  const rDeltaEl = document.getElementById('kpiResultsDelta');
+  rDeltaEl.textContent = rDelta.text;
+  rDeltaEl.className = 'kpi-delta ' + rDelta.cls;
+
+  const prevSpendTotal = selected.reduce((s, t) => s + t.prevSpend, 0);
+  const costPerResult = (selected.length === 0 || curTotal === 0) ? null : spendTotal / curTotal;
+  document.getElementById('kpiCostResultValue').textContent = costPerResult === null ? '–' : ('$' + costPerResult.toFixed(2));
+  // Cost/Result "vs prev" uses the same selected-type scope for both periods so the comparison stays apples-to-apples.
+  const prevCostPerResult = (selected.length === 0 || prevTotal === 0) ? null : prevSpendTotal / prevTotal;
+  const crDeltaEl = document.getElementById('kpiCostResultDelta');
+  if (costPerResult === null || prevCostPerResult === null) {
+    crDeltaEl.textContent = '—';
+    crDeltaEl.className = 'kpi-delta neutral';
+  } else {
+    const pct = ((costPerResult - prevCostPerResult) / prevCostPerResult) * 100;
+    const cls = pct > 0.05 ? 'down' : pct < -0.05 ? 'up' : 'neutral'; // cost metric: lower is better
+    const arrow = pct > 0.05 ? '↗ +' : pct < -0.05 ? '↙ ' : '';
+    crDeltaEl.textContent = `${arrow}${pct.toFixed(1)}% vs prev`;
+    crDeltaEl.className = 'kpi-delta ' + cls;
+  }
+}
+
+renderResultsTypeOptions();
+recomputeResults();
+</script>
+</body>
+</html>
