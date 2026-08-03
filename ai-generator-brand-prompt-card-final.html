@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brand Guidelines Prompt — Final</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue: #23A9F6;
+  --blue-deep: #001983;
+  --blue-tint: #EEF6FF;
+  --blue-tint-2: #E1F1FF;
+  --ink: #102532;
+  --ink-soft: #707070;
+  --border: #D9E3E6;
+  --surface: #FFFFFF;
+  --page: #F7F7F7;
+  --font: 'Poppins','Noto Sans HK',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:var(--font);
+  background:var(--page);
+  min-height:100vh;
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:40px 16px;
+}
+.chat-frame{width:100%;max-width:640px;display:flex;flex-direction:column;gap:14px;}
+.msg-row{display:flex;gap:10px;align-items:flex-start;}
+.avatar{
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--blue),#73DFFF);
+  display:grid;place-items:center;color:#fff;font-size:14px;font-weight:700;
+}
+.bubble-text{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px 14px 14px 4px;padding:12px 16px;
+  font-size:14px;line-height:1.6;color:var(--ink);max-width:480px;
+}
+
+.card{
+  background:var(--surface);
+  border-radius:12px;
+  box-shadow:0 4px 16px rgba(0,0,0,0.08);
+  overflow:hidden;
+  margin-left:42px;
+  border:1px solid var(--border);
+}
+.card__head{
+  background:var(--blue-tint);
+  padding:16px 20px;
+  display:flex;align-items:center;gap:10px;
+}
+.card__head-title{font-size:15px;font-weight:700;color:var(--blue-deep);}
+.card__body{padding:20px;}
+.card__q{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:4px;}
+.card__sub{font-size:12.5px;color:var(--ink-soft);margin-bottom:16px;line-height:1.6;}
+
+.opt-list{display:flex;flex-direction:column;gap:10px;}
+.opt{
+  display:flex;align-items:center;gap:14px;
+  border:1.5px solid var(--border);border-radius:12px;padding:13px 14px;
+  cursor:pointer;transition:border-color .15s, background .15s, box-shadow .15s;background:#fff;
+}
+.opt:hover{border-color:var(--blue);background:var(--blue-tint);}
+.opt.is-selected{border-color:var(--blue);background:var(--blue-tint-2);box-shadow:0 0 0 3px rgba(35,169,246,0.14);}
+.opt__icon{
+  width:38px;height:38px;border-radius:10px;flex-shrink:0;
+  background:var(--blue-tint);display:grid;place-items:center;color:var(--blue-deep);
+}
+.opt.is-selected .opt__icon{background:var(--blue);color:#fff;}
+.opt__body{flex:1;min-width:0;}
+.opt__title{font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:2px;}
+.opt__desc{font-size:12px;color:var(--ink-soft);line-height:1.5;}
+.opt__radio{width:18px;height:18px;border-radius:50%;border:2px solid #C9DCE6;flex-shrink:0;position:relative;}
+.opt.is-selected .opt__radio{border-color:var(--blue);}
+.opt.is-selected .opt__radio::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--blue);}
+.opt__tag{font-size:10.5px;font-weight:600;color:var(--blue-deep);background:var(--blue-tint-2);padding:2px 7px;border-radius:20px;flex-shrink:0;}
+
+.card__foot{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--border);}
+.btn{border:none;border-radius:8px;font-size:13.5px;font-weight:600;padding:9px 18px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s, background .15s;}
+.btn--ghost{background:#fff;border:1px solid var(--border);color:var(--ink-soft);}
+.btn--ghost:hover{background:#F5F9FB;}
+.btn--primary{background:var(--blue);color:#fff;}
+.btn--primary:hover{background:#0B8FE0;}
+.btn--primary:disabled{background:#B9E0FA;cursor:not-allowed;}
+.btn--text{background:none;border:none;color:var(--ink-soft);font-size:12.5px;text-decoration:underline;cursor:pointer;padding:0;}
+.btn--text:hover{color:var(--ink);}
+
+/* ---- shared screen chrome ---- */
+.screen{display:none;}
+.screen.is-active{display:block;}
+.back-row{display:flex;align-items:center;gap:8px;margin-bottom:2px;cursor:pointer;color:var(--ink-soft);font-size:12.5px;}
+.back-row:hover{color:var(--ink);}
+
+/* ---- My Page picker ---- */
+.page-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.page-row{
+  display:flex;align-items:center;gap:12px;border:1.5px solid var(--border);border-radius:12px;
+  padding:10px 12px;cursor:pointer;transition:border-color .15s, background .15s;
+}
+.page-row:hover{border-color:var(--blue);}
+.page-row.is-selected{border-color:var(--blue);background:var(--blue-tint);}
+.page-row__avatar{width:34px;height:34px;border-radius:8px;background:var(--blue-tint-2);display:grid;place-items:center;font-weight:700;color:var(--blue-deep);font-size:13px;flex-shrink:0;}
+.page-row__body{flex:1;min-width:0;}
+.page-row__name{font-size:13px;font-weight:600;color:var(--ink);}
+.page-row__meta{font-size:11.5px;color:var(--ink-soft);}
+.page-row__radio{width:17px;height:17px;border-radius:50%;border:2px solid #C9DCE6;flex-shrink:0;position:relative;}
+.page-row.is-selected .page-row__radio{border-color:var(--blue);}
+.page-row.is-selected .page-row__radio::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--blue);}
+
+.analyzing{
+  display:flex;flex-direction:column;align-items:center;gap:14px;padding:30px 10px;text-align:center;
+}
+.spinner{width:34px;height:34px;border-radius:50%;border:3px solid var(--blue-tint-2);border-top-color:var(--blue);animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.analyzing__title{font-size:13.5px;font-weight:600;color:var(--ink);}
+.analyzing__sub{font-size:12px;color:var(--ink-soft);}
+
+.result-field{border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px;background:#FAFCFD;}
+.result-field__label{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.result-field__label span:first-child{font-size:11.5px;font-weight:600;color:var(--ink);}
+.auto-tag{font-size:9.5px;font-weight:700;color:var(--blue-deep);background:var(--blue-tint-2);padding:1px 6px;border-radius:10px;}
+.result-field__val{font-size:12px;color:var(--ink-soft);line-height:1.55;}
+.swatches{display:flex;gap:6px;margin-top:4px;}
+.swatch{width:22px;height:22px;border-radius:6px;border:1px solid rgba(0,0,0,0.08);}
+.result-banner{
+  display:flex;align-items:center;gap:8px;background:var(--blue-tint);border-radius:10px;
+  padding:9px 12px;margin-bottom:14px;font-size:12px;color:var(--blue-deep);font-weight:600;
+}
+.result-field.is-empty{background:#fff;border-style:dashed;}
+.result-field__val.is-empty{color:#9AA7AE;font-style:italic;}
+.add-link{font-size:11px;font-weight:600;color:var(--blue-deep);cursor:pointer;text-decoration:underline;}
+
+/* ---- manual form (simple stacked, ref. GSHK layout) ---- */
+.form-group{margin-bottom:22px;}
+.form-label{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:8px;}
+.req{color:#E0453E;}
+.form-hint{font-weight:400;color:var(--ink-soft);font-size:12px;}
+.form-input, .form-textarea{
+  width:100%;border:1px solid var(--border);border-radius:8px;padding:11px 13px;
+  font-family:var(--font);font-size:13.5px;color:var(--ink);resize:vertical;
+}
+.form-input::placeholder, .form-textarea::placeholder{color:#B7C3CB;}
+.form-input:focus, .form-textarea:focus{outline:none;border-color:var(--blue);}
+.form-textarea{min-height:68px;}
+.form-row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.color-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.color-input{display:flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:8px;padding:6px 10px 6px 6px;}
+.color-input input[type=color]{width:24px;height:24px;border:none;padding:0;background:none;border-radius:5px;}
+.color-input input[type=text]{border:none;font-size:12.5px;width:78px;font-family:var(--font);color:var(--ink-soft);}
+.color-input input[type=text]:focus{outline:none;}
+.form-scroll{max-height:420px;overflow-y:auto;padding-right:4px;margin-bottom:4px;}
+.choice-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+.choice-pill{
+  border:1px solid var(--border);border-radius:999px;padding:8px 12px;background:#fff;
+  font-size:12px;font-weight:600;color:var(--ink-soft);cursor:pointer;
+}
+.choice-pill.is-selected{background:var(--blue-tint-2);border-color:var(--blue);color:var(--blue-deep);}
+.saved-brand{
+  display:flex;align-items:center;gap:12px;border:1.5px solid var(--border);border-radius:12px;
+  padding:12px;cursor:pointer;background:#fff;margin-bottom:10px;
+}
+.saved-brand.is-selected{border-color:var(--blue);background:var(--blue-tint);}
+.saved-brand__mark{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:700;background:linear-gradient(135deg,#16294e,#466297);}
+.saved-brand__body{flex:1;min-width:0;}
+.saved-brand__name{font-size:13px;font-weight:700;color:var(--ink);}
+.saved-brand__meta{font-size:11.5px;color:var(--ink-soft);line-height:1.45;}
+.upload-box{
+  border:1.5px dashed #BFD7E8;border-radius:12px;background:#FAFCFD;padding:14px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;
+}
+.upload-box__title{font-size:13px;font-weight:700;color:var(--ink);}
+.upload-box__sub{font-size:11.5px;color:var(--ink-soft);line-height:1.45;margin-top:2px;}
+.logo-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.logo-chip{
+  display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:999px;
+  padding:5px 9px;background:#fff;font-size:11.5px;color:var(--ink-soft);font-weight:600;
+}
+.logo-dot{width:18px;height:18px;border-radius:6px;background:linear-gradient(135deg,var(--blue),#73DFFF);display:inline-block;}
+.confirm-panel{border:1.5px solid var(--border);border-radius:12px;padding:14px;background:#FAFCFD;margin-top:12px;}
+.confirm-panel__title{font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:6px;}
+.confirm-panel__copy{font-size:12px;color:var(--ink-soft);line-height:1.6;}
+</style>
+</head>
+<body>
+
+<div class="chat-frame">
+
+  <div class="msg-row">
+    <div class="avatar">U</div>
+    <div class="bubble-text">Make me a Feed ad on-brand for our page — new hand cream launch</div>
+  </div>
+
+  <div class="card">
+
+    <!-- SCREEN 1: prompt card -->
+    <div class="screen is-active" id="screen-prompt">
+      <div class="card__head">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke="#0B8FE0" stroke-width="1.6" stroke-linejoin="round"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="#0B8FE0" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <div class="card__head-title">Brand Info Needed</div>
+      </div>
+      <div class="card__body">
+        <div class="card__q">Choose a Brand Guideline for this generation</div>
+        <div class="card__sub">Brand Guidelines help the AI follow the right tone, colors and visual rules when writing posts or generating images.</div>
+
+        <div class="opt-list">
+          <div class="opt is-selected" data-opt="saved">
+            <div class="opt__icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M5 4h14v16l-7-3-7 3V4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></div>
+            <div class="opt__body">
+              <div class="opt__title">Use an Existing Brand</div>
+              <div class="opt__desc">Pick from saved Brand Guidelines in Assets → Brand Setting</div>
+            </div>
+            <span class="opt__tag">Saved</span>
+            <div class="opt__radio"></div>
+          </div>
+
+          <div class="opt" data-opt="upload">
+            <div class="opt__icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="10.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5-4 4-3-3-6 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="opt__body">
+              <div class="opt__title">Upload Brand Logo / Brand Images</div>
+              <div class="opt__desc">AI reads colors and visual style from uploaded brand materials</div>
+            </div>
+            <span class="opt__tag">AI</span>
+            <div class="opt__radio"></div>
+          </div>
+
+          <div class="opt" data-opt="mypage">
+            <div class="opt__icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="1.7"/><path d="M8 12h8M8 16h5M8 8h3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+            <div class="opt__body">
+              <div class="opt__title">Select My Page</div>
+              <div class="opt__desc">Use a Facebook or Instagram page to generate Brand Guidelines</div>
+            </div>
+            <span class="opt__tag">AI</span>
+            <div class="opt__radio"></div>
+          </div>
+
+          <div class="opt" data-opt="manual">
+            <div class="opt__icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M4 20l4.5-1.2 10-10a1.7 1.7 0 000-2.4l-.9-.9a1.7 1.7 0 00-2.4 0l-10 10L4 20z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></div>
+            <div class="opt__body">
+              <div class="opt__title">Fill In Manually</div>
+              <div class="opt__desc">Enter your brand details yourself</div>
+            </div>
+            <div class="opt__radio"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card__foot">
+        <button class="btn btn--ghost" id="skipBtn">Skip</button>
+        <button class="btn btn--primary" id="continueBtn">Continue</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 1B: existing brand picker -->
+    <div class="screen" id="screen-saved">
+      <div class="card__head">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 4h14v16l-7-3-7 3V4z" stroke="#0B8FE0" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        <div class="card__head-title">Saved Brand Guidelines</div>
+      </div>
+      <div class="card__body">
+        <div class="back-row" onclick="showScreen('screen-prompt')">← Back</div>
+        <div class="card__q" style="margin-top:8px;">Use an existing Brand Guideline?</div>
+        <div class="card__sub">You can use a saved brand for this session, or create a new one if this campaign needs a different style.</div>
+
+        <div class="saved-brand is-selected" data-brand="bf">
+          <div class="saved-brand__mark">BF</div>
+          <div class="saved-brand__body">
+            <div class="saved-brand__name">BusinessFocus</div>
+            <div class="saved-brand__meta">Facebook Page · Professional business news · 4 brand colors</div>
+          </div>
+          <div class="page-row__radio"></div>
+        </div>
+        <div class="saved-brand" data-brand="gs">
+          <div class="saved-brand__mark" style="background:linear-gradient(135deg,#ffafa0,#ee867a);">GS</div>
+          <div class="saved-brand__body">
+            <div class="saved-brand__name">GirlStyle HK</div>
+            <div class="saved-brand__meta">Instagram Page · Pink, polished, lifestyle tone · 3 brand colors</div>
+          </div>
+          <div class="page-row__radio"></div>
+        </div>
+      </div>
+      <div class="card__foot">
+        <button class="btn btn--ghost" onclick="showScreen('screen-prompt')">Create New</button>
+        <button class="btn btn--primary" onclick="renderResult('saved')">Use Selected Brand</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 1C: upload brand materials -->
+    <div class="screen" id="screen-upload">
+      <div class="card__head">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="#0B8FE0" stroke-width="1.7"/><path d="M21 15l-5-5-4 4-3-3-6 6" stroke="#0B8FE0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="card__head-title">Upload Brand Materials</div>
+      </div>
+      <div class="card__body">
+        <div class="back-row" onclick="showScreen('screen-prompt')">← Back</div>
+        <div class="card__q" style="margin-top:8px;">Upload brand logo or visual references</div>
+        <div class="card__sub">Logo is optional and will be used as visual reference by default. It appears in generated images only when the user explicitly asks for it.</div>
+        <div class="upload-box">
+          <div>
+            <div class="upload-box__title">Brand Logo</div>
+            <div class="upload-box__sub">Supports multiple logos. PNG or JPG recommended.</div>
+          </div>
+          <button class="btn btn--ghost" type="button">Upload</button>
+        </div>
+        <div class="logo-list">
+          <span class="logo-chip"><span class="logo-dot"></span> logo-primary.png</span>
+          <span class="logo-chip"><span class="logo-dot" style="background:linear-gradient(135deg,#16294e,#fefb09);"></span> logo-dark.svg</span>
+        </div>
+        <div class="upload-box" style="margin-top:14px;">
+          <div>
+            <div class="upload-box__title">Brand Reference Images</div>
+            <div class="upload-box__sub">Optional. Helps AI understand layout, visual style and photography treatment.</div>
+          </div>
+          <button class="btn btn--ghost" type="button">Upload</button>
+        </div>
+      </div>
+      <div class="card__foot">
+        <button class="btn btn--ghost" onclick="showScreen('screen-prompt')">Cancel</button>
+        <button class="btn btn--primary" onclick="startAnalyzing('upload')">Generate Guidelines</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 2: My Page picker -->
+    <div class="screen" id="screen-mypage">
+      <div class="card__head">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="4" stroke="#0B8FE0" stroke-width="1.7"/><path d="M8 12h8M8 16h5M8 8h3" stroke="#0B8FE0" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <div class="card__head-title">Select My Page</div>
+      </div>
+      <div class="card__body">
+        <div class="back-row" onclick="showScreen('screen-prompt')">← Back</div>
+        <div class="card__q" style="margin-top:8px;">Choose a page to use as brand source</div>
+        <div class="card__sub">You can use a Facebook or Instagram page to generate Brand Guidelines. Brand name defaults to the page name.</div>
+
+        <div class="page-list">
+          <div class="page-row is-selected" data-page="bf">
+            <div class="page-row__avatar">BF</div>
+            <div class="page-row__body">
+              <div class="page-row__name">BusinessFocus</div>
+              <div class="page-row__meta">Facebook Page · 182K followers</div>
+            </div>
+            <div class="page-row__radio"></div>
+          </div>
+          <div class="page-row" data-page="gs">
+            <div class="page-row__avatar">GS</div>
+            <div class="page-row__body">
+              <div class="page-row__name">GirlStyle</div>
+              <div class="page-row__meta">Instagram · 96K followers</div>
+            </div>
+            <div class="page-row__radio"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card__foot">
+        <button class="btn btn--ghost" onclick="showScreen('screen-prompt')">Cancel</button>
+        <button class="btn btn--primary" onclick="showScreen('screen-mypage-confirm')">Continue</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 2B: My Page confirmation -->
+    <div class="screen" id="screen-mypage-confirm">
+      <div class="card__head">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="4" stroke="#0B8FE0" stroke-width="1.7"/><path d="M8 12h8M8 16h5M8 8h3" stroke="#0B8FE0" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <div class="card__head-title">Use My Page as Brand Source?</div>
+      </div>
+      <div class="card__body">
+        <div class="back-row" onclick="showScreen('screen-mypage')">← Back</div>
+        <div class="confirm-panel">
+          <div class="confirm-panel__title">Generate Brand Guidelines from BusinessFocus?</div>
+          <div class="confirm-panel__copy">Brand Guidelines help AI write posts and generate images that follow your brand tone, audience and color style. You can review and edit the generated guideline before saving it.</div>
+        </div>
+        <div class="result-field" style="margin-top:12px;">
+          <div class="result-field__label"><span>Platform</span></div>
+          <div class="result-field__val">Facebook Page · BusinessFocus · 182K followers</div>
+        </div>
+      </div>
+      <div class="card__foot">
+        <button class="btn btn--ghost" onclick="showScreen('screen-mypage')">Cancel</button>
+        <button class="btn btn--primary" onclick="startAnalyzing('mypage')">Generate Guidelines</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: analyzing -->
+    <div class="screen" id="screen-analyzing">
+      <div class="card__body">
+        <div class="analyzing">
+          <div class="spinner"></div>
+          <div class="analyzing__title">Analyzing BusinessFocus's recent posts…</div>
+          <div class="analyzing__sub">Detecting tone, audience and brand colors</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: Brand Guidelines result (shared by My Page + Manual) -->
+    <div class="screen" id="screen-result">
+      <div class="card__head">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke="#0B8FE0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="card__head-title" id="resultHeadTitle">Brand Guidelines</div>
+      </div>
+      <div class="card__body">
+        <div class="result-banner" id="resultBanner">✓ Analyzed from BusinessFocus — review and edit before saving</div>
+
+        <div class="result-field">
+          <div class="result-field__label"><span>Brand Name</span></div>
+          <div class="result-field__val" id="rv-name"></div>
+        </div>
+        <div class="result-field" id="rf-platform">
+          <div class="result-field__label"><span>Platform</span></div>
+          <div class="result-field__val" id="rv-platform"></div>
+        </div>
+        <div class="result-field" id="rf-logos">
+          <div class="result-field__label"><span>Brand Logo</span><span class="auto-tag">Optional</span></div>
+          <div id="rv-logos"></div>
+        </div>
+        <div class="result-field" id="rf-vibe">
+          <div class="result-field__label"><span>Brand Vibe & Tone</span></div>
+          <div class="result-field__val" id="rv-vibe"></div>
+        </div>
+        <div class="result-field" id="rf-audience">
+          <div class="result-field__label"><span>Target Audience</span></div>
+          <div class="result-field__val" id="rv-audience"></div>
+        </div>
+        <div class="result-field" id="rf-toneguard">
+          <div class="result-field__label"><span>Writing Rules (Tone Guard)</span></div>
+          <div class="result-field__val" id="rv-toneguard"></div>
+        </div>
+        <div class="result-field" id="rf-colors">
+          <div class="result-field__label"><span>Brand Colors</span></div>
+          <div id="rv-colors"></div>
+        </div>
+      </div>
+      <div class="card__foot">
+        <button class="btn btn--ghost" id="resultBackBtn">Back</button>
+        <button class="btn btn--ghost" onclick="showScreen('screen-manual')">Edit Details</button>
+        <button class="btn btn--primary" id="resultSaveBtn">Save & Continue</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 5: manual form (simplified, matches GSHK layout) -->
+    <div class="screen" id="screen-manual">
+      <div class="card__head">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 20l4.5-1.2 10-10a1.7 1.7 0 000-2.4l-.9-.9a1.7 1.7 0 00-2.4 0l-10 10L4 20z" stroke="#0B8FE0" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        <div class="card__head-title">Brand Details</div>
+      </div>
+      <div class="card__body">
+        <div class="back-row" onclick="showScreen('screen-prompt')">← Back</div>
+        <div class="card__q" style="margin-top:8px;">Only Brand Name is required</div>
+        <div class="card__sub">Everything else is optional — fill in what you have, skip the rest.</div>
+
+        <div class="form-scroll">
+          <div class="form-group">
+            <div class="form-label">Brand Name <span class="req">*</span></div>
+            <input class="form-input" type="text" placeholder="e.g. BusinessFocus" id="brandNameInput">
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">Platform <span class="form-hint">(optional)</span></div>
+            <div class="choice-row" id="platformRow">
+              <button class="choice-pill is-selected" type="button">Facebook Page · BusinessFocus</button>
+              <button class="choice-pill" type="button">Instagram Page · GirlStyle</button>
+              <button class="choice-pill" type="button">No platform</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">Brand Logo <span class="form-hint">(optional, supports multiple)</span></div>
+            <div class="upload-box">
+              <div>
+                <div class="upload-box__title">Upload logos</div>
+                <div class="upload-box__sub">Logo is a visual reference unless the user asks to place it in the image.</div>
+              </div>
+              <button class="btn btn--ghost" type="button">Upload</button>
+            </div>
+            <div class="logo-list" id="manualLogoList">
+              <span class="logo-chip"><span class="logo-dot"></span> logo-primary.png</span>
+              <span class="logo-chip"><span class="logo-dot" style="background:linear-gradient(135deg,#16294e,#fefb09);"></span> logo-alt.svg</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">Brand Vibe & Tone <span class="form-hint">(optional)</span></div>
+            <textarea class="form-textarea" id="vibeInput" placeholder="e.g. Professional, calm, fact-driven — neutral and analytical, no hype"></textarea>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">Target Audience <span class="form-hint">(optional)</span></div>
+            <textarea class="form-textarea" id="audienceInput" placeholder="e.g. Working professionals 25–45, Hong Kong & Greater Bay Area, finance/tech focus"></textarea>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">Writing Rules / Tone Guard <span class="form-hint">(optional)</span></div>
+            <textarea class="form-textarea" id="toneGuardInput" placeholder="e.g. No exaggerated headlines, no investment advice, always cite data sources"></textarea>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">Brand Colors <span class="form-hint">(optional, supports multiple; soft constraint)</span></div>
+            <div class="color-row" id="colorRow">
+              <div class="color-input"><input type="color" value="#16294e"><input type="text" placeholder="Primary" value=""></div>
+              <div class="color-input"><input type="color" value="#1f3c72"><input type="text" placeholder="Accent" value=""></div>
+              <div class="color-input"><input type="color" value="#466297"><input type="text" placeholder="Accent" value=""></div>
+              <div class="color-input"><input type="color" value="#fefb09"><input type="text" placeholder="Accent" value=""></div>
+            </div>
+            <button class="btn btn--ghost" type="button" style="margin-top:8px;padding:7px 12px;">Add Color</button>
+          </div>
+        </div>
+      </div>
+      <div class="card__foot">
+        <button class="btn btn--ghost" onclick="showScreen('screen-prompt')">Cancel</button>
+        <button class="btn btn--primary" id="saveManualBtn">Save & Continue</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('is-active'));
+  document.getElementById(id).classList.add('is-active');
+}
+let pendingSource = 'mypage';
+function startAnalyzing(source){
+  pendingSource = source || 'mypage';
+  showScreen('screen-analyzing');
+  const title = pendingSource === 'upload'
+    ? 'Analyzing uploaded brand materials…'
+    : 'Analyzing BusinessFocus\'s recent posts…';
+  const sub = pendingSource === 'upload'
+    ? 'Detecting logo usage, visual style and brand colors'
+    : 'Detecting tone, audience and brand colors';
+  document.querySelector('.analyzing__title').textContent = title;
+  document.querySelector('.analyzing__sub').textContent = sub;
+  setTimeout(()=>renderResult(pendingSource), 1400);
+}
+function finish(msg){
+  alert('(Prototype) '+msg);
+}
+
+function setField(id, value){
+  const el = document.getElementById(id);
+  const wrap = el.closest('.result-field');
+  if(value){
+    el.textContent = value;
+    wrap.classList.remove('is-empty');
+  } else {
+    el.textContent = 'Not set';
+    el.classList.add('is-empty');
+    wrap.classList.add('is-empty');
+  }
+}
+
+function renderResult(source){
+  let data;
+  if(source === 'saved'){
+    data = {
+      name: 'BusinessFocus',
+      platform: 'Facebook Page · BusinessFocus · 182K followers',
+      logos: ['logo-primary.png'],
+      vibe: 'Serious business & tech news brand — professional, calm, fact-driven, neutral and analytical.',
+      audience: 'Working professionals 25–45, Hong Kong & Greater Bay Area, finance/tech/career focus.',
+      toneguard: 'No exaggerated headlines, no investment advice, always cite data sources.',
+      colors: ['#16294E','#1F3C72','#466297','#FEFB09']
+    };
+    document.getElementById('resultBanner').style.display = 'flex';
+    document.getElementById('resultBanner').textContent = '✓ Using saved Brand Guideline — active for this session';
+    document.getElementById('resultBackBtn').onclick = ()=>showScreen('screen-saved');
+    document.getElementById('resultSaveBtn').onclick = ()=>finish('Saved Brand Guideline is now active in this session.');
+  } else if(source === 'mypage'){
+    data = {
+      name: 'BusinessFocus',
+      platform: 'Facebook Page · BusinessFocus · 182K followers',
+      logos: [],
+      vibe: 'Serious business & tech news brand — professional, calm, fact-driven, neutral and analytical.',
+      audience: 'Working professionals 25–45, Hong Kong & Greater Bay Area, finance/tech/career focus.',
+      toneguard: 'No exaggerated headlines, no investment advice, always cite data sources.',
+      colors: ['#16294E','#1F3C72','#466297','#FEFB09']
+    };
+    document.getElementById('resultBanner').style.display = 'flex';
+    document.getElementById('resultBanner').textContent = '✓ Analyzed from BusinessFocus — review and edit before saving';
+    document.getElementById('resultBackBtn').onclick = ()=>showScreen('screen-mypage');
+    document.getElementById('resultSaveBtn').onclick = ()=>finish('Brand Guidelines saved to Assets → Brand Setting and activated for this session.');
+  } else if(source === 'upload'){
+    data = {
+      name: 'New Brand from Logo',
+      platform: 'No platform linked',
+      logos: ['logo-primary.png','logo-dark.svg'],
+      vibe: 'Clean, polished and modern. Visual identity leans toward cool blue, high contrast typography and simple layouts.',
+      audience: '',
+      toneguard: 'Use brand colors as a soft constraint. Logo is reference-only unless the user asks to place it in the image.',
+      colors: ['#23A9F6','#001983','#73DFFF']
+    };
+    document.getElementById('resultBanner').style.display = 'flex';
+    document.getElementById('resultBanner').textContent = '✓ Generated from uploaded brand materials — review before saving';
+    document.getElementById('resultBackBtn').onclick = ()=>showScreen('screen-upload');
+    document.getElementById('resultSaveBtn').onclick = ()=>finish('Brand Guidelines saved from uploaded brand materials.');
+  } else {
+    data = {
+      name: document.getElementById('brandNameInput').value.trim(),
+      platform: document.querySelector('#platformRow .choice-pill.is-selected')?.textContent.trim() || '',
+      logos: ['logo-primary.png','logo-alt.svg'],
+      vibe: document.getElementById('vibeInput').value.trim(),
+      audience: document.getElementById('audienceInput').value.trim(),
+      toneguard: document.getElementById('toneGuardInput').value.trim(),
+      colors: Array.from(document.querySelectorAll('#colorRow input[type=color]')).map(i=>i.value.trim()).filter(Boolean)
+    };
+    document.getElementById('resultBanner').style.display = 'none';
+    document.getElementById('resultBackBtn').onclick = ()=>showScreen('screen-manual');
+    document.getElementById('resultSaveBtn').onclick = ()=>finish('Brand Guidelines saved to Assets → Brand Setting for "'+data.name+'".');
+  }
+
+  document.getElementById('rv-name').textContent = data.name || 'Untitled Brand';
+  setField('rv-platform', data.platform);
+  setField('rv-vibe', data.vibe);
+  setField('rv-audience', data.audience);
+  setField('rv-toneguard', data.toneguard);
+
+  const logosWrap = document.getElementById('rv-logos');
+  const logosField = document.getElementById('rf-logos');
+  if(data.logos && data.logos.length){
+    logosWrap.innerHTML = '<div class="logo-list">' + data.logos.map((l,i)=>`<span class="logo-chip"><span class="logo-dot" style="${i%2?'background:linear-gradient(135deg,#16294e,#fefb09);':''}"></span>${l}</span>`).join('') + '</div>';
+    logosField.classList.remove('is-empty');
+  } else {
+    logosWrap.innerHTML = '<span class="result-field__val is-empty">Not set. Logo is optional.</span>';
+    logosField.classList.add('is-empty');
+  }
+
+  const colorsWrap = document.getElementById('rv-colors');
+  const colorsField = document.getElementById('rf-colors');
+  if(data.colors && data.colors.length){
+    colorsWrap.innerHTML = '<div class="swatches">' + data.colors.map(c=>`<div class="swatch" style="background:${c}" title="${c}"></div>`).join('') + '</div>';
+    colorsField.classList.remove('is-empty');
+  } else {
+    colorsWrap.innerHTML = '<span class="result-field__val is-empty">Not set</span>';
+    colorsField.classList.add('is-empty');
+  }
+  showScreen('screen-result');
+}
+
+document.querySelectorAll('#screen-prompt .opt').forEach(opt=>{
+  opt.addEventListener('click', ()=>{
+    document.querySelectorAll('#screen-prompt .opt').forEach(o=>o.classList.remove('is-selected'));
+    opt.classList.add('is-selected');
+  });
+});
+document.querySelectorAll('.page-row').forEach(row=>{
+  row.addEventListener('click', ()=>{
+    document.querySelectorAll('.page-row').forEach(r=>r.classList.remove('is-selected'));
+    row.classList.add('is-selected');
+  });
+});
+document.querySelectorAll('.saved-brand').forEach(row=>{
+  row.addEventListener('click', ()=>{
+    document.querySelectorAll('.saved-brand').forEach(r=>r.classList.remove('is-selected'));
+    row.classList.add('is-selected');
+  });
+});
+document.querySelectorAll('.choice-pill').forEach(pill=>{
+  pill.addEventListener('click', ()=>{
+    pill.parentElement.querySelectorAll('.choice-pill').forEach(p=>p.classList.remove('is-selected'));
+    pill.classList.add('is-selected');
+  });
+});
+document.getElementById('skipBtn').addEventListener('click', ()=>{
+  alert('(Prototype) Skipped brand setup — generating with default style.');
+});
+document.getElementById('continueBtn').addEventListener('click', ()=>{
+  const sel = document.querySelector('#screen-prompt .opt.is-selected')?.dataset.opt;
+  if(sel === 'saved'){ showScreen('screen-saved'); }
+  else if(sel === 'mypage'){ showScreen('screen-mypage'); }
+  else if(sel === 'manual'){ showScreen('screen-manual'); }
+  else if(sel === 'upload'){ showScreen('screen-upload'); }
+});
+document.getElementById('saveManualBtn').addEventListener('click', ()=>{
+  const name = document.getElementById('brandNameInput').value.trim();
+  if(!name){
+    document.getElementById('brandNameInput').style.borderColor = '#E0453E';
+    document.getElementById('brandNameInput').focus();
+    return;
+  }
+  document.getElementById('brandNameInput').style.borderColor = '';
+  renderResult('manual');
+});
+</script>
+
+</body>
+</html>
