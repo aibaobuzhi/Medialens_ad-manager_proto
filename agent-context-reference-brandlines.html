@@ -1,0 +1,2714 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MediaLens Agent Reference Flow Architecture</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --ink: #17202a;
+      --muted: #5f6b7a;
+      --line: #d8dee8;
+      --soft: #eef2f7;
+      --upload-img: #1769e0;
+      --upload-post: #8f4bd8;
+      --quoted-img: #008c7a;
+      --quoted-post: #d56b00;
+      --asset: #b4236f;
+      --mypage: #5b63d8;
+      --message: #eff6ff;
+      --metadata: #f4efff;
+      --worker: #fff7e6;
+      --history: #eefaf4;
+      --danger: #fff1f2;
+      --good: #ebf8f1;
+      --shadow: 0 10px 28px rgba(20, 32, 50, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    header {
+      padding: 42px 48px 30px;
+      background: #101722;
+      color: #fff;
+    }
+
+    header h1 {
+      margin: 0 0 10px;
+      font-size: 34px;
+      letter-spacing: 0;
+    }
+
+    header p {
+      max-width: 1120px;
+      margin: 0;
+      color: #d5dbe7;
+      font-size: 16px;
+    }
+
+    main {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 28px 32px 56px;
+    }
+
+    section {
+      margin: 22px 0;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .section-head {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfe;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0;
+    }
+
+    .section-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+    }
+
+    .body {
+      padding: 22px 24px 26px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      background: #fff;
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      letter-spacing: 0;
+    }
+
+    .card p {
+      margin: 6px 0;
+      color: var(--muted);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 28px;
+      padding: 3px 9px 3px 4px;
+      border-radius: 999px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+
+    .tag .num {
+      display: inline-flex;
+      width: 22px;
+      height: 22px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.35);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .r1 { background: var(--upload-img); }
+    .r2 { background: var(--upload-post); }
+    .r3 { background: var(--quoted-img); }
+    .r4 { background: var(--quoted-post); }
+    .r5 { background: var(--asset); }
+    .r6 { background: var(--mypage); }
+
+    .mini {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #344054;
+      font-weight: 700;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+    code {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 0.92em;
+      background: #f1f4f8;
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    pre {
+      margin: 12px 0 0;
+      padding: 14px;
+      background: #101722;
+      color: #eaf1ff;
+      border-radius: 8px;
+      overflow: auto;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .lane {
+      display: grid;
+      grid-template-columns: 190px 1fr;
+      gap: 14px;
+      align-items: stretch;
+      margin: 12px 0;
+    }
+
+    .lane-title {
+      padding: 14px;
+      border-radius: 8px;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      font-weight: 750;
+    }
+
+    .lane-flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      min-height: 60px;
+      background: #fff;
+    }
+
+    .node {
+      position: relative;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      min-width: 145px;
+      max-width: 260px;
+    }
+
+    .node.message { background: var(--message); }
+    .node.metadata { background: var(--metadata); }
+    .node.worker { background: var(--worker); }
+    .node.history { background: var(--history); }
+    .node.danger { background: var(--danger); }
+    .node.good { background: var(--good); }
+
+    .arrow {
+      color: #8a95a5;
+      font-size: 20px;
+      align-self: center;
+    }
+
+    .callout {
+      border-left: 4px solid #1d7f5f;
+      background: #f1fbf7;
+      padding: 14px 16px;
+      border-radius: 6px;
+      margin: 14px 0;
+    }
+
+    .warn {
+      border-left-color: #d56b00;
+      background: #fff7e6;
+    }
+
+    .danger-note {
+      border-left-color: #d92d20;
+      background: #fff1f2;
+    }
+
+    .swimlane {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 14px 0;
+    }
+
+    .swimrow {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .swimrow:last-child { border-bottom: 0; }
+
+    .swimhead {
+      padding: 14px;
+      background: #f8fafc;
+      border-right: 1px solid var(--line);
+      font-weight: 750;
+    }
+
+    .swimbody {
+      padding: 12px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      min-height: 58px;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: #eef2f7;
+      color: #344054;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .legend-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .small-list {
+      margin: 8px 0 0 18px;
+      padding: 0;
+      color: var(--muted);
+    }
+
+    .small-list li { margin: 4px 0; }
+
+    .process-map {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(132px, 1fr));
+      gap: 10px;
+      align-items: stretch;
+      margin: 16px 0;
+    }
+
+    .process-step {
+      position: relative;
+      min-height: 132px;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .process-step::after {
+      content: "→";
+      position: absolute;
+      right: -15px;
+      top: 45%;
+      color: #98a2b3;
+      font-weight: 800;
+      z-index: 1;
+    }
+
+    .process-step:last-child::after { content: ""; }
+
+    .process-step h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+
+    .process-step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .process-step.hot {
+      border: 2px solid #d56b00;
+      background: #fff7e6;
+      box-shadow: 0 0 0 3px rgba(213, 107, 0, 0.12);
+    }
+
+    .hot-label {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: #d56b00;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .flow-note {
+      display: grid;
+      grid-template-columns: 190px 1fr;
+      gap: 14px;
+      margin: 12px 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+    }
+
+    .flow-note strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .seq {
+      display: grid;
+      grid-template-columns: 150px repeat(5, minmax(120px, 1fr));
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: auto;
+      margin: 14px 0;
+      background: #fff;
+    }
+
+    .seq .actor,
+    .seq .cell {
+      min-height: 62px;
+      padding: 10px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+    }
+
+    .seq .actor {
+      position: sticky;
+      left: 0;
+      background: #f8fafc;
+      font-weight: 800;
+      z-index: 2;
+    }
+
+    .seq .cell:nth-child(6n) { border-right: 0; }
+    .seq .actor.last,
+    .seq .cell.last { border-bottom: 0; }
+
+    .event {
+      display: block;
+      padding: 8px 9px;
+      border-radius: 8px;
+      background: #eef2f7;
+      border: 1px solid #d8dee8;
+    }
+
+    .event.hot {
+      background: #fff7e6;
+      border-color: #d56b00;
+      box-shadow: inset 0 0 0 1px rgba(213, 107, 0, 0.24);
+    }
+
+    .event.msg { background: var(--message); }
+    .event.meta { background: var(--metadata); }
+    .event.work { background: var(--worker); }
+    .event.hist { background: var(--history); }
+
+    .dataflow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 14px 0;
+    }
+
+    .data-col {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .data-col h3 {
+      margin: 0;
+      padding: 12px 14px;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--line);
+      font-size: 15px;
+    }
+
+    .data-col .data-body {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .flow-chip {
+      display: block;
+      padding: 8px 9px;
+      border-radius: 7px;
+      background: #eef2f7;
+      font-size: 13px;
+      border-left: 5px solid #98a2b3;
+    }
+
+    .flow-chip.r1c { border-left-color: var(--upload-img); }
+    .flow-chip.r2c { border-left-color: var(--upload-post); }
+    .flow-chip.r3c { border-left-color: var(--quoted-img); }
+    .flow-chip.r4c { border-left-color: var(--quoted-post); }
+    .flow-chip.r5c { border-left-color: var(--asset); }
+    .flow-chip.r6c { border-left-color: var(--mypage); }
+
+    .svg-wrap {
+      margin: 16px 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0f141c;
+      overflow: auto;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+    }
+
+    .svg-wrap svg {
+      display: block;
+      min-width: 1080px;
+      width: 100%;
+      height: auto;
+    }
+
+    .svg-title {
+      fill: #f3f6fb;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .svg-note {
+      fill: #aeb7c6;
+      font-size: 13px;
+    }
+
+    .svg-box {
+      fill: #2b3038;
+      stroke: #596273;
+      stroke-width: 1.4;
+      rx: 4;
+    }
+
+    .svg-box-hot {
+      fill: #3b2c1f;
+      stroke: #ff9f43;
+      stroke-width: 2.6;
+      rx: 4;
+    }
+
+    .svg-box-good {
+      fill: #19362c;
+      stroke: #38b983;
+      stroke-width: 2;
+      rx: 4;
+    }
+
+    .svg-label {
+      fill: #edf2f7;
+      font-size: 14px;
+      font-weight: 700;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .svg-small {
+      fill: #c7d0dd;
+      font-size: 11px;
+      font-weight: 600;
+      text-anchor: middle;
+    }
+
+    .svg-line {
+      stroke: #b8c0cc;
+      stroke-width: 1.8;
+      fill: none;
+    }
+
+    .svg-line-hot {
+      stroke: #ff9f43;
+      stroke-width: 2.6;
+      fill: none;
+    }
+
+    .svg-life {
+      stroke: #6f7785;
+      stroke-width: 1.5;
+      stroke-dasharray: 0;
+    }
+
+    .svg-dashed {
+      stroke-dasharray: 5 5;
+    }
+
+    .svg-chip-text {
+      fill: #ffffff;
+      font-size: 12px;
+      font-weight: 800;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .tabs {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 12px;
+      margin-bottom: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+    }
+
+    .tab-button {
+      appearance: none;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: #344054;
+      padding: 9px 12px;
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    .tab-button.active {
+      border-color: #1f6feb;
+      background: #eff6ff;
+      color: #124ea8;
+      box-shadow: inset 0 0 0 1px rgba(31, 111, 235, 0.2);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .module-map {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .module-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 16px;
+      min-height: 190px;
+    }
+
+    .module-card h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+    }
+
+    .module-card .owner {
+      display: inline-block;
+      margin: 0 0 10px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #eef2f7;
+      color: #344054;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .module-card.hot {
+      border: 2px solid #d56b00;
+      background: #fffaf2;
+    }
+
+    .framework-card {
+      margin: 16px 0;
+      padding: 24px;
+      border-radius: 14px;
+      background: #202124;
+      color: #f8fafc;
+      border: 1px solid #3a3d44;
+      box-shadow: var(--shadow);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      overflow: auto;
+    }
+
+    .framework-tree {
+      white-space: pre;
+      font-size: 18px;
+      line-height: 1.8;
+      min-width: 620px;
+    }
+
+    .framework-tree .dim { color: #aeb7c6; }
+    .framework-tree .hot { color: #ffbf7b; font-weight: 800; }
+    .framework-tree .good { color: #8ee6b8; font-weight: 800; }
+
+    @media (max-width: 920px) {
+      header { padding: 28px 22px; }
+      main { padding: 18px 14px 36px; }
+      .grid.cols-2, .grid.cols-3 { grid-template-columns: 1fr; }
+      .process-map, .dataflow { grid-template-columns: 1fr; }
+      .module-map { grid-template-columns: 1fr; }
+      .process-step::after { display: none; }
+      .lane, .swimrow { grid-template-columns: 1fr; }
+      .flow-note { grid-template-columns: 1fr; }
+      .swimhead { border-right: 0; border-bottom: 1px solid var(--line); }
+      .arrow { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MediaLens Agent Reference Flow Architecture</h1>
+    <p>用颜色编号追踪不同 reference object 在前端、ChatStream、ADK message、custom metadata、各 task 和多轮对话中的流转。</p>
+  </header>
+
+  <main>
+    <nav class="tabs" aria-label="Agent architecture tabs">
+      <button class="tab-button" type="button" data-tab="overall">总流程</button>
+      <button class="tab-button" type="button" data-tab="modules">模块总览</button>
+      <button class="tab-button" type="button" data-tab="framework">Agent 框架</button>
+      <button class="tab-button" type="button" data-tab="brand">Brand Guidelines 注入</button>
+      <button class="tab-button active" type="button" data-tab="reference">Reference 模块</button>
+    </nav>
+
+    <div id="tab-overall" class="tab-panel">
+      <section>
+        <div class="section-head">
+          <h2>总流程图</h2>
+          <p>从用户在 MediaLens 前端输入消息，到 ADK Runner 路由 agent、执行工具、返回 SSE typed events 的完整主链路。</p>
+        </div>
+        <div class="body">
+          <div class="svg-wrap">
+            <svg viewBox="0 0 1220 1150" role="img" aria-label="MediaLens agent 总流程图">
+              <defs>
+                <marker id="overallArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                  <path d="M0,0 L8,3 L0,6 Z" fill="#b8c0cc"></path>
+                </marker>
+                <marker id="overallHot" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                  <path d="M0,0 L8,3 L0,6 Z" fill="#ff9f43"></path>
+                </marker>
+              </defs>
+
+              <text x="70" y="52" class="svg-title">MediaLens Agent 总流程图</text>
+              <text x="70" y="78" class="svg-note">主链路自上而下。橙色节点是 reference / prompt / tool context 优化点。</text>
+
+              <rect x="455" y="105" width="310" height="58" class="svg-box"></rect>
+              <text x="610" y="128" class="svg-label">用户在 MediaLens 前端输入消息</text>
+              <text x="610" y="149" class="svg-small">message / upload / selected refs / ad context</text>
+
+              <line x1="610" y1="163" x2="610" y2="205" class="svg-line" marker-end="url(#overallArrow)"></line>
+              <rect x="430" y="205" width="360" height="64" class="svg-box-hot"></rect>
+              <text x="610" y="230" class="svg-label">Frontend pre-harness</text>
+              <text x="610" y="251" class="svg-small">reference pool + ChannelRouter + streamChat</text>
+
+              <line x1="610" y1="269" x2="610" y2="315" class="svg-line-hot" marker-end="url(#overallHot)"></line>
+              <rect x="405" y="315" width="410" height="72" class="svg-box"></rect>
+              <text x="610" y="338" class="svg-label">POST /chat/stream</text>
+              <text x="610" y="359" class="svg-small">Authorization + x-org-id + message/session/custom_metadata/attachments</text>
+              <text x="610" y="376" class="svg-small">medialens_adk FastAPI app/api/chat.py chat_stream</text>
+
+              <line x1="610" y1="387" x2="610" y2="432" class="svg-line" marker-end="url(#overallArrow)"></line>
+              <rect x="455" y="432" width="310" height="62" class="svg-box"></rect>
+              <text x="610" y="456" class="svg-label">鉴权</text>
+              <text x="610" y="477" class="svg-small">JWT decode + x-org-id 校验</text>
+
+              <line x1="610" y1="494" x2="610" y2="538" class="svg-line" marker-end="url(#overallArrow)"></line>
+              <rect x="455" y="538" width="310" height="62" class="svg-box"></rect>
+              <text x="610" y="562" class="svg-label">计费 / 组织检查</text>
+              <text x="610" y="583" class="svg-small">billing guard / user info / token balance</text>
+
+              <line x1="610" y1="600" x2="610" y2="645" class="svg-line-hot" marker-end="url(#overallHot)"></line>
+              <rect x="430" y="645" width="360" height="78" class="svg-box-hot"></rect>
+              <text x="610" y="668" class="svg-label">Pre-run harness</text>
+              <text x="610" y="689" class="svg-small">sanitize creative/ad context</text>
+              <text x="610" y="706" class="svg-small">build_message_parts: text + image + GCS file + URL-only refs</text>
+
+              <line x1="610" y1="723" x2="610" y2="770" class="svg-line-hot" marker-end="url(#overallHot)"></line>
+              <rect x="425" y="770" width="370" height="80" class="svg-box-hot"></rect>
+              <text x="610" y="793" class="svg-label">组装 ADK Content</text>
+              <text x="610" y="814" class="svg-small">LLM message parts + custom_metadata</text>
+              <text x="610" y="831" class="svg-small">引用图 / YouTube 一次性分析</text>
+
+              <line x1="610" y1="850" x2="610" y2="895" class="svg-line" marker-end="url(#overallArrow)"></line>
+              <rect x="455" y="895" width="310" height="62" class="svg-box"></rect>
+              <text x="610" y="919" class="svg-label">bootstrap_session</text>
+              <text x="610" y="940" class="svg-small">get/create session + title/type/adAccountId</text>
+
+              <line x1="610" y1="957" x2="610" y2="1002" class="svg-line-hot" marker-end="url(#overallHot)"></line>
+              <rect x="455" y="1002" width="310" height="62" class="svg-box-hot"></rect>
+              <text x="610" y="1026" class="svg-label">RunConfig</text>
+              <text x="610" y="1047" class="svg-small">SSE TEXT + custom_metadata + max_llm_calls=30</text>
+
+              <line x1="455" y1="1033" x2="240" y2="1033" class="svg-line" marker-end="url(#overallArrow)"></line>
+              <rect x="60" y="1002" width="180" height="62" class="svg-box"></rect>
+              <text x="150" y="1026" class="svg-label">ADK App</text>
+              <text x="150" y="1047" class="svg-small">root_agent + session DB + plugins</text>
+
+              <line x1="765" y1="1033" x2="980" y2="1033" class="svg-line" marker-end="url(#overallArrow)"></line>
+              <rect x="980" y="1002" width="180" height="62" class="svg-box"></rect>
+              <text x="1070" y="1026" class="svg-label">Artifact / Cache</text>
+              <text x="1070" y="1047" class="svg-small">artifact service + compaction + context cache</text>
+
+              <line x1="610" y1="1064" x2="610" y2="1096" class="svg-line" marker-end="url(#overallArrow)"></line>
+              <rect x="430" y="1096" width="360" height="42" class="svg-box-good"></rect>
+              <text x="610" y="1117" class="svg-label">Google ADK Runner run_async → root_agent → sub_agents → SSE events</text>
+            </svg>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="tab-framework" class="tab-panel">
+      <section>
+        <div class="section-head">
+          <h2>Agent 框架：Harness 是什么</h2>
+          <p>Harness 是包在 Agent / LLM 外面的一层工程能力。它不负责“想创意”，而是负责工具注册、权限、安全、运行、日志和结果处理。</p>
+        </div>
+        <div class="body">
+          <div class="framework-card">
+            <div class="framework-tree">用户
+↓
+Agent / LLM
+↓
+<span class="hot">Harness</span>
+├─ Tool registry
+├─ Hooks
+├─ Permission control
+├─ Logging
+├─ Execution runtime
+└─ Tool result handling
+↓
+<span class="good">实际工具</span></div>
+          </div>
+
+          <div class="grid cols-2">
+            <div class="card">
+              <h3>在 MediaLens 中 Harness 对应什么</h3>
+              <ul class="small-list">
+                <li><code>/chat/stream</code> 接收用户请求并做鉴权、计费和上下文清洗。</li>
+                <li><code>build_message_parts</code> 把用户文本、图片、URL-only references 组装给 LLM。</li>
+                <li><code>RunConfig.custom_metadata</code> 把结构化上下文给工具读取。</li>
+                <li><code>Runner.run_async</code> 负责 LLM 和工具之间的循环。</li>
+                <li>SSE typed events 把工具结果变成前端可渲染卡片。</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>为什么需要 Harness</h3>
+              <ul class="small-list">
+                <li>让 LLM 不直接处理权限、JWT、org id 等敏感信息。</li>
+                <li>让工具拿到稳定结构化参数，而不是从自然语言里猜。</li>
+                <li>让图片、Post、Brand Guideline 等上下文按固定规则进入生成流程。</li>
+                <li>让所有任务都有统一的日志、事件持久化、错误处理和前端事件输出。</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="svg-wrap">
+            <svg viewBox="0 0 1220 680" role="img" aria-label="Agent Harness 框架图">
+              <defs>
+                <marker id="frameworkArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                  <path d="M0,0 L8,3 L0,6 Z" fill="#b8c0cc"></path>
+                </marker>
+                <marker id="frameworkHot" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                  <path d="M0,0 L8,3 L0,6 Z" fill="#ff9f43"></path>
+                </marker>
+              </defs>
+              <text x="70" y="52" class="svg-title">Agent / Harness / Tools 分层图</text>
+              <text x="70" y="78" class="svg-note">LLM 负责理解和决策；Harness 负责工程化执行；实际工具负责完成业务动作。</text>
+
+              <rect x="95" y="130" width="210" height="70" class="svg-box"></rect>
+              <text x="200" y="156" class="svg-label">用户请求</text>
+              <text x="200" y="178" class="svg-small">message + refs + context</text>
+
+              <line x1="305" y1="165" x2="440" y2="165" class="svg-line" marker-end="url(#frameworkArrow)"></line>
+              <rect x="440" y="130" width="220" height="70" class="svg-box"></rect>
+              <text x="550" y="156" class="svg-label">Agent / LLM</text>
+              <text x="550" y="178" class="svg-small">理解需求 / 决定工具</text>
+
+              <line x1="550" y1="200" x2="550" y2="270" class="svg-line-hot" marker-end="url(#frameworkHot)"></line>
+              <rect x="300" y="270" width="500" height="190" class="svg-box-hot"></rect>
+              <text x="550" y="300" class="svg-label">Harness 工程层</text>
+              <text x="550" y="328" class="svg-small">Tool registry · Hooks · Permission control</text>
+              <text x="550" y="356" class="svg-small">Logging · Execution runtime · Tool result handling</text>
+              <text x="550" y="384" class="svg-small">build_message_parts · custom_metadata · session · SSE events</text>
+              <text x="550" y="412" class="svg-small">Brand / Reference / Ad context 清洗与注入</text>
+
+              <line x1="800" y1="365" x2="930" y2="365" class="svg-line-hot" marker-end="url(#frameworkHot)"></line>
+              <rect x="930" y="270" width="220" height="190" class="svg-box-good"></rect>
+              <text x="1040" y="300" class="svg-label">实际工具</text>
+              <text x="1040" y="328" class="svg-small">image-gen enqueue</text>
+              <text x="1040" y="356" class="svg-small">assemble post draft</text>
+              <text x="1040" y="384" class="svg-small">propose publish/action</text>
+              <text x="1040" y="412" class="svg-small">MCP / ad-insights scripts</text>
+
+              <path d="M930 470 C800 540, 510 550, 305 470" class="svg-line svg-dashed" marker-end="url(#frameworkArrow)"></path>
+              <text x="610" y="545" class="svg-small">tool_result / function_response 回到 ADK event stream</text>
+
+              <rect x="95" y="530" width="250" height="70" class="svg-box-good"></rect>
+              <text x="220" y="556" class="svg-label">前端展示</text>
+              <text x="220" y="578" class="svg-small">SSE text + typed events</text>
+            </svg>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="tab-modules" class="tab-panel">
+      <section>
+        <div class="section-head">
+          <h2>Agent 模块总览</h2>
+          <p>将整个 agent 按可维护模块拆开：Reference 注入只是其中一个模块，另外还有 Image Gen、Post Gen、Publish、Social Pulse、Pause Ad 和 Harness 基础设施。</p>
+        </div>
+        <div class="body">
+          <div class="module-map">
+            <div class="module-card hot">
+              <span class="owner">Reference / Prompt Context</span>
+              <h3>Reference 模块</h3>
+              <p>负责 upload image、selected post、quoted asset、My Page 的统一 reference pool、三通道分流、prompt 注入、多轮恢复。</p>
+              <ul class="small-list">
+                <li><code>referenceChannelRouter</code></li>
+                <li><code>build_message_parts</code></li>
+                <li><code>creative_studio_context</code></li>
+              </ul>
+            </div>
+            <div class="module-card hot">
+              <span class="owner">Brand Context</span>
+              <h3>Brand Guidelines 模块</h3>
+              <p>负责已确认 Brand Guideline 的保存、session 启用、品牌信息注入。它复用 Creative Studio 的结构化上下文，但不等同于 My Page。</p>
+              <ul class="small-list">
+                <li><code>creative_studio_context.brandGuideline</code></li>
+                <li>Brand Card confirmation</li>
+                <li>Assets -> Brand Setting</li>
+              </ul>
+            </div>
+            <div class="module-card hot">
+              <span class="owner">Creative Generation</span>
+              <h3>Image 生成模块</h3>
+              <p>消费用户 prompt、上传图、post image、asset image、My Page brand signal，调用 image-gen skill 入队。</p>
+              <ul class="small-list">
+                <li><code>image_gen_agent</code></li>
+                <li><code>image-gen/scripts/enqueue.py</code></li>
+                <li><code>image_gen_queued</code></li>
+              </ul>
+            </div>
+            <div class="module-card hot">
+              <span class="owner">Content Draft</span>
+              <h3>Post 生成模块</h3>
+              <p>复用 image-gen 生成视觉资产，同时生成 caption / overlay / post draft，并读取 postSettings。</p>
+              <ul class="small-list">
+                <li><code>full_post_gen_agent</code></li>
+                <li><code>assemble_post_draft.py</code></li>
+                <li><code>post_draft_created</code></li>
+              </ul>
+            </div>
+            <div class="module-card">
+              <span class="owner">Action Proposal</span>
+              <h3>Publish 模块</h3>
+              <p>从 session 找最近 draft，生成 publish intent。Agent 不直接发布，前端确认后 backend 执行。</p>
+              <ul class="small-list">
+                <li><code>propose_publish</code></li>
+                <li><code>publish_intent</code></li>
+                <li>frontend confirmation card</li>
+              </ul>
+            </div>
+            <div class="module-card">
+              <span class="owner">Monitoring Task</span>
+              <h3>Social Pulse 模块</h3>
+              <p>不走 Creative refs；从用户文本提取 keywords / platform / region / frequency，通过 MCP 创建任务。</p>
+              <ul class="small-list">
+                <li><code>social_pulse_agent</code></li>
+                <li><code>get_my_email</code></li>
+                <li><code>create_social_pulse_task</code></li>
+              </ul>
+            </div>
+            <div class="module-card">
+              <span class="owner">Ad Operation</span>
+              <h3>Pause Ad 模块</h3>
+              <p>消费 ad_manager_context，跑 ad-insights skill，生成暂停/恢复 proposal；真实写入 Meta 由确认后的 backend 完成。</p>
+              <ul class="small-list">
+                <li><code>ad_insights_agent</code></li>
+                <li><code>propose_ad_action</code></li>
+                <li><code>ad_action_proposal</code></li>
+              </ul>
+            </div>
+            <div class="module-card">
+              <span class="owner">Harness</span>
+              <h3>ADK Harness 模块</h3>
+              <p>负责 auth、billing、session、RunConfig、SSE stream、typed event 抽取、event persistence。</p>
+              <ul class="small-list">
+                <li><code>/chat/stream</code></li>
+                <li><code>Runner.run_async</code></li>
+                <li><code>DatabaseSessionService</code></li>
+              </ul>
+            </div>
+            <div class="module-card">
+              <span class="owner">Storage</span>
+              <h3>Artifact / Session 模块</h3>
+              <p>会话历史由 session events 管理；ADK artifact 是 agent/tool 文件产物，不是 Creative reference 的主通道。</p>
+              <ul class="small-list">
+                <li><code>GcsArtifactService</code></li>
+                <li><code>load_artifacts_tool</code></li>
+                <li><code>events_compaction_config</code></li>
+              </ul>
+            </div>
+            <div class="module-card">
+              <span class="owner">Typed Events</span>
+              <h3>前端展示模块</h3>
+              <p>后端从 function_response 抽取 typed events，前端渲染 queued image、draft、publish card、ad action card。</p>
+              <ul class="small-list">
+                <li><code>image_gen_queued</code></li>
+                <li><code>post_draft_created</code></li>
+                <li><code>publish_intent</code> / <code>ad_action_proposal</code></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="tab-brand" class="tab-panel">
+      <section>
+        <div class="section-head">
+          <h2>Brand Guidelines 注入逻辑</h2>
+          <p>Brand Guidelines 复用现有 Creative Studio 上下文流程，但作为独立品牌上下文管理。只有用户确认后才在当前 session 生效，并可保存到 Assets -> Brand Setting。</p>
+        </div>
+        <div class="body">
+          <div class="callout">
+            <strong>核心原则：</strong>My Page 是 Brand Guideline 的一种来源，不是 Brand Guideline 本身。Brand Guideline 可以来自 My Page、上传 Logo/品牌图、手动填写或已有保存项。
+          </div>
+
+          <div class="process-map">
+            <div class="process-step hot">
+              <span class="hot-label">1</span>
+              <h3>需要品牌信息</h3>
+              <p>Agent 判断当前任务需要品牌约束，或用户明确说“按品牌风格 / 用这个 My Page / 用我的 Logo”。</p>
+            </div>
+            <div class="process-step hot">
+              <span class="hot-label">2</span>
+              <h3>Brand Card 确认</h3>
+              <p>若用户已有 Brand，先选择已有或新建；若选择 My Page，则先确认是否用该 Page 生成 Guideline。</p>
+            </div>
+            <div class="process-step hot">
+              <span class="hot-label">3</span>
+              <h3>生成 / 编辑 Guideline</h3>
+              <p>LLM 可根据 My Page 或 Logo 生成草稿；用户可编辑 Brand Name、Platform、Logo、Colors、Tone、Audience。</p>
+            </div>
+            <div class="process-step hot">
+              <span class="hot-label">4</span>
+              <h3>用户确认</h3>
+              <p>确认后保存到 Brand Setting，并写入当前 session 的 active brand context。</p>
+            </div>
+            <div class="process-step hot">
+              <span class="hot-label">5</span>
+              <h3>注入生成任务</h3>
+              <p>Image Gen / Full Post Gen 读取 brandGuideline；Publish、Social Pulse、Pause Ad 默认不使用。</p>
+            </div>
+            <div class="process-step">
+              <h3>清除 / 忽略</h3>
+              <p>用户说“不要用品牌风格 / 忽略这个品牌”时，本任务或当前 session 停用。</p>
+            </div>
+            <div class="process-step">
+              <h3>后续 session</h3>
+              <p>不会默认加载，用户需要再次选择或确认 Brand Guideline。</p>
+            </div>
+          </div>
+
+          <div class="svg-wrap">
+            <svg viewBox="0 0 1220 720" role="img" aria-label="Brand Guidelines 注入主流程">
+              <defs>
+                <marker id="brandArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                  <path d="M0,0 L8,3 L0,6 Z" fill="#b8c0cc"></path>
+                </marker>
+                <marker id="brandHot" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                  <path d="M0,0 L8,3 L0,6 Z" fill="#ff9f43"></path>
+                </marker>
+              </defs>
+
+              <text x="70" y="52" class="svg-title">Brand Guidelines 注入主流程</text>
+              <text x="70" y="78" class="svg-note">橙色表示新增/需要重点设计的节点。Brand Guideline 走结构化上下文，不替代已有 Reference 三通道。</text>
+
+              <rect x="70" y="120" width="220" height="58" class="svg-box"></rect>
+              <text x="180" y="143" class="svg-label">User 生成需求</text>
+              <text x="180" y="164" class="svg-small">image / full post</text>
+
+              <line x1="290" y1="149" x2="420" y2="149" class="svg-line" marker-end="url(#brandArrow)"></line>
+              <rect x="420" y="120" width="260" height="58" class="svg-box-hot"></rect>
+              <text x="550" y="143" class="svg-label">是否需要 Brand?</text>
+              <text x="550" y="164" class="svg-small">Agent 判断 + session 状态</text>
+
+              <path d="M550 178 C490 232, 405 250, 330 270" class="svg-line-hot" marker-end="url(#brandHot)"></path>
+              <rect x="155" y="270" width="350" height="70" class="svg-box-hot"></rect>
+              <text x="330" y="294" class="svg-label">Brand Card</text>
+              <text x="330" y="315" class="svg-small">已有 Brand / My Page / Logo Upload / Manual</text>
+
+              <path d="M550 178 C620 232, 710 250, 810 270" class="svg-line" marker-end="url(#brandArrow)"></path>
+              <rect x="705" y="270" width="300" height="70" class="svg-box"></rect>
+              <text x="855" y="294" class="svg-label">无需品牌</text>
+              <text x="855" y="315" class="svg-small">普通 reference flow 继续</text>
+
+              <line x1="330" y1="340" x2="330" y2="400" class="svg-line-hot" marker-end="url(#brandHot)"></line>
+              <rect x="150" y="400" width="360" height="78" class="svg-box-hot"></rect>
+              <text x="330" y="423" class="svg-label">用户确认 Brand Guideline</text>
+              <text x="330" y="444" class="svg-small">保存到 Brand Setting + 当前 session active</text>
+              <text x="330" y="461" class="svg-small">by org + by user</text>
+
+              <line x1="510" y1="439" x2="700" y2="439" class="svg-line-hot" marker-end="url(#brandHot)"></line>
+              <rect x="700" y="400" width="360" height="78" class="svg-box-hot"></rect>
+              <text x="880" y="423" class="svg-label">creative_studio_context.brandGuideline</text>
+              <text x="880" y="444" class="svg-small">结构化字段给工具读</text>
+              <text x="880" y="461" class="svg-small">同时生成 prompt summary 给 LLM 读</text>
+
+              <path d="M790 478 C650 535, 510 545, 380 570" class="svg-line-hot" marker-end="url(#brandHot)"></path>
+              <rect x="210" y="570" width="340" height="68" class="svg-box-good"></rect>
+              <text x="380" y="594" class="svg-label">Image Gen</text>
+              <text x="380" y="615" class="svg-small">品牌视觉 + 颜色 + Logo 规则</text>
+
+              <path d="M970 478 C1015 530, 995 548, 900 570" class="svg-line-hot" marker-end="url(#brandHot)"></path>
+              <rect x="730" y="570" width="340" height="68" class="svg-box-good"></rect>
+              <text x="900" y="594" class="svg-label">Full Post Gen</text>
+              <text x="900" y="615" class="svg-small">品牌视觉 + caption tone + platform/page</text>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <h2>Brand Guideline 传递什么信息</h2>
+          <p>Brand Guideline 建议作为 <code>creative_studio_context.brandGuideline</code> 进入结构化上下文；同时在 <code>build_message_parts</code> 中注入一段短的品牌摘要给 LLM。</p>
+        </div>
+        <div class="body">
+          <table>
+            <thead>
+              <tr>
+                <th>字段</th>
+                <th>来源</th>
+                <th>进入哪里</th>
+                <th>用途</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>brandGuideline.id</code></td>
+                <td>保存后的 Brand Guideline id</td>
+                <td><code>custom_metadata.creative_studio_context</code></td>
+                <td>稳定识别这套品牌规则，支持后续 session 选择。</td>
+              </tr>
+              <tr>
+                <td><code>brandName</code></td>
+                <td>手动填写；或 My Page name 默认；或 LLM 从 Logo/图片生成</td>
+                <td>Prompt summary + structured context</td>
+                <td>告诉模型当前使用哪个品牌。</td>
+              </tr>
+              <tr>
+                <td><code>platforms[]</code></td>
+                <td>用户选择 My Facebook Page / My Instagram Page</td>
+                <td>Structured context</td>
+                <td>未来支持同时生成 Facebook + Instagram；当前用于 page identity。</td>
+              </tr>
+              <tr>
+                <td><code>logos[]</code></td>
+                <td>用户上传多个 Logo / Brand image</td>
+                <td>Structured context；必要时走 image reference 通道</td>
+                <td>默认作为视觉参考；用户明确要求“把 Logo 放在图里”时才作为画面元素。</td>
+              </tr>
+              <tr>
+                <td><code>colors[]</code></td>
+                <td>手动填写、Logo 分析、My Page 生成</td>
+                <td>Prompt summary + structured context</td>
+                <td>软约束，尽量贴合品牌色。</td>
+              </tr>
+              <tr>
+                <td><code>tone</code> / <code>audience</code></td>
+                <td>LLM 生成或手动填写</td>
+                <td>Prompt summary + structured context</td>
+                <td>影响 caption、overlay text 和视觉风格。</td>
+              </tr>
+              <tr>
+                <td><code>writingRules</code></td>
+                <td>用户填写或 LLM 生成</td>
+                <td>Prompt summary + structured context</td>
+                <td>Full Post Gen 写 caption 时遵循。</td>
+              </tr>
+              <tr>
+                <td><code>status=confirmed</code></td>
+                <td>用户点击确认后产生</td>
+                <td>Session active brand state</td>
+                <td>只有 confirmed 的 Brand Guideline 才能注入生成任务。</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <pre>{
+  "creative_studio_context": {
+    "agent": "image_gen | full_post_gen",
+    "format": { "ratio": "1:1" },
+    "referenceImageUrls": [],
+    "references": [],
+    "brandGuideline": {
+      "id": "brand_123",
+      "status": "confirmed",
+      "source": "saved | mypage | logo_upload | manual",
+      "brandName": "BusinessFocus",
+      "platforms": [
+        {
+          "type": "facebook",
+          "pageId": "fb_page_123",
+          "pageName": "BusinessFocus",
+          "handle": "businessfocusio"
+        }
+      ],
+      "logos": [
+        {
+          "gcsUri": "gs://.../logo-primary.png",
+          "fileName": "logo-primary.png",
+          "usage": "reference"
+        }
+      ],
+      "colors": ["#16294E", "#1F3C72", "#466297", "#FEFB09"],
+      "tone": "Professional, calm, fact-driven",
+      "audience": "Working professionals 25-45",
+      "writingRules": "No exaggerated headlines; cite data sources.",
+      "scope": "current_session"
+    }
+  }
+}</pre>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <h2>复用现有流程的方式</h2>
+          <p>Brand Guideline 不需要重做一套 agent 通道。建议在现有 Creative Studio context 上扩展。</p>
+        </div>
+        <div class="body">
+          <table>
+            <thead>
+              <tr>
+                <th>现有能力</th>
+                <th>Brand Guideline 如何复用</th>
+                <th>注意事项</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>creative_studio_context</code></td>
+                <td>新增 <code>brandGuideline</code> 字段，作为已确认品牌规则的结构化载体。</td>
+                <td>只传 confirmed brand；不默认加载历史 brand。</td>
+              </tr>
+              <tr>
+                <td><code>references[]</code></td>
+                <td>My Page 仍可作为 reference，但不再直接等同 Brand Guideline。</td>
+                <td>My Page 被引用后，如果需要品牌规则，先弹 Brand Card 确认。</td>
+              </tr>
+              <tr>
+                <td><code>attachments[]</code></td>
+                <td>Logo / Brand image 新上传时可复用 GCS upload 机制。</td>
+                <td>Logo 默认不是普通生成参考图，不一定进入 worker。</td>
+              </tr>
+              <tr>
+                <td><code>referenceImageUrls[]</code></td>
+                <td>当用户明确要求“图片上使用 Logo”时，把 Logo 作为 reference image 给 worker。</td>
+                <td>如果只是品牌参考，避免无标签地放入 worker，防止模型误把 Logo 画进图里。</td>
+              </tr>
+              <tr>
+                <td><code>build_message_parts</code></td>
+                <td>把 Brand Guideline 压缩成一段短文本注入 LLM message。</td>
+                <td>强调颜色是软约束，Logo 默认参考，不强制出现。</td>
+              </tr>
+              <tr>
+                <td><code>get_creative_studio_context()</code></td>
+                <td>Image Gen / Full Post Gen 通过工具读取完整 brandGuideline。</td>
+                <td>工具读取结构化字段，避免让 LLM 从自然语言里猜参数。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <h2>Image Gen 与 Full Post Gen 的注入差异</h2>
+          <p>同一套 Brand Guideline 在两个生成任务中的使用重点不同。</p>
+        </div>
+        <div class="body">
+          <div class="grid cols-2">
+            <div class="card">
+              <h3>Image Gen 注入</h3>
+              <ul class="small-list">
+                <li>注入品牌名、颜色、视觉语气、Logo 使用规则。</li>
+                <li>Logo 默认是视觉参考，不强制出现在图里。</li>
+                <li>如果用户说“把 Logo 放在图上”，Logo 才进入 worker reference image。</li>
+                <li>Brand color 是软约束，不能牺牲主体或产品表达。</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Full Post Gen 注入</h3>
+              <ul class="small-list">
+                <li>注入品牌名、platform/page、颜色、语气、受众、写作规则。</li>
+                <li>生成 caption 时遵循品牌语气和 Tone Guard。</li>
+                <li>生成图片时遵循品牌视觉规则。</li>
+                <li>如果同时引用竞品 Post：先保留竞品结构，再轻度套品牌。</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="svg-wrap">
+            <svg viewBox="0 0 1220 640" role="img" aria-label="Brand Guideline 在 Image Gen 和 Full Post Gen 中的流转">
+              <defs>
+                <marker id="brandTaskArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                  <path d="M0,0 L8,3 L0,6 Z" fill="#b8c0cc"></path>
+                </marker>
+                <marker id="brandTaskHot" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                  <path d="M0,0 L8,3 L0,6 Z" fill="#ff9f43"></path>
+                </marker>
+              </defs>
+              <text x="70" y="52" class="svg-title">Brand Guideline 注入到生成任务</text>
+              <text x="70" y="78" class="svg-note">时间从左到右。Brand context 与 reference context 并行进入生成 agent。</text>
+
+              <rect x="70" y="140" width="230" height="68" class="svg-box-hot"></rect>
+              <text x="185" y="164" class="svg-label">Confirmed Brand Guideline</text>
+              <text x="185" y="185" class="svg-small">brandName / platforms / logo / colors / tone</text>
+
+              <rect x="70" y="300" width="230" height="68" class="svg-box"></rect>
+              <text x="185" y="324" class="svg-label">Reference Context</text>
+              <text x="185" y="345" class="svg-small">upload / post / asset / mypage</text>
+
+              <line x1="300" y1="174" x2="490" y2="174" class="svg-line-hot" marker-end="url(#brandTaskHot)"></line>
+              <line x1="300" y1="334" x2="490" y2="334" class="svg-line" marker-end="url(#brandTaskArrow)"></line>
+
+              <rect x="490" y="120" width="270" height="110" class="svg-box-hot"></rect>
+              <text x="625" y="150" class="svg-label">build_message_parts</text>
+              <text x="625" y="174" class="svg-small">Brand summary 给 LLM 读</text>
+              <text x="625" y="196" class="svg-small">颜色软约束 / Logo 默认参考</text>
+
+              <rect x="490" y="280" width="270" height="110" class="svg-box-hot"></rect>
+              <text x="625" y="310" class="svg-label">custom_metadata</text>
+              <text x="625" y="334" class="svg-small">brandGuideline 结构化字段</text>
+              <text x="625" y="356" class="svg-small">给工具稳定读取</text>
+
+              <path d="M760 175 C835 205, 870 225, 910 260" class="svg-line-hot" marker-end="url(#brandTaskHot)"></path>
+              <path d="M760 335 C840 315, 875 300, 910 280" class="svg-line-hot" marker-end="url(#brandTaskHot)"></path>
+
+              <rect x="910" y="170" width="250" height="86" class="svg-box-good"></rect>
+              <text x="1035" y="198" class="svg-label">Image Gen</text>
+              <text x="1035" y="220" class="svg-small">视觉风格 + 颜色 + Logo 规则</text>
+
+              <rect x="910" y="330" width="250" height="86" class="svg-box-good"></rect>
+              <text x="1035" y="358" class="svg-label">Full Post Gen</text>
+              <text x="1035" y="380" class="svg-small">caption tone + visual + page/platform</text>
+
+              <line x1="1035" y1="256" x2="1035" y2="330" class="svg-line svg-dashed" marker-end="url(#brandTaskArrow)"></line>
+              <text x="1088" y="294" class="svg-small">共用 image-gen skill</text>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <h2>什么时候注入 Brand Guideline</h2>
+          <p>避免过度打扰，也避免用户没确认时偷偷套品牌。</p>
+        </div>
+        <div class="body">
+          <table>
+            <thead>
+              <tr>
+                <th>场景</th>
+                <th>是否注入</th>
+                <th>说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>用户刚确认 Brand Card</td>
+                <td>是</td>
+                <td>当前 session 生效，后续 Image Gen / Full Post Gen 默认使用。</td>
+              </tr>
+              <tr>
+                <td>用户选择已有 Brand</td>
+                <td>是</td>
+                <td>选择后才加载，不在新 session 自动加载。</td>
+              </tr>
+              <tr>
+                <td>用户引用 My Page 且任务需要品牌</td>
+                <td>先确认</td>
+                <td>弹 Brand Card：是否用这个 My Page 生成 Brand Guideline。</td>
+              </tr>
+              <tr>
+                <td>用户上传 Logo / Brand image</td>
+                <td>先确认</td>
+                <td>LLM 生成 Guideline 草稿，用户确认后注入。</td>
+              </tr>
+              <tr>
+                <td>用户说“不要用品牌风格”</td>
+                <td>否</td>
+                <td>本任务临时禁用。</td>
+              </tr>
+              <tr>
+                <td>Publish / Social Pulse / Pause Ad</td>
+                <td>默认否</td>
+                <td>这些任务不重新生成内容或不使用 Creative refs。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <div id="tab-reference" class="tab-panel active">
+    <section>
+      <div class="section-head">
+        <h2>0. 颜色编号图例</h2>
+        <p>下面 6 类 reference object 会在整份图里使用同一套颜色和编号。</p>
+      </div>
+      <div class="body">
+        <div class="grid cols-3">
+          <div class="card">
+            <span class="tag r1"><span class="num">1</span>User uploaded image</span>
+            <p>用户本地上传的图片。先上传到 GCS，聊天请求里作为 <code>attachments[]</code>，同时 dual-write 到 <code>referenceImageUrls[]</code> 给生图 worker。</p>
+          </div>
+          <div class="card">
+            <span class="tag r2"><span class="num">2</span>User uploaded / selected post</span>
+            <p>用户选择的 post reference。包含 post identity、caption、platform、sentiment、media、children 等结构化信息；post 主图另走 worker 图片通道。</p>
+          </div>
+          <div class="card">
+            <span class="tag r3"><span class="num">3</span>User quoted image</span>
+            <p>用户在 prompt 中使用 <code>@image1</code> 这类 marker 引用图片。可能指向上传图，也可能指向已有 asset；靠 <code>assignedNo</code> / <code>refToken</code> 绑定。</p>
+          </div>
+          <div class="card">
+            <span class="tag r4"><span class="num">4</span>User quoted post image</span>
+            <p>用户用 <code>@Post</code> 引用 post，希望参考 post 的图像和 caption。图片走 <code>referenceImageUrls[]</code>，caption 和 post metadata 走 <code>references[]</code>。</p>
+          </div>
+          <div class="card">
+            <span class="tag r5"><span class="num">5</span>User quoted assets</span>
+            <p>用户引用 MediaLens 内已有生成资产。CDN URL 进入 <code>referenceImageUrls[]</code>，结构化 asset identity 进入 <code>references[]</code>。</p>
+          </div>
+          <div class="card">
+            <span class="tag r6"><span class="num">6</span>User quoted My Page</span>
+            <p>用户引用自己的 connected page。没有图片像素通道，只进入 <code>references[]</code>，提供 page identity、handle、followers、brand tone 等。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>0.1 主流程图：优化点在哪个环节</h2>
+        <p>橙色高亮表示最影响生成质量、最值得优化的环节。核心目标是让 LLM 和生图 worker 在当前 turn 都拿到准确、成对、结构化的 reference。</p>
+      </div>
+      <div class="body">
+        <div class="process-map">
+          <div class="process-step hot">
+            <span class="hot-label">优化点 A</span>
+            <h3>Frontend Reference Pool</h3>
+            <p>统一保存 upload / post / asset / mypage。关键是稳定 <code>refToken</code>、<code>entityId</code>、<code>assignedNo</code>。</p>
+          </div>
+          <div class="process-step hot">
+            <span class="hot-label">优化点 B</span>
+            <h3>Channel Router</h3>
+            <p>把 reference 拆到 <code>attachments[]</code>、<code>referenceImageUrls[]</code>、<code>references[]</code>。这里决定图片是否同时给 LLM 和 worker。</p>
+          </div>
+          <div class="process-step">
+            <h3>/chat/stream</h3>
+            <p>接收 message、attachments、custom metadata，做 auth、billing、上下文提取。</p>
+          </div>
+          <div class="process-step hot">
+            <span class="hot-label">优化点 C</span>
+            <h3>build_message_parts</h3>
+            <p>注入 <code>[imageN]</code>、<code>file_data</code>、URL-only 文本、引用图分析。这里决定 LLM 当前 turn 看见什么。</p>
+          </div>
+          <div class="process-step hot">
+            <span class="hot-label">优化点 D</span>
+            <h3>custom_metadata</h3>
+            <p>结构化保存 <code>creative_studio_context</code>。工具稳定读取 ratio、postSettings、referenceImageUrls、references。</p>
+          </div>
+          <div class="process-step hot">
+            <span class="hot-label">优化点 E</span>
+            <h3>Sub-agent / Skill</h3>
+            <p>image-gen / full-post-gen 消费 refs。这里要确保 post image 和 caption 仍然绑定为同一 post。</p>
+          </div>
+          <div class="process-step hot">
+            <span class="hot-label">优化点 F</span>
+            <h3>Session History</h3>
+            <p>多轮可以读历史 events，但质量最稳是当前 turn 重新发送关键 reference。</p>
+          </div>
+        </div>
+
+        <div class="flow-note">
+          <div>
+            <strong>当前最关键优化</strong>
+            <span class="mini">生成质量优先级最高</span>
+          </div>
+          <div>
+            <span class="pill">上传图：当前 turn 同时进入 attachments[] + referenceImageUrls[]</span>
+            <span class="pill">Post：image URL 和 caption 用 entityId/ref_token 强绑定</span>
+            <span class="pill">多轮 re-gen：从历史 snapshot 恢复并重发 reference</span>
+          </div>
+        </div>
+
+        <div class="dataflow">
+          <div class="data-col">
+            <h3>Reference 输入</h3>
+            <div class="data-body">
+              <span class="flow-chip r1c">1 上传图：GCS gs:// + assignedNo</span>
+              <span class="flow-chip r4c">4 引用 post：post id + image + caption</span>
+              <span class="flow-chip r6c">6 My Page：page id + handle + brand</span>
+            </div>
+          </div>
+          <div class="data-col">
+            <h3>LLM Prompt</h3>
+            <div class="data-body">
+              <span class="flow-chip r1c">[image1] + file_data</span>
+              <span class="flow-chip r4c">post identity URL-only line</span>
+              <span class="flow-chip r6c">page identity + brand tone line</span>
+            </div>
+          </div>
+          <div class="data-col">
+            <h3>Tool Metadata</h3>
+            <div class="data-body">
+              <span class="flow-chip r1c">referenceImageUrls: gs:// upload image</span>
+              <span class="flow-chip r4c">references: post caption/media</span>
+              <span class="flow-chip r6c">references: brand tone/audience/colors</span>
+            </div>
+          </div>
+          <div class="data-col">
+            <h3>Worker / Output</h3>
+            <div class="data-body">
+              <span class="flow-chip r1c">worker 读取上传图像素</span>
+              <span class="flow-chip r4c">worker 读取 post 主图</span>
+              <span class="flow-chip">typed event: queued / draft</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>0.2 箭头版主流程图</h2>
+        <p>这张图按“同一份用户请求拆成两路”理解：一路进入 LLM message parts，一路进入 custom_metadata。橙色框就是当前需要重点优化的环节。</p>
+      </div>
+      <div class="body">
+        <div class="svg-wrap">
+          <svg viewBox="0 0 1220 620" role="img" aria-label="主流程图：同一份用户请求拆分到 LLM message parts 和 custom_metadata">
+            <defs>
+              <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#b8c0cc"></path>
+              </marker>
+              <marker id="arrowHot" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#ff9f43"></path>
+              </marker>
+            </defs>
+
+            <text x="70" y="52" class="svg-title">主流程：同一份用户请求如何拆成 Prompt 与 Tool Context</text>
+            <text x="70" y="78" class="svg-note">橙色 = 生成质量优化点；箭头表示数据流向，不是调用栈。</text>
+
+            <rect x="480" y="108" width="250" height="58" class="svg-box-hot"></rect>
+            <text x="605" y="133" class="svg-label">同一份用户请求</text>
+            <text x="605" y="153" class="svg-small">message + attachments + custom_metadata</text>
+
+            <path d="M520 166 C380 205, 320 210, 270 245" class="svg-line-hot" marker-end="url(#arrowHot)"></path>
+            <path d="M690 166 C825 205, 890 210, 940 245" class="svg-line-hot" marker-end="url(#arrowHot)"></path>
+
+            <rect x="150" y="245" width="250" height="62" class="svg-box-hot"></rect>
+            <text x="275" y="270" class="svg-label">LLM message parts</text>
+            <text x="275" y="291" class="svg-small">build_message_parts 注入</text>
+
+            <rect x="815" y="245" width="250" height="62" class="svg-box-hot"></rect>
+            <text x="940" y="270" class="svg-label">custom_metadata</text>
+            <text x="940" y="291" class="svg-small">RunConfig 中的结构化上下文</text>
+
+            <path d="M215 307 C175 345, 170 365, 170 394" class="svg-line" marker-end="url(#arrow)"></path>
+            <path d="M335 307 C390 348, 410 365, 410 394" class="svg-line" marker-end="url(#arrow)"></path>
+            <path d="M900 307 C850 348, 835 365, 835 394" class="svg-line" marker-end="url(#arrow)"></path>
+            <path d="M990 307 C1048 348, 1070 365, 1070 394" class="svg-line" marker-end="url(#arrow)"></path>
+
+            <rect x="70" y="394" width="200" height="54" class="svg-box"></rect>
+            <text x="170" y="415" class="svg-label">给模型读</text>
+            <text x="170" y="434" class="svg-small">自然语言 + 多模态</text>
+
+            <rect x="310" y="394" width="250" height="54" class="svg-box-hot"></rect>
+            <text x="435" y="415" class="svg-label">[imageN] / file_data / URL-only</text>
+            <text x="435" y="434" class="svg-small">决定当前 turn 模型看见什么</text>
+
+            <rect x="735" y="394" width="200" height="54" class="svg-box"></rect>
+            <text x="835" y="415" class="svg-label">给工具读</text>
+            <text x="835" y="434" class="svg-small">结构化、稳定、带权限</text>
+
+            <rect x="970" y="394" width="230" height="54" class="svg-box-hot"></rect>
+            <text x="1085" y="415" class="svg-label">refs / ratio / postSettings</text>
+            <text x="1085" y="434" class="svg-small">工具拿准确参数</text>
+
+            <path d="M170 448 L170 502" class="svg-line" marker-end="url(#arrow)"></path>
+            <path d="M835 448 L835 502" class="svg-line" marker-end="url(#arrow)"></path>
+            <path d="M435 448 C520 490, 600 500, 690 502" class="svg-line-hot" marker-end="url(#arrowHot)"></path>
+            <path d="M1085 448 C1025 490, 945 500, 870 502" class="svg-line-hot" marker-end="url(#arrowHot)"></path>
+
+            <rect x="60" y="502" width="220" height="58" class="svg-box"></rect>
+            <text x="170" y="525" class="svg-label">模型决定调用哪个工具</text>
+            <text x="170" y="545" class="svg-small">基于 prompt 理解需求</text>
+
+            <rect x="620" y="502" width="290" height="58" class="svg-box-good"></rect>
+            <text x="765" y="525" class="svg-label">工具拿到准确上下文并执行</text>
+            <text x="765" y="545" class="svg-small">image-gen / full-post-gen / ad-insights</text>
+
+            <rect x="430" y="580" width="360" height="28" fill="#2d3748" stroke="#596273" rx="14"></rect>
+            <text x="610" y="595" class="svg-chip-text">结论：Prompt 给模型理解，metadata 给工具可靠执行，两路要同步优化</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>1. 三个核心传输通道</h2>
+        <p>同一个 reference pool 会被前端 <code>referenceChannelRouter</code> 分流到三个通道。</p>
+      </div>
+      <div class="body">
+        <table>
+          <thead>
+            <tr>
+              <th>通道</th>
+              <th>谁消费</th>
+              <th>承载什么</th>
+              <th>哪些 reference 会进入</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>attachments[]</code></td>
+              <td>ADK / Gemini LLM</td>
+              <td><code>gcs_uri</code>, <code>mime_type</code>, <code>file_name</code>, <code>ref_token</code>, <code>assignedNo</code>, <code>entityType</code>, <code>entityId</code>, <code>orgId</code></td>
+              <td><span class="tag r1"><span class="num">1</span>upload image</span> <span class="tag r3"><span class="num">3</span>quoted upload image</span></td>
+            </tr>
+            <tr>
+              <td><code>referenceImageUrls[]</code></td>
+              <td>image generation worker</td>
+              <td><code>url</code>, <code>assignedNo</code>, <code>ref_token</code>。URL 可以是上传图的 <code>gs://</code>，也可以是 post / asset 的 HTTPS 图片。</td>
+              <td><span class="tag r1"><span class="num">1</span>upload image</span> <span class="tag r4"><span class="num">4</span>post main image</span> <span class="tag r5"><span class="num">5</span>asset CDN image</span></td>
+            </tr>
+            <tr>
+              <td><code>references[]</code></td>
+              <td>LLM / agent tools via <code>get_creative_studio_context()</code></td>
+              <td>结构化身份和语义信息：<code>entityType</code>, <code>entityId</code>, <code>name</code>, <code>post</code>, <code>brand</code>, <code>platform</code>, <code>handle</code>, <code>follower</code></td>
+              <td><span class="tag r2"><span class="num">2</span>post</span> <span class="tag r4"><span class="num">4</span>quoted post</span> <span class="tag r5"><span class="num">5</span>asset</span> <span class="tag r6"><span class="num">6</span>My Page</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <strong>核心边界：</strong> <code>attachments[]</code> 是 LLM 的真实文件/像素通道；<code>referenceImageUrls[]</code> 是生图 worker 的参考图通道；<code>references[]</code> 是结构化语义通道。
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>2. Reference Object 分别传了什么</h2>
+        <p>这里按 reference 类型列出进入各通道的具体字段。</p>
+      </div>
+      <div class="body">
+        <table>
+          <thead>
+            <tr>
+              <th>Reference</th>
+              <th><code>attachments[]</code></th>
+              <th><code>referenceImageUrls[]</code></th>
+              <th><code>references[]</code></th>
+              <th>补充注入到 LLM message</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="tag r1"><span class="num">1</span>User uploaded image</span></td>
+              <td><code>gcs_uri</code>, <code>mime_type</code>, <code>file_name</code>, <code>ref_token</code>, <code>assignedNo=image1</code>, <code>orgId</code></td>
+              <td><code>{ url: "gs://...", assignedNo: "image1", ref_token }</code></td>
+              <td>通常不进入</td>
+              <td><code>[image1]</code> + ADK <code>file_data</code>，LLM 当前 turn 直接看到像素。</td>
+            </tr>
+            <tr>
+              <td><span class="tag r2"><span class="num">2</span>User selected post</span></td>
+              <td>不进入</td>
+              <td>post 主图 / video cover / album representative：<code>{ url, ref_token }</code></td>
+              <td><code>entityType=post</code>, <code>entityId</code>, <code>name</code>, <code>ref_token</code>, <code>post.caption</code>, <code>post.platform</code>, <code>post.sentiment</code>, <code>post.media</code>, <code>post.children</code></td>
+              <td>URL-only post identity line；可选 <code>[引用图分析]</code>。</td>
+            </tr>
+            <tr>
+              <td><span class="tag r3"><span class="num">3</span>User quoted image</span></td>
+              <td>如果引用的是上传图：同 <span class="tag r1"><span class="num">1</span>upload</span></td>
+              <td>如果引用的是上传图或 asset image：进入 worker 参考图列表</td>
+              <td>如果是 asset：进入结构化 asset identity；如果是 upload：通常不进入</td>
+              <td>通过 <code>assignedNo</code> 绑定 prompt 中的 <code>@image1</code>。</td>
+            </tr>
+            <tr>
+              <td><span class="tag r4"><span class="num">4</span>User quoted post image</span></td>
+              <td>不进入</td>
+              <td><code>{ url: post main image, ref_token }</code></td>
+              <td>完整 post 结构化 payload，包括 caption/media/sentiment</td>
+              <td>注入 post identity line + 可选视觉摘要。建议进一步显式写明图片和 caption 属于同一 post。</td>
+            </tr>
+            <tr>
+              <td><span class="tag r5"><span class="num">5</span>User quoted assets</span></td>
+              <td>不进入，CDN URL 禁止进入 attachments</td>
+              <td><code>{ url: asset CDN URL, assignedNo, ref_token }</code></td>
+              <td><code>entityType=asset</code>, <code>entityId</code>, <code>name</code>, <code>assignedNo</code>, <code>ref_token</code></td>
+              <td>URL-only asset line，例如 <code>[image2] — generated asset...</code></td>
+            </tr>
+            <tr>
+              <td><span class="tag r6"><span class="num">6</span>User quoted My Page</span></td>
+              <td>不进入</td>
+              <td>不进入</td>
+              <td><code>entityType=page</code>, <code>entityId</code>, <code>name</code>, <code>platform</code>, <code>handle</code>, <code>follower</code>, <code>brand.tone/audience/colors</code></td>
+              <td>My Page identity line；brand tone 来自前端固定表，不是临时 AI 分析。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>3. ChatStream 中的数据流转</h2>
+        <p>从前端引用池到 ADK message / metadata 的完整路径。</p>
+      </div>
+      <div class="body">
+        <div class="lane">
+          <div class="lane-title">Frontend Reference Pool</div>
+          <div class="lane-flow">
+            <span class="tag r1"><span class="num">1</span>upload image</span>
+            <span class="tag r2"><span class="num">2</span>post</span>
+            <span class="tag r3"><span class="num">3</span>@image</span>
+            <span class="tag r4"><span class="num">4</span>@post</span>
+            <span class="tag r5"><span class="num">5</span>asset</span>
+            <span class="tag r6"><span class="num">6</span>mypage</span>
+          </div>
+        </div>
+
+        <div class="lane">
+          <div class="lane-title">referenceChannelRouter</div>
+          <div class="lane-flow">
+            <div class="node">按 <code>origin</code> 分流</div>
+            <span class="arrow">→</span>
+            <div class="node message"><code>attachments[]</code><br><span class="mini">upload gs:// only</span></div>
+            <div class="node worker"><code>referenceImageUrls[]</code><br><span class="mini">worker pixels</span></div>
+            <div class="node metadata"><code>references[]</code><br><span class="mini">structured signals</span></div>
+          </div>
+        </div>
+
+        <div class="lane">
+          <div class="lane-title">POST /chat/stream</div>
+          <div class="lane-flow">
+            <div class="node">Extract <code>creative_studio_context</code></div>
+            <span class="arrow">→</span>
+            <div class="node">Extract <code>ad_manager_context</code></div>
+            <span class="arrow">→</span>
+            <div class="node">白名单 / 数量限制 / 字段清洗</div>
+          </div>
+        </div>
+
+        <div class="lane">
+          <div class="lane-title">build_message_parts</div>
+          <div class="lane-flow">
+            <div class="node message">用户原始文本</div>
+            <span class="arrow">→</span>
+            <div class="node message"><span class="tag r1"><span class="num">1</span></span> <code>[image1]</code> + <code>file_data</code></div>
+            <span class="arrow">→</span>
+            <div class="node message"><span class="tag r2"><span class="num">2</span></span> <span class="tag r4"><span class="num">4</span></span> post URL-only line</div>
+            <span class="arrow">→</span>
+            <div class="node message"><span class="tag r6"><span class="num">6</span></span> My Page URL-only line</div>
+            <span class="arrow">→</span>
+            <div class="node message">可选 <code>[引用图分析]</code></div>
+          </div>
+        </div>
+
+        <div class="lane">
+          <div class="lane-title">build_run_config</div>
+          <div class="lane-flow">
+            <div class="node metadata"><code>custom_metadata.creative_studio_context</code></div>
+            <span class="arrow">→</span>
+            <div class="node metadata"><code>custom_metadata.ad_manager_context</code></div>
+            <span class="arrow">→</span>
+            <div class="node metadata"><code>user_token</code>, <code>org_id</code>, <code>request_id</code></div>
+          </div>
+        </div>
+
+        <div class="callout warn">
+          <strong>为什么同一份 reference 要拆成 message 和 metadata 两路：</strong> message 给 LLM 理解需求；metadata 给工具稳定读取结构化参数。URL、ratio、postSettings、ad account、JWT 这类信息如果只靠自然语言 prompt，模型可能漏传、改写或排序错。
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>4. 在不同 Task 流程中的流转</h2>
+        <p>不同 task 消费 reference 的方式不同。生成质量主要受生图和 full post 这两条影响。</p>
+      </div>
+      <div class="body">
+        <div class="swimlane">
+          <div class="swimrow">
+            <div class="swimhead">生图 Image Gen</div>
+            <div class="swimbody">
+              <span class="tag r1"><span class="num">1</span>upload image</span>
+              <span class="tag r3"><span class="num">3</span>@image</span>
+              <span class="tag r4"><span class="num">4</span>@post image</span>
+              <span class="tag r5"><span class="num">5</span>asset</span>
+              <span class="tag r6"><span class="num">6</span>mypage</span>
+              <span class="pill">get_creative_studio_context()</span>
+              <span class="pill">enqueue.py</span>
+              <span class="pill">image_gen_queued</span>
+            </div>
+          </div>
+          <div class="swimrow">
+            <div class="swimhead">生成 Post</div>
+            <div class="swimbody">
+              <span class="tag r1"><span class="num">1</span>upload image</span>
+              <span class="tag r2"><span class="num">2</span>post</span>
+              <span class="tag r4"><span class="num">4</span>@post</span>
+              <span class="tag r6"><span class="num">6</span>mypage</span>
+              <span class="pill">postSettings</span>
+              <span class="pill">image-gen enqueue</span>
+              <span class="pill">LLM caption</span>
+              <span class="pill">assemble_post_draft.py</span>
+            </div>
+          </div>
+          <div class="swimrow">
+            <div class="swimhead">Publish Post</div>
+            <div class="swimbody">
+              <span class="pill">普通 publish intent</span>
+              <span class="pill">session 最近 post_id</span>
+              <span class="pill">propose_publish</span>
+              <span class="pill">publish_intent typed event</span>
+              <span class="mini">通常不重新消费 reference objects。</span>
+            </div>
+          </div>
+          <div class="swimrow">
+            <div class="swimhead">Social Pulse</div>
+            <div class="swimbody">
+              <span class="pill">user text</span>
+              <span class="pill">get_my_email</span>
+              <span class="pill">keywords/platforms/regions</span>
+              <span class="pill">create_social_pulse_task</span>
+              <span class="mini">不走 Creative Studio reference 注入。</span>
+            </div>
+          </div>
+          <div class="swimrow">
+            <div class="swimhead">Pause Ad</div>
+            <div class="swimbody">
+              <span class="pill">ad_manager_context</span>
+              <span class="pill">get_ad_manager_context()</span>
+              <span class="pill">ad-insights scripts</span>
+              <span class="pill">propose_ad_action</span>
+              <span class="mini">不走 image/post/mypage reference。</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dataflow">
+          <div class="data-col">
+            <h3>生图数据线</h3>
+            <div class="data-body">
+              <span class="flow-chip r1c">upload image -> attachments -> file_data -> LLM</span>
+              <span class="flow-chip r1c">upload image -> referenceImageUrls -> worker</span>
+              <span class="flow-chip r4c">post image -> referenceImageUrls -> worker</span>
+              <span class="flow-chip r6c">My Page -> references -> brand signal</span>
+            </div>
+          </div>
+          <div class="data-col">
+            <h3>生成 Post 数据线</h3>
+            <div class="data-body">
+              <span class="flow-chip r4c">post caption/media -> references -> LLM caption</span>
+              <span class="flow-chip r4c">post image -> referenceImageUrls -> image-gen</span>
+              <span class="flow-chip r6c">postSettings.pageId/pageName -> draft config</span>
+              <span class="flow-chip">assetId + caption -> assemble_post_draft</span>
+            </div>
+          </div>
+          <div class="data-col">
+            <h3>Publish 数据线</h3>
+            <div class="data-body">
+              <span class="flow-chip">user publish intent -> full_post_gen_agent</span>
+              <span class="flow-chip">session recent post_id -> propose_publish</span>
+              <span class="flow-chip">publish_intent -> frontend confirm card</span>
+            </div>
+          </div>
+          <div class="data-col">
+            <h3>非 Creative 数据线</h3>
+            <div class="data-body">
+              <span class="flow-chip">Social Pulse -> text params + MCP</span>
+              <span class="flow-chip">Pause Ad -> ad_manager_context + skill scripts</span>
+              <span class="flow-chip">不消费 image/post/mypage refs</span>
+            </div>
+          </div>
+        </div>
+
+        <h3>每个 Task 的独立时序图</h3>
+        <p class="mini">阅读方式：参与者从左到右，时间从上到下；实线箭头是调用，虚线箭头是返回事件/结果；橙色箭头是该任务的关键优化点。</p>
+
+        <div class="svg-wrap">
+          <svg viewBox="0 0 1220 700" role="img" aria-label="Image Gen 独立时序图">
+            <defs>
+              <marker id="taskImgArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#b8c0cc"></path>
+              </marker>
+              <marker id="taskImgHot" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#ff9f43"></path>
+              </marker>
+            </defs>
+            <text x="70" y="52" class="svg-title">Image Gen 流程</text>
+            <text x="70" y="78" class="svg-note">优化重点：upload image 同时给 LLM 和 worker；post image 和 caption 用同一 identity 绑定。</text>
+
+            <rect x="60" y="108" width="120" height="42" class="svg-box"></rect><text x="120" y="129" class="svg-label">User</text>
+            <rect x="240" y="108" width="140" height="42" class="svg-box"></rect><text x="310" y="129" class="svg-label">Frontend</text>
+            <rect x="455" y="108" width="150" height="42" class="svg-box"></rect><text x="530" y="129" class="svg-label">ADK API</text>
+            <rect x="680" y="108" width="160" height="42" class="svg-box"></rect><text x="760" y="129" class="svg-label">image_gen_agent</text>
+            <rect x="920" y="108" width="130" height="42" class="svg-box"></rect><text x="985" y="129" class="svg-label">enqueue.py</text>
+            <rect x="1090" y="108" width="110" height="42" class="svg-box"></rect><text x="1145" y="129" class="svg-label">Worker</text>
+
+            <line x1="120" y1="150" x2="120" y2="650" class="svg-life"></line>
+            <line x1="310" y1="150" x2="310" y2="650" class="svg-life"></line>
+            <line x1="530" y1="150" x2="530" y2="650" class="svg-life"></line>
+            <line x1="760" y1="150" x2="760" y2="650" class="svg-life"></line>
+            <line x1="985" y1="150" x2="985" y2="650" class="svg-life"></line>
+            <line x1="1145" y1="150" x2="1145" y2="650" class="svg-life"></line>
+
+            <line x1="120" y1="190" x2="310" y2="190" class="svg-line" marker-end="url(#taskImgArrow)"></line>
+            <text x="215" y="180" class="svg-small">生图需求 + refs</text>
+            <path d="M310 226 C350 226, 350 256, 310 256" class="svg-line-hot" marker-end="url(#taskImgHot)"></path>
+            <text x="430" y="240" class="svg-small">ChannelRouter 三通道分流</text>
+            <line x1="310" y1="292" x2="530" y2="292" class="svg-line-hot" marker-end="url(#taskImgHot)"></line>
+            <text x="420" y="282" class="svg-small">attachments + creative_studio_context</text>
+            <path d="M530 330 C570 330, 570 360, 530 360" class="svg-line-hot" marker-end="url(#taskImgHot)"></path>
+            <text x="660" y="344" class="svg-small">build_message_parts: [image1] + file_data + URL-only</text>
+            <line x1="530" y1="400" x2="760" y2="400" class="svg-line" marker-end="url(#taskImgArrow)"></line>
+            <text x="645" y="390" class="svg-small">run_async routes</text>
+            <line x1="760" y1="444" x2="530" y2="444" class="svg-line-hot" marker-end="url(#taskImgHot)"></line>
+            <text x="645" y="434" class="svg-small">get_creative_studio_context()</text>
+            <line x1="530" y1="482" x2="760" y2="482" class="svg-line svg-dashed" marker-end="url(#taskImgArrow)"></line>
+            <text x="645" y="472" class="svg-small">refs + ratio</text>
+            <line x1="760" y1="526" x2="985" y2="526" class="svg-line-hot" marker-end="url(#taskImgHot)"></line>
+            <text x="872" y="516" class="svg-small">prompt + reference-image-urls</text>
+            <line x1="985" y1="568" x2="1145" y2="568" class="svg-line-hot" marker-end="url(#taskImgHot)"></line>
+            <text x="1065" y="558" class="svg-small">worker reads refs</text>
+            <line x1="985" y1="615" x2="530" y2="615" class="svg-line svg-dashed" marker-end="url(#taskImgArrow)"></line>
+            <text x="758" y="605" class="svg-small">image_gen_queued</text>
+          </svg>
+        </div>
+
+        <div class="svg-wrap">
+          <svg viewBox="0 0 1220 720" role="img" aria-label="Full Post Gen 独立时序图">
+            <defs>
+              <marker id="fullArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#b8c0cc"></path>
+              </marker>
+              <marker id="fullHot" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#ff9f43"></path>
+              </marker>
+            </defs>
+            <text x="70" y="52" class="svg-title">Generate Post 流程</text>
+            <text x="70" y="78" class="svg-note">优化重点：同一 turn 内入队 image，同时生成 caption，并用 postSettings 组装 draft。</text>
+
+            <rect x="60" y="108" width="120" height="42" class="svg-box"></rect><text x="120" y="129" class="svg-label">User</text>
+            <rect x="225" y="108" width="135" height="42" class="svg-box"></rect><text x="292" y="129" class="svg-label">Frontend</text>
+            <rect x="415" y="108" width="130" height="42" class="svg-box"></rect><text x="480" y="129" class="svg-label">ADK API</text>
+            <rect x="600" y="108" width="170" height="42" class="svg-box"></rect><text x="685" y="129" class="svg-label">full_post_gen_agent</text>
+            <rect x="825" y="108" width="125" height="42" class="svg-box"></rect><text x="887" y="129" class="svg-label">image-gen</text>
+            <rect x="1000" y="108" width="165" height="42" class="svg-box"></rect><text x="1082" y="129" class="svg-label">assemble draft</text>
+
+            <line x1="120" y1="150" x2="120" y2="660" class="svg-life"></line>
+            <line x1="292" y1="150" x2="292" y2="660" class="svg-life"></line>
+            <line x1="480" y1="150" x2="480" y2="660" class="svg-life"></line>
+            <line x1="685" y1="150" x2="685" y2="660" class="svg-life"></line>
+            <line x1="887" y1="150" x2="887" y2="660" class="svg-life"></line>
+            <line x1="1082" y1="150" x2="1082" y2="660" class="svg-life"></line>
+
+            <line x1="120" y1="190" x2="292" y2="190" class="svg-line" marker-end="url(#fullArrow)"></line>
+            <text x="206" y="180" class="svg-small">生成 post + refs + page</text>
+            <path d="M292 226 C332 226, 332 256, 292 256" class="svg-line-hot" marker-end="url(#fullHot)"></path>
+            <text x="420" y="240" class="svg-small">refs + postSettings snapshot</text>
+            <line x1="292" y1="292" x2="480" y2="292" class="svg-line-hot" marker-end="url(#fullHot)"></line>
+            <text x="386" y="282" class="svg-small">message + metadata</text>
+            <line x1="480" y1="338" x2="685" y2="338" class="svg-line" marker-end="url(#fullArrow)"></line>
+            <text x="582" y="328" class="svg-small">run_async routes</text>
+            <line x1="685" y1="382" x2="480" y2="382" class="svg-line-hot" marker-end="url(#fullHot)"></line>
+            <text x="582" y="372" class="svg-small">get_creative_studio_context()</text>
+            <line x1="685" y1="430" x2="887" y2="430" class="svg-line-hot" marker-end="url(#fullHot)"></line>
+            <text x="786" y="420" class="svg-small">enqueue image</text>
+            <line x1="887" y1="468" x2="685" y2="468" class="svg-line svg-dashed" marker-end="url(#fullArrow)"></line>
+            <text x="786" y="458" class="svg-small">media assetId</text>
+            <path d="M685 500 C725 500, 725 530, 685 530" class="svg-line-hot" marker-end="url(#fullHot)"></path>
+            <text x="815" y="514" class="svg-small">LLM 生成 caption + overlay</text>
+            <line x1="685" y1="565" x2="1082" y2="565" class="svg-line-hot" marker-end="url(#fullHot)"></line>
+            <text x="884" y="555" class="svg-small">assemble_post_draft.py(caption, assetId, postSettings)</text>
+            <line x1="1082" y1="615" x2="480" y2="615" class="svg-line svg-dashed" marker-end="url(#fullArrow)"></line>
+            <text x="781" y="605" class="svg-small">post_draft_created typed event</text>
+          </svg>
+        </div>
+
+        <div class="svg-wrap">
+          <svg viewBox="0 0 1220 720" role="img" aria-label="Publish Post 独立时序图">
+            <defs>
+              <marker id="pubArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#b8c0cc"></path>
+              </marker>
+              <marker id="pubHot" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#ff9f43"></path>
+              </marker>
+            </defs>
+            <text x="70" y="52" class="svg-title">Publish Post 流程</text>
+            <text x="70" y="78" class="svg-note">重点：agent 只 propose publish，不直接发布；真实发布必须经前端确认后调用 backend。</text>
+
+            <rect x="60" y="108" width="110" height="42" class="svg-box"></rect><text x="115" y="129" class="svg-label">User</text>
+            <rect x="220" y="108" width="130" height="42" class="svg-box"></rect><text x="285" y="129" class="svg-label">Frontend</text>
+            <rect x="400" y="108" width="125" height="42" class="svg-box"></rect><text x="462" y="129" class="svg-label">ADK API</text>
+            <rect x="570" y="108" width="130" height="42" class="svg-box"></rect><text x="635" y="129" class="svg-label">ADK Runner</text>
+            <rect x="750" y="108" width="165" height="42" class="svg-box"></rect><text x="832" y="129" class="svg-label">full_post_gen</text>
+            <rect x="965" y="108" width="130" height="42" class="svg-box"></rect><text x="1030" y="129" class="svg-label">propose_publish</text>
+            <rect x="1130" y="108" width="70" height="42" class="svg-box"></rect><text x="1165" y="129" class="svg-label">Backend</text>
+
+            <line x1="115" y1="150" x2="115" y2="660" class="svg-life"></line>
+            <line x1="285" y1="150" x2="285" y2="660" class="svg-life"></line>
+            <line x1="462" y1="150" x2="462" y2="660" class="svg-life"></line>
+            <line x1="635" y1="150" x2="635" y2="660" class="svg-life"></line>
+            <line x1="832" y1="150" x2="832" y2="660" class="svg-life"></line>
+            <line x1="1030" y1="150" x2="1030" y2="660" class="svg-life"></line>
+            <line x1="1165" y1="150" x2="1165" y2="660" class="svg-life"></line>
+
+            <line x1="115" y1="190" x2="285" y2="190" class="svg-line" marker-end="url(#pubArrow)"></line>
+            <text x="200" y="180" class="svg-small">点击/输入 publish 当前 post</text>
+            <line x1="285" y1="235" x2="462" y2="235" class="svg-line" marker-end="url(#pubArrow)"></line>
+            <text x="374" y="225" class="svg-small">普通 message</text>
+            <line x1="462" y1="280" x2="635" y2="280" class="svg-line" marker-end="url(#pubArrow)"></line>
+            <text x="548" y="270" class="svg-small">runner.run_async</text>
+            <line x1="635" y1="325" x2="832" y2="325" class="svg-line" marker-end="url(#pubArrow)"></line>
+            <text x="734" y="315" class="svg-small">路由到 full_post_gen_agent</text>
+            <path d="M832 360 C875 360, 875 390, 832 390" class="svg-line-hot" marker-end="url(#pubHot)"></path>
+            <text x="960" y="374" class="svg-small">从 session 找最近 draft post_id</text>
+            <path d="M832 416 C875 416, 875 446, 832 446" class="svg-line" marker-end="url(#pubArrow)"></path>
+            <text x="955" y="430" class="svg-small">fallback: list_post_drafts.py</text>
+            <line x1="832" y1="492" x2="1030" y2="492" class="svg-line-hot" marker-end="url(#pubHot)"></line>
+            <text x="931" y="482" class="svg-small">propose_publish(post_id)</text>
+            <line x1="1030" y1="532" x2="832" y2="532" class="svg-line svg-dashed" marker-end="url(#pubArrow)"></line>
+            <text x="931" y="522" class="svg-small">publish_intent</text>
+            <line x1="832" y1="570" x2="285" y2="570" class="svg-line svg-dashed" marker-end="url(#pubArrow)"></line>
+            <text x="558" y="560" class="svg-small">SSE typed event publish_intent</text>
+            <line x1="285" y1="610" x2="1165" y2="610" class="svg-line-hot" marker-end="url(#pubHot)"></line>
+            <text x="725" y="600" class="svg-small">用户确认后，Frontend 调用真实发布接口</text>
+          </svg>
+        </div>
+
+        <div class="svg-wrap">
+          <svg viewBox="0 0 1220 700" role="img" aria-label="Social Pulse 独立时序图">
+            <defs>
+              <marker id="spArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#b8c0cc"></path>
+              </marker>
+              <marker id="spHot" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#ff9f43"></path>
+              </marker>
+            </defs>
+            <text x="70" y="52" class="svg-title">Create Social Pulse Task 流程</text>
+            <text x="70" y="78" class="svg-note">重点：不走 Creative Studio refs；靠用户文本解析 task 参数，MCP 创建任务。</text>
+
+            <rect x="70" y="108" width="120" height="42" class="svg-box"></rect><text x="130" y="129" class="svg-label">User</text>
+            <rect x="260" y="108" width="140" height="42" class="svg-box"></rect><text x="330" y="129" class="svg-label">Frontend</text>
+            <rect x="470" y="108" width="130" height="42" class="svg-box"></rect><text x="535" y="129" class="svg-label">ADK API</text>
+            <rect x="680" y="108" width="170" height="42" class="svg-box"></rect><text x="765" y="129" class="svg-label">social_pulse_agent</text>
+            <rect x="950" y="108" width="150" height="42" class="svg-box"></rect><text x="1025" y="129" class="svg-label">MCP Tools</text>
+
+            <line x1="130" y1="150" x2="130" y2="640" class="svg-life"></line>
+            <line x1="330" y1="150" x2="330" y2="640" class="svg-life"></line>
+            <line x1="535" y1="150" x2="535" y2="640" class="svg-life"></line>
+            <line x1="765" y1="150" x2="765" y2="640" class="svg-life"></line>
+            <line x1="1025" y1="150" x2="1025" y2="640" class="svg-life"></line>
+
+            <line x1="130" y1="190" x2="330" y2="190" class="svg-line" marker-end="url(#spArrow)"></line>
+            <text x="230" y="180" class="svg-small">创建 task 的自然语言需求</text>
+            <line x1="330" y1="235" x2="535" y2="235" class="svg-line" marker-end="url(#spArrow)"></line>
+            <text x="432" y="225" class="svg-small">普通 message</text>
+            <line x1="535" y1="280" x2="765" y2="280" class="svg-line" marker-end="url(#spArrow)"></line>
+            <text x="650" y="270" class="svg-small">run_async routes</text>
+            <line x1="765" y1="326" x2="1025" y2="326" class="svg-line" marker-end="url(#spArrow)"></line>
+            <text x="895" y="316" class="svg-small">get_my_email()</text>
+            <line x1="1025" y1="366" x2="765" y2="366" class="svg-line svg-dashed" marker-end="url(#spArrow)"></line>
+            <text x="895" y="356" class="svg-small">account email</text>
+            <path d="M765 402 C810 402, 810 432, 765 432" class="svg-line-hot" marker-end="url(#spHot)"></path>
+            <text x="930" y="416" class="svg-small">解析 keywords/platforms/regions/frequency</text>
+            <line x1="765" y1="475" x2="330" y2="475" class="svg-line svg-dashed" marker-end="url(#spArrow)"></line>
+            <text x="548" y="465" class="svg-small">social_pulse_confirm marker</text>
+            <line x1="130" y1="520" x2="330" y2="520" class="svg-line" marker-end="url(#spArrow)"></line>
+            <text x="230" y="510" class="svg-small">用户确认</text>
+            <line x1="765" y1="566" x2="1025" y2="566" class="svg-line-hot" marker-end="url(#spHot)"></line>
+            <text x="895" y="556" class="svg-small">create_social_pulse_task(...)</text>
+            <line x1="1025" y1="610" x2="330" y2="610" class="svg-line svg-dashed" marker-end="url(#spArrow)"></line>
+            <text x="678" y="600" class="svg-small">social_pulse_success + quick_actions</text>
+          </svg>
+        </div>
+
+        <div class="svg-wrap">
+          <svg viewBox="0 0 1220 720" role="img" aria-label="Pause Ad 独立时序图">
+            <defs>
+              <marker id="adArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#b8c0cc"></path>
+              </marker>
+              <marker id="adHot" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#ff9f43"></path>
+              </marker>
+            </defs>
+            <text x="70" y="52" class="svg-title">Pause Ad 流程</text>
+            <text x="70" y="78" class="svg-note">重点：agent 只生成 ad_action_proposal；真实 pause 必须经用户确认，由 backend 写 Meta。</text>
+
+            <rect x="60" y="108" width="120" height="42" class="svg-box"></rect><text x="120" y="129" class="svg-label">User</text>
+            <rect x="230" y="108" width="150" height="42" class="svg-box"></rect><text x="305" y="129" class="svg-label">Ad Manager FE</text>
+            <rect x="440" y="108" width="130" height="42" class="svg-box"></rect><text x="505" y="129" class="svg-label">ADK API</text>
+            <rect x="635" y="108" width="160" height="42" class="svg-box"></rect><text x="715" y="129" class="svg-label">ad_insights_agent</text>
+            <rect x="855" y="108" width="130" height="42" class="svg-box"></rect><text x="920" y="129" class="svg-label">Skill scripts</text>
+            <rect x="1040" y="108" width="135" height="42" class="svg-box"></rect><text x="1107" y="129" class="svg-label">Backend/Meta</text>
+
+            <line x1="120" y1="150" x2="120" y2="660" class="svg-life"></line>
+            <line x1="305" y1="150" x2="305" y2="660" class="svg-life"></line>
+            <line x1="505" y1="150" x2="505" y2="660" class="svg-life"></line>
+            <line x1="715" y1="150" x2="715" y2="660" class="svg-life"></line>
+            <line x1="920" y1="150" x2="920" y2="660" class="svg-life"></line>
+            <line x1="1107" y1="150" x2="1107" y2="660" class="svg-life"></line>
+
+            <line x1="120" y1="190" x2="305" y2="190" class="svg-line" marker-end="url(#adArrow)"></line>
+            <text x="212" y="180" class="svg-small">暂停表现差的广告</text>
+            <line x1="305" y1="238" x2="505" y2="238" class="svg-line-hot" marker-end="url(#adHot)"></line>
+            <text x="405" y="228" class="svg-small">message + ad_manager_context</text>
+            <path d="M505 276 C545 276, 545 306, 505 306" class="svg-line-hot" marker-end="url(#adHot)"></path>
+            <text x="650" y="290" class="svg-small">server override orgId + enrich context</text>
+            <line x1="505" y1="346" x2="715" y2="346" class="svg-line" marker-end="url(#adArrow)"></line>
+            <text x="610" y="336" class="svg-small">run_async routes</text>
+            <line x1="715" y1="390" x2="505" y2="390" class="svg-line-hot" marker-end="url(#adHot)"></line>
+            <text x="610" y="380" class="svg-small">get_ad_manager_context()</text>
+            <line x1="715" y1="438" x2="920" y2="438" class="svg-line-hot" marker-end="url(#adHot)"></line>
+            <text x="818" y="428" class="svg-small">run ad-insights scripts</text>
+            <line x1="920" y1="480" x2="715" y2="480" class="svg-line svg-dashed" marker-end="url(#adArrow)"></line>
+            <text x="818" y="470" class="svg-small">pause candidates / metrics</text>
+            <path d="M715 516 C755 516, 755 546, 715 546" class="svg-line-hot" marker-end="url(#adHot)"></path>
+            <text x="858" y="530" class="svg-small">propose_ad_action(action=pause, items)</text>
+            <line x1="715" y1="585" x2="305" y2="585" class="svg-line svg-dashed" marker-end="url(#adArrow)"></line>
+            <text x="510" y="575" class="svg-small">ad_action_proposal typed event</text>
+            <line x1="305" y1="628" x2="1107" y2="628" class="svg-line-hot" marker-end="url(#adHot)"></line>
+            <text x="706" y="618" class="svg-small">用户确认后调用真实 pause API，Backend 写 Meta PAUSED</text>
+          </svg>
+        </div>
+
+        <div class="grid cols-2">
+          <div class="card">
+            <h3>Image Gen 组装重点</h3>
+            <ul class="small-list">
+              <li>LLM 当前 turn 看到：用户文本、上传图 <code>file_data</code>、URL-only refs、引用图分析、My Page brand identity。</li>
+              <li>worker 当前 turn 看到：<code>reference-image-urls</code>，包含上传图片 <code>gs://</code>、post 主图、asset CDN 图。</li>
+              <li>调用 <code>image-gen/scripts/enqueue.py</code>，只入队，不等待出图。</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Full Post 组装重点</h3>
+            <ul class="small-list">
+              <li>复用 image-gen skill 生成/入队图片。</li>
+              <li>同一 turn 内 LLM 生成 caption / overlay text。</li>
+              <li>读取 <code>postSettings</code> 生成 publish config。</li>
+              <li>调用 <code>assemble_post_draft.py</code> 保存 draft，输出 <code>post_draft_created</code>。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>4.1 时序图：ChatStream 与生成任务</h2>
+        <p>这里用横向时序表表达调用顺序。橙色步骤是当前建议优化或需要特别保证质量的环节。</p>
+      </div>
+      <div class="body">
+        <div class="callout">
+          <strong>阅读方式：</strong>下面的 SVG 时序图是标准时序图读法，参与者从左到右排列，时间从上到下推进，横向箭头表示一次消息/调用，虚线箭头表示返回结果或 stream event。
+        </div>
+
+        <h3>总流程时序图（箭头版）</h3>
+        <div class="svg-wrap">
+          <svg viewBox="0 0 1220 760" role="img" aria-label="ChatStream 总流程时序图">
+            <defs>
+              <marker id="seqArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#b8c0cc"></path>
+              </marker>
+              <marker id="seqArrowHot" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#ff9f43"></path>
+              </marker>
+            </defs>
+
+            <text x="70" y="52" class="svg-title">总流程时序图</text>
+            <text x="70" y="78" class="svg-note">时间从上到下。橙色箭头 = 当前需要重点优化/保证准确性的环节。</text>
+
+            <rect x="72" y="108" width="140" height="42" class="svg-box"></rect>
+            <text x="142" y="129" class="svg-label">Frontend</text>
+            <rect x="300" y="108" width="140" height="42" class="svg-box"></rect>
+            <text x="370" y="129" class="svg-label">/chat/stream</text>
+            <rect x="528" y="108" width="150" height="42" class="svg-box"></rect>
+            <text x="603" y="129" class="svg-label">SessionService</text>
+            <rect x="760" y="108" width="140" height="42" class="svg-box"></rect>
+            <text x="830" y="129" class="svg-label">ADK Runner</text>
+            <rect x="995" y="108" width="150" height="42" class="svg-box"></rect>
+            <text x="1070" y="129" class="svg-label">Agent Tools</text>
+
+            <line x1="142" y1="150" x2="142" y2="700" class="svg-life"></line>
+            <line x1="370" y1="150" x2="370" y2="700" class="svg-life"></line>
+            <line x1="603" y1="150" x2="603" y2="700" class="svg-life"></line>
+            <line x1="830" y1="150" x2="830" y2="700" class="svg-life"></line>
+            <line x1="1070" y1="150" x2="1070" y2="700" class="svg-life"></line>
+
+            <line x1="142" y1="188" x2="370" y2="188" class="svg-line-hot" marker-end="url(#seqArrowHot)"></line>
+            <text x="256" y="178" class="svg-small">message + attachments + custom_metadata</text>
+
+            <path d="M370 224 C410 224, 410 254, 370 254" class="svg-line-hot" marker-end="url(#seqArrowHot)"></path>
+            <text x="475" y="238" class="svg-small">Extract creative_studio_context</text>
+
+            <path d="M370 282 C410 282, 410 312, 370 312" class="svg-line" marker-end="url(#seqArrow)"></path>
+            <text x="470" y="296" class="svg-small">Extract ad_manager_context</text>
+
+            <path d="M370 340 C410 340, 410 370, 370 370" class="svg-line-hot" marker-end="url(#seqArrowHot)"></path>
+            <text x="474" y="354" class="svg-small">build_message_parts</text>
+
+            <line x1="370" y1="404" x2="603" y2="404" class="svg-line" marker-end="url(#seqArrow)"></line>
+            <text x="486" y="394" class="svg-small">bootstrap_session</text>
+
+            <path d="M370 438 C410 438, 410 468, 370 468" class="svg-line-hot" marker-end="url(#seqArrowHot)"></path>
+            <text x="500" y="452" class="svg-small">build_run_config + custom_metadata</text>
+
+            <line x1="370" y1="506" x2="830" y2="506" class="svg-line" marker-end="url(#seqArrow)"></line>
+            <text x="600" y="496" class="svg-small">run_async(new_message, run_config)</text>
+
+            <line x1="830" y1="554" x2="1070" y2="554" class="svg-line-hot" marker-end="url(#seqArrowHot)"></line>
+            <text x="950" y="544" class="svg-small">get_creative_studio_context / get_ad_manager_context</text>
+
+            <line x1="1070" y1="592" x2="830" y2="592" class="svg-line svg-dashed" marker-end="url(#seqArrow)"></line>
+            <text x="950" y="582" class="svg-small">request-scoped context</text>
+
+            <line x1="830" y1="632" x2="370" y2="632" class="svg-line svg-dashed" marker-end="url(#seqArrow)"></line>
+            <text x="600" y="622" class="svg-small">stream events</text>
+
+            <line x1="370" y1="672" x2="142" y2="672" class="svg-line svg-dashed" marker-end="url(#seqArrow)"></line>
+            <text x="256" y="662" class="svg-small">SSE text + typed events</text>
+
+            <rect x="284" y="720" width="650" height="28" fill="#2d3748" stroke="#596273" rx="14"></rect>
+            <text x="609" y="735" class="svg-chip-text">优化环节：Extract / build_message_parts / custom_metadata / tool context 必须保持同一份 reference 的稳定身份</text>
+          </svg>
+        </div>
+
+        <h3>Image Gen 时序图（箭头版）</h3>
+        <div class="svg-wrap">
+          <svg viewBox="0 0 1220 720" role="img" aria-label="Image Gen 时序图">
+            <defs>
+              <marker id="imgArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#b8c0cc"></path>
+              </marker>
+              <marker id="imgArrowHot" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#ff9f43"></path>
+              </marker>
+            </defs>
+
+            <text x="70" y="52" class="svg-title">Image Gen 时序图</text>
+            <text x="70" y="78" class="svg-note">重点：LLM 当前 turn 看到 file_data，worker 当前 turn 收到 reference-image-urls。</text>
+
+            <rect x="60" y="108" width="120" height="42" class="svg-box"></rect>
+            <text x="120" y="129" class="svg-label">User</text>
+            <rect x="240" y="108" width="140" height="42" class="svg-box"></rect>
+            <text x="310" y="129" class="svg-label">Frontend</text>
+            <rect x="460" y="108" width="140" height="42" class="svg-box"></rect>
+            <text x="530" y="129" class="svg-label">ADK API</text>
+            <rect x="680" y="108" width="160" height="42" class="svg-box"></rect>
+            <text x="760" y="129" class="svg-label">image_gen_agent</text>
+            <rect x="920" y="108" width="130" height="42" class="svg-box"></rect>
+            <text x="985" y="129" class="svg-label">Skill</text>
+            <rect x="1090" y="108" width="110" height="42" class="svg-box"></rect>
+            <text x="1145" y="129" class="svg-label">Worker</text>
+
+            <line x1="120" y1="150" x2="120" y2="660" class="svg-life"></line>
+            <line x1="310" y1="150" x2="310" y2="660" class="svg-life"></line>
+            <line x1="530" y1="150" x2="530" y2="660" class="svg-life"></line>
+            <line x1="760" y1="150" x2="760" y2="660" class="svg-life"></line>
+            <line x1="985" y1="150" x2="985" y2="660" class="svg-life"></line>
+            <line x1="1145" y1="150" x2="1145" y2="660" class="svg-life"></line>
+
+            <line x1="120" y1="190" x2="310" y2="190" class="svg-line" marker-end="url(#imgArrow)"></line>
+            <text x="215" y="180" class="svg-small">输入 prompt + 上传/引用 refs</text>
+
+            <path d="M310 226 C350 226, 350 256, 310 256" class="svg-line-hot" marker-end="url(#imgArrowHot)"></path>
+            <text x="430" y="240" class="svg-small">ChannelRouter: 三通道分流</text>
+
+            <line x1="310" y1="292" x2="530" y2="292" class="svg-line-hot" marker-end="url(#imgArrowHot)"></line>
+            <text x="420" y="282" class="svg-small">attachments + creative_studio_context</text>
+
+            <path d="M530 330 C570 330, 570 360, 530 360" class="svg-line-hot" marker-end="url(#imgArrowHot)"></path>
+            <text x="650" y="344" class="svg-small">build_message_parts: [image1] + file_data + URL-only</text>
+
+            <line x1="530" y1="400" x2="760" y2="400" class="svg-line" marker-end="url(#imgArrow)"></line>
+            <text x="645" y="390" class="svg-small">run_async routes to image_gen_agent</text>
+
+            <line x1="760" y1="444" x2="530" y2="444" class="svg-line-hot" marker-end="url(#imgArrowHot)"></line>
+            <text x="645" y="434" class="svg-small">get_creative_studio_context()</text>
+
+            <line x1="530" y1="482" x2="760" y2="482" class="svg-line svg-dashed" marker-end="url(#imgArrow)"></line>
+            <text x="645" y="472" class="svg-small">referenceImageUrls + references + ratio</text>
+
+            <line x1="760" y1="526" x2="985" y2="526" class="svg-line-hot" marker-end="url(#imgArrowHot)"></line>
+            <text x="872" y="516" class="svg-small">enqueue.py args</text>
+
+            <line x1="985" y1="570" x2="1145" y2="570" class="svg-line-hot" marker-end="url(#imgArrowHot)"></line>
+            <text x="1065" y="560" class="svg-small">reference-image-urls</text>
+
+            <line x1="985" y1="620" x2="530" y2="620" class="svg-line svg-dashed" marker-end="url(#imgArrow)"></line>
+            <text x="758" y="610" class="svg-small">image_gen_queued typed payload</text>
+
+            <rect x="275" y="676" width="680" height="28" fill="#2d3748" stroke="#596273" rx="14"></rect>
+            <text x="615" y="691" class="svg-chip-text">质量关键：upload image 不能只给 LLM，也必须给 worker；post image 和 caption 必须用同一 ref_token/entityId 绑定</text>
+          </svg>
+        </div>
+
+        <h3>ChatStream 主时序</h3>
+        <div class="seq">
+          <div class="actor">Frontend</div>
+          <div class="cell"><span class="event hot">收集 reference pool<br><span class="mini">1/2/3/4/5/6</span></span></div>
+          <div class="cell"><span class="event hot">ChannelRouter 分流<br><code>attachments</code> / <code>referenceImageUrls</code> / <code>references</code></span></div>
+          <div class="cell"><span class="event">发送 <code>/chat/stream</code></span></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+
+          <div class="actor">ADK API</div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"><span class="event meta">Extract contexts<br><code>creative_studio_context</code></span></div>
+          <div class="cell"><span class="event hot msg">build_message_parts<br><code>[imageN]</code> / <code>file_data</code> / URL-only</span></div>
+          <div class="cell"><span class="event hot meta">build_run_config<br><code>custom_metadata</code></span></div>
+
+          <div class="actor">ADK Runner</div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"><span class="event">读取 session history</span></div>
+          <div class="cell"><span class="event">root_agent 路由 sub-agent</span></div>
+
+          <div class="actor">Sub-agent / Tool</div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"><span class="event hot">读取 <code>get_creative_studio_context()</code></span></div>
+          <div class="cell"><span class="event">返回 function_response</span></div>
+
+          <div class="actor last">Frontend UI</div>
+          <div class="cell last"></div>
+          <div class="cell last"></div>
+          <div class="cell last"></div>
+          <div class="cell last"></div>
+          <div class="cell last"><span class="event">typed event 渲染卡片</span></div>
+        </div>
+
+        <h3>Image Gen 时序</h3>
+        <div class="seq">
+          <div class="actor">User</div>
+          <div class="cell"><span class="event msg">输入需求 + 上传图 / 选 post / 选 page</span></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+
+          <div class="actor">Frontend</div>
+          <div class="cell"></div>
+          <div class="cell"><span class="event hot">把上传图 dual-write<br><code>attachments[]</code> + <code>referenceImageUrls[]</code></span></div>
+          <div class="cell"><span class="event hot">把 post image + caption 分别写入两个通道，并保留 <code>ref_token</code></span></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+
+          <div class="actor">ADK API</div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"><span class="event hot msg">注入 LLM message<br><code>[image1]</code> + URL-only + 引用图分析</span></div>
+          <div class="cell"><span class="event meta">metadata 保存 refs/ratio</span></div>
+          <div class="cell"></div>
+
+          <div class="actor">image_gen_agent</div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"><span class="event hot">读取 refs，组装 prompt + worker args</span></div>
+          <div class="cell"><span class="event work">调用 <code>enqueue.py</code></span></div>
+
+          <div class="actor last">Worker / UI</div>
+          <div class="cell last"></div>
+          <div class="cell last"></div>
+          <div class="cell last"></div>
+          <div class="cell last"><span class="event work">worker 读取 reference-image-urls</span></div>
+          <div class="cell last"><span class="event">返回 <code>image_gen_queued</code></span></div>
+        </div>
+
+        <h3>Full Post 时序</h3>
+        <div class="seq">
+          <div class="actor">User</div>
+          <div class="cell"><span class="event msg">要求生成 post</span></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+
+          <div class="actor">Frontend</div>
+          <div class="cell"></div>
+          <div class="cell"><span class="event hot">发送 refs + <code>postSettings</code></span></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+
+          <div class="actor">full_post_gen_agent</div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"><span class="event hot">读取 post image/caption/page brand</span></div>
+          <div class="cell"><span class="event work">复用 image-gen 入队图片</span></div>
+          <div class="cell"><span class="event hot">LLM 生成 caption / overlay</span></div>
+
+          <div class="actor">full-post-gen skill</div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"><span class="event work">assemble_post_draft.py 保存 draft</span></div>
+
+          <div class="actor last">Frontend UI</div>
+          <div class="cell last"></div>
+          <div class="cell last"></div>
+          <div class="cell last"></div>
+          <div class="cell last"></div>
+          <div class="cell last"><span class="event">渲染 <code>post_draft_created</code></span></div>
+        </div>
+
+        <h3>多轮“用回最开始参考图”时序</h3>
+        <div class="seq">
+          <div class="actor">Turn 1</div>
+          <div class="cell"><span class="event msg">User 上传 image1</span></div>
+          <div class="cell"><span class="event hot">message 注入 <code>[image1]</code> + <code>file_data</code></span></div>
+          <div class="cell"><span class="event hist">ADK 保存 session events</span></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+
+          <div class="actor">Turn 2</div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"><span class="event msg">User: 用回最开始的参考图</span></div>
+          <div class="cell"><span class="event hist">ADK 读取历史 events</span></div>
+          <div class="cell"><span class="event">模型可能看到历史 image1</span></div>
+
+          <div class="actor last">推荐优化</div>
+          <div class="cell last"></div>
+          <div class="cell last"></div>
+          <div class="cell last"><span class="event hot">前端从 snapshot 恢复 image1</span></div>
+          <div class="cell last"><span class="event hot">当前 turn 重发 attachments + referenceImageUrls</span></div>
+          <div class="cell last"><span class="event hot">LLM 和 worker 都拿到原图</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>5. Post 图片 + Caption 的绑定关系</h2>
+        <p>当前可以识别，但建议加强显式 contract。</p>
+      </div>
+      <div class="body">
+        <div class="grid cols-2">
+          <div class="card">
+            <h3>当前结构</h3>
+            <pre>{
+  "referenceImageUrls": [
+    {
+      "url": "https://.../post-main-image.jpg",
+      "ref_token": "post_123"
+    }
+  ],
+  "references": [
+    {
+      "entityType": "post",
+      "entityId": "post_123",
+      "ref_token": "post_123",
+      "name": "Some Post",
+      "post": {
+        "platform": "instagram",
+        "caption": "...",
+        "media": {
+          "source_url": "https://.../post-main-image.jpg"
+        }
+      }
+    }
+  ]
+}</pre>
+          </div>
+          <div class="card">
+            <h3>建议强化</h3>
+            <pre>{
+  "referenceImageUrls": [
+    {
+      "url": "https://.../post-main-image.jpg",
+      "ref_token": "post_123",
+      "entityType": "post",
+      "entityId": "post_123",
+      "source": "post-main-image"
+    }
+  ]
+}</pre>
+          </div>
+        </div>
+        <div class="callout">
+          <strong>建议：</strong>在 prompt 注入中显式写出“reference image 和 caption 属于同一个 selected post”。这对生成质量比让模型自己从分散字段推断更稳。
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>6. URL-only 文本和引用图分析从哪里来</h2>
+        <p>这两类都是后端额外注入到 ADK message parts 的文本。</p>
+      </div>
+      <div class="body">
+        <table>
+          <thead>
+            <tr>
+              <th>注入文本</th>
+              <th>来源</th>
+              <th>用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>[Some Post] — referenced Instagram post (URL-only; id: xxx)</code></td>
+              <td><code>references[].name</code>, <code>references[].post.platform</code>, <code>references[].entityId</code></td>
+              <td>让任何 routed sub-agent 都知道用户引用的是哪个 post。这里的 URL-only 表示没有作为 <code>file_data</code> 给 LLM。</td>
+            </tr>
+            <tr>
+              <td><code>[image2] — generated asset (URL-only, no pixels attached): https://...</code></td>
+              <td><code>referenceImageUrls[]</code> 中非 upload 的 asset URL 和 <code>assignedNo</code></td>
+              <td>让 prompt 里的 <code>@image2</code> 能落到某个已有 asset。</td>
+            </tr>
+            <tr>
+              <td><code>[引用图分析 Some Post] ...</code></td>
+              <td>后端对 post image / video cover / asset image 调视觉模型分析得到的摘要</td>
+              <td>当 LLM 没有直接拿到原图像素时，用视觉摘要补充构图、主体、色调等信息。</td>
+            </tr>
+            <tr>
+              <td><code>[My Page] — your connected Facebook page @handle ...</code></td>
+              <td><code>references[]</code> 中 page identity、handle、followers、brand</td>
+              <td>给生成任务提供品牌身份和语气，不提供图片像素。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>7. My Page 字段来源</h2>
+        <p>My Page 没有图片 URL 注入，主要是品牌身份和调性上下文。</p>
+      </div>
+      <div class="body">
+        <table>
+          <thead>
+            <tr>
+              <th>字段</th>
+              <th>来源</th>
+              <th>说明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>entityId</code></td>
+              <td><code>MyPagePicker.vue</code> selected page 的 <code>page.id</code></td>
+              <td>稳定 page id；当前 <code>refToken</code> 也用这个值。</td>
+            </tr>
+            <tr>
+              <td><code>name</code></td>
+              <td><code>page.name</code>，fallback 到 <code>page.username</code></td>
+              <td>用于 LLM 可读的 page 名称。</td>
+            </tr>
+            <tr>
+              <td><code>platform</code></td>
+              <td>My Page picker 的 active platform</td>
+              <td>如 fb / ig / thread。</td>
+            </tr>
+            <tr>
+              <td><code>handle</code></td>
+              <td><code>page.username</code></td>
+              <td>后端会注入为 <code>@handle</code>。</td>
+            </tr>
+            <tr>
+              <td><code>follower</code></td>
+              <td><code>page.follower</code></td>
+              <td>作为品牌规模信号。</td>
+            </tr>
+            <tr>
+              <td><code>brand.tone/audience/colors</code></td>
+              <td><code>utils/myPageBrandTone.js</code> 固定映射表，按 handle 精确匹配</td>
+              <td>不是临时 AI 分析。tone/audience 来自 Notion 品牌调性整理，colors 来自 Notion Brand color/logo。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>8. 多轮对话中的流转</h2>
+        <p>ADK session history 会保留历史 events，但生成质量最好不要只依赖历史。</p>
+      </div>
+      <div class="body">
+        <div class="lane">
+          <div class="lane-title">Turn 1</div>
+          <div class="lane-flow">
+            <div class="node message">User: 用这张图生成广告</div>
+            <span class="arrow">→</span>
+            <div class="node message"><span class="tag r1"><span class="num">1</span></span> <code>[image1]</code> + <code>file_data gs://...</code></div>
+            <span class="arrow">→</span>
+            <div class="node history">ADK session events 持久化</div>
+          </div>
+        </div>
+        <div class="lane">
+          <div class="lane-title">Turn 2</div>
+          <div class="lane-flow">
+            <div class="node message">User: 用回最开始的参考图重新生成</div>
+            <span class="arrow">→</span>
+            <div class="node history">ADK 读取历史 events</div>
+            <span class="arrow">→</span>
+            <div class="node message">历史 <code>[image1]</code> / <code>file_data</code> 可能仍在上下文</div>
+          </div>
+        </div>
+        <div class="lane">
+          <div class="lane-title">质量最稳做法</div>
+          <div class="lane-flow">
+            <div class="node good">前端从历史 snapshot 恢复 image1</div>
+            <span class="arrow">→</span>
+            <div class="node good">当前 turn 重新发送 <code>attachments[]</code></div>
+            <span class="arrow">→</span>
+            <div class="node good">当前 turn 重新发送 <code>referenceImageUrls[]</code></div>
+            <span class="arrow">→</span>
+            <div class="node good">LLM 和 worker 都直接拿到原图</div>
+          </div>
+        </div>
+
+        <div class="callout danger-note">
+          <strong>注意：</strong>ADK session history 是正常多轮机制，但长对话会压缩或截断。对生成质量敏感的任务，不建议只依赖“历史里可能还有图片”；应该在当前生成 turn 重新发送关键 reference。
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>9. 生成质量建议清单</h2>
+        <p>如果目标是提高 image generation / full post generation 的稳定性，优先做这些。</p>
+      </div>
+      <div class="body">
+        <table>
+          <thead>
+            <tr>
+              <th>建议</th>
+              <th>原因</th>
+              <th>影响</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>当前 turn 重发关键上传图到 <code>attachments[]</code></td>
+              <td>确保 LLM 直接看到原始像素，不依赖历史上下文。</td>
+              <td>提高多轮 re-gen 稳定性。</td>
+            </tr>
+            <tr>
+              <td>当前 turn 重发关键参考图到 <code>referenceImageUrls[]</code></td>
+              <td>确保生图 worker 直接拿到参考图。</td>
+              <td>提高 img2img / clone / style match 成功率。</td>
+            </tr>
+            <tr>
+              <td>Post 图片和 caption 用 <code>entityId/ref_token</code> 显式绑定</td>
+              <td>避免模型把图片和另一个 post caption 混淆。</td>
+              <td>提高引用 post 改写质量。</td>
+            </tr>
+            <tr>
+              <td>在 prompt 注入中明确声明“image + caption belong to same selected post”</td>
+              <td>让 LLM 无需隐式推断跨通道关系。</td>
+              <td>降低错配概率。</td>
+            </tr>
+            <tr>
+              <td>My Page brand 缺失时不要猜</td>
+              <td>当前 brand tone 是固定表精确匹配，不是 AI 分析。</td>
+              <td>避免跨品牌风格污染。</td>
+            </tr>
+            <tr>
+              <td>不要把 CDN URL 放进 <code>attachments[]</code></td>
+              <td><code>attachments[]</code> 是 GCS file_data 通道，只接受 <code>gs://</code>。</td>
+              <td>避免整条 chat request 失败。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    </div>
+  </main>
+  <script>
+    (function () {
+      const buttons = Array.from(document.querySelectorAll('.tab-button'))
+      const panels = Array.from(document.querySelectorAll('.tab-panel'))
+
+      function activate(tab) {
+        buttons.forEach((button) => {
+          const isActive = button.dataset.tab === tab
+          button.classList.toggle('active', isActive)
+          button.setAttribute('aria-selected', isActive ? 'true' : 'false')
+        })
+        panels.forEach((panel) => {
+          panel.classList.toggle('active', panel.id === `tab-${tab}`)
+        })
+        if (window.location.hash !== `#${tab}`) {
+          history.replaceState(null, '', `#${tab}`)
+        }
+      }
+
+      buttons.forEach((button) => {
+        button.addEventListener('click', () => activate(button.dataset.tab))
+      })
+
+      const initial = window.location.hash.replace('#', '')
+      if (initial && document.getElementById(`tab-${initial}`)) {
+        activate(initial)
+      }
+    })()
+  </script>
+</body>
+</html>
