@@ -195,6 +195,16 @@
       font-weight: 700;
     }
 
+    .pill-live {
+      background: var(--good);
+      color: var(--green);
+    }
+
+    .pill-planned {
+      background: var(--soft);
+      color: var(--muted);
+    }
+
     .mini {
       margin: 10px 0 0;
       color: var(--muted);
@@ -410,6 +420,7 @@
                 <th>用户想要什么</th>
                 <th>主要产出</th>
                 <th>Insight step</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -419,13 +430,7 @@
                 <td>把 topic 或 idea 转成 organic social post。</td>
                 <td>Post Draft</td>
                 <td>No</td>
-              </tr>
-              <tr>
-                <td>UC2</td>
-                <td><strong>Create an ad creative post</strong></td>
-                <td>生成一条带 caption 和 image 的 conversion-focused post。</td>
-                <td>Post Draft</td>
-                <td>Optional Ad Intelligence context</td>
+                <td><span class="pill pill-live">已实现</span></td>
               </tr>
               <tr>
                 <td>UC3</td>
@@ -433,6 +438,15 @@
                 <td>把一条 selected Buzz post 作为我品牌内容的灵感来源。</td>
                 <td>Post Draft</td>
                 <td>Light reference analysis</td>
+                <td><span class="pill pill-live">已实现</span></td>
+              </tr>
+              <tr>
+                <td>UC2</td>
+                <td><strong>Create an ad creative post</strong></td>
+                <td>生成一条带 caption 和 image 的 conversion-focused post。</td>
+                <td>Post Draft</td>
+                <td>Optional Ad Intelligence context</td>
+                <td><span class="pill pill-planned">规划中</span></td>
               </tr>
               <tr>
                 <td>UC4</td>
@@ -440,6 +454,7 @@
                 <td>先找出这些 posts 的共性，再生成我的版本。</td>
                 <td>Insights + strategy + Post Draft</td>
                 <td>Yes</td>
+                <td><span class="pill pill-planned">规划中</span></td>
               </tr>
               <tr>
                 <td>UC5</td>
@@ -447,6 +462,7 @@
                 <td>查找过去 7 天表现最好的 competitor posts。</td>
                 <td>Insights + strategy + Post Draft</td>
                 <td>Yes</td>
+                <td><span class="pill pill-planned">规划中</span></td>
               </tr>
               <tr>
                 <td>UC6</td>
@@ -454,6 +470,7 @@
                 <td>发现我所在 category 的 winning posts，并推荐 content angles。</td>
                 <td>Topic options + optional Post Draft</td>
                 <td>Yes</td>
+                <td><span class="pill pill-planned">规划中</span></td>
               </tr>
             </tbody>
           </table>
