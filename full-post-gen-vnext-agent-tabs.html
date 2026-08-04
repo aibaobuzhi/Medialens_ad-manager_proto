@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Full Post Gen vNext — Insight-to-Post Agent Architecture</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --ink: #17202a;
+      --muted: #5f6b7a;
+      --line: #d8dee8;
+      --soft: #eef2f7;
+      --dark: #101722;
+      --blue: #1769e0;
+      --green: #008c7a;
+      --orange: #d56b00;
+      --purple: #6d4bd8;
+      --pink: #b4236f;
+      --good: #ebf8f1;
+      --warn: #fff7e6;
+      --info: #eff6ff;
+      --shadow: 0 10px 28px rgba(20, 32, 50, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    header {
+      padding: 42px 48px 30px;
+      background: var(--dark);
+      color: #fff;
+    }
+
+    header h1 {
+      margin: 0 0 10px;
+      font-size: 34px;
+      letter-spacing: 0;
+    }
+
+    header p {
+      max-width: 1120px;
+      margin: 0;
+      color: #d5dbe7;
+      font-size: 16px;
+    }
+
+    main {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 26px 32px 58px;
+    }
+
+    .tabs {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      margin: -26px -32px 22px;
+      background: rgba(246, 247, 249, 0.96);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+
+    .tab {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px 13px;
+      background: #fff;
+      color: #344054;
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: var(--dark);
+      border-color: var(--dark);
+      color: #fff;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    section {
+      margin: 22px 0;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .section-head {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfe;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0;
+    }
+
+    .section-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+    }
+
+    .body { padding: 22px 24px 26px; }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      background: #fff;
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      letter-spacing: 0;
+    }
+
+    .card p {
+      margin: 6px 0;
+      color: var(--muted);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #344054;
+      font-weight: 800;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    code {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 0.92em;
+      background: #f1f4f8;
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    pre {
+      margin: 12px 0 0;
+      padding: 14px;
+      background: #101722;
+      color: #eaf1ff;
+      border-radius: 8px;
+      overflow: auto;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: #eef2f7;
+      color: #344054;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .mini {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .callout {
+      border-left: 4px solid var(--green);
+      background: #f1fbf7;
+      padding: 14px 16px;
+      border-radius: 6px;
+      margin: 14px 0;
+    }
+
+    .callout.warn {
+      border-left-color: var(--orange);
+      background: var(--warn);
+    }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: stretch;
+      margin: 14px 0;
+    }
+
+    .node {
+      position: relative;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      min-width: 150px;
+      max-width: 250px;
+      font-size: 14px;
+    }
+
+    .node.blue { background: var(--info); border-color: #b7d4ff; }
+    .node.green { background: var(--good); border-color: #a8dfc2; }
+    .node.orange { background: var(--warn); border-color: #f0c06a; }
+    .node.purple { background: #f4efff; border-color: #ccb8ff; }
+
+    .arrow {
+      color: #8a95a5;
+      font-size: 20px;
+      align-self: center;
+      padding: 8px 0;
+    }
+
+    .swimlane {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 14px 0;
+      background: #fff;
+    }
+
+    .swimrow {
+      display: grid;
+      grid-template-columns: 190px 1fr;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .swimrow:last-child { border-bottom: 0; }
+
+    .swimhead {
+      padding: 14px;
+      background: #f8fafc;
+      border-right: 1px solid var(--line);
+      font-weight: 800;
+    }
+
+    .swimbody {
+      padding: 12px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      min-height: 58px;
+    }
+
+    .dataflow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 14px 0;
+    }
+
+    .data-col {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .data-col h3 {
+      margin: 0;
+      padding: 12px 14px;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--line);
+      font-size: 15px;
+    }
+
+    .data-body {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .chip {
+      display: block;
+      padding: 8px 9px;
+      border-radius: 7px;
+      background: #eef2f7;
+      font-size: 13px;
+      border-left: 5px solid #98a2b3;
+    }
+
+    .chip.blue { border-left-color: var(--blue); }
+    .chip.green { border-left-color: var(--green); }
+    .chip.orange { border-left-color: var(--orange); }
+    .chip.purple { border-left-color: var(--purple); }
+    .chip.pink { border-left-color: var(--pink); }
+
+    .diagram {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      background: #fff;
+      margin: 14px 0;
+      overflow: auto;
+    }
+
+    .diagram-title {
+      margin: 0 0 12px;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    @media (max-width: 980px) {
+      header { padding: 30px 22px 24px; }
+      main { padding: 20px 16px 44px; }
+      .tabs { margin: -20px -16px 18px; overflow-x: auto; }
+      .cols-2, .cols-3, .dataflow { grid-template-columns: 1fr; }
+      .swimrow { grid-template-columns: 1fr; }
+      .swimhead { border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Full Post Gen vNext — Insight-to-Post Agent Architecture</h1>
+    <p>整理 Full Post Gen 的六个用户场景、前端入口、insight 默认规则，以及推荐的新 agent 架构：Content Insights 与 PostStrategyBrief 放在同一路径下，但业务上仍是“分析 → brief 输出”两层；Full Post Gen 负责生成可发布草稿。</p>
+  </header>
+
+  <main>
+    <nav class="tabs" aria-label="Document tabs">
+      <button class="tab active" data-tab="user-cases">User Cases</button>
+      <button class="tab" data-tab="architecture">Agent Architecture</button>
+      <button class="tab" data-tab="flows">Sequence Flows</button>
+      <button class="tab" data-tab="data">Data & Decisions</button>
+    </nav>
+
+    <div id="user-cases" class="tab-panel active">
+      <section>
+        <div class="section-head">
+          <h2>Frontend User Case Options</h2>
+          <p>所有前端展示 label 使用英文。Auto mode 同时承接 insight 与 generation flows；Full Post Gen mode 聚焦直接生成。</p>
+        </div>
+        <div class="body">
+          <div class="grid cols-2">
+            <div class="card">
+              <h3>Auto Mode</h3>
+              <p>展示全部六个 options，因为 Auto 可以路由到 Content Insights 或 Full Post Gen。</p>
+              <div class="flow">
+                <span class="node blue">Create an editorial post</span>
+                <span class="node blue">Create an ad creative post</span>
+                <span class="node purple">Remix this Buzz post</span>
+                <span class="node green">Analyze selected Buzz posts</span>
+                <span class="node green">Analyze a competitor folder</span>
+                <span class="node green">Find industry winners</span>
+              </div>
+            </div>
+            <div class="card">
+              <h3>Full Post Gen Mode</h3>
+              <p>只展示直接生成 options，避免暗示该 mode 可以执行更广泛的 Buzz analysis。</p>
+              <div class="flow">
+                <span class="node blue">Create an editorial post</span>
+                <span class="node purple">Remix this Buzz post</span>
+                <span class="node blue">Create an ad creative post</span>
+              </div>
+            </div>
+          </div>
+          <div class="callout">
+            <strong>Insight 默认规则：</strong>所有 insight-heavy user case 在用户未指定 period 时默认使用过去 7 天；回复中应说明 “Based on the past 7 days of Buzz data...”
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <h2>User Case Summary</h2>
+          <p>面向市场人员的六个入口总览。</p>
+        </div>
+        <div class="body">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>User Case</th>
+                <th>用户想要什么</th>
+                <th>主要产出</th>
+                <th>Insight step</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>UC1</td>
+                <td><strong>Create an editorial post</strong></td>
+                <td>把 topic 或 idea 转成 organic social post。</td>
+                <td>Post Draft</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td>UC2</td>
+                <td><strong>Create an ad creative post</strong></td>
+                <td>生成一条带 caption 和 image 的 conversion-focused post。</td>
+                <td>Post Draft</td>
+                <td>Optional Ad Intelligence context</td>
+              </tr>
+              <tr>
+                <td>UC3</td>
+                <td><strong>Remix this Buzz post</strong></td>
+                <td>把一条 selected Buzz post 作为我品牌内容的灵感来源。</td>
+                <td>Post Draft</td>
+                <td>Light reference analysis</td>
+              </tr>
+              <tr>
+                <td>UC4</td>
+                <td><strong>Analyze selected Buzz posts</strong></td>
+                <td>先找出这些 posts 的共性，再生成我的版本。</td>
+                <td>Insights + strategy + Post Draft</td>
+                <td>Yes</td>
+              </tr>
+              <tr>
+                <td>UC5</td>
+                <td><strong>Analyze a competitor folder</strong></td>
+                <td>查找过去 7 天表现最好的 competitor posts。</td>
+                <td>Insights + strategy + Post Draft</td>
+                <td>Yes</td>
+              </tr>
+              <tr>
+                <td>UC6</td>
+                <td><strong>Find industry winners</strong></td>
+                <td>发现我所在 category 的 winning posts，并推荐 content angles。</td>
+                <td>Topic options + optional Post Draft</td>
+                <td>Yes</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <h2>Competitor Folder and Category Rules</h2>
+          <p>UC5 和 UC6 在分析前需要一个 soft setup step。</p>
+        </div>
+        <div class="body">
+          <div class="grid cols-2">
+            <div class="card">
+              <h3>UC5 — Competitor Folder</h3>
+              <p>如果只有一个 folder 或存在 current UI folder，则使用它并说明假设；如果存在多个 folders 且没有 current context，则让用户选择。</p>
+              <pre>I found multiple competitor folders. I can use "Beauty Competitors" and the past 7 days by default. If you want another folder or time range, tell me; otherwise I will continue with that.</pre>
+            </div>
+            <div class="card">
+              <h3>UC6 — My Page Category</h3>
+              <p>如果有 selected 或 connected My Page category，则优先使用；如果连接了多个 pages，则询问或软确认 current page。</p>
+              <pre>I can use BusinessFocus as the page context and "business & tech news" as the category. Unless you want another page or category, I will analyze the past 7 days.</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="architecture" class="tab-panel">
+      <section>
+        <div class="section-head">
+          <h2>Recommended Agent Framework</h2>
+          <p>将 insight discovery 与 post generation 拆开。</p>
+        </div>
+        <div class="body">
+          <div class="diagram">
+            <p class="diagram-title">高层架构</p>
+            <div class="flow">
+              <span class="node blue">Root / Auto Router</span>
+              <span class="arrow">→</span>
+              <span class="node green">Content Insights Agent<br><small>same insights path</small></span>
+              <span class="arrow">→</span>
+              <span class="node orange">PostStrategyBrief<br><small>same insights path</small></span>
+              <span class="arrow">→</span>
+              <span class="node purple">Full Post Gen Agent</span>
+              <span class="arrow">→</span>
+              <span class="node blue">Image Gen Queue</span>
+              <span class="arrow">→</span>
+              <span class="node green">Post Draft</span>
+            </div>
+            <p class="mini">说明：Content Insights Agent 与 PostStrategyBrief 在工程上放在同一个 insights skill/path 下；业务表达上仍然是“分析 → brief 输出”两层。</p>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>层级</th>
+                <th>负责内容</th>
+                <th>不负责内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Content Insights Agent</strong></td>
+                <td>Buzz analysis、folder/category resolution、过去 7 天默认规则、top post commonality、topic options。与 PostStrategyBrief 同属一个 insights path。</td>
+                <td>Caption finalization、image generation、draft assembly。</td>
+              </tr>
+              <tr>
+                <td><strong>PostStrategyBrief</strong></td>
+                <td>Content Insights path 下的第二层业务输出，将 insight conclusion 整理成 Full Post Gen 可消费的 strategy brief。</td>
+                <td>查询 Buzz 数据、生成图片、落 draft。</td>
+              </tr>
+              <tr>
+                <td><strong>Full Post Gen Agent</strong></td>
+                <td>Editorial/ad generation、Buzz single-post remix、caption、overlay、image prompt、draft assembly。</td>
+                <td>Ranking competitor folders、category-level Buzz discovery、insight brief generation。</td>
+              </tr>
+              <tr>
+                <td><strong>Publish Flow</strong></td>
+                <td>Account validation、publish confirmation、Meta execution、scheduling。</td>
+                <td>Creative strategy 与 insight analysis。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <h2>Reference Structure</h2>
+          <p>Insight 与 generation 使用分开的 runtime references。</p>
+        </div>
+        <div class="body">
+          <div class="grid cols-2">
+            <div class="card">
+              <h3>Content Insights References</h3>
+              <p><code>use_cases.md</code>, <code>period.md</code>, <code>competitor_folder.md</code>, <code>industry_category.md</code>, <code>buzz_pattern_analysis.md</code><br><code>post_strategy_brief.md</code>（同路径下的第二层业务文档）</p>
+            </div>
+            <div class="card">
+              <h3>Full Post Gen References</h3>
+              <p><code>use_cases.md</code>, <code>editorial.md</code>, <code>ad.md</code>, <code>buzz_remix.md</code>, <code>strategy_brief_input.md</code>, <code>post_settings.md</code></p>
+            </div>
+          </div>
+          <div class="callout warn">
+            <strong>建议：</strong>不要把 <code>editorial_vs_ad.md</code> 作为主要 runtime reference。随着产品增长，分开的 <code>editorial.md</code> 和 <code>ad.md</code> 更容易维护。
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="flows" class="tab-panel">
+      <section>
+        <div class="section-head">
+          <h2>Sequence Diagrams</h2>
+          <p>每条 swimlane 展示新架构下对应 UC 的预期运行路径。</p>
+        </div>
+        <div class="body">
+          <div class="swimlane">
+            <div class="swimrow">
+              <div class="swimhead">UC1 Editorial</div>
+              <div class="swimbody">
+                <span class="pill">User topic</span><span class="arrow">→</span><span class="pill">Full Post Gen</span><span class="arrow">→</span><span class="pill">editorial.md</span><span class="arrow">→</span><span class="pill">Image + caption</span><span class="arrow">→</span><span class="pill">Draft</span>
+              </div>
+            </div>
+            <div class="swimrow">
+              <div class="swimhead">UC2 Ad</div>
+              <div class="swimbody">
+                <span class="pill">Offer / audience / objective</span><span class="arrow">→</span><span class="pill">Full Post Gen</span><span class="arrow">→</span><span class="pill">ad.md</span><span class="arrow">→</span><span class="pill">Conversion creative</span><span class="arrow">→</span><span class="pill">Draft</span>
+              </div>
+            </div>
+            <div class="swimrow">
+              <div class="swimhead">UC3 Remix</div>
+              <div class="swimbody">
+                <span class="pill">Selected Buzz post</span><span class="arrow">→</span><span class="pill">Extract mechanism</span><span class="arrow">→</span><span class="pill">User brand</span><span class="arrow">→</span><span class="pill">Adapt, not copy</span><span class="arrow">→</span><span class="pill">Draft</span>
+              </div>
+            </div>
+            <div class="swimrow">
+              <div class="swimhead">UC4 Selected Buzz</div>
+              <div class="swimbody">
+                <span class="pill">Multiple selected posts</span><span class="arrow">→</span><span class="pill">Content Insights</span><span class="arrow">→</span><span class="pill">PostStrategyBrief</span><span class="arrow">→</span><span class="pill">Full Post Gen</span>
+              </div>
+            </div>
+            <div class="swimrow">
+              <div class="swimhead">UC5 Folder</div>
+              <div class="swimbody">
+                <span class="pill">Resolve folder</span><span class="arrow">→</span><span class="pill">Past 7 days default</span><span class="arrow">→</span><span class="pill">Top Buzz posts</span><span class="arrow">→</span><span class="pill">Winning traits</span><span class="arrow">→</span><span class="pill">Draft if user proceeds</span>
+              </div>
+            </div>
+            <div class="swimrow">
+              <div class="swimhead">UC6 Industry</div>
+              <div class="swimbody">
+                <span class="pill">解析 My Page category</span><span class="arrow">→</span><span class="pill">Category winners</span><span class="arrow">→</span><span class="pill">Topic options</span><span class="arrow">→</span><span class="pill">用户选择</span><span class="arrow">→</span><span class="pill">Draft</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <h2>Process Flow</h2>
+          <p>Insight-first flows 业务上分两层：Content Insights 先分析，PostStrategyBrief 再输出结构化 brief，然后进入 generation。</p>
+        </div>
+        <div class="body">
+          <div class="flow">
+            <span class="node blue">User intent</span>
+            <span class="arrow">→</span>
+            <span class="node purple">Route by selected agent</span>
+            <span class="arrow">→</span>
+            <span class="node green">Insight required?</span>
+            <span class="arrow">→</span>
+            <span class="node orange">Resolve context</span>
+            <span class="arrow">→</span>
+            <span class="node green">Analyze patterns</span>
+            <span class="arrow">→</span>
+            <span class="node blue">生成 draft</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="data" class="tab-panel">
+      <section>
+        <div class="section-head">
+          <h2>Data Flow</h2>
+          <p>UI context、Buzz data、My Page category 与 generation outputs 在系统中的流向。</p>
+        </div>
+        <div class="body">
+          <div class="dataflow">
+            <div class="data-col">
+              <h3>Frontend Context</h3>
+              <div class="data-body">
+                <span class="chip blue">Selected agent mode</span>
+                <span class="chip blue">Selected Buzz posts</span>
+                <span class="chip blue">Current competitor folder</span>
+                <span class="chip blue">Selected / connected My Page</span>
+              </div>
+            </div>
+            <div class="data-col">
+              <h3>Insight Inputs</h3>
+              <div class="data-body">
+                <span class="chip green">Buzz posts</span>
+                <span class="chip green">Competitor folder posts</span>
+                <span class="chip green">Industry category winners</span>
+                <span class="chip green">Past 7 days default</span>
+              </div>
+            </div>
+            <div class="data-col">
+              <h3>Strategy Output</h3>
+              <div class="data-body">
+                <span class="chip orange">Hook pattern</span>
+                <span class="chip orange">Emotional trigger</span>
+                <span class="chip orange">Visual pattern</span>
+                <span class="chip orange">PostStrategyBrief（same insights path）</span>
+              </div>
+            </div>
+            <div class="data-col">
+              <h3>Generation Output</h3>
+              <div class="data-body">
+                <span class="chip purple">Caption</span>
+                <span class="chip purple">Overlay text</span>
+                <span class="chip purple">Image assetId</span>
+                <span class="chip purple">Post Draft</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <h2>Decision Log</h2>
+          <p>本次讨论形成的关键产品决策。</p>
+        </div>
+        <div class="body">
+          <table>
+            <thead>
+              <tr>
+                <th>Decision</th>
+                <th>建议</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Insight references location</td>
+                <td>使用单独的 Content Insights skill/path；其中 insight analysis 与 PostStrategyBrief 是两个业务层、两个 md 文档，再 hand off 给 Full Post Gen。</td>
+              </tr>
+              <tr>
+                <td>Editorial 与 ad references</td>
+                <td>使用独立的 <code>editorial.md</code> 与 <code>ad.md</code> runtime references。</td>
+              </tr>
+              <tr>
+                <td>UC5 folder confirmation</td>
+                <td>当 folder ambiguous 时需要确认；有 current UI folder 或唯一 folder 时可作为 soft default。</td>
+              </tr>
+              <tr>
+                <td>Insight period</td>
+                <td>默认使用过去 7 天，并在回复中说明。</td>
+              </tr>
+              <tr>
+                <td>Frontend options</td>
+                <td>Auto mode 展示全部六个；Full Post Gen mode 展示三个直接生成 options。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const tabs = Array.from(document.querySelectorAll(".tab"));
+    const panels = Array.from(document.querySelectorAll(".tab-panel"));
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const target = tab.dataset.tab;
+        tabs.forEach((item) => item.classList.toggle("active", item === tab));
+        panels.forEach((panel) => panel.classList.toggle("active", panel.id === target));
+      });
+    });
+  </script>
+</body>
+</html>
