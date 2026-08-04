@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>Ad Intelligence Score 计算方式 Brief</title>
+<style>
+  :root{
+    --bg:#f5f7fa; --card:#fff; --ink:#102532; --sub:#5b6b76; --line:#e3e8ec;
+    --blue:#23a9f6; --blue-bg:#eaf6fe; --green:#1aa06d; --green-bg:#e7f7f0;
+    --amber:#c98a1a; --amber-bg:#fdf3e2; --red:#d1483f; --red-bg:#fbebe9;
+    --purple:#7c5cd6; --purple-bg:#f1ecfb;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang SC","Microsoft YaHei",Helvetica,Arial,sans-serif;line-height:1.6;}
+  .wrap{max-width:1400px;margin:0 auto;padding:32px 24px 100px;}
+  h1{font-size:26px;margin:0 0 6px;}
+  .lead{color:var(--sub);font-size:14.5px;margin:0 0 20px;}
+
+  /* tabs */
+  .tabbar{position:sticky;top:0;z-index:10;background:var(--bg);padding:10px 0 16px;display:flex;gap:8px;border-bottom:1px solid var(--line);margin-bottom:28px;}
+  .tabbtn{appearance:none;border:1px solid var(--line);background:#fff;color:var(--sub);font-size:14px;font-weight:700;padding:9px 22px;border-radius:9px;cursor:pointer;transition:all .15s ease;}
+  .tabbtn:hover{border-color:var(--blue);color:var(--blue);}
+  .tabbtn.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .tabpanel{display:none;}
+  .tabpanel.active{display:block;}
+
+  /* layout: left nav + content */
+  .layout{display:flex;align-items:flex-start;gap:32px;}
+  .sidenav{position:sticky;top:74px;flex:0 0 200px;width:200px;align-self:flex-start;max-height:calc(100vh - 100px);overflow-y:auto;}
+  .sidenav-list{display:none;}
+  .sidenav-list.active{display:block;}
+  .sidenav-group{margin-bottom:18px;}
+  .sidenav-group-title{font-size:11px;font-weight:700;color:#9aa9b3;text-transform:uppercase;letter-spacing:.04em;margin:0 0 6px;}
+  .sidenav a{display:block;font-size:13px;color:var(--sub);text-decoration:none;padding:5px 0 5px 10px;border-left:2px solid var(--line);transition:all .15s ease;}
+  .sidenav a:hover{color:var(--blue);border-left-color:var(--blue);}
+  .sidenav a.sub{font-size:12px;padding-left:20px;color:#8a99a3;}
+  .content-col{flex:1 1 auto;min-width:0;}
+
+  section.report{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px 30px;margin-bottom:32px;box-shadow:0 4px 16px rgba(16,37,50,.04);}
+  .report-header{display:flex;align-items:baseline;gap:12px;margin-bottom:4px;flex-wrap:wrap;}
+  .report-title{font-size:20px;font-weight:700;}
+  .badge{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;}
+  .badge.live{background:var(--green-bg);color:var(--green);}
+  .badge.none{background:var(--red-bg);color:var(--red);}
+  .report-sub{color:var(--sub);font-size:13.5px;margin:2px 0 20px;}
+  .report-sub code{background:#eef2f5;padding:1px 5px;border-radius:4px;font-size:12px;}
+  h3.section-h{font-size:15px;font-weight:700;margin:28px 0 10px;padding-top:16px;border-top:1px dashed var(--line);}
+  h3.section-h:first-of-type{border-top:none;padding-top:0;}
+  h4.dim-h{font-size:13.5px;font-weight:700;margin:20px 0 6px;color:#0c4f70;}
+  h4.dim-h .w{font-weight:700;color:var(--blue);margin-left:6px;}
+  .dim-meaning{font-size:12.5px;color:var(--sub);margin:0 0 6px;}
+  .brief-box{background:var(--blue-bg);border-radius:10px;padding:16px 18px;font-size:13.5px;color:#0c4f70;}
+  .brief-box b{color:#083a54;}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px;}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+  th{background:#f7f9fb;font-weight:700;color:#33454f;font-size:12.5px;}
+  tr:nth-child(even) td{background:#fafcfd;}
+  td.dim{font-weight:600;white-space:nowrap;}
+  .w{font-weight:700;color:var(--blue);}
+  table.band{max-width:520px;}
+  table.band th, table.band td{padding:6px 12px;font-size:12.5px;}
+  td.score-cell{font-weight:700;color:var(--green);text-align:center;}
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px;margin-right:4px;white-space:nowrap;}
+  .tag.new{background:var(--amber-bg);color:var(--amber);}
+  .tag.kept{background:var(--green-bg);color:var(--green);}
+  .tag.mod{background:var(--blue-bg);color:#0c6fa0;}
+  .tag.have{background:var(--purple-bg);color:var(--purple);}
+  .note{font-size:12.5px;color:var(--sub);margin-top:10px;}
+  .quote{border-left:3px solid var(--blue);padding:10px 16px;margin:10px 0 18px;font-size:13.5px;color:#33454f;background:#f9fcfe;font-style:italic;}
+  .quote b{font-style:normal;color:var(--ink);}
+  .src{font-size:11.5px;color:#8a99a3;}
+  .correction-banner{background:var(--red-bg);border:1px solid #f3c9c5;border-radius:10px;padding:16px 20px;font-size:13.5px;color:#7a2e28;margin-bottom:24px;}
+  .correction-banner b{color:#5c1f1a;}
+  .correction-banner ul{margin:8px 0 0;padding-left:20px;}
+  .correction-banner li{margin-bottom:4px;}
+  .samplebox{background:#f7f9fb;border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:12.5px;margin:8px 0 16px;color:#455661;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Campaign / Category / Advertiser Report — Score 计算方式 Brief</h1>
+  <p class="lead">已对照三份 Notion 规格文档（advertiser-report-ai-summary-prd-v1 / category-report-ai-summary-prd-v1 / campaign-report-ai-summary-spec-v1）与 <code>demo-app</code>（develop 分支）实际代码核对。</p>
+
+  <div class="tabbar">
+    <button class="tabbtn active" data-tab="current">Current 现状</button>
+    <button class="tabbtn" data-tab="recommendation">Recommendation 建议</button>
+  </div>
+
+  <div class="layout">
+    <nav class="sidenav">
+      <div class="sidenav-list active" id="nav-current">
+        <div class="sidenav-group">
+          <p class="sidenav-group-title">Campaign</p>
+          <a href="#cur-campaign">整体计算逻辑</a>
+          <a class="sub" href="#cur-campaign-d1">D1 Cost Efficiency</a>
+          <a class="sub" href="#cur-campaign-d2">D2 Engagement Depth</a>
+          <a class="sub" href="#cur-campaign-d3">D3 Creative Leverage</a>
+          <a class="sub" href="#cur-campaign-d4">D4 Creator Dependency</a>
+        </div>
+        <div class="sidenav-group">
+          <p class="sidenav-group-title">Category</p>
+          <a href="#cur-category">整体计算逻辑</a>
+          <a class="sub" href="#cur-category-d1">D1 Engagement Efficiency</a>
+          <a class="sub" href="#cur-category-d2">D2 Cost Efficiency</a>
+          <a class="sub" href="#cur-category-d3">D3 Efficiency Headroom</a>
+        </div>
+        <div class="sidenav-group">
+          <p class="sidenav-group-title">Advertiser</p>
+          <a href="#cur-advertiser">整体计算逻辑</a>
+          <a class="sub" href="#cur-advertiser-d1">D1 Cost Efficiency</a>
+          <a class="sub" href="#cur-advertiser-d2">D2 Engagement Depth</a>
+          <a class="sub" href="#cur-advertiser-d3">D3 Spend-to-Engagement Match</a>
+          <a class="sub" href="#cur-advertiser-d4">D4 Page Dependency</a>
+        </div>
+      </div>
+      <div class="sidenav-list" id="nav-recommendation">
+        <div class="sidenav-group">
+          <p class="sidenav-group-title">建议</p>
+          <a href="#rec-campaign">Campaign Report</a>
+          <a href="#rec-category">Category Report</a>
+          <a href="#rec-advertiser">Advertiser Report</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="content-col">
+
+  <!-- ================================================================ -->
+  <!-- CURRENT TAB -->
+  <!-- ================================================================ -->
+  <div class="tabpanel active" id="tab-current">
+
+  <!-- ============ CAMPAIGN ============ -->
+  <section class="report" id="cur-campaign">
+    <div class="report-header">
+      <div class="report-title">1. Campaign Report — Scorecard v3</div>
+      <span class="badge live">现有 Score：有</span>
+    </div>
+    <p class="report-sub">来源：Notion <code>campaign-report-ai-summary-spec-v1</code> 第 4 节 · 代码 <code>demo-app/services/campaignScoreEngine.js</code> · 写入 <code>data.score</code>，AI 不参与算分</p>
+
+    <h3 class="section-h">整体计算逻辑</h3>
+    <div class="brief-box">
+      四个维度各 <b>25 分</b>，满分 100，下限 10，<b>连续 clamp 计分</b>（非分档）。D1（Cost Efficiency）与 D2（Engagement Depth）对标 <b>全行业基准</b> <code>allIndustryBenchmark</code>（HK 地区 + 与活动同期 + branded_content &amp; paid_post，实时聚合，非固定常量）；D3（Creative Leverage）与 D4（Creator Dependency）为活动内部相对值，不依赖外部基准。<br><br>
+      缺项处理为「归一化后丢弃」：基准缺失 / 分母为 0 → 同时丢弃 D1+D2；单一维度输入缺失 → 只丢该维度；可用维度 &lt; 2 → overall 输出 "-"。<code>overall = max(10, round(100 × Σ可用 / (25 × 可用维度数)))</code>，星级 = <code>ceil(overall/20)</code>。
+    </div>
+
+    <h3 class="section-h">每个维度的计算逻辑</h3>
+    <table>
+      <tr><th style="width:16%">维度</th><th style="width:10%">权重</th><th style="width:32%">含义</th><th>对比对象</th></tr>
+      <tr><td class="dim">D1 · Cost Efficiency</td><td class="w">25</td><td>每互动成本是否比大盘划算（越低越好）</td><td>本活动 CPE（spending÷engagements）÷ 全行业 CPE（<code>allIndustryBenchmark.ad_values÷engagements</code>）</td></tr>
+      <tr><td class="dim">D2 · Engagement Depth</td><td class="w">25</td><td>单帖互动深度是否比大盘高</td><td>本活动 avgEngagements ÷ 全行业单帖均互动（<code>allIndustryBenchmark.engagements÷contents</code>）</td></tr>
+      <tr><td class="dim">D3 · Creative Leverage</td><td class="w">25</td><td>头部素材类别能否以小博大</td><td>活动<b>内部</b>：Top1 ad category「互动占比 ÷ 投放占比」</td></tr>
+      <tr><td class="dim">D4 · Creator Dependency</td><td class="w">25</td><td>是否过度依赖头部 1-2 位达人（反向计分）</td><td>活动<b>内部</b>：Top2 Pages 互动占总互动比例</td></tr>
+    </table>
+
+    <h4 class="dim-h" id="cur-campaign-d1">D1 · Cost Efficiency <span class="w">25 分，连续 clamp</span></h4>
+    <p class="dim-meaning">公式：<code>ratio = campaignCpe ÷ allIndustryCpe</code>；<code>D1 = 25 × clamp((1.6 − ratio)/1.0, 0, 1)</code></p>
+    <table class="band">
+      <tr><th>比值</th><th>含义</th><th>得分</th></tr>
+      <tr><td>≤ 0.6×</td><td>比全行业便宜四成以上</td><td class="score-cell">25（满分）</td></tr>
+      <tr><td>0.6 – 1.6× 区间</td><td>线性递减</td><td class="score-cell">线性 clamp</td></tr>
+      <tr><td>≥ 1.6×</td><td>比全行业贵六成以上</td><td class="score-cell">0</td></tr>
+    </table>
+
+    <h4 class="dim-h" id="cur-campaign-d2">D2 · Engagement Depth <span class="w">25 分，连续 clamp</span></h4>
+    <p class="dim-meaning">公式：<code>ratio = avgEngagements ÷ allIndustryAvgEngagements</code>；<code>D2 = 25 × clamp((ratio − 0.5)/1.0, 0, 1)</code>。直接引用 <code>avgEngagements</code>，禁止换分母重算</p>
+    <table class="band">
+      <tr><th>比值</th><th>含义</th><th>得分</th></tr>
+      <tr><td>≥ 1.5×</td><td>达全行业均值 1.5 倍以上</td><td class="score-cell">25（满分）</td></tr>
+      <tr><td>0.5 – 1.5× 区间</td><td>线性递减</td><td class="score-cell">线性 clamp</td></tr>
+      <tr><td>≤ 0.5×</td><td>不到全行业均值一半</td><td class="score-cell">0</td></tr>
+    </table>
+
+    <h4 class="dim-h" id="cur-campaign-d3">D3 · Creative Leverage <span class="w">25 分，连续 clamp</span></h4>
+    <p class="dim-meaning">公式：<code>ratio = top.engagements.percentage ÷ top.posts.percentage</code>；<code>D3 = 25 × clamp((ratio − 1.0)/1.5, 0, 1)</code>。纯相对值，无需外部基准</p>
+    <table class="band">
+      <tr><th>比值</th><th>含义</th><th>得分</th></tr>
+      <tr><td>ratio = 1</td><td>互动占比=投放占比，素材无杠杆</td><td class="score-cell">0</td></tr>
+      <tr><td>1 – 2.5× 区间</td><td>线性递增</td><td class="score-cell">线性 clamp</td></tr>
+      <tr><td>≥ 2.5×</td><td>以少量素材撬动大量互动</td><td class="score-cell">25（满分）</td></tr>
+    </table>
+
+    <h4 class="dim-h" id="cur-campaign-d4">D4 · Creator Dependency <span class="w">25 分，反向计分，连续 clamp</span></h4>
+    <p class="dim-meaning">公式：<code>top2Share = (topPages[0].engagements + topPages[1].engagements) ÷ engagements</code>；<code>D4 = 25 × clamp((0.95 − top2Share)/0.55, 0, 1)</code></p>
+    <table class="band">
+      <tr><th>Top2 互动占比</th><th>含义</th><th>得分</th></tr>
+      <tr><td>≤ 40%</td><td>矩阵健康，成效可复制</td><td class="score-cell">25（满分）</td></tr>
+      <tr><td>40 – 95% 区间</td><td>线性递减</td><td class="score-cell">线性 clamp</td></tr>
+      <tr><td>≥ 95%</td><td>单点依赖，不可持续</td><td class="score-cell">0</td></tr>
+    </table>
+
+    <div class="samplebox"><b>样本活动实测</b>（HUAWEIPura90sSeriesLaunch）：D1=5.9 / D2=8.6 / D3=19.2 / D4=7.5 → 合计 41.2 → <b>41 分，Fair，3★</b></div>
+  </section>
+
+  <!-- ============ CATEGORY ============ -->
+  <section class="report" id="cur-category">
+    <div class="report-header">
+      <div class="report-title">2. Category Report — Category Efficiency Score</div>
+      <span class="badge live">现有 Score：有</span>
+    </div>
+    <p class="report-sub">来源：Notion <code>category-report-ai-summary-prd-v1</code> 第 6 节 · 代码 <code>demo-app/services/categoryScoreEngine.js</code></p>
+
+    <h3 class="section-h">整体计算逻辑</h3>
+    <div class="brief-box">
+      三个维度，权重 <b>40 / 40 / 20</b>，满分 100，下限 10，<b>整数分档制</b>（非线性插值）——理由：抗基准漂移（基准实时聚合，插值下会连续跳动）、对外行读者更好解释。D1、D2 对标全市场基准（与 category <code>overview</code> 同口径：fb+ig+yt engagements/contents，fb+ig+story+yt ad-values）；D3 为行业内部头部广告主 vs 均值的差距，是转化钩子设计（暗示「你的位置只有 MediaLens 能答」）。<br><br>
+      缺项归一化：<code>overall = max(10, round(100 × Σ可用得分 ÷ Σ可用权重))</code>，可用权重和 &lt;40 时输出 "-"。星级由<b>评级带直接映射</b>，不是 <code>ceil(overall/20)</code>（会在 81-84 分误判 5 星）。
+    </div>
+
+    <h3 class="section-h">每个维度的计算逻辑</h3>
+    <table>
+      <tr><th style="width:18%">维度</th><th style="width:10%">权重</th><th style="width:32%">含义</th><th>对比对象</th></tr>
+      <tr><td class="dim">D1 · Engagement Efficiency</td><td class="w">40</td><td>本行业内容是否比大盘更容易起量</td><td>本行业单帖均互动 ÷ 全市场均互动</td></tr>
+      <tr><td class="dim">D2 · Cost Efficiency</td><td class="w">40</td><td>本行业花钱是否比大盘值</td><td>本行业每互动成本 ÷ 全市场每互动成本</td></tr>
+      <tr><td class="dim">D3 · Efficiency Headroom</td><td class="w">20</td><td>行业头部广告主比均值好多少（效率空间）</td><td>行业<b>内部</b>：Top1 广告主均互动 ÷ 本行业均互动</td></tr>
+    </table>
+
+    <h4 class="dim-h" id="cur-category-d1">D1 · Engagement Efficiency <span class="w">40 分，5 档</span></h4>
+    <p class="dim-meaning">公式：<code>ratio = overview.avgEngagements ÷ (benchmark.engagements ÷ benchmark.contents)</code></p>
+    <table class="band">
+      <tr><th>比值</th><th>含义</th><th>得分</th></tr>
+      <tr><td>≥ 1.5×</td><td>远高于全市场</td><td class="score-cell">40</td></tr>
+      <tr><td>1.1 – 1.5×</td><td>高于全市场</td><td class="score-cell">32</td></tr>
+      <tr><td>0.9 – 1.1×</td><td>与全市场持平（±10% 中性带）</td><td class="score-cell">24</td></tr>
+      <tr><td>0.6 – 0.9×</td><td>低于全市场</td><td class="score-cell">12</td></tr>
+      <tr><td>&lt; 0.6×</td><td>远低于全市场</td><td class="score-cell">0</td></tr>
+    </table>
+
+    <h4 class="dim-h" id="cur-category-d2">D2 · Cost Efficiency <span class="w">40 分，5 档，越低越好</span></h4>
+    <p class="dim-meaning">公式：<code>ratio = (totalSpending÷engagements) ÷ (benchmark.ad_values÷benchmark.engagements)</code></p>
+    <table class="band">
+      <tr><th>比值</th><th>含义</th><th>得分</th></tr>
+      <tr><td>≤ 0.6×</td><td>远比全市场便宜</td><td class="score-cell">40</td></tr>
+      <tr><td>0.6 – 0.9×</td><td>比全市场便宜</td><td class="score-cell">32</td></tr>
+      <tr><td>0.9 – 1.1×</td><td>与全市场持平（±10% 中性带）</td><td class="score-cell">24</td></tr>
+      <tr><td>1.1 – 1.5×</td><td>比全市场贵</td><td class="score-cell">12</td></tr>
+      <tr><td>&gt; 1.5×</td><td>远比全市场贵</td><td class="score-cell">0</td></tr>
+    </table>
+
+    <h4 class="dim-h" id="cur-category-d3">D3 · Efficiency Headroom <span class="w">20 分，5 档</span></h4>
+    <p class="dim-meaning">公式：<code>ratio = top.avgEngagement[0] ÷ overview.avgEngagements</code>；头部广告主必然 ≥ 行业均值，比值恒 ≥1。满分线定在 5× 而非 3×，避免形同送分</p>
+    <table class="band">
+      <tr><th>比值</th><th>含义</th><th>得分</th></tr>
+      <tr><td>≥ 5×</td><td>差距悬殊，大多数玩家做得不好</td><td class="score-cell">20</td></tr>
+      <tr><td>2.5 – 5×</td><td>差距明显，有可观效率空间</td><td class="score-cell">15</td></tr>
+      <tr><td>1.5 – 2.5×</td><td>中等差距</td><td class="score-cell">10</td></tr>
+      <tr><td>1.1 – 1.5×</td><td>差距小</td><td class="score-cell">5</td></tr>
+      <tr><td>&lt; 1.1×</td><td>头部与平均几乎无差距，行业效率已见顶</td><td class="score-cell">0</td></tr>
+    </table>
+
+    <div class="samplebox"><b>校准检查</b>：各项与全市场持平、头部 2×均值 → 24+24+10=58 Fair；互动高20%/便宜20%/头部3× → 32+32+15=79 Good；互动高60%/便宜一半/头部6× → 40+40+20=100 Excellent；互动低30%/贵30%/头部1.2× → 12+12+5=29 Poor</div>
+  </section>
+
+  <!-- ============ ADVERTISER ============ -->
+  <section class="report" id="cur-advertiser">
+    <div class="report-header">
+      <div class="report-title">3. Advertiser Report — Advertiser Health Score</div>
+      <span class="badge live">现有 Score：有</span>
+    </div>
+    <p class="report-sub">来源：Notion <code>advertiser-report-ai-summary-prd-v1</code> 第 6 节 · 代码 <code>demo-app/services/advertiserScoreEngine.js</code>，接入点 <code>controllers/v1/reports/advertiser/details.js:186</code></p>
+
+    <h3 class="section-h">整体计算逻辑</h3>
+    <div class="brief-box">
+      四个维度各 25 分，满分 100，下限 10，<b>整数分档制</b>，也使用全市场基准（<code>categoryIndustryBenchmarkAggregate</code>，<b>范围是 HK + Macau</b>，与 Campaign/Category 的 HK-only 不同）。与 Campaign 的四维度一一对应，其中两项因数据结构不同而替换：D3 Spend-to-Engagement Match 替换 Creative Leverage（本 payload 的 adCategories 只有 count 无按分类互动数，算不出杠杆比，改用 <code>mediaTypeAdValueSplit</code> 的 adValuePct vs engagementPct）；D4 Page Dependency 替换 Creator Dependency（页面维度而非达人维度）。<br><br>
+      D1/D2 均须<b>排除 official_post</b>（自营内容零花费但互动量大，计入会把每互动成本/深度摊到失真——样本 CHANEL 全量口径 HK$13.11/互动，排除后 HK$21.87，差 67%）。D3 须<b>剔除 story 行</b>（story 有花费但无互动记录，不剔除会凭空增加约 1.8 个百分点的假错配）。<br><br>
+      缺项归一化，可用权重和 &lt;50 时输出 "-"。评级带比其他两份报表更细：<b>Poor 拆成两档</b>（25-39→2★ / 10-24→1★），星级用显式带表，不用 <code>ceil(overall/20)</code>（会在 61-64 分产生「Fair 配 4★」的自相矛盾，样本 CHANEL 62 分正好落在此区间）。
+    </div>
+
+    <h3 class="section-h">每个维度的计算逻辑</h3>
+    <table>
+      <tr><th style="width:18%">维度</th><th style="width:12%">权重</th><th style="width:30%">含义</th><th>对比对象 / 对应 Campaign 维度</th></tr>
+      <tr><td class="dim">D1 · Cost Efficiency</td><td class="w">25</td><td>钱花得值不值？</td><td>品牌 CPE（不含 official_post）÷ 全市场 CPE — 沿用 Campaign D1</td></tr>
+      <tr><td class="dim">D2 · Engagement Depth</td><td class="w">25</td><td>单条内容够不够有效？</td><td>品牌 avg engagement/content（不含 official_post、排除 story）÷ 全市场均互动 — 沿用 Campaign D2</td></tr>
+      <tr><td class="dim">D3 · Spend-to-Engagement Match</td><td class="w">25</td><td>钱有没有投在对的内容形式上？</td><td>品牌<b>内部</b>：投放金额分布 vs 互动产出分布的错配度 — 替换 Campaign 的 Creative Leverage</td></tr>
+      <tr><td class="dim">D4 · Page Dependency</td><td class="w">25</td><td>声量会不会毁在单点上？</td><td>品牌<b>内部</b>：Top2 Pages 互动占比 — Creator Dependency 的页面维度版本</td></tr>
+    </table>
+
+    <h4 class="dim-h" id="cur-advertiser-d1">D1 · Cost Efficiency <span class="w">25 分，5 档</span></h4>
+    <p class="dim-meaning">公式：品牌 branded+paid 的 <code>spend÷engagement</code>（<b>排除 official_post</b>）÷ 全市场同口径 CPE</p>
+    <table class="band">
+      <tr><th>比值</th><th>含义</th><th>得分</th></tr>
+      <tr><td>≤ 0.6×</td><td>远比全市场便宜</td><td class="score-cell">25</td></tr>
+      <tr><td>0.6 – 0.9×</td><td>比全市场便宜</td><td class="score-cell">20</td></tr>
+      <tr><td>0.9 – 1.1×</td><td>与全市场持平</td><td class="score-cell">15</td></tr>
+      <tr><td>1.1 – 1.5×</td><td>比全市场贵</td><td class="score-cell">8</td></tr>
+      <tr><td>&gt; 1.5×</td><td>远比全市场贵</td><td class="score-cell">0</td></tr>
+    </table>
+
+    <h4 class="dim-h" id="cur-advertiser-d2">D2 · Engagement Depth <span class="w">25 分，5 档</span></h4>
+    <p class="dim-meaning">公式：品牌 avg engagement/content（<b>排除 official_post</b>，分母排除 story）÷ 全市场均互动</p>
+    <table class="band">
+      <tr><th>比值</th><th>含义</th><th>得分</th></tr>
+      <tr><td>≥ 1.5×</td><td>远高于全市场</td><td class="score-cell">25</td></tr>
+      <tr><td>1.1 – 1.5×</td><td>高于全市场</td><td class="score-cell">20</td></tr>
+      <tr><td>0.9 – 1.1×</td><td>与全市场持平</td><td class="score-cell">15</td></tr>
+      <tr><td>0.6 – 0.9×</td><td>低于全市场</td><td class="score-cell">8</td></tr>
+      <tr><td>&lt; 0.6×</td><td>远低于全市场</td><td class="score-cell">0</td></tr>
+    </table>
+
+    <h4 class="dim-h" id="cur-advertiser-d3">D3 · Spend-to-Engagement Match <span class="w">25 分，5 档</span></h4>
+    <p class="dim-meaning">公式：剔除 story 行后，Σ|adValuePct − engagementPct| ÷ 2，结果落在 0-100%（0%=完全匹配，100%=钱完全投在无产出形式上）</p>
+    <table class="band">
+      <tr><th>错配度</th><th>含义</th><th>得分</th></tr>
+      <tr><td>≤ 10%</td><td>投放分布与产出高度匹配</td><td class="score-cell">25</td></tr>
+      <tr><td>10 – 20%</td><td>基本匹配</td><td class="score-cell">20</td></tr>
+      <tr><td>20 – 30%</td><td>有明显偏移</td><td class="score-cell">15</td></tr>
+      <tr><td>30 – 40%</td><td>错配严重</td><td class="score-cell">8</td></tr>
+      <tr><td>&gt; 40%</td><td>钱大量投在低产出形式上</td><td class="score-cell">0</td></tr>
+    </table>
+
+    <h4 class="dim-h" id="cur-advertiser-d4">D4 · Page Dependency <span class="w">25 分，反向计分，5 档</span></h4>
+    <p class="dim-meaning">公式：<code>(pages[0].engagements + pages[1].engagements) ÷ totalEngagements</code>。已知局限：不区分自营页面与第三方页面（自营集中可控，第三方集中才是真风险），当前版本不做区分</p>
+    <table class="band">
+      <tr><th>Top2 互动占比</th><th>含义</th><th>得分</th></tr>
+      <tr><td>≤ 40%</td><td>矩阵健康，声量分散</td><td class="score-cell">25</td></tr>
+      <tr><td>40 – 60%</td><td>尚可</td><td class="score-cell">20</td></tr>
+      <tr><td>60 – 75%</td><td>开始偏集中</td><td class="score-cell">15</td></tr>
+      <tr><td>75 – 90%</td><td>高度依赖少数页面</td><td class="score-cell">8</td></tr>
+      <tr><td>&gt; 90%</td><td>单点依赖</td><td class="score-cell">0</td></tr>
+    </table>
+
+    <div class="samplebox"><b>样本品牌实测</b>（CHANEL，2026-05-31~06-30）：Cost Efficiency（HK$21.87/eng，全市场 0.51×）=25 / Engagement Depth（1,413.2，全市场 2.94×）=25 / Spend-to-Engagement Match（错配度 31.2%）=8 / Page Dependency（前两名占 81.3%）=8 → 合计 <b>66 分，Good，4★</b>。诊断画像：钱花得便宜、内容效率远高于全市场，但投放形式配比明显错配、声量集中在两个页面。</div>
+  </section>
+
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- RECOMMENDATION TAB -->
+  <!-- ================================================================ -->
+  <div class="tabpanel" id="tab-recommendation">
+
+  <div class="correction-banner">
+    <b>User Feedback：</b>
+    <p style="margin:8px 0 0;font-style:italic;">"建议把找 publisher 媒体资源的 campaign 都有点加分，或者是 publisher vs influencer 的比例（自己定义最优值）；average engagement per cost 完全忽略了 boosting 的影响"</p>
+  </div>
+
+  <!-- ============ CAMPAIGN ============ -->
+  <section class="report" id="rec-campaign">
+    <div class="report-header">
+      <div class="report-title">1. Campaign Report — 新计算维度建议</div>
+    </div>
+    <div class="quote">"建议把找 publisher 媒体资源的 campaign 都有点加分，或者是 publisher vs influencer 的比例（自己定义最优值）；average engagement per cost 完全忽略了 boosting 的影响"</div>
+    <p class="note">现状：Campaign Scorecard v3 四维度各 25 分（D1 Cost Efficiency / D2 Engagement Depth / D3 Creative Leverage / D4 Creator Dependency），详见 Current 分頁。D1 用总 spending÷engagements 一刀切，未拆 boosted/organic；四维度均未涉及 publisher/influencer 配比。</p>
+    <table>
+      <tr><th style="width:16%">维度</th><th style="width:10%">权重</th><th style="width:10%">状态</th><th style="width:28%">含义</th><th>计算方式概要</th></tr>
+      <tr><td class="dim">D1 · Boost-Adjusted Cost Efficiency</td><td class="w">20</td><td><span class="tag mod">调整</span></td><td>每互动成本是否比大盘划算，<b>拆分自然量与投放量</b></td><td>用既有 <code>isBoosted</code> 字段分离 boosted spend 与 organic engagement，仅对 boosted 部分算 CPE 对比全行业，organic 占比另计加权，避免高自然流量活动被总量摊薄成本假象拉低分</td></tr>
+      <tr><td class="dim">D2 · Engagement Depth</td><td class="w">20</td><td><span class="tag kept">保留</span></td><td>单帖互动深度 vs 大盘</td><td>与现有 D2 相同，权重由 25→20</td></tr>
+      <tr><td class="dim">D3 · Creative Leverage</td><td class="w">15</td><td><span class="tag kept">保留</span></td><td>头部素材以小博大程度</td><td>与现有 D3 相同，权重由 25→15</td></tr>
+      <tr><td class="dim">D4 · Creator Dependency</td><td class="w">15</td><td><span class="tag kept">保留</span></td><td>是否单点依赖头部达人</td><td>与现有 D4 相同，权重由 25→15</td></tr>
+      <tr><td class="dim">D5 · Publisher Resource Bonus</td><td class="w">15</td><td><span class="tag new">新增聚合</span></td><td>是否用到 publisher（媒体／自有渠道）资源，而非纯 influencer 投放</td><td>计算活动内 publisher 类型 Page 的互动占比；占比越高分越高</td></tr>
+      <tr><td class="dim">D6 · Publisher / Influencer Mix Fit</td><td class="w">15</td><td><span class="tag new">新增算法</span></td><td>publisher 与 influencer 的配比是否接近「最优值」</td><td>业务定义最优比例常量（如 30:70，需真实数据校准），按偏离度钟形计分（越接近最优越高，两端极值均降分）</td></tr>
+    </table>
+    <p class="note">D5/D6 需要 campaign 报表接口新增「按 pageType 聚合互动占比」这层输出；分类逻辑可直接复用 advertiser 层已有的 <code>PAGE_TYPE_ACTIVE_KEYS</code>。</p>
+  </section>
+
+  <!-- ============ CATEGORY ============ -->
+  <section class="report" id="rec-category">
+    <div class="report-header">
+      <div class="report-title">2. Category Report — 新计算维度建议</div>
+    </div>
+    <div class="quote">同一套反馈套用到行业层级：D2 Cost Efficiency 同样是总花费÷总互动，未区分行业内 boosting 强度差异；行业层级尚无衡量 publisher 资源利用度的维度。</div>
+    <p class="note">代码核实：<code>categoryReportAggregate.js:163-218</code> 已有 boosted/organic 拆分聚合（与 advertiser 层同一套逻辑），D2 调整可直接复用。Publisher/influencer 的行业级聚合未确认存在，需新开发。</p>
+    <table>
+      <tr><th style="width:18%">维度</th><th style="width:10%">权重</th><th style="width:10%">状态</th><th style="width:26%">含义</th><th>计算方式概要</th></tr>
+      <tr><td class="dim">D1 · Engagement Efficiency</td><td class="w">30</td><td><span class="tag kept">保留</span></td><td>内容是否比大盘更容易起量</td><td>与现有 D1 相同，权重 40→30</td></tr>
+      <tr><td class="dim">D2 · Boost-Adjusted Cost Efficiency</td><td class="w">30</td><td><span class="tag have">既有数据待接入</span></td><td>花钱是否比大盘值，且区分自然量/投放量</td><td>复用既有 boosted/organic 拆分，仅对 boosted 部分算行业每互动成本对比全市场同口径</td></tr>
+      <tr><td class="dim">D3 · Efficiency Headroom</td><td class="w">15</td><td><span class="tag kept">保留</span></td><td>头部广告主效率空间</td><td>与现有 D3 相同，权重 20→15</td></tr>
+      <tr><td class="dim">D4 · Publisher Resource Utilization</td><td class="w">15</td><td><span class="tag new">新增聚合</span></td><td>行业整体是否善用 publisher（媒体）资源</td><td>行业内 publisher 类型 Page 的互动占比；分类逻辑可复用 advertiser 层，但汇总层未确认存在</td></tr>
+      <tr><td class="dim">D5 · Publisher / Influencer Mix Fit</td><td class="w">10</td><td><span class="tag new">新增聚合+算法</span></td><td>行业整体配比是否接近最优值</td><td>行业层级实际比例 vs 最优值偏离度，钟形计分，与 Campaign D6 共用一套常量</td></tr>
+    </table>
+    <p class="note">D4/D5 需要 <code>categoryIndustryBenchmarkAggregate</code> 扩充 publisher/influencer 拆分字段，目前只含 engagements / contents / ad_values 三项原始计数。</p>
+  </section>
+
+  <!-- ============ ADVERTISER ============ -->
+  <section class="report" id="rec-advertiser">
+    <div class="report-header">
+      <div class="report-title">3. Advertiser Report — 新计算维度建议</div>
+    </div>
+    <div class="quote">同一套反馈套用到品牌层级：D1 Cost Efficiency 也是总 spend÷总 engagement，未拆 boosted/organic；现有 4 个维度都没用到品牌层级已经在算的 publisher/influencer 分布数据。</div>
+    <p class="note"><b>代码核实（可信度最高）：</b>boosted/organic 拆分与 publisher/influencer 分类<b>在 advertiser 报表数据层都已经存在且在跑</b>（<code>boostedPaid/nonBoostedPaid</code>、<code>PAGE_TYPE_ACTIVE_KEYS</code>），只是 <code>advertiserScoreEngine.js</code> 的 D1-D4 完全没有读取这两组字段。下面全部是「接入既有数据」，没有一项需要新聚合开发。</p>
+    <table>
+      <tr><th style="width:18%">维度</th><th style="width:10%">权重</th><th style="width:10%">状态</th><th style="width:26%">含义</th><th>计算方式概要</th></tr>
+      <tr><td class="dim">D1 · Boost-Adjusted Cost Efficiency</td><td class="w">20</td><td><span class="tag have">既有数据待接入</span></td><td>花钱是否比大盘值，区分自然量/投放量</td><td>用既有 <code>boostedPaid</code> spend 单独算 boosted CPE 对比全市场，<code>nonBoostedPaid</code>（含 organic）占比另计加权</td></tr>
+      <tr><td class="dim">D2 · Engagement Depth</td><td class="w">20</td><td><span class="tag kept">保留</span></td><td>单帖互动深度 vs 大盘</td><td>与现有 D2 相同，权重 25→20</td></tr>
+      <tr><td class="dim">D3 · Spend-to-Engagement Match</td><td class="w">15</td><td><span class="tag kept">保留</span></td><td>投放与互动分布是否匹配</td><td>与现有 D3 相同，权重 25→15</td></tr>
+      <tr><td class="dim">D4 · Page Dependency</td><td class="w">15</td><td><span class="tag kept">保留</span></td><td>是否单点依赖头部 Page</td><td>与现有 D4 相同，权重 25→15</td></tr>
+      <tr><td class="dim">D5 · Publisher Resource Bonus</td><td class="w">15</td><td><span class="tag have">既有数据待接入</span></td><td>是否用到 publisher（媒体）资源</td><td>直接读 <code>PAGE_TYPE_ACTIVE_KEYS</code> 已算好的 publisher 占比；占比越高分越高</td></tr>
+      <tr><td class="dim">D6 · Publisher / Influencer Mix Fit</td><td class="w">15</td><td><span class="tag new">新增算法</span></td><td>配比是否接近业务定义的最优值</td><td>分类数据是现成的，「最优比例」常量与钟形计分逻辑需新设计，与 Campaign D6 / Category D5 共用一套常量口径</td></tr>
+    </table>
+    <p class="note">三份报表建议共用同一套「publisher:influencer 最优比例」常量与钟形计分函数，避免同一品牌在 Campaign / Advertiser 两份报表里因常量不同而口径打架。另需注意：Advertiser 层的 Page Dependency（D4）目前不区分自营页面与第三方页面，若接入 publisher 维度，可考虑同步修正这个已知局限。</p>
+  </section>
+
+  </div>
+
+    </div>
+  </div>
+
+</div>
+<script>
+  document.querySelectorAll('.tabbtn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.tabbtn').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.tabpanel').forEach(function(p){ p.classList.remove('active'); });
+      document.querySelectorAll('.sidenav-list').forEach(function(l){ l.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+      document.getElementById('nav-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
