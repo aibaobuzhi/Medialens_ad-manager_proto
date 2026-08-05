@@ -988,17 +988,18 @@
   function installStyles(){
     const style = document.createElement('style');
     style.textContent = [
-      '.metric-control{display:flex!important;align-items:center!important;gap:10px!important;flex-wrap:wrap!important;flex-basis:100%!important;width:100%!important;margin-top:10px!important}',
+      '.metric-control{display:flex!important;align-items:center!important;gap:10px!important;flex-wrap:wrap!important;flex-basis:100%!important;width:100%!important;margin-top:10px!important;font-family:"Poppins","Noto Sans HK","Helvetica Neue",Arial,sans-serif!important}',
       '.metric-control .metric-label{font-size:12.5px!important;color:#707070!important;font-weight:500!important;line-height:32px!important}',
       '.metric-control .metric-group{display:inline-flex!important;align-items:center!important;gap:2px!important;background:#eef2f5!important;border-radius:10px!important;padding:3px!important;max-width:100%!important;flex-wrap:wrap!important}',
       '.metric-control .metric-btn{border:0!important;background:transparent!important;font:inherit!important;font-size:12.5px!important;line-height:1.2!important;font-weight:500!important;color:#707070!important;padding:8px 18px!important;border-radius:8px!important;cursor:pointer!important;white-space:nowrap!important;box-shadow:none!important;opacity:1!important}',
       '.metric-control .metric-btn.active{background:#fff!important;color:#23A9F6!important;font-weight:600!important;box-shadow:0 1px 3px rgba(0,0,0,.08)!important}',
       '.metric-control .metric-btn.is-locked{color:#707070!important;opacity:1!important}',
-      '.avg-toggle-wrap{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-basis:100%;width:100%;margin-left:0;margin-top:8px;color:#707070;font-size:11.5px;white-space:nowrap}',
-      '.avg-toggle{width:34px;height:20px;border:0;border-radius:999px;background:#cdd7dc;position:relative;cursor:pointer;transition:background .16s ease}',
-      '.avg-toggle:after{content:"";position:absolute;width:16px;height:16px;left:2px;top:2px;background:#fff;border-radius:50%;box-shadow:0 1px 2px rgba(0,0,0,.16);transition:transform .16s ease}',
-      '.avg-toggle.is-on{background:#23A9F6}',
-      '.avg-toggle.is-on:after{transform:translateX(14px)}',
+      '.avg-toggle-wrap{display:inline-flex!important;align-items:center!important;gap:8px!important;height:36px!important;padding:0!important;margin-left:4px!important;color:#8a8f98!important;background:transparent!important;border-radius:0!important;font-family:"Poppins","Noto Sans HK","Helvetica Neue",Arial,sans-serif!important;font-size:13px!important;font-weight:400!important;white-space:nowrap!important}',
+      '.avg-toggle-wrap.is-on{color:#23A9F6!important}',
+      '.avg-toggle{width:38px!important;height:21px!important;border:1px solid #e1e4e8!important;border-radius:999px!important;background:#eef0f2!important;position:relative!important;cursor:pointer!important;transition:background .16s ease,border-color .16s ease,opacity .16s ease!important;box-shadow:none!important}',
+      '.avg-toggle:after{content:""!important;position:absolute!important;width:17px!important;height:17px!important;left:1px!important;top:1px!important;background:#fff!important;border-radius:50%!important;box-shadow:0 1px 3px rgba(31,54,72,.25)!important;transition:transform .16s ease!important}',
+      '.avg-toggle.is-on{background:#23A9F6!important;border-color:#23A9F6!important}',
+      '.avg-toggle.is-on:after{transform:translateX(17px)!important}',
       '.avg-toggle.is-disabled{opacity:.48;cursor:not-allowed}'
     ].join('\n');
     document.head.appendChild(style);
@@ -1016,9 +1017,12 @@
     if(!toggle){
       toggle = document.createElement('span');
       toggle.className = 'avg-toggle-wrap';
-      toggle.innerHTML = '<span>Average</span><button type="button" class="avg-toggle is-on" aria-label="Average toggle"></button>';
-      control.appendChild(toggle);
+      toggle.innerHTML = '<button type="button" class="avg-toggle is-on" aria-label="Average toggle"></button><span>Average</span>';
     }
+    if(toggle && !toggle.querySelector('.avg-toggle + span')){
+      toggle.innerHTML = '<button type="button" class="avg-toggle is-on" aria-label="Average toggle"></button><span>Average</span>';
+    }
+    control.insertBefore(toggle, group);
     group.querySelectorAll('[data-ml-metric]').forEach(btn => {
       btn.addEventListener('click', () => {
         activeMetric = metrics.find(metric => metric.key === btn.dataset.mlMetric) || metrics[0];
@@ -1074,11 +1078,14 @@
       btn.classList.toggle('active', btn.dataset.mlMetric === activeMetric.key);
     });
     const toggle = document.querySelector('.avg-toggle');
+    const toggleWrap = document.querySelector('.avg-toggle-wrap');
+    const isOn = !!avgOn && !!activeMetric.avg;
     if(toggle){
-      toggle.classList.toggle('is-on', !!avgOn && !!activeMetric.avg);
+      toggle.classList.toggle('is-on', isOn);
       toggle.classList.toggle('is-disabled', !!activeMetric.locked);
       toggle.setAttribute('aria-disabled', activeMetric.locked ? 'true' : 'false');
     }
+    if(toggleWrap) toggleWrap.classList.toggle('is-on', isOn);
   }
 
   function render(){
