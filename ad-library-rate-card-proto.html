@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>Ad Library Rate Card — Portal Prototype</title>
+<style>
+  :root{
+    --bg:#f4f5f7; --panel:#ffffff; --panel2:#eceef1; --border:#e2e4e9;
+    --text:#1f2430; --text-dim:#6b7280; --accent:#3b82f6; --accent-ig:#e1306c; --accent-yt:#ff0000;
+    --good:#22c55e; --warn:#f59e0b; --danger:#ef4444;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--text); line-height:1.5;}
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 28px; background:#fff; border-bottom:1px solid var(--border);
+  }
+  .brand{display:flex; align-items:center; gap:10px; font-weight:800; font-size:18px; letter-spacing:.02em;}
+  .brand .dot{width:20px; height:20px; border-radius:6px; background:linear-gradient(135deg,#3b82f6,#22d3ee);}
+  .brand span.med{color:#1f2430;} .brand span.lens{color:#3b82f6;}
+  .user{color:var(--text-dim); font-size:13px; display:flex; align-items:center; gap:6px;}
+
+  .layout{display:flex; min-height:calc(100vh - 54px);}
+  .sidebar{
+    width:220px; background:#f9fafb; border-right:1px solid var(--border);
+    padding:18px 0; flex-shrink:0;
+  }
+  .sidebar .item{padding:10px 22px; font-size:13.5px; color:#374151; cursor:default;}
+  .sidebar .item.active{background:#fde68a; color:#111; font-weight:700;}
+  .sidebar .section-label{padding:16px 22px 6px; font-size:11px; color:#9ca3af; text-transform:uppercase; letter-spacing:.05em; font-weight:700;}
+
+  .main{flex:1; padding:28px 32px 80px; max-width:1180px;}
+  h1{font-size:20px; margin:0 0 18px;}
+
+  .page-tabs{display:flex; gap:8px; margin-bottom:22px; border-bottom:1px solid var(--border);}
+  .page-tab{
+    padding:10px 4px; margin-right:22px; font-size:14px; font-weight:600; color:var(--text-dim);
+    border-bottom:3px solid transparent; cursor:pointer; background:none; border-top:none; border-left:none; border-right:none;
+    font-family:inherit;
+  }
+  .page-tab.active{color:var(--text); border-bottom-color:var(--accent);}
+
+  .toolbar{display:flex; align-items:center; gap:14px; margin-bottom:18px; flex-wrap:wrap;}
+  select.country{
+    padding:9px 14px; border:1px solid var(--border); border-radius:8px; background:#fff;
+    font-size:13.5px; color:var(--text); min-width:160px;
+  }
+
+  .type-tabs{display:flex; gap:0; background:#f1f2f5; border-radius:8px; padding:4px; width:fit-content;}
+  .type-tab{
+    padding:8px 20px; border-radius:6px; font-size:13.5px; font-weight:700; color:#6b7280;
+    cursor:pointer; border:none; background:none; font-family:inherit;
+  }
+  .type-tab.active{background:#fff; color:var(--text); box-shadow:0 1px 3px rgba(0,0,0,.12);}
+  .type-tab.active.nondark{color:#2563eb;}
+  .type-tab.active.dark{color:#7c3aed;}
+
+  .btnrow{display:flex; gap:10px; margin-bottom:20px;}
+  .btn{
+    padding:8px 16px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer;
+    border:1px solid transparent; display:flex; align-items:center; gap:6px;
+  }
+  .btn-add{background:#ecfdf5; color:#059669; border-color:#a7f3d0;}
+  .btn-remove{background:#fef2f2; color:#dc2626; border-color:#fecaca;}
+  .btn-reset{background:#fffbeb; color:#b45309; border-color:#fde68a;}
+  .btn-confirm{background:var(--accent); color:#fff; padding:10px 26px; font-size:14px; border:none;}
+
+  .cat-row{
+    background:#f3f4f6; border-radius:10px; margin-bottom:14px; overflow:hidden;
+  }
+  .cat-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 18px; background:#e5e7eb;
+  }
+  .cat-name{font-weight:700; font-size:14px; display:flex; align-items:center; gap:10px;}
+  .cat-name input{
+    border:1px solid var(--border); border-radius:6px; padding:6px 10px; font-size:13.5px; width:220px;
+    font-family:inherit; background:#fff;
+  }
+  .cat-del{background:none; border:none; color:#9ca3af; cursor:pointer; font-size:16px; padding:4px;}
+
+  .cat-body{padding:16px 18px; display:grid; grid-template-columns:1fr 1fr; gap:0;}
+  .fmt-col{padding:0 18px;}
+  .fmt-col + .fmt-col{border-left:1px solid var(--border);}
+  .fmt-title{font-weight:700; font-size:13px; color:#374151; margin-bottom:10px; display:flex; align-items:center; gap:6px;}
+  .fmt-title .ic{width:16px; height:16px; border-radius:4px; display:inline-block;}
+  .fmt-title.video .ic{background:#f97316;}
+  .fmt-title.image .ic{background:#0ea5e9;}
+
+  .field-row{display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap;}
+  .field-row label{font-size:12.5px; color:var(--text-dim); min-width:64px;}
+  .num{
+    border:1px solid var(--border); border-radius:6px; padding:6px 8px; font-size:13px; width:82px;
+    font-family:inherit; text-align:right;
+  }
+  .num-wrap{position:relative; display:inline-flex; align-items:center;}
+  .num-wrap .spin{
+    display:flex; flex-direction:column; margin-left:-24px; z-index:1;
+  }
+  .num-wrap .spin span{
+    font-size:8px; color:#9ca3af; line-height:1; padding:1px 6px; cursor:pointer;
+  }
+  .unit{font-size:11.5px; color:#9ca3af;}
+
+  .duration-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:4px;}
+  .duration-cell{background:#fff; border:1px solid var(--border); border-radius:8px; padding:8px 10px;}
+  .duration-cell .dlabel{font-size:11px; color:var(--text-dim); margin-bottom:5px; font-weight:600;}
+  .duration-cell .num{width:100%; text-align:left;}
+
+  .callout{
+    background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:14px 16px;
+    font-size:13px; color:#1e3a8a; margin-bottom:20px; line-height:1.7;
+  }
+  .callout b{color:#1d4ed8;}
+  .callout.warn{background:#fffbeb; border-color:#fde68a; color:#78350f;}
+  .callout.warn b{color:#b45309;}
+
+  .formula-strip{
+    background:#111827; color:#e5e7eb; border-radius:10px; padding:14px 18px;
+    font-family:'SF Mono',Consolas,monospace; font-size:12.5px; margin-bottom:20px; overflow-x:auto;
+  }
+  .formula-strip .lbl{color:#9ca3af; font-family:inherit; font-size:11px; text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px;}
+
+  .pill{display:inline-block; background:#eef2ff; color:#4338ca; border-radius:20px; padding:2px 10px; font-size:11px; font-weight:700; margin-left:8px;}
+  .footer-actions{display:flex; justify-content:flex-end; gap:12px; margin-top:24px;}
+
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span><span class="med">MEDIA</span><span class="lens">LENS</span></div>
+  <div class="user">Julie Li ▾</div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="section-label">Advertisers</div>
+    <div class="item">Advertisers/Brands</div>
+    <div class="item">Advertisers Breakdown</div>
+    <div class="item">Products/Services</div>
+    <div class="item">Product Categories</div>
+    <div class="section-label">Accounts</div>
+    <div class="item">FB Pages</div>
+    <div class="item">IG Accounts</div>
+    <div class="item">Youtube Channels</div>
+    <div class="section-label">Pricing</div>
+    <div class="item">Ad_Cost</div>
+    <div class="item active">Ad Library Rate Card</div>
+    <div class="section-label">Moderation</div>
+    <div class="item">Buzz Keywords Blocklist</div>
+    <div class="item">Ad Hashtags Blocklist</div>
+  </div>
+
+  <div class="main">
+    <h1>Ad Library Rate Card <span class="pill">NEW · Prototype</span></h1>
+
+    <div class="page-tabs">
+      <button class="page-tab" data-page="page-noncontext">Ad_Cost（现行，仅供对照）</button>
+      <button class="page-tab active" data-page="page-adlibrary">Ad Library Rate Card（新）</button>
+    </div>
+
+    <!-- ================= NEW: Ad Library Rate Card ================= -->
+    <div class="tab-panel active" id="page-adlibrary">
+
+      <div class="callout">
+        本页评估 <b>Ad Library 里的全部内容</b>（Boost Post + Dark Post），不调用 Meta API、不做机器学习 —— 和 <b>Ad_Cost</b> 一样，是运营在后台手动维护的查表报价，只是维度换成了 <b>Product Category × Ad Format</b>。
+      </div>
+
+      <div class="toolbar">
+        <select class="country">
+          <option>Hong Kong</option>
+          <option>Taiwan</option>
+          <option>Singapore</option>
+        </select>
+
+        <div class="type-tabs">
+          <button class="type-tab nondark active" data-type="nondark">Non-dark（Boost Post）</button>
+          <button class="type-tab dark" data-type="dark">Dark（Dark Post）</button>
+        </div>
+      </div>
+
+      <div class="btnrow">
+        <button class="btn btn-add" onclick="addRow()">＋ Add Category Row</button>
+        <button class="btn btn-remove" onclick="removeRow()">－ Remove Row</button>
+        <button class="btn btn-reset">↺ Reset</button>
+      </div>
+
+      <!-- NON-DARK: CPM Rate Card -->
+      <div id="nondark-panel">
+        <div class="formula-strip">
+          <div class="lbl">CPM Rate Card 公式</div>
+          im/eng = impression ÷ engagement（1 个 engagement 对应多少次曝光）<br>
+          Ad Value = Engagements × (im/eng) ÷ 1000 × CPM　<span style="color:#f59e0b;">← 区间：下限用 Min CPM，上限用 Max CPM</span>
+        </div>
+
+        <div id="nondark-rows"></div>
+      </div>
+
+      <!-- DARK: Budget/day Rate Card -->
+      <div id="dark-panel" style="display:none;">
+        <div class="formula-strip">
+          <div class="lbl">Budget/day Rate Card 公式</div>
+          Ad Value = Budget/day [ Category, Format, DurationBucket(period) ] × period
+        </div>
+
+        <div id="dark-rows"></div>
+      </div>
+
+      <div class="callout warn">
+        <b>待确认：</b>Duration Bucket 边界（1–3 / 3–7 天在数值 3 上重叠）需要定义清楚是否前闭后开。<span style="color:#059669;">（CPM 单位已确认为标准定义"每千次曝光价格"，公式按 ÷1000 执行，Min/Max CPM 按此单位填写。）</span>
+      </div>
+
+      <div class="footer-actions">
+        <button class="btn btn-reset">Cancel</button>
+        <button class="btn btn-confirm">Confirm</button>
+      </div>
+    </div>
+
+    <!-- ================= EXISTING: Ad_Cost (static reference) ================= -->
+    <div class="tab-panel" id="page-noncontext">
+      <div class="callout">
+        以下为<b>现行生产环境已有</b>的 Ad_Cost 设置页（Branded/Paid Post 报价），放在这里仅作对照，不是本次新增内容。
+      </div>
+      <div class="toolbar">
+        <select class="country"><option>Hong Kong</option></select>
+        <div class="type-tabs">
+          <button class="type-tab active" style="color:#2563eb;">Facebook</button>
+          <button class="type-tab">Instagram</button>
+          <button class="type-tab">Youtube</button>
+        </div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-head">
+          <div class="cat-name">From <input value="0" style="width:70px;"> To <input value="10000" style="width:80px;"> &nbsp;General Cost <input value="2000" style="width:80px;"></div>
+        </div>
+        <div class="cat-body">
+          <div class="fmt-col">
+            <div class="fmt-title">Influencer</div>
+            <div class="field-row"><label>Photo</label><input class="num" value="2000"></div>
+            <div class="field-row"><label>Album</label><input class="num" value="2000"></div>
+            <div class="field-row"><label>Video Orig.</label><input class="num" value="4000"><label>Curated</label><input class="num" value="2000"></div>
+            <div class="field-row"><label>Link Ext.</label><input class="num" value="2000"><label>Internal</label><input class="num" value="3500"></div>
+          </div>
+          <div class="fmt-col">
+            <div class="fmt-title">Publisher</div>
+            <div class="field-row"><label>Photo</label><input class="num" value="6000"></div>
+            <div class="field-row"><label>Album</label><input class="num" value="6000"></div>
+            <div class="field-row"><label>Video Orig.</label><input class="num" value="14000"><label>Curated</label><input class="num" value="6000"></div>
+            <div class="field-row"><label>Link Ext.</label><input class="num" value="6000"><label>Internal</label><input class="num" value="10000"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const DURATIONS = ['1–3 天', '3–7 天', '7–15 天', '>15 天'];
+  let categories = [
+    { name: 'Financial', video: {min:1.23, max:2.10, imeng:100, budget:[200,1000,200,200]}, image: {min:0.9, max:1.5, imeng:80, budget:[150,600,150,150]} },
+    { name: 'Entertainment', video: {min:0.8, max:1.4, imeng:120, budget:[150,700,150,150]}, image: {min:0.6, max:1.1, imeng:90, budget:[100,500,100,100]} },
+  ];
+
+  function fmtCol(cat, key, title, iconClass, mode){
+    const d = cat[key];
+    if(mode === 'nondark'){
+      return `<div class="fmt-col">
+        <div class="fmt-title ${iconClass}"><span class="ic"></span>${title}</div>
+        <div class="field-row"><label>Min CPM</label><input class="num" value="${d.min}"></div>
+        <div class="field-row"><label>Max CPM</label><input class="num" value="${d.max}"></div>
+        <div class="field-row"><label>im/eng</label><input class="num" value="${d.imeng}"></div>
+      </div>`;
+    } else {
+      return `<div class="fmt-col">
+        <div class="fmt-title ${iconClass}"><span class="ic"></span>${title}</div>
+        <div class="field-row" style="margin-bottom:4px;"><label style="min-width:auto;">Budget / day</label></div>
+        <div class="duration-grid">
+          ${DURATIONS.map((dl,i)=>`<div class="duration-cell"><div class="dlabel">${dl}</div><input class="num" value="${d.budget[i]}"></div>`).join('')}
+        </div>
+      </div>`;
+    }
+  }
+
+  function render(){
+    const mode = document.querySelector('.type-tab.active').dataset.type;
+    const targetId = mode === 'nondark' ? 'nondark-rows' : 'dark-rows';
+    const container = document.getElementById(targetId);
+    container.innerHTML = categories.map((cat, idx) => `
+      <div class="cat-row" data-idx="${idx}">
+        <div class="cat-head">
+          <div class="cat-name">Product Category: <input value="${cat.name}"></div>
+          <button class="cat-del" onclick="deleteRow(${idx})">✕</button>
+        </div>
+        <div class="cat-body">
+          ${fmtCol(cat, 'video', 'Video ad', 'video', mode)}
+          ${fmtCol(cat, 'image', 'Image ad', 'image', mode)}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function addRow(){
+    categories.push({ name: 'New Category', video:{min:1.0,max:1.5,imeng:100,budget:[150,600,150,150]}, image:{min:0.8,max:1.2,imeng:90,budget:[120,500,120,120]} });
+    render();
+  }
+  function removeRow(){ categories.pop(); render(); }
+  function deleteRow(i){ categories.splice(i,1); render(); }
+
+  document.querySelectorAll('.type-tab').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.type-tab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('nondark-panel').style.display = btn.dataset.type==='nondark' ? '' : 'none';
+      document.getElementById('dark-panel').style.display = btn.dataset.type==='dark' ? '' : 'none';
+      render();
+    });
+  });
+
+  document.querySelectorAll('.page-tab').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.page-tab').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.page).classList.add('active');
+    });
+  });
+
+  render();
+</script>
+
+</body>
+</html>
