@@ -70,6 +70,10 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
 .lens-btn{background:transparent;border:none;border-radius:8px;color:var(--ac-muted);cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;padding:8px 18px;transition:all .2s ease;white-space:nowrap;}
 .lens-btn.active{background:var(--ac-pill-active-bg);box-shadow:0 1px 3px rgba(0,0,0,.08);color:var(--ac-brand);font-weight:600;}
 
+/* Metric selector — options depend on mode (My Page vs Competitors); only affects cards 1 & 5 */
+.metric-select-wrap{display:flex;align-items:center;gap:8px;}
+.metric-select-label{font-size:11px;color:var(--ac-secondary);font-weight:600;}
+
 .section{margin-bottom:var(--ac-card-gap);}
 .section-title-lg{font-size:15px;font-weight:600;color:var(--ac-title);margin-bottom:2px;}
 .section-sub-lg{font-size:11.5px;color:var(--ac-secondary);margin-bottom:14px;}
@@ -208,6 +212,10 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
           <button class="lens-btn" onclick="setLens('ad',this)">Ad category</button>
           <button class="lens-btn" onclick="setLens('image',this)">Image category</button>
         </div>
+        <div class="metric-select-wrap">
+          <span class="metric-select-label">Metric:</span>
+          <div class="lens-group" id="metric-toggle"></div>
+        </div>
       </div>
 
       <!-- 1. Category Bars — "{Lens} vs Post Volume" -->
@@ -289,7 +297,14 @@ function buildCategoryData(names, seed, skewP1){
     const er2 = +(1.5 + rnd()*7).toFixed(1);
     const eng1 = Math.round(p1*(300+rnd()*1800));
     const eng2 = Math.round(p2*(300+rnd()*1800));
-    return {name, p1, p2, er1, er2, eng1, eng2};
+    // Engagements splits roughly into likes/comments/shares — deterministic mock breakdown.
+    const likes1 = Math.round(eng1*(0.55+rnd()*0.1));
+    const likes2 = Math.round(eng2*(0.55+rnd()*0.1));
+    const comments1 = Math.round(eng1*(0.12+rnd()*0.08));
+    const comments2 = Math.round(eng2*(0.12+rnd()*0.08));
+    const shares1 = Math.max(0, eng1-likes1-comments1);
+    const shares2 = Math.max(0, eng2-likes2-comments2);
+    return {name, p1, p2, er1, er2, eng1, eng2, likes1, likes2, comments1, comments2, shares1, shares2};
   });
 }
 
@@ -352,13 +367,26 @@ let currentLens = 'content';
 
 function fmt(n){return n>=1000?(n/1000).toFixed(1)+'K':String(n);}
 
+// ---------- Metric options per mode (only cards 1 & 5 respond to this; cards 2/3/4 are fixed) ----------
+const METRIC_META = {
+  posts:    {label:'Posts',       k1:'p1',        k2:'p2'},
+  eng:      {label:'Engagements', k1:'eng1',      k2:'eng2'},
+  likes:    {label:'Likes',       k1:'likes1',    k2:'likes2'},
+  comments: {label:'Comments',    k1:'comments1', k2:'comments2'},
+  shares:   {label:'Shares',      k1:'shares1',   k2:'shares2'},
+};
+const MODE_METRICS = {
+  mypage:      {options:['eng','likes','comments','shares'], default:'eng'},
+  competitors: {options:['posts','eng'],                     default:'posts'},
+};
+let selectedMetric = MODE_METRICS.mypage.default;
+
 // ---------- Shared rank card (Category Bars + Combinations) ----------
-// metric: 'posts' uses r.p1/r.p2, 'eng' uses r.eng1/r.eng2. Both modes reuse this — only the
-// metric fed in (and the title/sub text) differs between My Page and Competitors.
+// metric: any key from METRIC_META. Both modes reuse this — only the metric fed in
+// (and the title/sub text) differs between My Page and Competitors.
 function rankCardHTML(title, sub, rows, showAll, metric){
-  const key1 = metric==='eng' ? 'eng1' : 'p1';
-  const key2 = metric==='eng' ? 'eng2' : 'p2';
-  const metricLabel = metric==='eng' ? 'Engagements' : 'Posts';
+  const meta = METRIC_META[metric];
+  const key1 = meta.k1, key2 = meta.k2, metricLabel = meta.label;
   const withTotal = rows.map(r=>({...r, v1:r[key1], v2:r[key2], total:r[key1]+r[key2]}));
   const sorted = [...withTotal].sort((a,b)=>b.total-a.total).slice(0, showAll?rows.length:8);
   const grandTotal = withTotal.reduce((s,r)=>s+r.total,0);
@@ -392,15 +420,14 @@ function rankCardHTML(title, sub, rows, showAll, metric){
   </div>`;
 }
 
-// ---------- 1. Category Bars — My Page: vs Engagements · Competitors: vs Posts ----------
+// ---------- 1. Category Bars — metric picked via the Metric selector ----------
 function renderBars(){
   const lens = LENSES[currentLens];
-  const metric = MODE==='mypage' ? 'eng' : 'posts';
-  const metricLabel = MODE==='mypage' ? 'Engagements' : 'Posts';
+  const metricLabel = METRIC_META[selectedMetric].label;
   document.getElementById('section-bars').innerHTML = rankCardHTML(
     `${lens.label} vs ${metricLabel}`,
     `Ranked by combined ${metricLabel.toLowerCase()} of both pages · hover a bar for the breakdown`,
-    lens.categories, false, metric
+    lens.categories, false, selectedMetric
   );
 }
 
@@ -530,18 +557,16 @@ function renderCombos(){
   ).join('');
 }
 
-// ---------- 5. Top categories table — My Page: Engagements · Competitors: Posts ----------
+// ---------- 5. Top categories table — metric picked via the Metric selector ----------
 const TOP_PAGE_SIZE = 10;
 let topPage = 1;
 
 function renderTopTable(){
   const lens = LENSES[currentLens];
-  const metric = MODE==='mypage' ? 'eng' : 'posts';
-  const metricLabel = MODE==='mypage' ? 'Engagements' : 'Contents';
-  const key1 = metric==='eng' ? 'eng1' : 'p1';
-  const key2 = metric==='eng' ? 'eng2' : 'p2';
+  const meta = METRIC_META[selectedMetric];
+  const key1 = meta.k1, key2 = meta.k2, metricLabel = meta.label;
 
-  document.getElementById('top-sub').textContent = `Ranked by combined ${MODE==='mypage'?'engagements':'post volume'} of both pages`;
+  document.getElementById('top-sub').textContent = `Ranked by combined ${metricLabel.toLowerCase()} of both pages`;
   document.getElementById('top-th-total').textContent = metricLabel;
   document.getElementById('top-th-p1').textContent = `${P1.name} ${metricLabel}`;
   document.getElementById('top-th-p2').textContent = `${P2.name} ${metricLabel}`;
@@ -590,13 +615,31 @@ function setLens(lens, el){
   renderAll();
 }
 
+// ---------- Metric selector — options depend on MODE, only affects cards 1 & 5 ----------
+function renderMetricToggle(){
+  const options = MODE_METRICS[MODE].options;
+  document.getElementById('metric-toggle').innerHTML = options.map(key=>
+    `<button class="lens-btn${key===selectedMetric?' active':''}" onclick="setMetric('${key}',this)">${METRIC_META[key].label}</button>`
+  ).join('');
+}
+
+function setMetric(key, el){
+  selectedMetric = key;
+  document.querySelectorAll('#metric-toggle .lens-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  topPage = 1;
+  renderBars();
+  renderTopTable();
+}
+
 // ---------- Mode switch: My Page · Compare vs Competitors · Compare ----------
-// Only the metrics differ between the two modes (per spec) — page chrome (chips/tabs/lenses)
-// stays the same; we swap the page title + sidebar highlight just to signal context.
+// Page chrome (chips/tabs/lenses) stays the same; we swap the page title, sidebar highlight,
+// and the Metric selector's available options + default to signal context.
 let MODE = 'mypage';
 
 function setMode(mode, el){
   MODE = mode;
+  selectedMetric = MODE_METRICS[mode].default;
   document.querySelectorAll('#mode-toggle .mode-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('pg-title').textContent = mode==='mypage' ? 'My Pages · Compare' : 'Competitors · Compare';
@@ -604,6 +647,7 @@ function setMode(mode, el){
   document.getElementById('nav-competitors').classList.toggle('active', mode==='competitors');
   hmExpanded = new Set();
   topPage = 1;
+  renderMetricToggle();
   renderAll();
 }
 
@@ -615,6 +659,7 @@ function renderAll(){
   renderTopTable();
 }
 
+renderMetricToggle();
 renderAll();
 </script>
 </body>
