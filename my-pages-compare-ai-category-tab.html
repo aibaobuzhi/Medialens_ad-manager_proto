@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<!-- MY PAGES — COMPARE · AI CATEGORY TAB — style/tokens/section order aligned to production AI Category tab -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediaLens — My Pages · Compare · AI Category</title>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ac-brand:#23A9F6;--ac-brand-tint:#EEF6FF;
+  --p1:#23A9F6;--p2:#F5A623;
+  --ac-title:#0A1F2C;--ac-text:#102532;--ac-muted:#707070;--ac-secondary:#828282;
+  --ac-border:#D9E3E6;--ac-divider:#E8EEF0;--ac-bg:#F7F7F7;
+  --ac-pill-track:#EEF2F5;--ac-pill-active-bg:#FFFFFF;
+  --ac-r-card:12px;--ac-r:10px;
+  --ac-card-shadow:0 1px 3px rgba(0,0,0,.06);
+  --ac-card-padding:20px;--ac-card-gap:20px;--ac-row-gap:14px;
+  --ac-font-card-title-size:15px;--ac-font-card-sub-size:12.5px;
+  --ac-font-body-size:13px;--ac-font-value-size:13.5px;--ac-font-meta-size:11.5px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:var(--ac-text);font-size:14px;line-height:1.5;}
+
+.topnav{background:#fff;height:64px;display:flex;align-items:center;padding:0 24px;border-bottom:1px solid var(--ac-border);position:sticky;top:0;z-index:90;}
+.logo{display:flex;align-items:center;gap:8px;color:var(--ac-brand);font-weight:700;font-size:19px;letter-spacing:.2px;}
+.logo-mark{width:22px;height:22px;border-radius:50%;background:conic-gradient(from 0deg,#23A9F6,#F5A623,#23A9F6);}
+.nav-user{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--ac-text);font-size:13.5px;}
+.nav-avatar{width:28px;height:28px;border-radius:50%;background:var(--ac-brand-tint);color:var(--ac-brand);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;}
+
+.shell{display:flex;min-height:calc(100vh - 64px);}
+.sidebar{width:212px;background:#fff;border-right:1px solid var(--ac-divider);padding:14px 0;flex-shrink:0;}
+.org{padding:0 16px 12px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--ac-divider);margin-bottom:6px;}
+.org-badge{width:34px;height:34px;border-radius:8px;background:var(--ac-brand-tint);color:var(--ac-brand);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;}
+.org-name{font-weight:600;font-size:12.5px;}
+.org-sub{font-size:10px;color:var(--ac-secondary);}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 16px;color:var(--ac-muted);font-size:12.5px;cursor:pointer;border-left:3px solid transparent;}
+.nav-item:hover{background:#fafcfe;color:var(--ac-text);}
+.nav-item.active{background:var(--ac-brand-tint);color:var(--ac-brand);border-left-color:var(--ac-brand);font-weight:600;}
+.content{flex:1;min-width:0;}
+
+.pg-head{display:flex;align-items:center;padding:20px 26px 0;gap:12px;flex-wrap:wrap;}
+.pg-title{font-size:18px;font-weight:700;color:var(--ac-title);}
+.pg-meta{font-size:11.5px;color:var(--ac-secondary);margin-top:1px;}
+.page-chips{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.page-chip{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;background:#fff;border:1px solid var(--ac-border);border-radius:20px;padding:5px 12px 5px 6px;}
+.chip-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.vs{font-size:11px;color:var(--ac-secondary);font-weight:600;}
+
+.subtabs-bar{padding:12px 26px 0;border-bottom:1px solid var(--ac-divider);display:flex;gap:0;overflow-x:auto;}
+.subtab{padding:9px 16px;font-size:13px;color:var(--ac-muted);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;font-weight:500;}
+.subtab:hover{color:var(--ac-text);}
+.subtab.active{color:var(--ac-brand);border-bottom-color:var(--ac-brand);font-weight:600;}
+.badge-new{display:inline-block;font-size:8px;font-weight:700;background:var(--ac-brand);color:#fff;border-radius:6px;padding:1px 5px;margin-left:5px;vertical-align:middle;}
+
+.tabbody{padding:20px 26px 60px;}
+
+/* Lens selector — matches production .lens-group / .lens-btn tokens */
+.lens-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--ac-space-xl,24px);flex-wrap:wrap;gap:10px;}
+.lens-group{background:var(--ac-pill-track);border-radius:var(--ac-r);display:inline-flex;gap:2px;padding:3px;}
+.lens-btn{background:transparent;border:none;border-radius:8px;color:var(--ac-muted);cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;padding:8px 18px;transition:all .2s ease;white-space:nowrap;}
+.lens-btn.active{background:var(--ac-pill-active-bg);box-shadow:0 1px 3px rgba(0,0,0,.08);color:var(--ac-brand);font-weight:600;}
+
+.section{margin-bottom:var(--ac-card-gap);}
+.section-title-lg{font-size:15px;font-weight:600;color:var(--ac-title);margin-bottom:2px;}
+.section-sub-lg{font-size:11.5px;color:var(--ac-secondary);margin-bottom:14px;}
+
+/* Card — matches production .ac-category-bars / card-hd / card-title / card-sub tokens */
+.card{background:#fff;border:1px solid var(--ac-border);border-radius:var(--ac-r-card);box-shadow:var(--ac-card-shadow);padding:var(--ac-card-padding);}
+.card-hd{align-items:center;display:flex;gap:12px;justify-content:space-between;margin-bottom:2px;flex-wrap:wrap;}
+.card-title{color:var(--ac-text);font-size:var(--ac-font-card-title-size);font-weight:600;text-transform:capitalize;}
+.card-sub{color:var(--ac-secondary);font-size:var(--ac-font-card-sub-size);margin-bottom:14px;}
+.cards-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--ac-card-gap);}
+@media(max-width:1100px){.cards-row{grid-template-columns:1fr;}}
+
+/* Page identity pill — shown under every card, matches attached reference pill */
+.page-legend-pill{display:inline-flex;align-items:center;gap:14px;background:#fff;border-radius:24px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:8px 16px;font-size:12px;font-weight:600;color:var(--ac-text);margin-top:16px;}
+.page-legend-item{display:flex;align-items:center;gap:8px;}
+.page-legend-sq{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+
+/* stacked rank list (Category Bars + Combinations) */
+.rank-list{display:flex;flex-direction:column;}
+.rank-item{padding:var(--ac-row-gap) 0;border-bottom:1px solid var(--ac-divider);position:relative;}
+.rank-item:first-child{padding-top:2px;}
+.rank-item:last-child{border-bottom:none;}
+.rank-item-top{display:flex;align-items:baseline;gap:8px;margin-bottom:6px;}
+.rank-num{font-size:12px;font-weight:700;color:var(--ac-accent-rank,#FFA500);width:16px;flex-shrink:0;}
+.rank-name{font-size:var(--ac-font-body-size);font-weight:500;color:var(--ac-text);flex:1;}
+.rank-val{font-size:var(--ac-font-value-size);color:var(--ac-text);font-weight:600;white-space:nowrap;}
+.stack-track{height:14px;border-radius:5px;background:#EEF3F6;overflow:hidden;display:flex;margin-left:24px;cursor:default;}
+.stack-seg{height:100%;transition:width .3s;}
+.rank-item:hover .stack-track{outline:2px solid rgba(35,169,246,.25);}
+
+.tt{position:absolute;left:24px;top:100%;margin-top:4px;background:var(--ac-title);color:#fff;font-size:11px;border-radius:8px;padding:8px 11px;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.18);z-index:20;opacity:0;pointer-events:none;transition:opacity .12s;}
+.rank-item:hover .tt{opacity:1;}
+.tt-row{display:flex;align-items:center;gap:6px;margin-top:2px;}
+.tt-title{font-weight:600;margin-bottom:2px;}
+.tt-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+/* Performance vs volume matrix — bubble scatter */
+.scatter-wrap{position:relative;}
+.scatter-note{font-size:11px;color:var(--ac-secondary);margin-top:8px;}
+
+/* Which format wins in each category — heatmap, capped to 10 rows visible, rest scrolls */
+.hm-scroll{max-height:440px;overflow-y:auto;}
+.hm-wrap{overflow-x:auto;}
+.hm-table{border-collapse:separate;border-spacing:4px;width:100%;}
+.hm-table thead th{position:sticky;top:0;background:#fff;z-index:5;}
+.hm-th{font-size:10.5px;font-weight:600;color:var(--ac-secondary);text-align:center;padding:4px 6px;white-space:nowrap;}
+.hm-rh{font-size:11.5px;color:var(--ac-text);padding:4px 10px 4px 0;white-space:nowrap;font-weight:500;}
+.hm-cell{border-radius:7px;text-align:center;padding:8px 4px;min-width:56px;}
+.hm-v{font-size:11.5px;font-weight:700;}
+.hm-null{background:#F7F7F7;color:var(--ac-secondary);font-size:10.5px;}
+.hm-page-label{font-size:10px;font-weight:700;color:var(--ac-secondary);text-transform:uppercase;letter-spacing:.4px;margin:14px 0 6px;}
+.hm-page-label:first-child{margin-top:0;}
+.hm-main-row{cursor:pointer;}
+.hm-main-row:hover td:first-child .hm-rh{color:var(--ac-brand);}
+.hm-rh-clickable{display:flex;align-items:center;gap:6px;color:var(--ac-secondary);}
+.hm-sub-row td:first-child{padding-left:18px;}
+
+/* Top categories table */
+.top-table{width:100%;border-collapse:collapse;}
+.top-table th{font-size:11px;font-weight:600;color:var(--ac-secondary);text-align:left;padding:9px 14px;background:#F7F9FC;border-bottom:1px solid var(--ac-divider);white-space:nowrap;}
+.top-table th.r{text-align:right;}
+.top-table td{font-size:12.5px;padding:10px 14px;border-bottom:1px solid var(--ac-divider);vertical-align:middle;}
+.top-table td.r{text-align:right;font-weight:600;}
+.top-table tr:last-child td{border-bottom:none;}
+.top-table tr:hover td{background:#FAFCFE;}
+.rank-badge{font-size:10.5px;font-weight:700;color:var(--ac-secondary);width:18px;}
+
+.top-pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--ac-divider);}
+.top-pagination-info{font-size:11.5px;color:var(--ac-secondary);}
+.top-pagination-btns{display:flex;align-items:center;gap:4px;}
+.pg-btn{border:1px solid var(--ac-border);background:#fff;color:var(--ac-text);font-family:inherit;font-size:12px;border-radius:6px;padding:5px 10px;cursor:pointer;min-width:30px;}
+.pg-btn:hover:not(:disabled){border-color:var(--ac-brand);color:var(--ac-brand);}
+.pg-btn.active{background:var(--ac-brand);border-color:var(--ac-brand);color:#fff;font-weight:600;}
+.pg-btn:disabled{opacity:.4;cursor:not-allowed;}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="logo"><div class="logo-mark"></div>MEDIA LENS</div>
+  <div class="nav-user"><div class="nav-avatar">J</div>Julie Li</div>
+</nav>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="org">
+      <div class="org-badge">P</div>
+      <div><div class="org-name">PL - Hong Kong</div><div class="org-sub">Admin · Julie Li</div></div>
+    </div>
+    <div class="nav-item">Dashboard</div>
+    <div class="nav-item active">My Pages</div>
+    <div class="nav-item">Competitor Analysis</div>
+    <div class="nav-item">Buzz (Market Insights)</div>
+    <div class="nav-item">Leader Board</div>
+    <div class="nav-item">Social Listening</div>
+    <div class="nav-item">Social Pulses</div>
+    <div class="nav-item">Ad Manager</div>
+    <div class="nav-item">Ad Intelligence</div>
+    <div class="nav-item">Report Scheduler</div>
+    <div class="nav-item">AIGC</div>
+  </aside>
+
+  <div class="content">
+    <div class="pg-head">
+      <div>
+        <div class="pg-title">My Pages · Compare</div>
+        <div class="pg-meta">Instagram · Last 30 days</div>
+      </div>
+      <div class="page-chips">
+        <div class="page-chip"><span class="chip-dot" style="background:var(--p1)"></span>BusinessFocus | 商業、投資、創科平台</div>
+        <span class="vs">vs</span>
+        <div class="page-chip"><span class="chip-dot" style="background:var(--p2)"></span>POPLADY</div>
+      </div>
+    </div>
+
+    <div class="subtabs-bar">
+      <div class="subtab">Overview</div>
+      <div class="subtab">Posts</div>
+      <div class="subtab">Hashtags</div>
+      <div class="subtab active">AI Category<span class="badge-new">NEW</span></div>
+      <div class="subtab">Audience</div>
+    </div>
+
+    <div class="tabbody">
+
+      <div class="lens-bar">
+        <div class="lens-group" id="lens-toggle">
+          <button class="lens-btn active" onclick="setLens('content',this)">Content category</button>
+          <button class="lens-btn" onclick="setLens('ad',this)">Ad category</button>
+          <button class="lens-btn" onclick="setLens('image',this)">Image category</button>
+        </div>
+      </div>
+
+      <!-- 1. Category Bars — "{Lens} vs Post Volume" -->
+      <div class="section" id="section-bars"></div>
+
+      <!-- 2. Engagements vs Post Volume — scatter -->
+      <div class="section">
+        <div class="card scatter-wrap">
+          <div class="card-hd"><div class="card-title">Engagements vs Post Volume</div></div>
+          <div class="card-sub" id="scatter-sub">Each dot is one category for one page · x = post volume, y = engagements</div>
+          <svg id="scatter-svg" width="100%" height="360" viewBox="0 0 900 360"></svg>
+          <div class="scatter-note">Bubble size = engagement rate for that category</div>
+          <div class="page-legend-pill" id="pill-scatter"></div>
+        </div>
+      </div>
+
+      <!-- 3. Which format wins in each category — heatmap (Content lens only) -->
+      <div class="section" id="section-heatmap"></div>
+
+      <!-- 4. Combinations -->
+      <div class="section">
+        <div class="cards-row" id="combo-cards"></div>
+      </div>
+
+      <!-- 5. Top categories table -->
+      <div class="section">
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div style="padding:20px 20px 0;">
+            <div class="card-title">Top categories</div>
+            <div class="card-sub">Ranked by combined post volume of both pages</div>
+          </div>
+          <table class="top-table">
+            <thead>
+              <tr>
+                <th style="width:26px;padding-left:14px;">#</th>
+                <th>Category</th>
+                <th class="r">Contents</th>
+                <th class="r" id="top-th-p1">BusinessFocus Contents</th>
+                <th class="r" id="top-th-p2">POPLADY Contents</th>
+              </tr>
+            </thead>
+            <tbody id="top-tbody"></tbody>
+          </table>
+          <div class="top-pagination" id="top-pagination"></div>
+          <div style="padding:16px 20px;"><div class="page-legend-pill" id="pill-table"></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const P1 = {name:'BusinessFocus | 商業、投資、創科平台', color:'#23A9F6'};
+const P2 = {name:'POPLADY', color:'#F5A623'};
+
+function pageLegendHTML(withTotal){
+  const totalItem = withTotal ? `<div class="page-legend-item"><span class="page-legend-sq" style="background:#828282"></span>Total</div>` : '';
+  return `${totalItem}<div class="page-legend-item"><span class="page-legend-sq" style="background:${P1.color}"></span>${P1.name}</div>
+          <div class="page-legend-item"><span class="page-legend-sq" style="background:${P2.color}"></span>${P2.name}</div>`;
+}
+
+// ---------- Taxonomies ----------
+const CONTENT_CATS = ['News & Current Affairs','Technology & Innovation','Science & Environment','Entertainment & Pop Culture','Business & Finance','Lifestyle & Personal Development','Sports & Recreation','Society & Culture','Opinion & Editorial','Trends & Viral Content','Miscellaneous & Niche Topics'];
+const AD_CATS = ['Before & After Comparison','Call-To-Action (CTA) Image','Customer Review & Testimonial','Face-Only Image','Giveaway & Contest Announcement','Infographic & Data Visualization','Product-Only Image','Promotional Offer & Discount Graphics','Text-Only Graphic','User-Generated Content (UGC) & Lifestyle Shots'];
+const IMAGE_CATS = ['Animals & Wildlife','Business & Finance','Entertainment & Pop Culture','Lifestyle & Fashion','Nature & Landscapes','People & Portraits','Science & Medicine','Social & Cultural Themes','Symbols & Abstract Concepts','Technology & Digital','Transportation & Vehicles','Urban & Architecture','Weather & Natural Phenomena'];
+const POST_FORMATS = ['Photo','Video','Album','Reel','Link','Status'];
+
+// deterministic pseudo-random so numbers stay stable across renders
+function seedRand(seed){let s=seed;return()=>{s=(s*9301+49297)%233280;return s/233280;};}
+
+function buildCategoryData(names, seed, skewP1){
+  const rnd = seedRand(seed);
+  return names.map((name)=>{
+    const base = Math.round(4 + rnd()*30);
+    const p1 = Math.max(1, Math.round(base*(skewP1?0.55+rnd()*0.35:0.25+rnd()*0.4)));
+    const p2 = Math.max(1, Math.round(base*(0.25+rnd()*0.5)));
+    const er1 = +(1.5 + rnd()*7).toFixed(1);
+    const er2 = +(1.5 + rnd()*7).toFixed(1);
+    const eng1 = Math.round(p1*(300+rnd()*1800));
+    const eng2 = Math.round(p2*(300+rnd()*1800));
+    return {name, p1, p2, er1, er2, eng1, eng2};
+  });
+}
+
+function buildCombos(namesA, namesB, seed, n){
+  const rnd = seedRand(seed);
+  const pairs = [];
+  for(let i=0;i<n;i++){
+    const a = namesA[Math.floor(rnd()*namesA.length)];
+    const b = namesB[Math.floor(rnd()*namesB.length)];
+    const p1 = Math.max(1, Math.round(2 + rnd()*14));
+    const p2 = Math.max(1, Math.round(2 + rnd()*14));
+    pairs.push({name:`${a} × ${b}`, p1, p2});
+  }
+  return pairs.sort((x,y)=>(y.p1+y.p2)-(x.p1+x.p2)).slice(0,6);
+}
+
+function buildHeatmap(names, seed){
+  const rnd = seedRand(seed);
+  const hm = {};
+  names.forEach(n=>{
+    hm[n] = {};
+    POST_FORMATS.forEach(f=>{ hm[n][f] = rnd()>0.15 ? Math.round(300 + rnd()*3200) : null; });
+  });
+  return hm;
+}
+
+const LENSES = {
+  content: {
+    label: 'Content category',
+    categories: buildCategoryData(CONTENT_CATS, 11, true),
+    heatmap: {p1: buildHeatmap(CONTENT_CATS, 51), p2: buildHeatmap(CONTENT_CATS, 52)},
+    combos: [
+      {title:'Content category × Ad category', sub:'Top pairings ranked by combined post volume of both pages', data: buildCombos(CONTENT_CATS, AD_CATS, 21, 40)},
+      {title:'Content category × Image category', sub:'Top pairings ranked by combined post volume of both pages', data: buildCombos(CONTENT_CATS, IMAGE_CATS, 22, 40)},
+    ]
+  },
+  ad: {
+    label: 'Ad category',
+    categories: buildCategoryData(AD_CATS, 31, false),
+    heatmap: null,
+    combos: [
+      {title:'Ad category × Image category', sub:'Top pairings ranked by combined post volume of both pages', data: buildCombos(AD_CATS, IMAGE_CATS, 32, 40)},
+    ]
+  },
+  image: {
+    label: 'Image category',
+    categories: buildCategoryData(IMAGE_CATS, 41, false),
+    heatmap: null,
+    combos: [
+      {title:'Image category × Content category', sub:'Top pairings ranked by combined post volume of both pages', data: buildCombos(IMAGE_CATS, CONTENT_CATS, 42, 40)},
+      {title:'Image category × Ad category', sub:'Top pairings ranked by combined post volume of both pages', data: buildCombos(IMAGE_CATS, AD_CATS, 43, 40)},
+    ]
+  }
+};
+
+let currentLens = 'content';
+
+function fmt(n){return n>=1000?(n/1000).toFixed(1)+'K':String(n);}
+
+// ---------- Shared rank card (Category Bars + Combinations) ----------
+function rankCardHTML(title, sub, rows, showAll){
+  const withTotal = rows.map(r=>({...r, total:r.p1+r.p2}));
+  const sorted = [...withTotal].sort((a,b)=>b.total-a.total).slice(0, showAll?rows.length:8);
+  const grandTotal = withTotal.reduce((s,r)=>s+r.total,0);
+  const max = sorted[0]?sorted[0].total:1;
+  const items = sorted.map((r,i)=>{
+    const pct = grandTotal ? Math.round(r.total/grandTotal*100) : 0;
+    const w1 = Math.round(r.p1/max*100);
+    const w2 = Math.round(r.p2/max*100);
+    return `<div class="rank-item">
+      <div class="rank-item-top">
+        <span class="rank-num">${i+1}</span>
+        <span class="rank-name">${r.name}</span>
+        <span class="rank-val">${r.total} (${pct}%)</span>
+      </div>
+      <div class="stack-track" style="width:${w1+w2}%;">
+        <div class="stack-seg" style="width:${w1/(w1+w2)*100}%;background:${P1.color};"></div>
+        <div class="stack-seg" style="width:${w2/(w1+w2)*100}%;background:${P2.color};"></div>
+      </div>
+      <div class="tt">
+        <div class="tt-title">${r.name}</div>
+        <div class="tt-row"><span class="tt-dot" style="background:${P1.color}"></span>${P1.name}: ${r.p1}</div>
+        <div class="tt-row"><span class="tt-dot" style="background:${P2.color}"></span>${P2.name}: ${r.p2}</div>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="card">
+    <div class="card-hd"><div class="card-title">${title}</div></div>
+    <div class="card-sub">${sub}</div>
+    <div class="rank-list">${items}</div>
+    <div class="page-legend-pill">${pageLegendHTML()}</div>
+  </div>`;
+}
+
+// ---------- 1. Category Bars ----------
+function renderBars(){
+  const lens = LENSES[currentLens];
+  document.getElementById('section-bars').innerHTML = rankCardHTML(
+    `${lens.label} vs Post Volume`,
+    'Ranked by combined post volume of both pages · hover a bar for the breakdown',
+    lens.categories, false
+  );
+}
+
+// ---------- 2. Engagements vs Post Volume ----------
+function renderScatter(){
+  const lens = LENSES[currentLens];
+  const cats = lens.categories;
+  const svg = document.getElementById('scatter-svg');
+  const W=900,H=360,padL=50,padR=20,padT=16,padB=36;
+  const maxPosts = Math.max(...cats.map(c=>Math.max(c.p1,c.p2)));
+  const maxEng = Math.max(...cats.map(c=>Math.max(c.eng1,c.eng2)));
+  const maxER = Math.max(...cats.map(c=>Math.max(c.er1,c.er2)));
+
+  function x(v){return padL + (v/maxPosts)*(W-padL-padR);}
+  function y(v){return H-padB - (v/(maxEng*1.15))*(H-padT-padB);}
+  function r(v){return 5 + (v/maxER)*16;}
+
+  let axes = `<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H-padB}" stroke="#E4E9ED"/>
+              <line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="#E4E9ED"/>
+              <text x="${padL-8}" y="${padT+4}" font-size="10" fill="#828282" text-anchor="end">${fmt(maxEng)}</text>
+              <text x="${padL-8}" y="${H-padB}" font-size="10" fill="#828282" text-anchor="end">0</text>
+              <text x="${padL}" y="${H-14}" font-size="10" fill="#828282">0</text>
+              <text x="${W-padR}" y="${H-14}" font-size="10" fill="#828282" text-anchor="end">${maxPosts} posts</text>`;
+
+  let dots = '';
+  cats.forEach(c=>{
+    dots += `<circle cx="${x(c.p1)}" cy="${y(c.eng1)}" r="${r(c.er1)}" fill="${P1.color}" opacity="0.55" stroke="${P1.color}" stroke-width="1.2"><title>${c.name} · ${P1.name}\nPosts: ${c.p1}  Eng: ${fmt(c.eng1)}  ER: ${c.er1}%</title></circle>`;
+    dots += `<circle cx="${x(c.p2)}" cy="${y(c.eng2)}" r="${r(c.er2)}" fill="${P2.color}" opacity="0.55" stroke="${P2.color}" stroke-width="1.2"><title>${c.name} · ${P2.name}\nPosts: ${c.p2}  Eng: ${fmt(c.eng2)}  ER: ${c.er2}%</title></circle>`;
+  });
+
+  svg.innerHTML = axes + dots;
+  document.getElementById('scatter-sub').textContent = `Each dot is one ${lens.label.toLowerCase()} for one page · x = post volume, y = engagements, size = engagement rate`;
+  document.getElementById('pill-scatter').innerHTML = pageLegendHTML();
+}
+
+// ---------- 3. Which format wins in each category (heatmap, Content lens only) ----------
+// Default: one row per category = combined total across all pages. Click a row to expand
+// into a per-page breakdown (BusinessFocus in blue, POPLADY in orange) for that category.
+let hmExpanded = new Set();
+
+function sumOrNull(a,b){
+  if(a==null && b==null) return null;
+  return (a||0)+(b||0);
+}
+
+function heatmapGridHTML(names, hmP1, hmP2){
+  // totals across all pages, for the default (collapsed) view
+  const totals = {};
+  names.forEach(n=>{
+    totals[n] = {};
+    POST_FORMATS.forEach(f=> totals[n][f] = sumOrNull((hmP1[n]||{})[f], (hmP2[n]||{})[f]) );
+  });
+
+  let totalMax = 0;
+  names.forEach(n=>POST_FORMATS.forEach(f=>{const v=totals[n][f]; if(v&&v>totalMax)totalMax=v;}));
+  let pageMax = 0;
+  names.forEach(n=>POST_FORMATS.forEach(f=>{
+    const v1=(hmP1[n]||{})[f], v2=(hmP2[n]||{})[f];
+    if(v1&&v1>pageMax)pageMax=v1;
+    if(v2&&v2>pageMax)pageMax=v2;
+  }));
+
+  function bg(v, max, tint){
+    if(!v) return '#F7F7F7';
+    const t = v/max;
+    const from = {r:238,g:243,b:246};
+    const to = tint==='p2' ? {r:245,g:166,b:35} : tint==='p1' ? {r:35,g:169,b:246} : {r:130,g:130,b:130};
+    const r = Math.round(from.r+t*(to.r-from.r));
+    const g = Math.round(from.g+t*(to.g-from.g));
+    const b = Math.round(from.b+t*(to.b-from.b));
+    return `rgb(${r},${g},${b})`;
+  }
+  function col(v, max){return (v/max) > 0.55 ? '#fff' : '#102532';}
+
+  function cellHTML(v, max, tint){
+    if(!v) return `<td><div class="hm-cell hm-null">—</div></td>`;
+    return `<td><div class="hm-cell" style="background:${bg(v,max,tint)};color:${col(v,max)};"><div class="hm-v">${fmt(v)}</div></div></td>`;
+  }
+
+  function chevron(open){
+    return `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="transition:transform .2s;transform:rotate(${open?180:0}deg);flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>`;
+  }
+
+  const heads = POST_FORMATS.map(f=>`<th class="hm-th">${f}</th>`).join('');
+
+  const rows = names.map(n=>{
+    const open = hmExpanded.has(n);
+    const totalCells = POST_FORMATS.map(f=>cellHTML(totals[n][f], totalMax, null)).join('');
+    const mainRow = `<tr class="hm-main-row" onclick="toggleHmRow('${n}')">
+      <td><div class="hm-rh hm-rh-clickable">${chevron(open)}<span>${n}</span></div></td>
+      ${totalCells}
+    </tr>`;
+    if(!open) return mainRow;
+    const p1Cells = POST_FORMATS.map(f=>cellHTML((hmP1[n]||{})[f], pageMax, 'p1')).join('');
+    const p2Cells = POST_FORMATS.map(f=>cellHTML((hmP2[n]||{})[f], pageMax, 'p2')).join('');
+    const p1Row = `<tr class="hm-sub-row"><td><div class="hm-rh"><span class="page-legend-sq" style="background:${P1.color};display:inline-block;width:8px;height:8px;margin-right:6px;vertical-align:middle;"></span>${P1.name}</div></td>${p1Cells}</tr>`;
+    const p2Row = `<tr class="hm-sub-row"><td><div class="hm-rh"><span class="page-legend-sq" style="background:${P2.color};display:inline-block;width:8px;height:8px;margin-right:6px;vertical-align:middle;"></span>${P2.name}</div></td>${p2Cells}</tr>`;
+    return mainRow + p1Row + p2Row;
+  }).join('');
+
+  return `<table class="hm-table"><thead><tr><th></th>${heads}</tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function toggleHmRow(name){
+  if(hmExpanded.has(name)) hmExpanded.delete(name);
+  else hmExpanded.add(name);
+  renderHeatmap();
+}
+
+function renderHeatmap(){
+  const lens = LENSES[currentLens];
+  const el = document.getElementById('section-heatmap');
+  if(!lens.heatmap){ el.innerHTML=''; return; }
+  el.innerHTML = `<div class="card">
+    <div class="card-hd"><div class="card-title">Which format wins in each category</div></div>
+    <div class="card-sub">Total engagements by category and post format across all pages · click a category to break it down by page · showing 10 rows, scroll for more</div>
+    <div class="hm-scroll"><div class="hm-wrap">${heatmapGridHTML(CONTENT_CATS, lens.heatmap.p1, lens.heatmap.p2)}</div></div>
+    <div class="page-legend-pill">${pageLegendHTML(true)}</div>
+  </div>`;
+}
+
+// ---------- 4. Combinations ----------
+function renderCombos(){
+  const lens = LENSES[currentLens];
+  document.getElementById('combo-cards').innerHTML = lens.combos.map(c=>rankCardHTML(c.title, c.sub, c.data, true)).join('');
+}
+
+// ---------- 5. Top categories table ----------
+const TOP_PAGE_SIZE = 10;
+let topPage = 1;
+
+function renderTopTable(){
+  const lens = LENSES[currentLens];
+  document.getElementById('top-th-p1').textContent = `${P1.name} Contents`;
+  document.getElementById('top-th-p2').textContent = `${P2.name} Contents`;
+  const sorted = [...lens.categories].map(c=>({...c,total:c.p1+c.p2})).sort((a,b)=>b.total-a.total);
+
+  const totalPages = Math.max(1, Math.ceil(sorted.length / TOP_PAGE_SIZE));
+  if(topPage > totalPages) topPage = totalPages;
+  const start = (topPage-1)*TOP_PAGE_SIZE;
+  const pageRows = sorted.slice(start, start+TOP_PAGE_SIZE);
+
+  document.getElementById('top-tbody').innerHTML = pageRows.map((c,i)=>`
+    <tr>
+      <td style="padding-left:14px;" class="rank-badge">${start+i+1}</td>
+      <td>${c.name}</td>
+      <td class="r">${c.total}</td>
+      <td class="r" style="color:${P1.color};">${c.p1}</td>
+      <td class="r" style="color:${P2.color};">${c.p2}</td>
+    </tr>`).join('');
+  document.getElementById('pill-table').innerHTML = pageLegendHTML();
+
+  const pageBtns = [];
+  for(let p=1;p<=totalPages;p++){
+    pageBtns.push(`<button class="pg-btn${p===topPage?' active':''}" onclick="goToTopPage(${p})">${p}</button>`);
+  }
+  document.getElementById('top-pagination').innerHTML = `
+    <div class="top-pagination-info">Showing ${start+1}–${Math.min(start+TOP_PAGE_SIZE, sorted.length)} of ${sorted.length} categories</div>
+    <div class="top-pagination-btns">
+      <button class="pg-btn" onclick="goToTopPage(${topPage-1})" ${topPage===1?'disabled':''}>‹</button>
+      ${pageBtns.join('')}
+      <button class="pg-btn" onclick="goToTopPage(${topPage+1})" ${topPage===totalPages?'disabled':''}>›</button>
+    </div>`;
+}
+
+function goToTopPage(p){
+  topPage = p;
+  renderTopTable();
+}
+
+function setLens(lens, el){
+  currentLens = lens;
+  hmExpanded = new Set();
+  topPage = 1;
+  document.querySelectorAll('#lens-toggle .lens-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderAll();
+}
+
+function renderAll(){
+  renderBars();
+  renderScatter();
+  renderHeatmap();
+  renderCombos();
+  renderTopTable();
+}
+
+renderAll();
+</script>
+</body>
+</html>
