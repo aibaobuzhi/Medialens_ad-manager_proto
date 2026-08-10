@@ -43,6 +43,14 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
 .pg-head{display:flex;align-items:center;padding:20px 26px 0;gap:12px;flex-wrap:wrap;}
 .pg-title{font-size:18px;font-weight:700;color:var(--ac-title);}
 .pg-meta{font-size:11.5px;color:var(--ac-secondary);margin-top:1px;}
+
+/* Mode switch — My Page vs Competitors (prototype-only control, not part of the real page chrome) */
+.mode-switch{display:flex;align-items:center;gap:8px;padding:12px 26px 0;}
+.mode-switch-label{font-size:11px;color:var(--ac-secondary);font-weight:600;}
+.mode-group{background:var(--ac-pill-track);border-radius:var(--ac-r);display:inline-flex;gap:2px;padding:3px;}
+.mode-btn{background:transparent;border:none;border-radius:8px;color:var(--ac-muted);cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:500;padding:6px 14px;white-space:nowrap;}
+.mode-btn.active{background:var(--ac-pill-active-bg);box-shadow:0 1px 3px rgba(0,0,0,.08);color:var(--ac-brand);font-weight:600;}
+
 .page-chips{margin-left:auto;display:flex;align-items:center;gap:10px;}
 .page-chip{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;background:#fff;border:1px solid var(--ac-border);border-radius:20px;padding:5px 12px 5px 6px;}
 .chip-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
@@ -152,8 +160,8 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
       <div><div class="org-name">PL - Hong Kong</div><div class="org-sub">Admin · Julie Li</div></div>
     </div>
     <div class="nav-item">Dashboard</div>
-    <div class="nav-item active">My Pages</div>
-    <div class="nav-item">Competitor Analysis</div>
+    <div class="nav-item active" id="nav-mypages">My Pages</div>
+    <div class="nav-item" id="nav-competitors">Competitor Analysis</div>
     <div class="nav-item">Buzz (Market Insights)</div>
     <div class="nav-item">Leader Board</div>
     <div class="nav-item">Social Listening</div>
@@ -165,9 +173,16 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
   </aside>
 
   <div class="content">
+    <div class="mode-switch">
+      <span class="mode-switch-label">Prototype mode:</span>
+      <div class="mode-group" id="mode-toggle">
+        <button class="mode-btn active" onclick="setMode('mypage',this)">My Page · Compare</button>
+        <button class="mode-btn" onclick="setMode('competitors',this)">Competitors · Compare</button>
+      </div>
+    </div>
     <div class="pg-head">
       <div>
-        <div class="pg-title">My Pages · Compare</div>
+        <div class="pg-title" id="pg-title">My Pages · Compare</div>
         <div class="pg-meta">Instagram · Last 30 days</div>
       </div>
       <div class="page-chips">
@@ -198,11 +213,11 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
       <!-- 1. Category Bars — "{Lens} vs Post Volume" -->
       <div class="section" id="section-bars"></div>
 
-      <!-- 2. Engagements vs Post Volume — scatter -->
+      <!-- 2. Avg Engagements vs Posts — scatter (identical in both modes) -->
       <div class="section">
         <div class="card scatter-wrap">
-          <div class="card-hd"><div class="card-title">Engagements vs Post Volume</div></div>
-          <div class="card-sub" id="scatter-sub">Each dot is one category for one page · x = post volume, y = engagements</div>
+          <div class="card-hd"><div class="card-title">Avg Engagements vs Posts</div></div>
+          <div class="card-sub" id="scatter-sub">Each dot is one category for one page · x = posts, y = avg engagements per post</div>
           <svg id="scatter-svg" width="100%" height="360" viewBox="0 0 900 360"></svg>
           <div class="scatter-note">Bubble size = engagement rate for that category</div>
           <div class="page-legend-pill" id="pill-scatter"></div>
@@ -222,14 +237,14 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
         <div class="card" style="padding:0;overflow:hidden;">
           <div style="padding:20px 20px 0;">
             <div class="card-title">Top categories</div>
-            <div class="card-sub">Ranked by combined post volume of both pages</div>
+            <div class="card-sub" id="top-sub">Ranked by combined post volume of both pages</div>
           </div>
           <table class="top-table">
             <thead>
               <tr>
                 <th style="width:26px;padding-left:14px;">#</th>
                 <th>Category</th>
-                <th class="r">Contents</th>
+                <th class="r" id="top-th-total">Contents</th>
                 <th class="r" id="top-th-p1">BusinessFocus Contents</th>
                 <th class="r" id="top-th-p2">POPLADY Contents</th>
               </tr>
@@ -278,6 +293,7 @@ function buildCategoryData(names, seed, skewP1){
   });
 }
 
+// Combinations are always ranked by Engagements (same in both My Page and Competitors modes).
 function buildCombos(namesA, namesB, seed, n){
   const rnd = seedRand(seed);
   const pairs = [];
@@ -286,9 +302,11 @@ function buildCombos(namesA, namesB, seed, n){
     const b = namesB[Math.floor(rnd()*namesB.length)];
     const p1 = Math.max(1, Math.round(2 + rnd()*14));
     const p2 = Math.max(1, Math.round(2 + rnd()*14));
-    pairs.push({name:`${a} × ${b}`, p1, p2});
+    const eng1 = Math.round(p1*(300+rnd()*1800));
+    const eng2 = Math.round(p2*(300+rnd()*1800));
+    pairs.push({name:`${a} × ${b}`, p1, p2, eng1, eng2});
   }
-  return pairs.sort((x,y)=>(y.p1+y.p2)-(x.p1+x.p2)).slice(0,6);
+  return pairs.sort((x,y)=>(y.eng1+y.eng2)-(x.eng1+x.eng2)).slice(0,6);
 }
 
 function buildHeatmap(names, seed){
@@ -307,8 +325,8 @@ const LENSES = {
     categories: buildCategoryData(CONTENT_CATS, 11, true),
     heatmap: {p1: buildHeatmap(CONTENT_CATS, 51), p2: buildHeatmap(CONTENT_CATS, 52)},
     combos: [
-      {title:'Content category × Ad category', sub:'Top pairings ranked by combined post volume of both pages', data: buildCombos(CONTENT_CATS, AD_CATS, 21, 40)},
-      {title:'Content category × Image category', sub:'Top pairings ranked by combined post volume of both pages', data: buildCombos(CONTENT_CATS, IMAGE_CATS, 22, 40)},
+      {title:'Content category × Ad category', sub:'Top pairings ranked by combined engagements of both pages', data: buildCombos(CONTENT_CATS, AD_CATS, 21, 40)},
+      {title:'Content category × Image category', sub:'Top pairings ranked by combined engagements of both pages', data: buildCombos(CONTENT_CATS, IMAGE_CATS, 22, 40)},
     ]
   },
   ad: {
@@ -316,7 +334,7 @@ const LENSES = {
     categories: buildCategoryData(AD_CATS, 31, false),
     heatmap: null,
     combos: [
-      {title:'Ad category × Image category', sub:'Top pairings ranked by combined post volume of both pages', data: buildCombos(AD_CATS, IMAGE_CATS, 32, 40)},
+      {title:'Ad category × Image category', sub:'Top pairings ranked by combined engagements of both pages', data: buildCombos(AD_CATS, IMAGE_CATS, 32, 40)},
     ]
   },
   image: {
@@ -324,8 +342,8 @@ const LENSES = {
     categories: buildCategoryData(IMAGE_CATS, 41, false),
     heatmap: null,
     combos: [
-      {title:'Image category × Content category', sub:'Top pairings ranked by combined post volume of both pages', data: buildCombos(IMAGE_CATS, CONTENT_CATS, 42, 40)},
-      {title:'Image category × Ad category', sub:'Top pairings ranked by combined post volume of both pages', data: buildCombos(IMAGE_CATS, AD_CATS, 43, 40)},
+      {title:'Image category × Content category', sub:'Top pairings ranked by combined engagements of both pages', data: buildCombos(IMAGE_CATS, CONTENT_CATS, 42, 40)},
+      {title:'Image category × Ad category', sub:'Top pairings ranked by combined engagements of both pages', data: buildCombos(IMAGE_CATS, AD_CATS, 43, 40)},
     ]
   }
 };
@@ -335,20 +353,25 @@ let currentLens = 'content';
 function fmt(n){return n>=1000?(n/1000).toFixed(1)+'K':String(n);}
 
 // ---------- Shared rank card (Category Bars + Combinations) ----------
-function rankCardHTML(title, sub, rows, showAll){
-  const withTotal = rows.map(r=>({...r, total:r.p1+r.p2}));
+// metric: 'posts' uses r.p1/r.p2, 'eng' uses r.eng1/r.eng2. Both modes reuse this — only the
+// metric fed in (and the title/sub text) differs between My Page and Competitors.
+function rankCardHTML(title, sub, rows, showAll, metric){
+  const key1 = metric==='eng' ? 'eng1' : 'p1';
+  const key2 = metric==='eng' ? 'eng2' : 'p2';
+  const metricLabel = metric==='eng' ? 'Engagements' : 'Posts';
+  const withTotal = rows.map(r=>({...r, v1:r[key1], v2:r[key2], total:r[key1]+r[key2]}));
   const sorted = [...withTotal].sort((a,b)=>b.total-a.total).slice(0, showAll?rows.length:8);
   const grandTotal = withTotal.reduce((s,r)=>s+r.total,0);
   const max = sorted[0]?sorted[0].total:1;
   const items = sorted.map((r,i)=>{
     const pct = grandTotal ? Math.round(r.total/grandTotal*100) : 0;
-    const w1 = Math.round(r.p1/max*100);
-    const w2 = Math.round(r.p2/max*100);
+    const w1 = Math.round(r.v1/max*100);
+    const w2 = Math.round(r.v2/max*100);
     return `<div class="rank-item">
       <div class="rank-item-top">
         <span class="rank-num">${i+1}</span>
         <span class="rank-name">${r.name}</span>
-        <span class="rank-val">${r.total} (${pct}%)</span>
+        <span class="rank-val">${fmt(r.total)} (${pct}%)</span>
       </div>
       <div class="stack-track" style="width:${w1+w2}%;">
         <div class="stack-seg" style="width:${w1/(w1+w2)*100}%;background:${P1.color};"></div>
@@ -356,8 +379,8 @@ function rankCardHTML(title, sub, rows, showAll){
       </div>
       <div class="tt">
         <div class="tt-title">${r.name}</div>
-        <div class="tt-row"><span class="tt-dot" style="background:${P1.color}"></span>${P1.name}: ${r.p1}</div>
-        <div class="tt-row"><span class="tt-dot" style="background:${P2.color}"></span>${P2.name}: ${r.p2}</div>
+        <div class="tt-row"><span class="tt-dot" style="background:${P1.color}"></span>${P1.name} ${metricLabel}: ${fmt(r.v1)}</div>
+        <div class="tt-row"><span class="tt-dot" style="background:${P2.color}"></span>${P2.name} ${metricLabel}: ${fmt(r.v2)}</div>
       </div>
     </div>`;
   }).join('');
@@ -369,45 +392,47 @@ function rankCardHTML(title, sub, rows, showAll){
   </div>`;
 }
 
-// ---------- 1. Category Bars ----------
+// ---------- 1. Category Bars — My Page: vs Engagements · Competitors: vs Posts ----------
 function renderBars(){
   const lens = LENSES[currentLens];
+  const metric = MODE==='mypage' ? 'eng' : 'posts';
+  const metricLabel = MODE==='mypage' ? 'Engagements' : 'Posts';
   document.getElementById('section-bars').innerHTML = rankCardHTML(
-    `${lens.label} vs Post Volume`,
-    'Ranked by combined post volume of both pages · hover a bar for the breakdown',
-    lens.categories, false
+    `${lens.label} vs ${metricLabel}`,
+    `Ranked by combined ${metricLabel.toLowerCase()} of both pages · hover a bar for the breakdown`,
+    lens.categories, false, metric
   );
 }
 
-// ---------- 2. Engagements vs Post Volume ----------
+// ---------- 2. Avg Engagements vs Posts (same in both modes) ----------
 function renderScatter(){
   const lens = LENSES[currentLens];
-  const cats = lens.categories;
+  const cats = lens.categories.map(c=>({...c, avgEng1:c.eng1/c.p1, avgEng2:c.eng2/c.p2}));
   const svg = document.getElementById('scatter-svg');
   const W=900,H=360,padL=50,padR=20,padT=16,padB=36;
   const maxPosts = Math.max(...cats.map(c=>Math.max(c.p1,c.p2)));
-  const maxEng = Math.max(...cats.map(c=>Math.max(c.eng1,c.eng2)));
+  const maxAvgEng = Math.max(...cats.map(c=>Math.max(c.avgEng1,c.avgEng2)));
   const maxER = Math.max(...cats.map(c=>Math.max(c.er1,c.er2)));
 
   function x(v){return padL + (v/maxPosts)*(W-padL-padR);}
-  function y(v){return H-padB - (v/(maxEng*1.15))*(H-padT-padB);}
+  function y(v){return H-padB - (v/(maxAvgEng*1.15))*(H-padT-padB);}
   function r(v){return 5 + (v/maxER)*16;}
 
   let axes = `<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H-padB}" stroke="#E4E9ED"/>
               <line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="#E4E9ED"/>
-              <text x="${padL-8}" y="${padT+4}" font-size="10" fill="#828282" text-anchor="end">${fmt(maxEng)}</text>
+              <text x="${padL-8}" y="${padT+4}" font-size="10" fill="#828282" text-anchor="end">${fmt(Math.round(maxAvgEng))}</text>
               <text x="${padL-8}" y="${H-padB}" font-size="10" fill="#828282" text-anchor="end">0</text>
               <text x="${padL}" y="${H-14}" font-size="10" fill="#828282">0</text>
               <text x="${W-padR}" y="${H-14}" font-size="10" fill="#828282" text-anchor="end">${maxPosts} posts</text>`;
 
   let dots = '';
   cats.forEach(c=>{
-    dots += `<circle cx="${x(c.p1)}" cy="${y(c.eng1)}" r="${r(c.er1)}" fill="${P1.color}" opacity="0.55" stroke="${P1.color}" stroke-width="1.2"><title>${c.name} · ${P1.name}\nPosts: ${c.p1}  Eng: ${fmt(c.eng1)}  ER: ${c.er1}%</title></circle>`;
-    dots += `<circle cx="${x(c.p2)}" cy="${y(c.eng2)}" r="${r(c.er2)}" fill="${P2.color}" opacity="0.55" stroke="${P2.color}" stroke-width="1.2"><title>${c.name} · ${P2.name}\nPosts: ${c.p2}  Eng: ${fmt(c.eng2)}  ER: ${c.er2}%</title></circle>`;
+    dots += `<circle cx="${x(c.p1)}" cy="${y(c.avgEng1)}" r="${r(c.er1)}" fill="${P1.color}" opacity="0.55" stroke="${P1.color}" stroke-width="1.2"><title>${c.name} · ${P1.name}\nPosts: ${c.p1}  Avg Eng/Post: ${fmt(Math.round(c.avgEng1))}  ER: ${c.er1}%</title></circle>`;
+    dots += `<circle cx="${x(c.p2)}" cy="${y(c.avgEng2)}" r="${r(c.er2)}" fill="${P2.color}" opacity="0.55" stroke="${P2.color}" stroke-width="1.2"><title>${c.name} · ${P2.name}\nPosts: ${c.p2}  Avg Eng/Post: ${fmt(Math.round(c.avgEng2))}  ER: ${c.er2}%</title></circle>`;
   });
 
   svg.innerHTML = axes + dots;
-  document.getElementById('scatter-sub').textContent = `Each dot is one ${lens.label.toLowerCase()} for one page · x = post volume, y = engagements, size = engagement rate`;
+  document.getElementById('scatter-sub').textContent = `Each dot is one ${lens.label.toLowerCase()} for one page · x = posts, y = avg engagements per post, size = engagement rate`;
   document.getElementById('pill-scatter').innerHTML = pageLegendHTML();
 }
 
@@ -497,21 +522,31 @@ function renderHeatmap(){
   </div>`;
 }
 
-// ---------- 4. Combinations ----------
+// ---------- 4. Combinations — always vs Engagements (same in both modes) ----------
 function renderCombos(){
   const lens = LENSES[currentLens];
-  document.getElementById('combo-cards').innerHTML = lens.combos.map(c=>rankCardHTML(c.title, c.sub, c.data, true)).join('');
+  document.getElementById('combo-cards').innerHTML = lens.combos.map(c=>
+    rankCardHTML(`${c.title} vs Engagements`, c.sub, c.data, true, 'eng')
+  ).join('');
 }
 
-// ---------- 5. Top categories table ----------
+// ---------- 5. Top categories table — My Page: Engagements · Competitors: Posts ----------
 const TOP_PAGE_SIZE = 10;
 let topPage = 1;
 
 function renderTopTable(){
   const lens = LENSES[currentLens];
-  document.getElementById('top-th-p1').textContent = `${P1.name} Contents`;
-  document.getElementById('top-th-p2').textContent = `${P2.name} Contents`;
-  const sorted = [...lens.categories].map(c=>({...c,total:c.p1+c.p2})).sort((a,b)=>b.total-a.total);
+  const metric = MODE==='mypage' ? 'eng' : 'posts';
+  const metricLabel = MODE==='mypage' ? 'Engagements' : 'Contents';
+  const key1 = metric==='eng' ? 'eng1' : 'p1';
+  const key2 = metric==='eng' ? 'eng2' : 'p2';
+
+  document.getElementById('top-sub').textContent = `Ranked by combined ${MODE==='mypage'?'engagements':'post volume'} of both pages`;
+  document.getElementById('top-th-total').textContent = metricLabel;
+  document.getElementById('top-th-p1').textContent = `${P1.name} ${metricLabel}`;
+  document.getElementById('top-th-p2').textContent = `${P2.name} ${metricLabel}`;
+
+  const sorted = [...lens.categories].map(c=>({...c, v1:c[key1], v2:c[key2], total:c[key1]+c[key2]})).sort((a,b)=>b.total-a.total);
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / TOP_PAGE_SIZE));
   if(topPage > totalPages) topPage = totalPages;
@@ -522,9 +557,9 @@ function renderTopTable(){
     <tr>
       <td style="padding-left:14px;" class="rank-badge">${start+i+1}</td>
       <td>${c.name}</td>
-      <td class="r">${c.total}</td>
-      <td class="r" style="color:${P1.color};">${c.p1}</td>
-      <td class="r" style="color:${P2.color};">${c.p2}</td>
+      <td class="r">${fmt(c.total)}</td>
+      <td class="r" style="color:${P1.color};">${fmt(c.v1)}</td>
+      <td class="r" style="color:${P2.color};">${fmt(c.v2)}</td>
     </tr>`).join('');
   document.getElementById('pill-table').innerHTML = pageLegendHTML();
 
@@ -552,6 +587,23 @@ function setLens(lens, el){
   topPage = 1;
   document.querySelectorAll('#lens-toggle .lens-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
+  renderAll();
+}
+
+// ---------- Mode switch: My Page · Compare vs Competitors · Compare ----------
+// Only the metrics differ between the two modes (per spec) — page chrome (chips/tabs/lenses)
+// stays the same; we swap the page title + sidebar highlight just to signal context.
+let MODE = 'mypage';
+
+function setMode(mode, el){
+  MODE = mode;
+  document.querySelectorAll('#mode-toggle .mode-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('pg-title').textContent = mode==='mypage' ? 'My Pages · Compare' : 'Competitors · Compare';
+  document.getElementById('nav-mypages').classList.toggle('active', mode==='mypage');
+  document.getElementById('nav-competitors').classList.toggle('active', mode==='competitors');
+  hmExpanded = new Set();
+  topPage = 1;
   renderAll();
 }
 
