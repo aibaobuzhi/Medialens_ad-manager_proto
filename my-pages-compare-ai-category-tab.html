@@ -141,6 +141,21 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
 .top-table tr:hover td{background:#FAFCFE;}
 .rank-badge{font-size:10.5px;font-weight:700;color:var(--ac-secondary);width:18px;}
 
+.top-th-sort{cursor:pointer;user-select:none;}
+.top-th-sort:hover{color:var(--ac-brand);}
+.top-sort-caret{display:inline-block;margin-left:3px;font-size:9px;opacity:.5;}
+.top-th-sort.active .top-sort-caret{opacity:1;color:var(--ac-brand);}
+
+.top-main-row{cursor:pointer;}
+.top-main-row:hover .top-cat-name{color:var(--ac-brand);}
+.top-cat-cell{display:flex;align-items:center;gap:6px;}
+.top-cat-name{font-weight:500;}
+.top-chevron{color:var(--ac-secondary);flex-shrink:0;transition:transform .2s;}
+.top-chevron.open{transform:rotate(180deg);}
+.top-sub-row td{background:#FAFCFE;}
+.top-sub-row .top-cat-cell{padding-left:18px;color:var(--ac-secondary);font-weight:500;font-size:12px;}
+.top-page-dot{width:8px;height:8px;border-radius:3px;flex-shrink:0;}
+
 .top-pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--ac-divider);}
 .top-pagination-info{font-size:11.5px;color:var(--ac-secondary);}
 .top-pagination-btns{display:flex;align-items:center;gap:4px;}
@@ -240,21 +255,21 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
         <div class="cards-row" id="combo-cards"></div>
       </div>
 
-      <!-- 5. Top categories table -->
+      <!-- 5. Top categories table — click a category to break it down by page -->
       <div class="section">
         <div class="card" style="padding:0;overflow:hidden;">
           <div style="padding:20px 20px 0;">
             <div class="card-title">Top categories</div>
-            <div class="card-sub" id="top-sub">Ranked by combined post volume of both pages</div>
+            <div class="card-sub" id="top-sub">Ranked by combined Contents of both pages · click a category to break it down by page</div>
           </div>
           <table class="top-table">
             <thead>
               <tr>
                 <th style="width:26px;padding-left:14px;">#</th>
                 <th>Category</th>
-                <th class="r" id="top-th-total">Contents</th>
-                <th class="r" id="top-th-p1">BusinessFocus Contents</th>
-                <th class="r" id="top-th-p2">POPLADY Contents</th>
+                <th class="r top-th-sort" onclick="setTopSort('contents')" id="top-th-contents">Contents</th>
+                <th class="r top-th-sort" onclick="setTopSort('eng')" id="top-th-eng">Engagements</th>
+                <th class="r top-th-sort" onclick="setTopSort('avgEng')" id="top-th-avgeng">Avg Engagements</th>
               </tr>
             </thead>
             <tbody id="top-tbody"></tbody>
@@ -272,8 +287,10 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
 const P1 = {name:'BusinessFocus | 商業、投資、創科平台', color:'#23A9F6'};
 const P2 = {name:'POPLADY', color:'#F5A623'};
 
+const TOTAL_COLOR = '#6B4BD8'; // distinct purple — was grey, which read as "no data"/disabled
+
 function pageLegendHTML(withTotal){
-  const totalItem = withTotal ? `<div class="page-legend-item"><span class="page-legend-sq" style="background:#828282"></span>Total</div>` : '';
+  const totalItem = withTotal ? `<div class="page-legend-item"><span class="page-legend-sq" style="background:${TOTAL_COLOR}"></span>Total</div>` : '';
   return `${totalItem}<div class="page-legend-item"><span class="page-legend-sq" style="background:${P1.color}"></span>${P1.name}</div>
           <div class="page-legend-item"><span class="page-legend-sq" style="background:${P2.color}"></span>${P2.name}</div>`;
 }
@@ -494,7 +511,7 @@ function heatmapGridHTML(names, hmP1, hmP2){
     if(!v) return '#F7F7F7';
     const t = v/max;
     const from = {r:238,g:243,b:246};
-    const to = tint==='p2' ? {r:245,g:166,b:35} : tint==='p1' ? {r:35,g:169,b:246} : {r:130,g:130,b:130};
+    const to = tint==='p2' ? {r:245,g:166,b:35} : tint==='p1' ? {r:35,g:169,b:246} : {r:107,g:75,b:216};
     const r = Math.round(from.r+t*(to.r-from.r));
     const g = Math.round(from.g+t*(to.g-from.g));
     const b = Math.round(from.b+t*(to.b-from.b));
@@ -557,35 +574,88 @@ function renderCombos(){
   ).join('');
 }
 
-// ---------- 5. Top categories table — metric picked via the Metric selector ----------
+// ---------- 5. Top categories table ----------
+// Fixed 3 metrics (Contents / Engagements / Avg Engagements), independent of the Metric selector
+// (that selector only drives card 1). Default row per category = combined total across all
+// pages. Click a category to expand into a per-page breakdown, same interaction as the
+// "Which format wins" heatmap card.
 const TOP_PAGE_SIZE = 10;
 let topPage = 1;
+let topExpanded = new Set();
+let topSortKey = 'contents';
+let topSortDir = 'desc';
+
+const TOP_SORT_LABEL = {contents:'Contents', eng:'Engagements', avgEng:'Avg Engagements'};
+
+function topChevron(open){
+  return `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="top-chevron${open?' open':''}"><polyline points="6 9 12 15 18 9"/></svg>`;
+}
+
+function setTopSort(key){
+  if(topSortKey===key){ topSortDir = topSortDir==='desc' ? 'asc' : 'desc'; }
+  else { topSortKey = key; topSortDir = 'desc'; }
+  topPage = 1;
+  renderTopTable();
+}
+
+function toggleTopRow(name){
+  if(topExpanded.has(name)) topExpanded.delete(name);
+  else topExpanded.add(name);
+  renderTopTable();
+}
 
 function renderTopTable(){
   const lens = LENSES[currentLens];
-  const meta = METRIC_META[selectedMetric];
-  const key1 = meta.k1, key2 = meta.k2, metricLabel = meta.label;
 
-  document.getElementById('top-sub').textContent = `Ranked by combined ${metricLabel.toLowerCase()} of both pages`;
-  document.getElementById('top-th-total').textContent = metricLabel;
-  document.getElementById('top-th-p1').textContent = `${P1.name} ${metricLabel}`;
-  document.getElementById('top-th-p2').textContent = `${P2.name} ${metricLabel}`;
+  document.getElementById('top-sub').textContent = `Ranked by combined ${TOP_SORT_LABEL[topSortKey].toLowerCase()} of both pages · click a category to break it down by page`;
+  ['contents','eng','avgEng'].forEach(k=>{
+    const th = document.getElementById('top-th-'+(k==='avgEng'?'avgeng':k));
+    th.classList.toggle('active', topSortKey===k);
+    th.innerHTML = `${TOP_SORT_LABEL[k]}<span class="top-sort-caret">${topSortKey===k ? (topSortDir==='desc'?'▼':'▲') : '▾'}</span>`;
+  });
 
-  const sorted = [...lens.categories].map(c=>({...c, v1:c[key1], v2:c[key2], total:c[key1]+c[key2]})).sort((a,b)=>b.total-a.total);
+  const withTotals = lens.categories.map(c=>{
+    const contents = c.p1+c.p2;
+    const eng = c.eng1+c.eng2;
+    const avgEng = contents ? Math.round(eng/contents) : 0;
+    return {...c, contents, eng, avgEng};
+  });
+  const dir = topSortDir==='desc' ? -1 : 1;
+  const sorted = [...withTotals].sort((a,b)=>(a[topSortKey]-b[topSortKey])*dir);
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / TOP_PAGE_SIZE));
   if(topPage > totalPages) topPage = totalPages;
   const start = (topPage-1)*TOP_PAGE_SIZE;
   const pageRows = sorted.slice(start, start+TOP_PAGE_SIZE);
 
-  document.getElementById('top-tbody').innerHTML = pageRows.map((c,i)=>`
-    <tr>
+  const PAGES = [
+    {name:P1.name, color:P1.color, posts:'p1', eng:'eng1'},
+    {name:P2.name, color:P2.color, posts:'p2', eng:'eng2'},
+  ];
+
+  document.getElementById('top-tbody').innerHTML = pageRows.map((c,i)=>{
+    const open = topExpanded.has(c.name);
+    const mainRow = `<tr class="top-main-row" onclick="toggleTopRow('${c.name}')">
       <td style="padding-left:14px;" class="rank-badge">${start+i+1}</td>
-      <td>${c.name}</td>
-      <td class="r">${fmt(c.total)}</td>
-      <td class="r" style="color:${P1.color};">${fmt(c.v1)}</td>
-      <td class="r" style="color:${P2.color};">${fmt(c.v2)}</td>
-    </tr>`).join('');
+      <td><div class="top-cat-cell">${topChevron(open)}<span class="top-cat-name">${c.name}</span></div></td>
+      <td class="r">${fmt(c.contents)}</td>
+      <td class="r">${fmt(c.eng)}</td>
+      <td class="r">${fmt(c.avgEng)}</td>
+    </tr>`;
+    if(!open) return mainRow;
+    const subRows = PAGES.map(p=>{
+      const posts = c[p.posts], eng = c[p.eng];
+      const avgEng = posts ? Math.round(eng/posts) : 0;
+      return `<tr class="top-sub-row">
+        <td></td>
+        <td><div class="top-cat-cell"><span class="top-page-dot" style="background:${p.color}"></span>${p.name}</div></td>
+        <td class="r" style="color:${p.color};">${fmt(posts)}</td>
+        <td class="r" style="color:${p.color};">${fmt(eng)}</td>
+        <td class="r" style="color:${p.color};">${fmt(avgEng)}</td>
+      </tr>`;
+    }).join('');
+    return mainRow + subRows;
+  }).join('');
   document.getElementById('pill-table').innerHTML = pageLegendHTML();
 
   const pageBtns = [];
@@ -609,13 +679,14 @@ function goToTopPage(p){
 function setLens(lens, el){
   currentLens = lens;
   hmExpanded = new Set();
+  topExpanded = new Set();
   topPage = 1;
   document.querySelectorAll('#lens-toggle .lens-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   renderAll();
 }
 
-// ---------- Metric selector — options depend on MODE, only affects cards 1 & 5 ----------
+// ---------- Metric selector — options depend on MODE, only affects card 1 (Category Bars) ----------
 function renderMetricToggle(){
   const options = MODE_METRICS[MODE].options;
   document.getElementById('metric-toggle').innerHTML = options.map(key=>
@@ -627,9 +698,7 @@ function setMetric(key, el){
   selectedMetric = key;
   document.querySelectorAll('#metric-toggle .lens-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
-  topPage = 1;
   renderBars();
-  renderTopTable();
 }
 
 // ---------- Mode switch: My Page · Compare vs Competitors · Compare ----------
@@ -646,6 +715,7 @@ function setMode(mode, el){
   document.getElementById('nav-mypages').classList.toggle('active', mode==='mypage');
   document.getElementById('nav-competitors').classList.toggle('active', mode==='competitors');
   hmExpanded = new Set();
+  topExpanded = new Set();
   topPage = 1;
   renderMetricToggle();
   renderAll();
