@@ -586,12 +586,6 @@
 #ag-root .ag-tbl tbody tr:hover td.ag-sel{background:#E6F2FE}
 #ag-root .ag-up{color:#10B981;font-weight:600}
 #ag-root .ag-down{color:#DC2626;font-weight:600}
-#ag-root .ag-bm{display:inline-block;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid}
-#ag-root .ag-bm.t25{color:#0F9D58;border-color:#B7E4C7;background:#F0FBF4}
-#ag-root .ag-bm.t50{color:#1F7AE0;border-color:#C3DDFA;background:#F2F8FF}
-#ag-root .ag-bm.avg{color:#D48806;border-color:#FFE0A3;background:#FFFBF0}
-#ag-root .ag-bm.low{color:#8C8C8C;border-color:#E4E4E4;background:#FAFAFA}
-#ag-root .ag-bm.nd{color:#98A6AE;border-color:#EAEEF0;background:#F7F9FA;font-weight:500}
 /* copied verbatim from .matrix-heatmap__* (Content category "Which format wins in each category") */
 #ag-root .ag-hm{border-collapse:separate;border-spacing:0 2px;font-size:12px;width:100%}
 #ag-root .ag-hm th{border-bottom:1px solid rgba(226,232,240,.5);color:#939eab;font-size:11px;font-weight:600;
@@ -646,9 +640,9 @@ var METRICS=[
  {k:'ctr',label:'CTR',fmt:'p2'},
  {k:'nonFansReach',label:'Non-Fans Reach',fmt:'int'}
 ];
-var MIN_POSTS=5; // below this an angle's per-post averages are treated as not reliable
 
-// 25-angle taxonomy with a realistic long tail
+// placeholder taxonomy for layout testing only — the real Angle enum is defined in a separate doc,
+// and fbPost.angle is multi-value (a post may carry several of these)
 var SEED=[
  ['Results & Transformation',24,612],['Advanced Technology',19,498],['Value Proposition',15,441],
  ['Social Proof & Trust',13,735],['Problem & Solution',11,404],['Data & Research',9,522],
@@ -669,9 +663,12 @@ function buildMetrics(eng,j,r){
   return {engagement:eng,likes:eng*m(0.62,0.79),comments:eng*m(0.07,0.14),shares:eng*m(0.10,0.23),
     videoViews:eng*m(14,52),er:er,pageEr:per,pageErBp:per*100,ctr:m(0.38,2.55),nonFansReach:eng*m(28,132)};
 }
+// distinct posts in the period. angle is multi-value, so Σ(angle.posts) exceeds this — both
+// numbers are valid, they just answer different questions.
+var TOTAL_POSTS=99;
 var ANGLES=SEED.map(function(s,i){
   var r=rng(i*7919+13),j=r();
-  var a={name:s.name,posts:s.posts,low:s.posts<MIN_POSTS,avg:buildMetrics(s.eng,j,r),delta:{},types:{},formats:{}};
+  var a={name:s.name,posts:s.posts,avg:buildMetrics(s.eng,j,r),delta:{},types:{},formats:{}};
   METRICS.forEach(function(m){var d=(r()*2-1);a.delta[m.k]=Math.round(((m.k==='shares'?1.6:1)*d*78)*10)/10;});
   var split=[0.20+r()*0.42,0.24+r()*0.24];split.push(1-split[0]-split[1]);
   var rem=s.posts,tm=[1.0,0.86+r()*0.2,1.18+r()*0.35];
@@ -693,7 +690,6 @@ var ANGLES=SEED.map(function(s,i){
   });
   return a;
 });
-var TOTAL_POSTS=ANGLES.reduce(function(s,a){return s+a.posts;},0);
 
 /* ---------------- state ---------------- */
 var PAGE_SIZE=10;
@@ -718,8 +714,6 @@ function fmt(v,k){var m=mdef(k);
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function att(s){return esc(s).replace(/"/g,'&quot;');}
 function clip(s,n){return s.length>n?s.slice(0,n-1)+'…':s;}
-// angles that carry enough volume for per-post averages to mean anything
-function reliable(){return ANGLES.filter(function(a){return !a.low;});}
 function byScale(k){return ANGLES.slice().sort(function(p,q){return q.posts*val(q.avg,k,q.posts)-p.posts*val(p.avg,k,p.posts);});}
 
 /* ---------------- tooltip ---------------- */
@@ -829,8 +823,8 @@ function cardByType(){
     var bh=grouped?Math.max(4,(rh-8)/act.length-1):Math.min(18,rh-8);
     shown.forEach(function(r,i){
       var cy=T+i*rh+rh/2,acc=0,gy0=cy-(act.length*bh+(act.length-1)*1)/2;
-      s.push('<text x="'+(L-10)+'" y="'+(cy+4)+'" text-anchor="end" font-size="11.5" fill="'+(r.a.low?'#9AAAB3':'#40606F')+
-        '" data-tip="'+att(r.a.name+' · '+r.a.posts+' posts')+'">'+esc(clip(r.a.name,30))+'</text>');
+      s.push('<text x="'+(L-10)+'" y="'+(cy+4)+'" text-anchor="end" font-size="11.5" fill="#40606F"'+
+        ' data-tip="'+att(r.a.name+' · '+r.a.posts+' posts')+'">'+esc(clip(r.a.name,30))+'</text>');
       r.segs.forEach(function(sg,si){
         if(sg.v<=0)return;
         var x0,w2,y;
@@ -898,30 +892,21 @@ function cardTable(){
     var vx=S.sort==='posts'?x.posts:S.sort==='delta'?x.delta[k]:val(x.avg,S.sort,x.posts),
         vy=S.sort==='posts'?y.posts:S.sort==='delta'?y.delta[k]:val(y.avg,S.sort,y.posts);
     return S.desc?vy-vx:vx-vy;});
-  // benchmark percentile is computed only over angles with enough volume to rank fairly
-  var pool=reliable().map(function(a){return val(a.avg,k,a.posts);}).sort(function(x,y){return x-y;});
-  function bm(a){
-    if(a.low)return ['nd','No data'];
-    var v=val(a.avg,k,a.posts),i=pool.indexOf(v)/Math.max(1,pool.length-1);
-    return i>=0.75?['t25','Top 25%']:i>=0.5?['t50','Top 50%']:i>=0.25?['avg','Avg']:['low','Below avg'];}
   var head='<th data-sort="name">Angle</th><th data-sort="posts" class="'+(S.sort==='posts'?'ag-sorted':'')+
     '">Posts<span class="ag-sortic">▼</span></th>'+
     METRICS.map(function(m){return '<th data-sort="'+m.k+'" class="'+(S.sort===m.k?'ag-sorted ':'')+(m.k===k?'ag-sel':'')+'">'+
       esc((S.avg&&!isRate(m.k)?'Avg ':'')+m.label)+'<span class="ag-sortic">▼</span></th>';}).join('')+
     '<th>Trend</th><th data-sort="delta" class="'+(S.sort==='delta'?'ag-sorted':'')+
-    '">vs Prev 7D<span class="ag-sortic">▼</span></th><th>Benchmark</th>';
+    '">vs Prev 7D<span class="ag-sortic">▼</span></th>';
   var pages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));
   if(S.page>pages)S.page=pages;
   var from=(S.page-1)*PAGE_SIZE, slice=rows.slice(from,from+PAGE_SIZE);
   var body=slice.length?slice.map(function(a){
-    var d=a.delta[k],up=d>=0,b=bm(a);
+    var d=a.delta[k],up=d>=0;
     return '<tr><td>'+esc(a.name)+'</td><td>'+a.posts+'</td>'+
       METRICS.map(function(m){return '<td class="'+(m.k===k?'ag-sel':'')+'">'+fmt(val(a.avg,m.k,a.posts),m.k)+'</td>';}).join('')+
       '<td>'+(up?'<span class="ag-up">↗</span>':'<span class="ag-down">↘</span>')+'</td>'+
-      '<td class="'+(up?'ag-up':'ag-down')+'">'+(up?'+':'')+d.toFixed(1)+'%</td>'+
-      '<td><span class="ag-bm '+b[0]+'" data-tip="'+att(b[0]==='nd'
-        ?'Under '+MIN_POSTS+' posts — too little volume to rank this angle.'
-        :'Percentile of '+mlabel(k)+' against this Page’s 12-month rolling history (P25 / P50 / P75).')+'">'+b[1]+'</span></td></tr>';
+      '<td class="'+(up?'ag-up':'ag-down')+'">'+(up?'+':'')+d.toFixed(1)+'%</td></tr>';
   }).join(''):'';
   var pager='';
   if(rows.length>PAGE_SIZE){
@@ -934,8 +919,9 @@ function cardTable(){
   return '<div class="ag-card"><div class="ag-hd"><div><div class="ag-title">Angle Performance</div></div>'+
     '<div class="ag-tools"><input class="ag-search" id="ag-q" type="text" placeholder="Search angle…" value="'+att(S.q)+'">'+
     '</div></div>'+
-    '<div class="ag-sub">All <b>'+ANGLES.length+'</b> angles with every metric available on My Page, '+PAGE_SIZE+
-    ' per page. Trend and <b>vs Prev 7D</b> follow the selected metric ('+esc(mdef(k).label)+').</div>'+
+    '<div class="ag-sub">All <b>'+ANGLES.length+'</b> angles across <b>'+TOTAL_POSTS+'</b> posts, with every metric '+
+    'available on My Page, '+PAGE_SIZE+' per page. Trend and <b>vs Prev 7D</b> follow the selected metric ('+
+    esc(mdef(k).label)+').</div>'+
     (body?'<div class="ag-tbl-wrap"><table class="ag-tbl"><thead><tr>'+head+'</tr></thead><tbody>'+body+'</tbody></table></div>'+pager
         :'<div class="ag-empty">No angle matches “'+esc(S.q)+'”.</div>')+
     '</div>';
@@ -949,7 +935,10 @@ function hmBg(idx){
 function cardFormat(){
   var k=S.metric;
   var used=FORMATS.filter(function(f){return ANGLES.some(function(a){return a.formats[f];});});
-  // channel average of the selected metric, weighted by posts — index 100 = channel average
+  // channel average of the selected metric, weighted by posts — index 100 = channel average.
+  // NOTE for implementation: fbPost.angle is multi-value, so the real base must be computed over
+  // DISTINCT posts. Summing angle×format posts (as this mock does) counts a 3-angle post 3 times,
+  // which inflates the base and pushes every index down. See PRD 4.4.
   var num=0,den=0;
   ANGLES.forEach(function(a){used.forEach(function(f){var d=a.formats[f];if(d){num+=d.avg[k]*d.posts;den+=d.posts;}});});
   var chAvg=den?num/den:1;
