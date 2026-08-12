@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediaLens · BF Agent 生成内容 流程原型</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-blue:#23A9F6; --brand-light-blue:#73DFFF; --brand-blue-tint:#EEF6FF;
+  --title:#0A1F2C; --text-regular:#707070; --surface-page:#F7F7F7;
+  --divider:#E8EEF0; --border:#D9E3E6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Poppins','Noto Sans HK',system-ui,-apple-system,sans-serif;
+  background:var(--surface-page);color:var(--title);overflow:hidden}
+
+#stage{position:fixed;inset:0 0 46px 0;background:#fff}
+#stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff;
+  opacity:0;pointer-events:none;transition:opacity .16s ease}
+#stage iframe.is-on{opacity:1;pointer-events:auto}
+
+#boot{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;background:#fff;z-index:5;transition:opacity .25s ease}
+#boot.is-off{opacity:0;pointer-events:none}
+#boot .sp{width:26px;height:26px;border:3px solid rgba(35,169,246,.22);border-top-color:var(--brand-blue);
+  border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+#boot p{font-size:13px;line-height:20px;color:var(--text-regular)}
+#boot b{display:block;font-size:15px;font-weight:600;color:var(--title);margin-bottom:2px}
+
+#flowbar{position:fixed;left:0;right:0;bottom:0;height:46px;z-index:20;
+  background:#0A1F2C;color:#fff;display:flex;align-items:center;gap:14px;padding:0 16px;
+  font-size:12px;line-height:18px}
+#flowbar .brand{font-weight:600;color:var(--brand-light-blue);white-space:nowrap}
+#flowbar .steps{display:flex;align-items:center;gap:6px;margin-left:6px}
+#flowbar .step{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;
+  border-radius:14px;background:rgba(255,255,255,.1);color:#fff;font-size:12px;font-weight:500;
+  cursor:pointer;white-space:nowrap;border:none;font-family:inherit}
+#flowbar .step:hover{background:rgba(255,255,255,.2)}
+#flowbar .step.is-on{background:var(--brand-blue)}
+#flowbar .step i{font-style:normal;opacity:.65;font-size:11px}
+#flowbar .step.is-on i{opacity:.9}
+#flowbar .arrow{opacity:.35}
+#flowbar .hint{margin-left:auto;opacity:.62;text-align:right}
+#flowbar .hint b{color:var(--brand-light-blue);font-weight:600}
+@media(max-width:1080px){ #flowbar .hint{display:none} }
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <div id="boot">
+    <div class="sp"></div>
+    <p><b>正在载入原型</b>三份页面快照较大，首次打开需要几秒</p>
+  </div>
+</div>
+
+<div id="flowbar">
+  <span class="brand">BF Agent · 生成内容 流程原型</span>
+  <div class="steps">
+    <button class="step" data-view="agent"><i>1</i>AI Creative Studio</button>
+    <span class="arrow">→</span>
+    <button class="step" data-view="publish"><i>2</i>Content Publish</button>
+    <span class="arrow">→</span>
+    <button class="step" data-view="editor"><i>3</i>Edit post</button>
+    <span class="arrow">→</span>
+    <button class="step" data-view="delivery"><i>4</i>交付详情</button>
+  </div>
+  <span class="hint" id="hint"></span>
+</div>
+
+<script>
+(function(){
+  var FILES = {
+    agent:   '03-ai-agent.html',
+    publish: '01-publish-list.html',
+    editor:  '02-edit-modal.html',
+    delivery:'04-delivery-detail.html'
+  };
+  var HINTS = {
+    agent:   'agent 选择器可切 <b>BF agent</b> · 草稿卡点 <b>Preview / Edit</b> 打开编辑弹窗',
+    publish: '<b>BF agent Draft</b> tab 点交付文件夹进详情页 · 卡片 <b>Edit / Publish</b> 打开编辑弹窗',
+    editor:  '点 <b>Cancel</b> 或右上 <b>✕</b> 回到 Content Publish',
+    delivery:'一个页面三个入口 · 上方原始交付 · 下方 4 条 post · 可 <b>Copy link</b> 给 leader'
+  };
+
+  var BUILD = Date.now();
+  var stage = document.getElementById('stage');
+  var boot  = document.getElementById('boot');
+  var hint  = document.getElementById('hint');
+  var frames = {};
+  var booted = false;
+
+  function ensure(view){
+    if(frames[view]) return frames[view];
+    var f = document.createElement('iframe');
+    f.setAttribute('title', view);
+    /* 加时间戳绕开缓存 —— 快照文件会被反复改，缓存住旧版会让交互对不上 */
+    f.src = FILES[view] + '?t=' + BUILD + (view === 'editor' ? '&mode=post' : '');
+    if(view === 'editor') f.dataset.mode = 'post';
+    stage.appendChild(f);
+    frames[view] = f;
+    return f;
+  }
+
+  function show(view){
+    if(!FILES[view]) return;
+    var f = ensure(view);
+    Object.keys(frames).forEach(function(k){
+      frames[k].classList.toggle('is-on', k === view);
+    });
+    document.querySelectorAll('#flowbar .step').forEach(function(b){
+      b.classList.toggle('is-on', b.dataset.view === view);
+    });
+    hint.innerHTML = HINTS[view] || '';
+
+    if(!booted){
+      f.addEventListener('load', function(){
+        boot.classList.add('is-off');
+        booted = true;
+        setTimeout(function(){ Object.keys(FILES).forEach(function(k){ ensure(k); }); }, 600);
+      }, { once: true });
+      setTimeout(function(){ boot.classList.add('is-off'); }, 12000);
+    }
+  }
+
+  window.addEventListener('message', function(e){
+    var d = e.data;
+    if(!d || typeof d !== 'object') return;
+    if(!d.mlnav) return;
+
+    /* 编辑弹窗有三种形态（carousel / link / delivery）。形态是"改造过的 DOM"，
+       没有干净的还原路径 —— 所以换形态时直接重载这个 iframe，而不是 postMessage。
+       否则打开过一次 link 之后，再点 carousel / image 仍然停在 link 形态。 */
+    if(d.mlnav === 'editor'){
+      var want = d.mlmode || 'post';
+      var fe = ensure('editor');
+      if(fe.dataset.mode !== want){
+        fe.dataset.mode = want;
+        fe.src = FILES.editor + '?t=' + BUILD + '&mode=' + want;
+      }
+      show('editor');
+      return;
+    }
+
+    show(d.mlnav);
+    if(d.mlmode && frames[d.mlnav]){
+      var w = frames[d.mlnav].contentWindow;
+      var send = function(){ try { w.postMessage({ mlmode: d.mlmode }, '*'); } catch(e){} };
+      send(); setTimeout(send, 300);
+    }
+  });
+
+  document.querySelectorAll('#flowbar .step').forEach(function(b){
+    b.onclick = function(){ show(b.dataset.view); };
+  });
+
+  show('agent');
+})();
+</script>
+</body>
+</html>
