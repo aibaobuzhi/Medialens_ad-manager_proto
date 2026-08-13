@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediaLens · BF Auto Content Agent 流程原型</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#23A9F6; --blue-l:#73DFFF; --blue-t:#EEF6FF; --ink:#0A1F2C;
+  --txt:#707070; --page:#F7F7F7; --div:#E8EEF0; --bd:#D9E3E6;
+  --ok:#1BA97B; --ok-t:#E8F8F2; --warn:#9A6B00; --warn-t:#FFF8EB;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Poppins,'Noto Sans HK',system-ui,-apple-system,sans-serif;
+  background:var(--page);color:var(--ink);padding-bottom:58px}
+
+/* ═══ 顶部 chrome ═══ */
+.top{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--div);
+  display:flex;align-items:center;gap:12px;padding:0 20px;height:56px}
+.top .logo{font-size:15px;font-weight:600}
+.top .logo span{color:var(--blue)}
+.top .badge{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 10px;border-radius:12px;
+  background:var(--blue-t);color:var(--blue);font-size:12px;font-weight:500}
+.top .who{margin-left:auto;font-size:12px;color:var(--txt)}
+
+/* ═══ 通用 ═══ */
+.wrap{max-width:1180px;margin:0 auto;padding:22px 20px 40px}
+.screen{display:none}
+.screen.is-on{display:block}
+h1{font-size:21px;line-height:30px;font-weight:600;margin-bottom:4px}
+.sub{font-size:13px;line-height:20px;color:var(--txt);margin-bottom:20px}
+.sub b{color:var(--ink);font-weight:600}
+.card{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:18px 20px;margin-bottom:16px}
+.card h2{font-size:15px;line-height:22px;font-weight:600;margin-bottom:3px}
+.card h2 .n{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;
+  border-radius:10px;background:var(--blue);color:#fff;font-size:11px;font-weight:600;margin-right:7px;
+  vertical-align:2px}
+.card .hint{font-size:12px;line-height:18px;color:var(--txt);margin-bottom:14px}
+.chip{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 9px;border-radius:11px;
+  font-size:12px;font-weight:500;background:#F0F3F5;color:var(--txt);white-space:nowrap}
+.chip--b{background:var(--blue-t);color:var(--blue)}
+.chip--ok{background:var(--ok-t);color:var(--ok)}
+.chip--w{background:var(--warn-t);color:var(--warn)}
+.btn{height:34px;padding:0 16px;border-radius:17px;border:1px solid var(--bd);background:#fff;
+  color:var(--ink);font:500 13px/32px Poppins,system-ui,sans-serif;cursor:pointer}
+.btn:hover{border-color:var(--blue);color:var(--blue)}
+.btn--p{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn--p:hover{background:#1795dd;color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* ═══ ① 架构 ═══ */
+.arch{display:grid;gap:12px}
+.lane{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:14px 16px}
+.lane__t{font-size:12px;font-weight:600;color:var(--blue);letter-spacing:.4px;text-transform:uppercase;
+  margin-bottom:10px}
+.lane__b{display:flex;gap:10px;flex-wrap:wrap}
+.box{flex:1;min-width:170px;border:1px solid var(--div);border-radius:9px;padding:11px 13px;background:#FBFDFE}
+.box b{display:block;font-size:13px;line-height:19px}
+.box p{font-size:12px;line-height:18px;color:var(--txt);margin-top:3px}
+.box--iso{border:2px solid var(--blue);background:var(--blue-t)}
+.box--mut{background:#F7F9FA;color:#909399}
+.box--mut b{color:#606266}
+.flowline{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;margin-top:2px}
+.stg{flex:1;min-width:230px;background:#fff;border:1px solid var(--bd);border-radius:12px;padding:14px 16px;
+  position:relative}
+.stg+.stg{margin-left:26px}
+.stg+.stg::before{content:'→';position:absolute;left:-21px;top:50%;transform:translateY(-50%);
+  color:var(--blue);font-size:16px}
+.stg__h{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.stg__h b{font-size:13px}
+.stg ul{list-style:none;font-size:12px;line-height:19px;color:var(--txt)}
+.stg li{padding-left:13px;position:relative}
+.stg li::before{content:'·';position:absolute;left:3px;color:var(--blue);font-weight:700}
+.stg code{font-family:ui-monospace,Menlo,monospace;font-size:11px;background:#F0F3F5;padding:0 4px;
+  border-radius:3px;color:var(--ink)}
+.note{border-left:3px solid var(--blue);background:var(--blue-t);border-radius:0 8px 8px 0;
+  padding:11px 14px;font-size:12px;line-height:19px;color:var(--ink)}
+.note b{font-weight:600}
+
+/* ═══ ② Settings ═══ */
+.set__row{padding:15px 0;border-bottom:1px solid #F0F3F5}
+.set__row:last-child{border-bottom:none}
+.set__lb{font-size:13px;font-weight:600;line-height:20px;margin-bottom:3px}
+.set__hp{font-size:12px;line-height:18px;color:var(--txt);margin-bottom:9px}
+.in,.sel,.ta{border:1px solid var(--bd);border-radius:6px;background:#fff;padding:8px 10px;
+  font:400 13px/20px Poppins,'Noto Sans HK',system-ui,sans-serif;color:var(--ink)}
+.in:focus,.sel:focus,.ta:focus{outline:none;border-color:var(--blue)}
+.ta{width:100%;min-height:190px;resize:vertical;white-space:pre-wrap}
+.sw{position:relative;width:42px;height:24px;border-radius:12px;background:var(--bd);cursor:pointer;
+  flex:0 0 42px;transition:background .15s}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:left .15s}
+.sw.is-on{background:var(--blue)}
+.sw.is-on::after{left:21px}
+/* 锁定的配置项：只读呈现，不做成 disabled 输入框 ——
+   disabled 输入框看起来像「坏了」，只读卡片看起来像「就是这个值」 */
+.set__row.is-locked{background:#FBFCFD;margin:0 -20px;padding:15px 20px}
+.lock{display:inline-flex;align-items:center;height:19px;padding:0 7px;border-radius:10px;
+  background:#F0F3F5;color:#828282;font-size:11px;font-weight:500;margin-left:6px;vertical-align:1px}
+.ro{border:1px solid var(--div);border-left:3px solid var(--bd);border-radius:8px;padding:10px 12px;
+  background:#fff}
+.ro b{display:block;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;line-height:19px;color:var(--ink)}
+.ro span{display:block;font-size:12px;line-height:18px;color:var(--txt);margin-top:3px}
+.ro i{display:block;font-style:normal;font-size:11px;line-height:17px;color:#909399;margin-top:4px}
+
+/* ═══ ③ 选题 ═══ */
+.tp{border:1px solid var(--bd);border-radius:11px;background:#fff;margin-bottom:10px;overflow:hidden}
+.tp.is-sel{border-color:var(--blue);box-shadow:0 2px 12px rgba(35,169,246,.12)}
+.tp__h{display:flex;gap:12px;padding:13px 15px;cursor:pointer}
+.tp__ck{flex:0 0 18px;width:18px;height:18px;border:1.5px solid var(--bd);border-radius:4px;margin-top:2px;
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;line-height:1}
+.tp.is-sel .tp__ck{background:var(--blue);border-color:var(--blue)}
+.tp__b{flex:1;min-width:0}
+.tp__t{font-size:14px;font-weight:600;line-height:21px}
+.tp__br{font-size:12px;line-height:19px;color:var(--txt);margin-top:4px}
+.tp__m{display:flex;align-items:center;gap:7px;margin-top:8px;flex-wrap:wrap}
+.tp__sc{flex:0 0 auto;text-align:right;min-width:56px}
+.tp__sc b{display:block;font-size:17px;line-height:22px;color:var(--blue)}
+.tp__sc i{font-style:normal;font-size:11px;color:#909399}
+.tp__src{border-top:1px dashed var(--div);background:#FBFDFE;padding:11px 15px 13px;display:none}
+.tp.is-open .tp__src{display:block}
+.tp__src h4{font-size:12px;font-weight:600;color:var(--txt);margin-bottom:7px}
+.srcline{display:flex;align-items:baseline;gap:8px;font-size:12px;line-height:20px;padding:2px 0}
+.srcline .o{flex:0 0 116px;font-weight:600}
+.srcline .u{color:var(--blue);word-break:break-all}
+.srcline .t{flex:0 0 auto}
+.tier1{background:var(--blue-t);color:var(--blue)}
+.tier2{background:#F3EFFF;color:#6B4EBF}
+.tier3{background:var(--ok-t);color:var(--ok)}
+.tp__x{font-size:12px;color:var(--blue);cursor:pointer;user-select:none}
+/* 溯源角标：让编辑一眼看出这条是怎么被找到的 —— trends / 双轨 / LLM 备选 / 来源扫描 */
+.sig{font-weight:600}
+.sig--trends{background:#E8F8F2;color:#12855F}
+.sig--both{background:#EEF6FF;color:#23A9F6}
+.sig--llm{background:#F3EFFF;color:#6B4EBF}
+.sig--scan{background:#FFF8EB;color:#9A6B00}
+.dropped{opacity:.5}
+.dropped .tp__ck{visibility:hidden}
+.bar{position:sticky;bottom:58px;z-index:30;background:#fff;border:1px solid var(--bd);border-radius:12px;
+  padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;
+  box-shadow:0 -2px 12px rgba(10,31,44,.06)}
+.bar .t{font-size:13px}
+.bar .t b{color:var(--blue)}
+
+/* ═══ ④ 生成中 ═══ */
+.gen{display:flex;flex-direction:column;gap:0}
+.gen__i{display:flex;align-items:center;gap:12px;padding:12px 2px;border-bottom:1px solid #F0F3F5}
+.gen__i:last-child{border-bottom:none}
+.gen__ic{flex:0 0 26px;width:26px;height:26px;border-radius:13px;background:#F0F3F5;color:#909399;
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+.gen__i.is-done .gen__ic{background:var(--ok-t);color:var(--ok)}
+.gen__i.is-run .gen__ic{background:var(--blue-t);color:var(--blue)}
+.gen__n{flex:1;min-width:0}
+.gen__n b{font-size:13px;font-weight:500;display:block}
+.gen__n span{font-size:12px;color:var(--txt)}
+.prog{height:4px;border-radius:2px;background:#EDF1F3;overflow:hidden;margin:4px 0 14px}
+.prog i{display:block;height:100%;background:var(--blue);width:0;transition:width .4s ease}
+
+/* ═══ ⑤ 交付详情 ═══ */
+.dl{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:16px;align-items:start}
+@media(max-width:940px){.dl{grid-template-columns:1fr}}
+.art{font-family:'Noto Sans HK',Poppins,system-ui,sans-serif}
+.art .seg{position:relative;padding:10px 0 10px 62px;border-bottom:1px dashed var(--div)}
+.art .seg:last-child{border-bottom:none}
+.art .tag{position:absolute;left:0;top:12px;width:52px;text-align:center;font-family:ui-monospace,Menlo,monospace;
+  font-size:10px;font-weight:600;color:var(--blue);background:var(--blue-t);border-radius:4px;padding:2px 0}
+.art h3{font-size:16px;line-height:24px;font-weight:700}
+.art h4{font-size:14px;line-height:21px;font-weight:600;margin-bottom:6px;color:var(--ink)}
+.art p{font-size:13px;line-height:22px;color:#3E4C54;margin-bottom:9px}
+.art p:last-child{margin-bottom:0}
+.art .hash{font-size:12px;line-height:20px;color:var(--blue);word-break:break-all}
+.art .brand{font-size:12px;line-height:19px;color:#909399}
+.assets{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.as{border:1px solid var(--div);border-radius:9px;overflow:hidden;background:#fff}
+.as img{width:100%;display:block}
+.as__c{padding:7px 9px}
+.as__c b{display:block;font-family:ui-monospace,Menlo,monospace;font-size:10px;line-height:15px;
+  color:var(--ink);word-break:break-all}
+.as__c span{font-size:11px;color:var(--txt)}
+.as--w{grid-column:1 / -1}
+.idx{font-size:12px;line-height:20px;color:var(--txt)}
+.idx b{color:var(--ink)}
+
+/* ═══ ⑥ Post preview ═══ */
+.posts{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media(max-width:940px){.posts{grid-template-columns:1fr}}
+.pv{background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden}
+.pv__h{display:flex;align-items:center;gap:9px;padding:12px 14px;border-bottom:1px solid var(--div)}
+.pv__h .av{width:32px;height:32px;border-radius:50%;background:var(--ink);color:#fff;font-size:11px;
+  font-weight:600;display:flex;align-items:center;justify-content:center;flex:0 0 32px}
+.pv__h .nm{font-size:13px;font-weight:600;line-height:18px}
+.pv__h .nm span{display:block;font-size:11px;font-weight:400;color:var(--txt)}
+.pv__h .pf{margin-left:auto}
+.pv__cap{padding:12px 14px;font-family:'Noto Sans HK',system-ui,sans-serif;font-size:12.5px;line-height:20px;
+  color:#3E4C54;white-space:pre-wrap;max-height:230px;overflow:auto;border-bottom:1px solid var(--div)}
+.pv__cap.is-full{max-height:none}
+.pv__more{padding:6px 14px;font-size:12px;color:var(--blue);cursor:pointer;border-bottom:1px solid var(--div)}
+/* 图不裁切 —— post 预览要看到真实构图；只限高度，避免一张 4:5 撑满整屏 */
+.pv__media{position:relative;background:#0A1F2C;display:flex;justify-content:center}
+.pv__media img{width:100%;max-height:560px;object-fit:contain;display:block}
+.pv__nav{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;
+  padding:0 8px;pointer-events:none}
+.pv__nav button{pointer-events:auto;width:28px;height:28px;border-radius:14px;border:none;cursor:pointer;
+  background:rgba(255,255,255,.9);color:var(--ink);font-size:13px;line-height:28px}
+.pv__dots{position:absolute;left:0;right:0;bottom:8px;display:flex;justify-content:center;gap:5px}
+.pv__dots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5)}
+.pv__dots i.on{background:#fff}
+.pv__cnt{position:absolute;top:8px;right:8px;background:rgba(10,31,44,.72);color:#fff;font-size:11px;
+  border-radius:11px;padding:2px 9px}
+.pv__f{padding:10px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.recipe{display:flex;gap:4px;flex-wrap:wrap;padding:0 14px 12px}
+.recipe i{font-style:normal;font-family:ui-monospace,Menlo,monospace;font-size:10px;background:var(--blue-t);
+  color:var(--blue);border-radius:4px;padding:2px 6px}
+.recipe i.off{background:#F0F3F5;color:#B0B7BC;text-decoration:line-through}
+
+/* ═══ ⑦ publish list ═══ */
+.fold{display:flex;align-items:center;gap:14px;padding:14px 16px;background:#fff;border:1px solid var(--bd);
+  border-radius:12px;margin-bottom:10px}
+.fold__ic{width:40px;height:40px;border-radius:10px;background:var(--blue-t);color:var(--blue);flex:0 0 40px;
+  display:flex;align-items:center;justify-content:center;font-size:18px}
+.fold__b{flex:1;min-width:0}
+.fold__b b{font-size:14px;font-weight:600;line-height:21px}
+.fold__b p{font-size:12px;line-height:18px;color:#828282;margin-top:3px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--div);margin-bottom:16px}
+.tabs button{border:none;background:none;padding:10px 14px;font:500 13px/20px Poppins,system-ui,sans-serif;
+  color:var(--txt);cursor:pointer;border-bottom:2px solid transparent}
+.tabs button.on{color:var(--blue);border-bottom-color:var(--blue)}
+.plist{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:820px){.plist{grid-template-columns:1fr}}
+
+/* ═══ 底部 flowbar ═══ */
+#flowbar{position:fixed;left:0;right:0;bottom:0;height:58px;z-index:50;background:var(--ink);color:#fff;
+  display:flex;align-items:center;gap:8px;padding:0 16px;overflow-x:auto}
+#flowbar .brand{font-size:12px;font-weight:600;color:var(--blue-l);white-space:nowrap;margin-right:4px}
+#flowbar button{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:15px;
+  background:rgba(255,255,255,.1);color:#fff;font:500 12px/30px Poppins,system-ui,sans-serif;border:none;
+  cursor:pointer;white-space:nowrap}
+#flowbar button:hover{background:rgba(255,255,255,.2)}
+#flowbar button.on{background:var(--blue)}
+#flowbar button i{font-style:normal;opacity:.6;font-size:11px;font-family:ui-monospace,Menlo,monospace}
+#flowbar .arw{opacity:.3;font-size:11px}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <span class="logo">Media<span>Lens</span></span>
+  <span class="badge">🤖 BF Auto Content Agent</span>
+  <span class="chip">agent_id: bf_agent</span>
+  <span class="who">Julie · BusinessFocus</span>
+</div>
+
+<div class="wrap">
+
+<!-- ═════════════ ① 架构 ═════════════ -->
+<section class="screen is-on" data-s="arch">
+  <h1>架构与流程</h1>
+  <p class="sub">一个<b>独立</b>的 BusinessFocus 社媒内容 agent：选题 → 生成初版交付 → 组装 post。不转出、不被转入。</p>
+
+  <div class="arch">
+    <div class="lane">
+      <div class="lane__t">Frontend · MediaLens</div>
+      <div class="lane__b">
+        <div class="box"><b>BF workspace</b><p>选题池、确认生成、Settings</p></div>
+        <div class="box"><b>交付详情页</b><p>01 文章 + 6 张图 + 索引</p></div>
+        <div class="box"><b>Content Publish</b><p>BF agent Draft → 2 条 post</p></div>
+      </div>
+    </div>
+
+    <div class="lane">
+      <div class="lane__t">Agent Layer · medialens_adk</div>
+      <div class="lane__b">
+        <div class="box box--mut"><b>root: medialens_agent</b><p>ad / page / post / trend / sentiment / ad_insights / seo</p></div>
+        <div class="box box--iso"><b>root: bf_agent ★</b><p>BusinessFocus 专属。与左边<b>无 transfer 边</b>（双向）</p></div>
+      </div>
+    </div>
+
+    <div class="lane">
+      <div class="lane__t">bf_agent 专属 skills</div>
+      <div class="lane__b">
+        <div class="box"><b>bf-topic-selection</b><p>建池 20 条 → 排序取 N → 深化 research pack</p></div>
+        <div class="box"><b>bf-content-package</b><p>editor writing skill 移植版 · 7 个产物</p></div>
+        <div class="box"><b>bf-post-assembly</b><p>纯 Python 切段组装 · 不经 LLM</p></div>
+      </div>
+    </div>
+
+    <div class="lane">
+      <div class="lane__t">Backend</div>
+      <div class="lane__b">
+        <div class="box"><b>/bf/* API</b><p>schedules · runs · topics · deliveries · assets · posts</p></div>
+        <div class="box"><b>GCS</b><p>6 张图 signed URL 上传 + 比例验证</p></div>
+        <div class="box"><b>Postgres</b><p>BFSchedule / BFRun / BFTopic / BFDelivery / BFPost</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>三段流程</h2>
+    <div class="hint">每天 10:00 HKT 自动触发一次。</div>
+    <div class="flowline">
+      <div class="stg">
+        <div class="stg__h"><span class="chip chip--b">Stage 1</span><b>选题</b></div>
+        <ul>
+          <li>HK / CN / Global 三层来源并行扫描</li>
+          <li>输出 20 条：标题 + brief + <b>该题全部来源</b></li>
+          <li>剔除规则 → 100 分评分 → 取前 N</li>
+          <li>编辑勾选确认后才进生成</li>
+          <li>选中的再做深：≥3 独立来源 + 原始资料</li>
+        </ul>
+      </div>
+      <div class="stg">
+        <div class="stg__h"><span class="chip chip--b">Stage 2</span><b>生成初版交付</b></div>
+        <ul>
+          <li>先文章，后图片，顺序不可改</li>
+          <li><code>01_文章全文.md</code>（8 区段锚点）</li>
+          <li><code>02</code> 直版封面 4:5</li>
+          <li><code>03</code>–<code>06</code> 四张资讯图 4:5</li>
+          <li><code>07</code> 横版封面 1000×525</li>
+          <li>写入 MediaLens（取代 Drive / Notion）</li>
+        </ul>
+      </div>
+      <div class="stg">
+        <div class="stg__h"><span class="chip chip--b">Stage 3</span><b>组装 post</b></div>
+        <ul>
+          <li>engineering，不用 AI：可重现、零幻觉</li>
+          <li>FB image：caption <code>s1..s7</code> + 图 <code>02</code></li>
+          <li>IG carousel：caption <code>s1..s8</code> + 图 <code>02→06</code></li>
+          <li>缺区段 / 图不齐 / 超字数 → 不建立 post</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>隔离怎么成立：</b>bf_agent 是自己的 root agent，不挂进 <code>medialens_agent.sub_agents</code>。
+    ADK 的 peer transfer 一律经 parent 转发 —— 没有共同 parent，就没有转进来的路径。
+    另外 agent 本身也设了 <code>disallow_transfer_to_parent / to_peers = True</code>，把转出方向也关掉。
+  </div>
+</section>
+
+<!-- ═════════════ ② Settings ═════════════ -->
+<section class="screen" data-s="set">
+  <h1>Settings</h1>
+  <p class="sub">这一组设定就是 <b>BFSchedule</b>，也是 <code>bf-topic-selection</code> 的输入。</p>
+
+  <div class="card">
+    <div class="set__row">
+      <div class="set__lb">Agent name</div>
+      <div class="set__hp">交付文件夹与 post 都会带上这个名字。</div>
+      <input class="in" style="width:260px" value="Businessfocus">
+    </div>
+    <div class="set__row">
+      <div class="set__lb">自动生成时间</div>
+      <div class="set__hp">每天到点自动跑一次：先选题，再逐题生成初版。</div>
+      <div class="row">
+        <span style="font-size:13px;color:var(--txt)">每天</span>
+        <input class="in" type="time" value="10:00" id="setTime">
+        <select class="sel">
+          <option selected>Asia/Hong_Kong (GMT+8)</option>
+          <option>Asia/Taipei (GMT+8)</option>
+          <option>UTC</option>
+        </select>
+      </div>
+    </div>
+    <div class="set__row">
+      <div class="set__lb">每天生成篇数（选题数）</div>
+      <div class="set__hp">先拉一个选题池，再按 BF 口味排序，取前 N 个选题各生成一套交付。</div>
+      <div class="row">
+        <span style="font-size:13px;color:var(--txt)">每天生成</span>
+        <input class="in" type="number" min="1" max="10" value="3" style="width:80px" id="setCount">
+        <span style="font-size:13px;color:var(--txt)">篇 · 从选题池</span>
+        <input class="in" type="number" min="5" max="40" value="20" style="width:80px">
+        <span style="font-size:13px;color:var(--txt)">条里挑</span>
+      </div>
+    </div>
+    <div class="set__row">
+      <div class="set__lb">是否开启自动发布</div>
+      <div class="set__hp">关闭时：生成完停在 <b>BF agent Draft</b>，等编辑审过再发。</div>
+      <div class="row">
+        <span class="sw" id="setSw"></span>
+        <span style="font-size:13px;color:var(--txt)" id="setSwT">已关闭 — 生成后进 Draft，等人审</span>
+      </div>
+      <div class="note" style="margin-top:9px;display:none" id="setWarn">
+        开启后，两条 post 生成完会直接发到已绑定的 Page，中间没有人审这一步；交付会标记 <code>unreviewed</code>。
+      </div>
+    </div>
+    <!-- 三个配置型条目：v1 写死，UI 上以只读形态出现。
+         先把位置和字段占住，日后多一条 BF 品牌线或换模板组时不用改 schema。 -->
+    <div class="set__row is-locked">
+      <div class="set__lb">选题 skill <span class="lock">🔒 v1 固定</span></div>
+      <div class="set__hp">决定「去哪里找选题、怎么建池」。v1 = Trends 优先，ChatGPT 式选题作备选与交叉验证。</div>
+      <div class="ro">
+        <b>bf-topic-selection v1</b>
+        <span>Google Trends (HK / 24h / include-news) → 筛商业财经 → web search 补来源 → 归一化</span>
+        <i>运行模式：trends_first（备选 cross_check / llm_only，v1 不开放）</i>
+      </div>
+    </div>
+
+    <div class="set__row is-locked">
+      <div class="set__lb">Writing skill <span class="lock">🔒 v1 固定</span></div>
+      <div class="set__hp">决定文章怎么写、图怎么生成、交付什么。移植自 editor 现行 writing skill，规则未改。</div>
+      <div class="ro">
+        <b>bf-content-package v1</b>
+        <span>8 区段文章结构 · 港式财经用语 · 股票代码规则 · 7 个固定产物</span>
+        <i>目的地已改为 MediaLens（原 Google Drive + Notion 停用）</i>
+      </div>
+    </div>
+
+    <div class="set__row is-locked">
+      <div class="set__lb">Image cover style <span class="lock">🔒 v1 固定</span></div>
+      <div class="set__hp">决定封面／资讯图／横版海报的版式。三张模板是硬性对照标准，不可自由发挥。</div>
+      <div class="ro">
+        <b>BF media template2</b>
+        <span>封面 4:5（左人右景 + 黄色标语带）· 资讯图 4:5 ×4（底部深蓝 logo 带）· 横版 1000×525</span>
+        <i>主色 #184c83 · 点缀 #fefb09 · 比例不符即重生成</i>
+      </div>
+    </div>
+
+    <div class="set__row">
+      <div class="set__lb">选题的 prompt 设定</div>
+      <div class="set__hp">现在只管<b>揀題口味</b>（优先级、重点范围、剔除规则、周末偏好），不再决定去哪里抓 —— 抓取由上面的选题 skill 负责。ChatGPT 式选题作备选轨时，用的也是这段。</div>
+      <textarea class="ta" id="setPrompt"></textarea>
+      <div class="row" style="margin-top:9px">
+        <button class="btn" id="setReset">恢复默认</button>
+        <span class="chip">来源：HK 5 + CN 5 + Global 2</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════ ③ 选题 ═════════════ -->
+<section class="screen" data-s="topic">
+  <h1>Stage 1 · 今日选题</h1>
+  <p class="sub">
+    run <code>bf-2026-06-25-1000</code> · 2026-06-25 10:00 HKT · 选题池 <b>20</b> 条（此处展开 12 条）·
+    每条可展开看到<b>该选题的全部来源</b><br>
+    建池：<b>Google Trends</b>（HK / 24h / include-news）→ 筛商业财经 → web search 补来源 ·
+    <code>discovery_mode: trends_first</code>
+  </p>
+
+  <div class="card">
+    <div class="row" style="margin-bottom:14px">
+      <span class="chip chip--ok">✓ Trends 正常（50 条 → 财经 14 条）</span>
+      <span class="chip">web search 补来源 HK 5 · CN 5 · Global 2</span>
+      <span class="chip">LLM 备选轨补 6 条</span>
+      <span class="chip">已剔除 6 条</span>
+      <span class="tp__x" id="expandAll" style="margin-left:auto">全部展开来源 ⌄</span>
+    </div>
+    <div id="topicList"></div>
+  </div>
+
+  <div class="bar">
+    <span class="t">已选 <b id="selN">3</b> / 3 条（Settings 每天 3 篇）</span>
+    <span class="chip" id="selNames">Momenta IPO · 港樓按揭 · 聯儲局</span>
+    <button class="btn" style="margin-left:auto">换一批</button>
+    <button class="btn btn--p" id="goGen">确认，开始生成初版 →</button>
+  </div>
+</section>
+
+<!-- ═════════════ ④ 生成中 ═════════════ -->
+<section class="screen" data-s="gen">
+  <h1>Stage 2 · 生成初版交付</h1>
+  <p class="sub">
+    选题 <b>#1 Momenta 擬香港 IPO</b> · 交付文件夹 <code>20260625_Momenta擬港籌9億美元</code> ·
+    顺序固定：先文章，再封面，再 4 张资讯图，最后横版
+  </p>
+
+  <div class="card">
+    <div class="row" style="margin-bottom:6px">
+      <h2 style="margin:0"><span class="n">1</span>产物进度</h2>
+      <span class="chip chip--b" id="genPct" style="margin-left:auto">0 / 7</span>
+    </div>
+    <div class="prog"><i id="genBar"></i></div>
+    <div class="gen" id="genList"></div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn btn--p" id="genRun">▶ 运行</button>
+      <button class="btn" id="genSkip">跳到完成</button>
+      <span class="chip chip--w">比例不符即重生成，不交付接近比例</span>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>为什么文章必须先出：</b>6 张图的标题、数据、人物全部从文章核心角度提炼；
+    图先出就会出现「图上写的和文里写的不是同一件事」。这条顺序在 skill 里是硬性的。
+  </div>
+</section>
+
+<!-- ═════════════ ⑤ 交付详情 ═════════════ -->
+<section class="screen" data-s="delivery">
+  <h1>Stage 2 · 交付详情</h1>
+  <p class="sub">
+    <code>20260625_Momenta擬港籌9億美元</code> · v1 · 7 个产物齐备 ·
+    <span class="chip chip--ok">比例全部验证通过</span>
+  </p>
+
+  <div class="card">
+    <div class="row">
+      <h2 style="margin:0">00_交付索引.md</h2>
+      <span class="chip chip--b" style="margin-left:auto">golden sample</span>
+    </div>
+    <div class="idx" style="margin-top:8px">
+      主題：自動駕駛獨角獸 Momenta 擬香港 IPO　·　角度：<b>下一隻 AI 新股：自動駕駛係咪真係可以賺錢？</b><br>
+      圖片尺寸驗證：直式圖全部 4:5（1080×1350 / 1122×1402）；橫版海報 1000×525。<br>
+      核實來源：HKEXnews · 中國證監會 · Reuters / The Edge · CnEVPost · Bamboo Works · Momenta 官方資料
+    </div>
+  </div>
+
+  <div class="dl">
+    <div class="card">
+      <h2><span class="n">1</span>01_文章全文.md</h2>
+      <div class="hint">8 个区段锚点 = 下游组装 caption 的硬契约。左侧标签就是锚点 id。</div>
+      <div class="art" id="artView"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">2</span>视觉产物 02–07</h2>
+      <div class="hint">这 6 张是 editor 真实交付的原图（从 docx 还原）。02–06 进社媒 post，07 给网站文章 hero。</div>
+      <div class="assets" id="assetGrid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════ ⑥ Post preview ═════════════ -->
+<section class="screen" data-s="posts">
+  <h1>Stage 3 · Post preview</h1>
+  <p class="sub">
+    caption 由 <code>assemble_posts.py</code> 按区段配方拼出来 —— 下面两条的文字是<b>脚本现场切段的结果</b>，不是手写稿。
+  </p>
+
+  <div class="posts" id="postWrap"></div>
+
+  <div class="card" style="margin-top:4px">
+    <h2>组装规则</h2>
+    <div class="hint">唯一差异是 <code>s8</code>（品牌署名 + 免责声明 + follow 行）：IG 带，FB 不带。</div>
+    <div class="idx">
+      <b>FB image post</b> — caption <code>s1+s2+s3+s4+s5+s6+s7</code>，图 = <code>02_直版封面_4x5</code> 单图<br>
+      <b>IG carousel post</b> — caption <code>s1+…+s7+s8</code>，图依序 <code>02 → 03 → 04 → 05 → 06</code>（5 张）<br>
+      <b>07_橫版封面_1000x525</b> 不进社媒 post，它是网站文章 hero
+    </div>
+    <div class="row" style="margin-top:12px">
+      <span class="chip chip--ok">✓ 8 区段齐备</span>
+      <span class="chip chip--ok">✓ 标题固定尾缀</span>
+      <span class="chip chip--ok">✓ carousel 图序 02–06</span>
+      <span class="chip" id="lenChips"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════ ⑦ Content Publish ═════════════ -->
+<section class="screen" data-s="publish">
+  <h1>Content Publish · BF agent Draft</h1>
+  <p class="sub">一次运行 = 一个交付文件夹。<code>auto_publish=false</code>，所以停在这里等审。</p>
+
+  <div class="card">
+    <div class="tabs">
+      <button>Draft (6)</button>
+      <button>Published (24)</button>
+      <button class="on">BF agent Draft (3)</button>
+    </div>
+
+    <div class="fold">
+      <span class="fold__ic">🗂</span>
+      <span class="fold__b">
+        <b>20260625_Momenta擬港籌9億美元</b>
+        <p>2 条 post · 7 个产物 · 12 分钟前生成</p>
+      </span>
+      <span class="chip chip--b">v1</span>
+      <span class="chip chip--w">待审</span>
+      <button class="btn" data-go="posts">打开 ›</button>
+    </div>
+    <div class="fold">
+      <span class="fold__ic">🗂</span>
+      <span class="fold__b">
+        <b>20260625_港樓按揭成交回暖</b>
+        <p>2 条 post · 7 个产物 · 18 分钟前生成</p>
+      </span>
+      <span class="chip chip--b">v1</span>
+      <span class="chip chip--w">待审</span>
+      <button class="btn">打开 ›</button>
+    </div>
+    <div class="fold">
+      <span class="fold__ic">🗂</span>
+      <span class="fold__b">
+        <b>20260625_聯儲局點陣圖與港息</b>
+        <p>2 条 post · 7 个产物 · 25 分钟前生成</p>
+      </span>
+      <span class="chip chip--b">v1</span>
+      <span class="chip chip--w">待审</span>
+      <button class="btn">打开 ›</button>
+    </div>
+
+    <div class="idx" style="margin-top:10px">
+      只显示每个交付的最新版本 · 一条 post 发布后就离开 BF agent Draft，只按状态归到 Published
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>文件夹里的 2 条 post</h2>
+    <div class="hint">这两条就是 Stage 3 组装出来的产物，卡片形态沿用现有 Content Publish。</div>
+    <div class="plist">
+      <div class="as">
+        <div class="pv__h" style="border-bottom:1px solid var(--div)">
+          <span class="av">BF</span>
+          <span class="nm">BusinessFocus<span>Facebook · image</span></span>
+          <span class="chip chip--b pf">AI generated</span>
+        </div>
+        <img src="assets/delivery-20260625-momenta/web/02_直版封面_4x5.jpg" alt="FB post 配图">
+        <div class="as__c"><b>caption s1..s7</b><span>1 张图 · 1,709 字</span></div>
+      </div>
+      <div class="as">
+        <div class="pv__h" style="border-bottom:1px solid var(--div)">
+          <span class="av">BF</span>
+          <span class="nm">businessfocus.io<span>Instagram · carousel</span></span>
+          <span class="chip chip--b pf">AI generated</span>
+        </div>
+        <img src="assets/delivery-20260625-momenta/web/03_資訊圖1_事件拆解_4x5.jpg" alt="IG carousel 配图">
+        <div class="as__c"><b>caption s1..s8</b><span>5 张图 · 1,923 字</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /wrap -->
+
+<div id="flowbar">
+  <span class="brand">BF Auto Content Agent</span>
+  <button data-s="arch"><i>1</i>架构</button>
+  <span class="arw">→</span>
+  <button data-s="set"><i>2</i>Settings</button>
+  <span class="arw">→</span>
+  <button data-s="topic"><i>3</i>选题</button>
+  <span class="arw">→</span>
+  <button data-s="gen"><i>4</i>生成中</button>
+  <span class="arw">→</span>
+  <button data-s="delivery"><i>5</i>交付详情</button>
+  <span class="arw">→</span>
+  <button data-s="posts"><i>6</i>Post preview</button>
+  <span class="arw">→</span>
+  <button data-s="publish"><i>7</i>Content Publish</button>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   BF Auto Content Agent · 原型脚本
+   · caption 不是手写：articleMd 走 parseArticle() 切段，再按配方拼
+     —— 与 agent/skills/bf-post-assembly/scripts/assemble_posts.py 同一套规则
+   ══════════════════════════════════════════════════════════════════ */
+(function(){
+
+/* ── 文章原文（= assets/delivery-20260625-momenta/01_文章全文.md） ───── */
+var ART = [
+'<!-- s1:headline -->',
+'Momenta擬港籌10億美元！中國自動駕駛AI新股光環背後 三年蝕逾92億問盈利何時到？【 @businessfocus.io 】【#BF社會熱話】',
+'',
+'<!-- s2:lede -->',
+'中國自動駕駛獨角獸 Momenta Global Limited 擬在香港 IPO，據報最快下周啟動招股，集資額或約 10 億美元（約合78億港元），估值約 90 億美元（約702億港元）。這宗交易之所以受市場注目，不只是因為通用汽車（美股：GM）、豐田汽車（日股：7203）、上汽集團（A股：600104）、Mercedes-Benz Group（德股：MBG）等車企在股東或合作方名單中出現，更因為它正好踩中港股市場最想聽、也最需要驗證的故事：下一隻 AI 新股，到底是科技重估，還是又一次用未來燒錢？',
+'',
+'<!-- s3:section1 -->',
+'## 車企背書夠豪華 但港股要看的不是名單',
+'',
+'Momenta 的賣點並不難包裝。公司主打自動駕駛及高階輔助駕駛方案，招股文件披露，2025 年收入增至人民幣 24.13 億元，毛利率升至 71.6%；截至 2025 年底，其量產車方案安裝量超過 68 萬套，城市 NOA 方案安裝量超過 65 萬套。對港股投資者而言，這些數字意味著 Momenta 並非停留在實驗室，而是已經進入車廠供應鏈。',
+'',
+'但問題是，港股近年對「有大股東、有大客戶、有 AI 故事」的新股已經不再盲目給溢價。車企背書可以證明技術卓越，卻不能直接證明盈利有出口。自動駕駛軟件要真正賺大錢，關鍵不只是上車數量，而是單車收費、授權收入可否持續放大，以及車廠會否在價格戰下把供應商利潤壓到最薄。',
+'',
+'<!-- s4:section2 -->',
+'## 收入增長快 虧損曲線仍是最大陰影',
+'',
+'Momenta 的財務數據同時提供兩個截然不同的敘事。一邊是收入由 2023 年人民幣 7.43 億元，升至 2025 年人民幣 24.13 億元，三年複合增速超過 80%；授權收入亦由 2023 年人民幣 2,300 萬元，大幅升至 2025 年人民幣 9.68 億元，反映軟件授權模式正在抬頭。',
+'',
+'另一邊，是虧損仍然沉重。招股文件披露，Momenta 2023 至 2025 年年度虧損分別為人民幣 25.70 億元、32.06 億元及 34.58 億元，三年合計逾人民幣 92 億元。公司非 IFRS 經調整虧損已收窄至 2025 年人民幣 3.03 億元，這是好消息；但市場真正要問的是，這種改善究竟來自商業模式成熟，還是會被下一輪研發、海外測試及 Robotaxi 擴張再次吞噬。',
+'',
+'<!-- s5:section3 -->',
+'## Robotaxi 是想像空間 也是估值風險',
+'',
+'Momenta 的長線故事，是「一個飛輪、兩條腿」：用量產車 ADAS 帶來收入和真實道路數據，再反哺 Robotaxi 技術。公司與 Uber（美股：UBER）計劃於 2026 年在慕尼黑測試 L4 Robotaxi，亦與 Mercedes-Benz 及 Lumo 在阿布扎比推進豪華 Robotaxi 服務，並透過 Grab（美股：GRAB）切入東南亞。對資本市場而言，這是比單純賣車載軟件更性感的全球化敘事。',
+'',
+'然而，Robotaxi 的資本開支、監管牌照、道路安全責任、車隊營運成本，全部都是慢變現、重投入的現實問題。Momenta 若以 AI 基建及自動駕駛平台估值上市，投資者自然會用未來十年的想像去定價；但若未來收入仍主要來自車企量產方案，估值又可能被拉回汽車供應商邏輯。這正是今次 IPO 最核心的矛盾。',
+'',
+'<!-- s6:closing -->',
+'香港 IPO 市場今年明顯回暖，Reuters 引述 LSEG 初步數據指，2026 年上半年香港 IPO 融資額達 216 億美元，按年升 51%。Momenta 若成功上市，固然可為港股補上一個「AI + 智能汽車 + Robotaxi」大型樣本；但它更像是一場市場測試：投資者究竟願意為自動駕駛的未來買單，還是只願意為看得見現金流的軟件收入付款。下一隻 AI 新股能否成為真正長線贏家，不在於故事有幾震撼，而在於它何時證明自動駕駛不只是會開車，還真的會賺錢。',
+'',
+'<!-- s7:hashtags -->',
+'#BusinessFocus #BF #Insight #Momenta #香港IPO #自動駕駛 #Robotaxi #AI新股',
+'',
+'<!-- s8:brandblock -->',
+'Text by BusinessFocus Editorial',
+'',
+'免責聲明：本網頁一切言論並不構成要約、招攬或邀請、誘使、任何不論種類或形式之申述或訂立任何建議及推薦，讀者務請運用個人獨立思考能力自行作出投資決定，如因相關言論招致損失，概與本公司無涉。投資涉及風險，證券價格可升可跌。',
+'',
+'———————————————',
+'',
+'📣 請即 follow @businessfocus.io 發掘更多商業智慧 投資靈感 及 創業故事！',
+'<!-- /s8 -->'
+].join('\n');
+
+/* ── 与 assemble_posts.py 同规则的切段 ───────────────────────────── */
+var SECTIONS = ['s1','s2','s3','s4','s5','s6','s7','s8'];
+var FB_RECIPE = ['s1','s2','s3','s4','s5','s6','s7'];
+var IG_RECIPE = ['s1','s2','s3','s4','s5','s6','s7','s8'];
+
+function parseArticle(md){
+  var re = /<!--\s*(s[1-8])(?::[a-zA-Z0-9_]+)?\s*-->/g, m, hits = [];
+  while((m = re.exec(md))){ hits.push({ id:m[1], from:m.index, to:m.index + m[0].length }); }
+  var end = /<!--\s*\/s8\s*-->/.exec(md);
+  var tail = end ? end.index : md.length;
+  var out = {};
+  hits.forEach(function(h, i){
+    out[h.id] = md.slice(h.to, (i + 1 < hits.length) ? hits[i + 1].from : tail).trim();
+  });
+  return out;
+}
+function demote(t){ return t.replace(/^#{1,6}\s+/gm, ''); }
+function buildCaption(sec, recipe){
+  return recipe.map(function(k){ return demote(sec[k] || '').trim(); })
+               .filter(Boolean).join('\n\n');
+}
+var SEC = parseArticle(ART);
+var FB_CAP = buildCaption(SEC, FB_RECIPE);
+var IG_CAP = buildCaption(SEC, IG_RECIPE);
+
+/* ── 选题池 ──────────────────────────────────────────────────────── */
+var TOPICS = [
+  { sel:true, sig:{k:'trends', t:'Trends ↑ +340% · 24h · #7', q:'Momenta / Momenta IPO / 自動駕駛新股'},
+    title:'Momenta 擬香港 IPO 集資約 10 億美元：AI 新股光環下三年蝕逾 92 億',
+    brief:'自動駕駛獨角獸據報最快下周啟動招股，估值約 90 億美元，通用、豐田、上汽在股東或合作名單。收入三年複合增速逾 80%，但同期累虧逾人民幣 92 億。香港投資者要問的是自動駕駛何時真正賺錢。',
+    cat:'ipo', score:88, why:'招股文件今早上載，估值區間有實數，港股投資者可直接落單。',
+    src:[
+      {o:'HKEXnews', t:3, u:'https://www1.hkexnews.hk/… Post Hearing Information Pack'},
+      {o:'中國證監會', t:3, u:'http://www.csrc.gov.cn/… 境外發行上市備案通知書'},
+      {o:'Reuters', t:2, u:'https://www.reuters.com/markets/deals/momenta-hong-kong-ipo-…'},
+      {o:'CnEVPost', t:2, u:'https://cnevpost.com/2026/06/25/momenta-hkex-passes-listing-hearing/'},
+      {o:'華爾街見聞', t:1, u:'https://wallstreetcn.com/articles/… Momenta 通過聆訊'},
+      {o:'36Kr', t:1, u:'https://36kr.com/p/… 自動駕駛獨角獸赴港'}
+    ]},
+  { sel:true, sig:{k:'trends', t:'Trends ↑ +180% · 24h · #12', q:'二手成交 / 按揭'},
+    title:'港樓二手成交連續三週回升：按揭審批放寬有幾真？',
+    brief:'土地註冊處數據顯示二手成交連升三週，同期銀行按揭審批時間縮短。但成交回暖集中在指標盤與細價樓，中價市場仍靠業主讓價成交，回暖成色要看下月供樓負擔比率。',
+    cat:'hk_property', score:81, why:'港人最切身的一條，數據可核，且與利率走向直接掛。',
+    src:[
+      {o:'土地註冊處', t:3, u:'https://www.landreg.gov.hk/… 月度統計'},
+      {o:'HKMA', t:3, u:'https://www.hkma.gov.hk/… 住宅按揭統計'},
+      {o:'HKET', t:1, u:'https://ps.hket.com/article/… 二手成交連升'},
+      {o:'HK01', t:1, u:'https://www.hk01.com/… 樓市成交'},
+      {o:'信報', t:1, u:'https://www1.hkej.com/… 按揭審批'}
+    ]},
+  { sel:true, sig:{k:'both', t:'Trends #21 · LLM 軌同時命中', q:'點陣圖 / FOMC'},
+    title:'聯儲局點陣圖轉鷹：港息跟不跟？三種情境對港股的實際影響',
+    brief:'最新點陣圖顯示年內降息預期收窄，一個月 HIBOR 已見反應。對港股的傳導不只在估值，還在按揭與銀行淨息差；市場正在重新定價高息股與地產股的相對吸引力。',
+    cat:'global_markets', score:79, why:'對香港投資者有直接傳導路徑，不是純美股新聞。',
+    src:[
+      {o:'Federal Reserve', t:3, u:'https://www.federalreserve.gov/monetarypolicy/… FOMC statement'},
+      {o:'Bloomberg', t:2, u:'https://www.bloomberg.com/news/articles/… dot plot hawkish'},
+      {o:'金十', t:1, u:'https://www.jin10.com/… 點陣圖'},
+      {o:'Now 財經', t:1, u:'https://finance.now.com/news/… HIBOR'},
+      {o:'Yahoo Finance HK', t:1, u:'https://hk.finance.yahoo.com/news/… 港息'}
+    ]},
+  { sig:{k:'trends', t:'Trends ↑ +95% · 24h · #33', q:'AI 晶片 / 國產替代'},
+    title:'內地 AI 晶片新規落地：國產替代由「政策題」變「訂單題」',
+    brief:'新規對數據中心採購提出國產比例要求，市場焦點由概念轉向實際訂單與交付能力。港股相關產業鏈已先行反應，但交付與良率仍是未解問題。',
+    cat:'tech_ai', score:74,
+    src:[
+      {o:'IT之家', t:1, u:'https://www.ithome.com/0/… AI 晶片新規'},
+      {o:'虎嗅', t:1, u:'https://www.huxiu.com/article/… 國產替代'},
+      {o:'TechCrunch', t:2, u:'https://techcrunch.com/2026/06/… china ai chip rules'}
+    ]},
+  { sig:{k:'trends', t:'Trends ↑ +220% · 24h · #9', q:'金價 / 黃金'},
+    title:'黃金再上新高：央行買盤與 ETF 資金這次不同步',
+    brief:'金價創新高，但 ETF 持倉未同步上升，買盤主要來自央行。這個結構意味著這一輪升勢對零售資金的敏感度較低，回調節奏也會不同。',
+    cat:'commodities_crypto', score:71,
+    src:[
+      {o:'World Gold Council', t:3, u:'https://www.gold.org/goldhub/… central bank demand'},
+      {o:'Bloomberg', t:2, u:'https://www.bloomberg.com/news/… gold record'},
+      {o:'金十', t:1, u:'https://www.jin10.com/… 黃金'}
+    ]},
+  { sig:{k:'scan', t:'來源掃描 · HKEXnews 公告', q:'—'},
+    title:'新股熱：本月第 4 隻 A+H 上市，配售水位說明了什麼',
+    brief:'月內第四隻 A+H 掛牌，國際配售比例與基石投資者名單顯示定價權正在轉移。抽新股的散戶要留意首日流通盤佔比。',
+    cat:'ipo', score:68,
+    src:[
+      {o:'HKEXnews', t:3, u:'https://www1.hkexnews.hk/… 配售結果公告'},
+      {o:'富途/信報', t:1, u:'https://www1.hkej.com/… A+H 新股'}
+    ]},
+  { sig:{k:'llm', t:'LLM 備選軌 · Trends 未命中', q:'—'},
+    title:'SCMP：香港虛擬資產牌照第二批審批進度落後市場預期',
+    brief:'第二批牌照審批進度慢於市場預期，交易所與券商的產品排期受影響。監管節奏本身就是這條賽道的最大變數。',
+    cat:'hk_econ_policy', score:66,
+    src:[
+      {o:'SFC', t:3, u:'https://www.sfc.hk/… VATP licence list'},
+      {o:'SCMP', t:1, u:'https://www.scmp.com/business/… crypto licence'}
+    ]},
+  { title:'內地新能源車價格戰再起：這次壓的是供應商而不是車主',
+    brief:'新一輪降價的成本主要由供應鏈承擔，零部件廠的應收帳期同步拉長。對港股汽車零部件板塊是實質壓力。',
+    cat:'tech_ai', score:64,
+    src:[
+      {o:'36Kr', t:1, u:'https://36kr.com/p/… 價格戰'},
+      {o:'CnEVPost', t:2, u:'https://cnevpost.com/… price war'}
+    ]},
+  { title:'港股半日成交縮至近月低位，資金明顯轉向防守',
+    brief:'成交縮量配合防守型板塊跑贏，但公用股估值上限同樣受壓。縮量不等於見底。',
+    cat:'hk_stocks', score:52, dropped:'noise' },
+  { title:'某科技股早盤升 6.8% 創兩個月新高',
+    brief:'單日升幅，無成因、無數據支撐。',
+    cat:'hk_stocks', score:0, dropped:'pure_price_move' },
+  { title:'外媒：歐洲某零售集團更換 CFO',
+    brief:'與香港讀者關聯太弱，無傳導路徑。',
+    cat:'global_markets', score:0, dropped:'weak_hk_link' },
+  { title:'Momenta 通過港交所聆訊（與 #1 同一事件）',
+    brief:'與已選中的 #1 高度重疊，同一天不出兩篇同一件事。',
+    cat:'ipo', score:0, dropped:'overlap_with_selected' }
+];
+var DROP_LABEL = {
+  noise:'剔除 · 市場噪音', pure_price_move:'剔除 · 純股價波動',
+  weak_hk_link:'剔除 · 香港關聯弱', overlap_with_selected:'剔除 · 與已選重疊'
+};
+
+/* ── 交付产物 ─────────────────────────────────────────────────────── */
+var DIR = 'assets/delivery-20260625-momenta/web/';
+var ASSETS = [
+  { f:'01_文章全文.md',                 use:'文章全文 → caption 来源', ratio:'—',        img:null },
+  { f:'02_直版封面_4x5.png',            use:'FB 单图 / IG 第 1 张',    ratio:'4:5 ✓',   img:'02_直版封面_4x5.jpg' },
+  { f:'03_資訊圖1_事件拆解_4x5.png',     use:'IG 第 2 张',              ratio:'4:5 ✓',   img:'03_資訊圖1_事件拆解_4x5.jpg' },
+  { f:'04_資訊圖2_痛點分析_4x5.png',     use:'IG 第 3 张',              ratio:'4:5 ✓',   img:'04_資訊圖2_痛點分析_4x5.jpg' },
+  { f:'05_資訊圖3_解法重點_4x5.png',     use:'IG 第 4 张 · 盈利路线',   ratio:'4:5 ✓',   img:'05_資訊圖3_解法重點_4x5.jpg' },
+  { f:'06_資訊圖4_CTA_4x5.png',         use:'IG 第 5 张 · CTA',        ratio:'4:5 ✓',   img:'06_資訊圖4_CTA_4x5.jpg' },
+  { f:'07_橫版封面_1000x525.png',       use:'网站文章 hero（不进 post）', ratio:'1000×525 ✓', img:'07_橫版封面_1000x525.jpg' }
+];
+var CAROUSEL = ASSETS.slice(1, 6).map(function(a){ return DIR + a.img; });
+
+/* ── 默认选题 prompt ─────────────────────────────────────────────── */
+var PROMPT = [
+'目標讀者是香港人。你係替財經網站揀題，第一優先唔係「全球最大新聞」，而係香港讀者會關心、會點入去、而且值得報道嘅新聞。',
+'',
+'【每日量級】每日整理約 20 條財經新聞，輸出標題 + brief + 該題全部來源。',
+'',
+'【來源要綜合，不單看一家】',
+'· 香港本地：SCMP (scmp.com)、HK01 (hk01.com)、信報 HKEJ (hkej.com)、Yahoo Finance HK (hk.finance.yahoo.com)、Now 財經 (finance.now.com)',
+'· 內地：36Kr (36kr.com)、虎嗅 (huxiu.com)、金十 (jin10.com)、華爾街見聞 (wallstreetcn.com)、IT之家 (ithome.com)',
+'· 國際：TechCrunch (techcrunch.com)、Bloomberg (bloomberg.com)',
+'再搭配原始資料（公司公告、監管文件、官方數據）。',
+'',
+'【揀題核心排序】即時性 > 重大影響 > 有實質數據 > 香港關聯 > 高討論度 / 高點擊潛力。',
+'',
+'【重點財經範圍】港股及大型上市公司業績；香港樓市、按揭、銀行存款及利率；IPO / 新股 / 配股 / 集資；中國宏觀政策及內地市場對香港的影響；美股、聯儲局及全球市場（以對香港投資者有直接影響為主）；科技、AI、晶片、新能源車；黃金、加密貨幣；香港本地經濟數據、政策及監管。',
+'',
+'【要剔除嘅題目】純粹股價日常波動、一般市場噪音、重複新聞、缺乏實質內容、影響有限，以及與香港讀者關聯太弱嘅消息。',
+'',
+'【突發財經題判斷角度】最好可以快速回答「發生咩事 → 資金 / 市場點解咁走 → 關鍵技術位 / 風險係邊」。',
+'',
+'【週末另一套偏好】減少高變數、很快過時嘅突發題；優先可延伸成懶人包、觀點、生活化內容、週末仍有討論度嘅題材。'
+].join('\n');
+
+/* ══ 渲染 ══════════════════════════════════════════════════════════ */
+
+/* ② Settings */
+document.getElementById('setPrompt').value = PROMPT;
+document.getElementById('setReset').onclick = function(){
+  document.getElementById('setPrompt').value = PROMPT;
+};
+var auto = false;
+var sw = document.getElementById('setSw');
+sw.onclick = function(){
+  auto = !auto;
+  sw.classList.toggle('is-on', auto);
+  document.getElementById('setSwT').textContent = auto
+    ? '已开启 — 生成后直接发布，不经人审'
+    : '已关闭 — 生成后进 Draft，等人审';
+  document.getElementById('setWarn').style.display = auto ? 'block' : 'none';
+};
+
+/* ③ 选题 */
+var listEl = document.getElementById('topicList');
+listEl.innerHTML = TOPICS.map(function(t, i){
+  var srcs = (t.src || []).map(function(s){
+    return '<div class="srcline"><span class="o">' + s.o + '</span>'
+      + '<span class="chip t tier' + s.t + '">Tier ' + s.t + '</span>'
+      + '<span class="u">' + s.u + '</span></div>';
+  }).join('');
+  return '<div class="tp' + (t.sel ? ' is-sel' : '') + (t.dropped ? ' dropped' : '') + '" data-i="' + i + '">'
+    + '<div class="tp__h">'
+      + '<span class="tp__ck">✓</span>'
+      + '<span class="tp__b">'
+        + '<span class="tp__t">' + (i + 1) + '. ' + t.title + '</span>'
+        + '<div class="tp__br">' + t.brief + '</div>'
+        + '<div class="tp__m">'
+          + '<span class="chip">' + t.cat + '</span>'
+          + (t.sig ? '<span class="chip sig sig--' + t.sig.k + '" title="trend queries: '
+              + t.sig.q + '">' + t.sig.t + '</span>' : '')
+          + (t.dropped ? '<span class="chip chip--w">' + DROP_LABEL[t.dropped] + '</span>' : '')
+          + (t.why ? '<span class="chip chip--ok">' + t.why + '</span>' : '')
+          + (t.src ? '<span class="tp__x" data-x="' + i + '">来源 ' + t.src.length + ' 个 ⌄</span>' : '')
+        + '</div>'
+      + '</span>'
+      + '<span class="tp__sc"><b>' + (t.score || '—') + '</b><i>score</i></span>'
+    + '</div>'
+    + (t.src ? '<div class="tp__src"><h4>该选题的来源（Tier 3 = 原始资料）</h4>' + srcs + '</div>' : '')
+  + '</div>';
+}).join('');
+
+function syncSel(){
+  var picked = TOPICS.filter(function(t){ return t.sel; });
+  document.getElementById('selN').textContent = picked.length;
+  document.getElementById('selNames').textContent = picked.length
+    ? picked.map(function(t){ return t.title.slice(0, 12) + '…'; }).join(' · ')
+    : '未选';
+  document.getElementById('goGen').disabled = picked.length === 0;
+}
+listEl.addEventListener('click', function(e){
+  var x = e.target.closest('[data-x]');
+  if(x){ e.stopPropagation(); x.closest('.tp').classList.toggle('is-open'); return; }
+  var tp = e.target.closest('.tp');
+  if(!tp) return;
+  var t = TOPICS[+tp.dataset.i];
+  if(t.dropped) return;
+  t.sel = !t.sel;
+  tp.classList.toggle('is-sel', t.sel);
+  syncSel();
+});
+document.getElementById('expandAll').onclick = function(){
+  var open = listEl.querySelectorAll('.tp.is-open').length === 0;
+  listEl.querySelectorAll('.tp').forEach(function(el){ el.classList.toggle('is-open', open); });
+  this.textContent = open ? '全部收起来源 ⌃' : '全部展开来源 ⌄';
+};
+syncSel();
+
+/* ④ 生成中 */
+var STEPS = [
+  { n:'读 research pack', d:'≥3 独立来源 · HKEXnews + 證監會 为 Tier 3' },
+  { n:'01_文章全文.md',   d:'8 区段结构 · 繁体 · 1,690 字 · 写入区段锚点' },
+  { n:'02_直版封面_4x5.png',        d:'对照 (Chant)BF media template2.jpg · strict 4:5 → 1122×1402 ✓' },
+  { n:'03_資訊圖1_事件拆解_4x5.png', d:'strict 4:5 → 1080×1350 ✓' },
+  { n:'04_資訊圖2_痛點分析_4x5.png', d:'strict 4:5 → 1080×1350 ✓' },
+  { n:'05_資訊圖3_解法重點_4x5.png', d:'strict 4:5 → 1080×1350 ✓（首次 1080×1080，已重生成）' },
+  { n:'06_資訊圖4_CTA_4x5.png',     d:'strict 4:5 → 1080×1350 ✓' },
+  { n:'07_橫版封面_1000x525.png',   d:'对照 AI投資懶人包.jpg · strict 1000×525 ✓' },
+  { n:'写入 MediaLens',   d:'建 BFDelivery + 7 个 asset（GCS signed URL）· 比例逐张验证' },
+  { n:'bf-post-assembly', d:'切段组装 FB image + IG carousel' }
+];
+var genEl = document.getElementById('genList');
+genEl.innerHTML = STEPS.map(function(s, i){
+  return '<div class="gen__i" data-g="' + i + '">'
+    + '<span class="gen__ic">' + (i + 1) + '</span>'
+    + '<span class="gen__n"><b>' + s.n + '</b><span>' + s.d + '</span></span>'
+    + '<span class="chip" data-st="' + i + '">等待</span>'
+  + '</div>';
+}).join('');
+
+var timer = null;
+function setStep(i, state){
+  var row = genEl.querySelector('[data-g="' + i + '"]');
+  var tag = genEl.querySelector('[data-st="' + i + '"]');
+  if(!row) return;
+  row.classList.toggle('is-run',  state === 'run');
+  row.classList.toggle('is-done', state === 'done');
+  tag.className = 'chip ' + (state === 'done' ? 'chip--ok' : state === 'run' ? 'chip--b' : '');
+  tag.textContent = state === 'done' ? '完成 ✓' : state === 'run' ? '生成中…' : '等待';
+  /* 图标回位：不是 done 就把序号写回去，否则重跑一次会留着上一轮的 ✓ */
+  row.querySelector('.gen__ic').textContent = (state === 'done') ? '✓' : String(i + 1);
+}
+function paintProg(done){
+  var artifacts = Math.min(done, 8) - 1;          // 7 个产物（第 2..8 步）
+  if(artifacts < 0) artifacts = 0;
+  document.getElementById('genPct').textContent = artifacts + ' / 7';
+  document.getElementById('genBar').style.width = (done / STEPS.length * 100) + '%';
+}
+function runGen(instant){
+  clearInterval(timer);
+  var i = 0;
+  if(instant){
+    STEPS.forEach(function(_, k){ setStep(k, 'done'); });
+    paintProg(STEPS.length);
+    return;
+  }
+  STEPS.forEach(function(_, k){ setStep(k, 'wait'); });
+  paintProg(0);
+  setStep(0, 'run');
+  timer = setInterval(function(){
+    setStep(i, 'done');
+    paintProg(i + 1);
+    i++;
+    if(i >= STEPS.length){ clearInterval(timer); return; }
+    setStep(i, 'run');
+  }, 620);
+}
+document.getElementById('genRun').onclick  = function(){ runGen(false); };
+document.getElementById('genSkip').onclick = function(){ runGen(true); };
+runGen(true);
+
+/* ⑤ 交付详情 */
+var SEG_LABEL = {
+  s1:'s1', s2:'s2', s3:'s3', s4:'s4', s5:'s5', s6:'s6', s7:'s7', s8:'s8'
+};
+function renderSeg(id){
+  var raw = SEC[id] || '';
+  var lines = raw.split('\n').filter(function(l){ return l.trim(); });
+  var html = lines.map(function(l){
+    if(/^#{1,6}\s+/.test(l)) return '<h4>' + l.replace(/^#{1,6}\s+/, '') + '</h4>';
+    if(id === 's1') return '<h3>' + l + '</h3>';
+    if(id === 's7') return '<div class="hash">' + l + '</div>';
+    if(id === 's8') return '<div class="brand">' + l + '</div>';
+    return '<p>' + l + '</p>';
+  }).join('');
+  return '<div class="seg"><span class="tag">' + SEG_LABEL[id] + '</span>' + html + '</div>';
+}
+document.getElementById('artView').innerHTML = SECTIONS.map(renderSeg).join('');
+
+document.getElementById('assetGrid').innerHTML = ASSETS.map(function(a){
+  if(!a.img){
+    return '<div class="as as--w"><div class="as__c" style="padding:11px 12px">'
+      + '<b>' + a.f + '</b><span>' + a.use + ' · 8 区段锚点齐备</span></div></div>';
+  }
+  var wide = a.f.indexOf('橫版') > -1;
+  return '<div class="as' + (wide ? ' as--w' : '') + '">'
+    + '<img src="' + DIR + a.img + '" alt="' + a.f + '" loading="lazy">'
+    + '<div class="as__c"><b>' + a.f + '</b>'
+    + '<span>' + a.use + ' · <span style="color:var(--ok)">' + a.ratio + '</span></span></div>'
+  + '</div>';
+}).join('');
+
+/* ⑥ Post preview */
+var ci = 0;
+function postHTML(){
+  return ''
+  /* FB */
+  + '<div class="pv">'
+    + '<div class="pv__h"><span class="av">BF</span>'
+      + '<span class="nm">BusinessFocus<span>Facebook Page · image post</span></span>'
+      + '<span class="chip chip--b pf">AI generated</span></div>'
+    + '<div class="pv__cap" id="fbCap">' + esc(FB_CAP) + '</div>'
+    + '<div class="pv__more" data-more="fbCap">展开全文 ⌄</div>'
+    + '<div class="pv__media"><img src="' + DIR + ASSETS[1].img + '" alt="FB 单图"></div>'
+    + '<div class="pv__f"><span class="chip">單圖</span>'
+      + '<span class="chip">02_直版封面_4x5</span>'
+      + '<span class="chip">' + FB_CAP.length + ' 字</span></div>'
+    + '<div class="recipe">'
+      + FB_RECIPE.map(function(s){ return '<i>' + s + '</i>'; }).join('')
+      + '<i class="off">s8</i>'
+    + '</div>'
+  + '</div>'
+  /* IG */
+  + '<div class="pv">'
+    + '<div class="pv__h"><span class="av">BF</span>'
+      + '<span class="nm">businessfocus.io<span>Instagram · carousel post</span></span>'
+      + '<span class="chip chip--b pf">AI generated</span></div>'
+    + '<div class="pv__cap" id="igCap">' + esc(IG_CAP) + '</div>'
+    + '<div class="pv__more" data-more="igCap">展开全文 ⌄</div>'
+    + '<div class="pv__media">'
+      + '<img src="' + CAROUSEL[0] + '" id="cImg" alt="IG carousel">'
+      + '<span class="pv__cnt" id="cCnt">1 / 5</span>'
+      + '<div class="pv__nav"><button data-c="-1">‹</button><button data-c="1">›</button></div>'
+      + '<div class="pv__dots" id="cDots"></div>'
+    + '</div>'
+    + '<div class="pv__f"><span class="chip">Carousel · 5 張</span>'
+      + '<span class="chip">02 → 03 → 04 → 05 → 06</span>'
+      + '<span class="chip">' + IG_CAP.length + ' 字</span></div>'
+    + '<div class="recipe">'
+      + IG_RECIPE.map(function(s){ return '<i>' + s + '</i>'; }).join('')
+    + '</div>'
+  + '</div>';
+}
+function esc(s){
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+var postWrap = document.getElementById('postWrap');
+postWrap.innerHTML = postHTML();
+document.getElementById('lenChips').textContent =
+  'FB ' + FB_CAP.length + ' 字 / IG ' + IG_CAP.length + ' 字（IG 上限 2200）';
+
+function paintCarousel(){
+  document.getElementById('cImg').src = CAROUSEL[ci];
+  document.getElementById('cCnt').textContent = (ci + 1) + ' / ' + CAROUSEL.length;
+  document.getElementById('cDots').innerHTML = CAROUSEL.map(function(_, i){
+    return '<i class="' + (i === ci ? 'on' : '') + '"></i>';
+  }).join('');
+}
+postWrap.addEventListener('click', function(e){
+  var c = e.target.closest('[data-c]');
+  if(c){
+    ci = (ci + (+c.dataset.c) + CAROUSEL.length) % CAROUSEL.length;
+    paintCarousel();
+    return;
+  }
+  var m = e.target.closest('[data-more]');
+  if(m){
+    var cap = document.getElementById(m.dataset.more);
+    var full = cap.classList.toggle('is-full');
+    m.textContent = full ? '收起 ⌃' : '展开全文 ⌄';
+  }
+});
+paintCarousel();
+
+/* ══ 屏幕切换 ══════════════════════════════════════════════════════ */
+function show(s){
+  document.querySelectorAll('.screen').forEach(function(el){
+    el.classList.toggle('is-on', el.dataset.s === s);
+  });
+  document.querySelectorAll('#flowbar button').forEach(function(b){
+    b.classList.toggle('on', b.dataset.s === s);
+  });
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('#flowbar button').forEach(function(b){
+  b.onclick = function(){ show(b.dataset.s); };
+});
+document.getElementById('goGen').onclick = function(){ show('gen'); runGen(false); };
+document.body.addEventListener('click', function(e){
+  var g = e.target.closest('[data-go]');
+  if(g) show(g.dataset.go);
+});
+show('arch');
+})();
+</script>
+</body>
+</html>
