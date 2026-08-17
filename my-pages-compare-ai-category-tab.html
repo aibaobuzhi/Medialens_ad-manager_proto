@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <!-- MY PAGES — COMPARE · AI CATEGORY TAB — style/tokens/section order aligned to production AI Category tab -->
+<!-- 5-page compare. Palette taken from production compare pages:
+     pages/organization/_orgId/{fb,ig}/{my-pages,competitor-analysis}/compare/{overview,page}.vue
+     const colorPalette = ['#0C8CD8', '#F9A501', '#7EB235', '#2E95A7', '#D63B67'] -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -10,7 +13,6 @@
 <style>
 :root{
   --ac-brand:#23A9F6;--ac-brand-tint:#EEF6FF;
-  --p1:#23A9F6;--p2:#F5A623;
   --ac-title:#0A1F2C;--ac-text:#102532;--ac-muted:#707070;--ac-secondary:#828282;
   --ac-border:#D9E3E6;--ac-divider:#E8EEF0;--ac-bg:#F7F7F7;
   --ac-pill-track:#EEF2F5;--ac-pill-active-bg:#FFFFFF;
@@ -40,7 +42,7 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
 .nav-item.active{background:var(--ac-brand-tint);color:var(--ac-brand);border-left-color:var(--ac-brand);font-weight:600;}
 .content{flex:1;min-width:0;}
 
-.pg-head{display:flex;align-items:center;padding:20px 26px 0;gap:12px;flex-wrap:wrap;}
+.pg-head{display:flex;align-items:flex-start;padding:20px 26px 0;gap:12px;flex-wrap:wrap;}
 .pg-title{font-size:18px;font-weight:700;color:var(--ac-title);}
 .pg-meta{font-size:11.5px;color:var(--ac-secondary);margin-top:1px;}
 
@@ -51,10 +53,11 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
 .mode-btn{background:transparent;border:none;border-radius:8px;color:var(--ac-muted);cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:500;padding:6px 14px;white-space:nowrap;}
 .mode-btn.active{background:var(--ac-pill-active-bg);box-shadow:0 1px 3px rgba(0,0,0,.08);color:var(--ac-brand);font-weight:600;}
 
-.page-chips{margin-left:auto;display:flex;align-items:center;gap:10px;}
-.page-chip{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;background:#fff;border:1px solid var(--ac-border);border-radius:20px;padding:5px 12px 5px 6px;}
-.chip-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.vs{font-size:11px;color:var(--ac-secondary);font-weight:600;}
+/* 5 pages — chips wrap instead of a single "A vs B" line */
+.page-chips{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;max-width:660px;}
+.page-chip{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;background:#fff;border:1px solid var(--ac-border);border-radius:20px;padding:5px 12px 5px 6px;max-width:230px;}
+.page-chip-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.chip-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-left:4px;}
 
 .subtabs-bar{padding:12px 26px 0;border-bottom:1px solid var(--ac-divider);display:flex;gap:0;overflow-x:auto;}
 .subtab{padding:9px 16px;font-size:13px;color:var(--ac-muted);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;font-weight:500;}
@@ -70,13 +73,11 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
 .lens-btn{background:transparent;border:none;border-radius:8px;color:var(--ac-muted);cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;padding:8px 18px;transition:all .2s ease;white-space:nowrap;}
 .lens-btn.active{background:var(--ac-pill-active-bg);box-shadow:0 1px 3px rgba(0,0,0,.08);color:var(--ac-brand);font-weight:600;}
 
-/* Metric selector — options depend on mode (My Page vs Competitors); only affects cards 1 & 5 */
+/* Metric selector — options depend on mode (My Page vs Competitors); drives cards 1 & 5 */
 .metric-select-wrap{display:flex;align-items:center;gap:8px;}
 .metric-select-label{font-size:11px;color:var(--ac-secondary);font-weight:600;}
 
 .section{margin-bottom:var(--ac-card-gap);}
-.section-title-lg{font-size:15px;font-weight:600;color:var(--ac-title);margin-bottom:2px;}
-.section-sub-lg{font-size:11.5px;color:var(--ac-secondary);margin-bottom:14px;}
 
 /* Card — matches production .ac-category-bars / card-hd / card-title / card-sub tokens */
 .card{background:#fff;border:1px solid var(--ac-border);border-radius:var(--ac-r-card);box-shadow:var(--ac-card-shadow);padding:var(--ac-card-padding);}
@@ -86,25 +87,28 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
 .cards-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--ac-card-gap);}
 @media(max-width:1100px){.cards-row{grid-template-columns:1fr;}}
 
-/* Page identity pill — shown under every card, matches attached reference pill */
-.page-legend-pill{display:inline-flex;align-items:center;gap:14px;background:#fff;border-radius:24px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:8px 16px;font-size:12px;font-weight:600;color:var(--ac-text);margin-top:16px;}
+/* Page identity pill — shown under every card */
+.page-legend-pill{display:inline-flex;align-items:center;gap:14px;flex-wrap:wrap;background:#fff;border-radius:24px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:8px 16px;font-size:12px;font-weight:600;color:var(--ac-text);margin-top:16px;}
 .page-legend-item{display:flex;align-items:center;gap:8px;}
 .page-legend-sq{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
 
-/* stacked rank list (Category Bars + Combinations) */
-.rank-list{display:flex;flex-direction:column;}
-.rank-item{padding:var(--ac-row-gap) 0;border-bottom:1px solid var(--ac-divider);position:relative;}
-.rank-item:first-child{padding-top:2px;}
-.rank-item:last-child{border-bottom:none;}
-.rank-item-top{display:flex;align-items:baseline;gap:8px;margin-bottom:6px;}
-.rank-num{font-size:12px;font-weight:700;color:var(--ac-accent-rank,#FFA500);width:16px;flex-shrink:0;}
-.rank-name{font-size:var(--ac-font-body-size);font-weight:500;color:var(--ac-text);flex:1;}
-.rank-val{font-size:var(--ac-font-value-size);color:var(--ac-text);font-weight:600;white-space:nowrap;}
-.stack-track{height:14px;border-radius:5px;background:#EEF3F6;overflow:hidden;display:flex;margin-left:24px;cursor:default;}
-.stack-seg{height:100%;transition:width .3s;}
-.rank-item:hover .stack-track{outline:2px solid rgba(35,169,246,.25);}
+/* stacked rank list (Category Bars + Combinations)
+   Bar geometry is a 1:1 copy of the production .cbar-track / .cbar-fill spec:
+     track  → background:#f1f5f9; border-radius:2px; height:4px; margin-top:5px; width:100%
+     fill   → border-radius:2px; height:100%; width = value / max
+   The only prototype-side addition is splitting the fill into one segment per page. */
+.rank-list{display:flex;flex-direction:column;gap:var(--ac-row-gap);}
+.rank-item{position:relative;cursor:pointer;}
+.rank-item-top{display:flex;align-items:flex-start;gap:8px;justify-content:space-between;min-width:0;}
+.rank-num{font-size:12px;font-weight:700;color:var(--ac-accent-rank,#FFA500);width:16px;flex-shrink:0;line-height:1.35;}
+.rank-name{font-size:13px;font-weight:500;color:#1e293b;flex:1 1 auto;min-width:0;line-height:1.35;word-wrap:anywhere;}
+.rank-val{font-size:.8rem;color:var(--ac-text);font-weight:600;line-height:1.4;min-width:110px;text-align:right;flex-shrink:0;}
+.stack-track{background:#f1f5f9;border-radius:2px;height:4px;margin-top:5px;overflow:hidden;width:100%;}
+.stack-fill{border-radius:2px;height:100%;display:flex;transition:width .45s ease;}
+.stack-seg{height:100%;transition:width .45s ease;}
+.rank-item:hover .stack-track{box-shadow:0 0 0 2px rgba(35,169,246,.22);}
 
-.tt{position:absolute;left:24px;top:100%;margin-top:4px;background:var(--ac-title);color:#fff;font-size:11px;border-radius:8px;padding:8px 11px;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.18);z-index:20;opacity:0;pointer-events:none;transition:opacity .12s;}
+.tt{position:absolute;left:24px;top:100%;margin-top:6px;background:var(--ac-title);color:#fff;font-size:11px;border-radius:8px;padding:8px 11px;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.18);z-index:20;opacity:0;pointer-events:none;transition:opacity .12s;}
 .rank-item:hover .tt{opacity:1;}
 .tt-row{display:flex;align-items:center;gap:6px;margin-top:2px;}
 .tt-title{font-weight:600;margin-bottom:2px;}
@@ -114,26 +118,59 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
 .scatter-wrap{position:relative;}
 .scatter-note{font-size:11px;color:var(--ac-secondary);margin-top:8px;}
 
-/* Which format wins in each category — heatmap, capped to 10 rows visible, rest scrolls */
-.hm-scroll{max-height:440px;overflow-y:auto;}
-.hm-wrap{overflow-x:auto;}
-.hm-table{border-collapse:separate;border-spacing:4px;width:100%;}
-.hm-table thead th{position:sticky;top:0;background:#fff;z-index:5;}
-.hm-th{font-size:10.5px;font-weight:600;color:var(--ac-secondary);text-align:center;padding:4px 6px;white-space:nowrap;}
-.hm-rh{font-size:11.5px;color:var(--ac-text);padding:4px 10px 4px 0;white-space:nowrap;font-weight:500;}
-.hm-cell{border-radius:7px;text-align:center;padding:8px 4px;min-width:56px;}
-.hm-v{font-size:11.5px;font-weight:700;}
-.hm-null{background:#F7F7F7;color:var(--ac-secondary);font-size:10.5px;}
-.hm-page-label{font-size:10px;font-weight:700;color:var(--ac-secondary);text-transform:uppercase;letter-spacing:.4px;margin:14px 0 6px;}
-.hm-page-label:first-child{margin-top:0;}
-.hm-main-row{cursor:pointer;}
-.hm-main-row:hover td:first-child .hm-rh{color:var(--ac-brand);}
-.hm-rh-clickable{display:flex;align-items:center;gap:6px;color:var(--ac-secondary);}
-.hm-sub-row td:first-child{padding-left:18px;}
+/* Which format wins in each category — pages × formats first;
+   click a page row to expand that page's categories × formats underneath */
+.fw-wrap{overflow-x:auto;}
+.fw-table{width:100%;border-collapse:collapse;min-width:940px;}
+.fw-table th{font-size:12.5px;font-weight:600;color:var(--ac-text);text-align:left;padding:10px 12px;border-bottom:1px solid var(--ac-divider);white-space:nowrap;}
+.fw-th-inner{display:flex;align-items:center;gap:7px;}
+.fw-th-icon{color:var(--ac-secondary);flex-shrink:0;}
+.fw-sortable{cursor:pointer;user-select:none;}
+.fw-sortable:hover{color:var(--ac-brand);}
+.fw-sort-caret{font-size:9px;opacity:.55;margin-left:2px;}
+.fw-sortable.active .fw-sort-caret{opacity:1;color:var(--ac-brand);}
+.fw-table td{padding:12px;border-bottom:1px solid var(--ac-divider);vertical-align:middle;}
+.fw-row{cursor:pointer;}
+.fw-row td{transition:background .15s;}
+.fw-row:hover td{background:#FAFCFE;}
+.fw-row td:first-child{border-left:3px solid transparent;}
+.fw-row.active td{background:var(--ac-brand-tint);}
+.fw-row.active td:first-child{border-left-color:var(--ac-brand);}
+.fw-page-inner{display:flex;align-items:flex-start;gap:9px;min-width:0;}
+.fw-page-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.fw-page-name{font-size:13.5px;font-weight:700;color:var(--ac-title);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px;}
+.fw-page-total{font-size:11.5px;color:var(--ac-secondary);margin-top:1px;}
+.fw-val{font-size:13px;font-weight:700;color:var(--ac-title);display:flex;align-items:center;gap:6px;line-height:1.3;}
+.fw-val.muted{color:var(--ac-secondary);font-weight:500;}
+.fw-best{font-size:8.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;border-radius:5px;padding:1px 5px;color:#fff;flex-shrink:0;}
+.fw-bar{height:4px;border-radius:2px;background:#E9EDF1;overflow:hidden;margin-top:8px;width:100%;max-width:128px;}
+.fw-bar-fill{height:100%;border-radius:2px;transition:width .45s ease;}
+.fw-leader-row td{border-bottom:none;background:#FBFCFD;}
+.fw-leader-row td:first-child{border-left:3px solid transparent;}
+.fw-leader-title{font-size:13px;font-weight:700;color:var(--ac-title);}
+.fw-leader-sub{font-size:11.5px;color:var(--ac-secondary);}
+.fw-leader-name{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--ac-title);}
+.fw-leader-name span.n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:110px;}
+.fw-leader-val{font-size:12px;color:var(--ac-secondary);font-weight:600;margin-top:2px;margin-left:17px;}
 
-/* Top categories table */
-.top-table{width:100%;border-collapse:collapse;}
-.top-table th{font-size:11px;font-weight:600;color:var(--ac-secondary);text-align:left;padding:9px 14px;background:#F7F9FC;border-bottom:1px solid var(--ac-divider);white-space:nowrap;}
+/* expanded per-page detail — categories × formats for the clicked page */
+.fw-detail{border-top:1px solid var(--ac-divider);margin-top:2px;padding-top:16px;}
+.fw-detail-hd{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.fw-detail-caret{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;cursor:pointer;}
+.fw-detail-name{font-size:14px;font-weight:700;color:var(--ac-title);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:320px;}
+.fw-detail-sub{font-size:12px;color:var(--ac-secondary);}
+.fw-detail-scroll{max-height:430px;overflow-y:auto;}
+.fw-detail-table{width:100%;border-collapse:collapse;min-width:940px;}
+.fw-detail-table thead th{position:sticky;top:0;background:#fff;z-index:5;font-size:11.5px;font-weight:600;color:var(--ac-secondary);text-align:left;padding:8px 12px;border-bottom:1px solid var(--ac-divider);white-space:nowrap;}
+.fw-detail-table td{padding:10px 12px;border-bottom:1px solid var(--ac-divider);}
+.fw-detail-table tr:last-child td{border-bottom:none;}
+.fw-cat-name{font-size:12.5px;color:var(--ac-text);}
+.fw-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--ac-divider);margin-top:16px;padding-top:12px;font-size:11.5px;color:var(--ac-secondary);flex-wrap:wrap;}
+
+/* Top categories table — one column per page */
+.top-wrap{overflow-x:auto;}
+.top-table{width:100%;border-collapse:collapse;min-width:820px;}
+.top-table th{font-size:11px;font-weight:600;color:var(--ac-secondary);text-align:left;padding:9px 14px;background:#F7F9FC;border-bottom:1px solid var(--ac-divider);white-space:nowrap;vertical-align:bottom;}
 .top-table th.r{text-align:right;}
 .top-table td{font-size:12.5px;padding:10px 14px;border-bottom:1px solid var(--ac-divider);vertical-align:middle;}
 .top-table td.r{text-align:right;font-weight:600;}
@@ -145,16 +182,14 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
 .top-th-sort:hover{color:var(--ac-brand);}
 .top-sort-caret{display:inline-block;margin-left:3px;font-size:9px;opacity:.5;}
 .top-th-sort.active .top-sort-caret{opacity:1;color:var(--ac-brand);}
-
-.top-main-row{cursor:pointer;}
-.top-main-row:hover .top-cat-name{color:var(--ac-brand);}
+/* long page names: single line, ellipsis, full name on hover via title= */
+.top-th-page{max-width:132px;}
+.top-th-page-inner{display:flex;align-items:center;justify-content:flex-end;gap:6px;min-width:0;}
+.top-th-page-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
 .top-cat-cell{display:flex;align-items:center;gap:6px;}
 .top-cat-name{font-weight:500;}
-.top-chevron{color:var(--ac-secondary);flex-shrink:0;transition:transform .2s;}
-.top-chevron.open{transform:rotate(180deg);}
-.top-sub-row td{background:#FAFCFE;}
-.top-sub-row .top-cat-cell{padding-left:18px;color:var(--ac-secondary);font-weight:500;font-size:12px;}
 .top-page-dot{width:8px;height:8px;border-radius:3px;flex-shrink:0;}
+.top-empty{color:var(--ac-secondary);font-weight:500;}
 
 .top-pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--ac-divider);}
 .top-pagination-info{font-size:11.5px;color:var(--ac-secondary);}
@@ -202,13 +237,9 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
     <div class="pg-head">
       <div>
         <div class="pg-title" id="pg-title">My Pages · Compare</div>
-        <div class="pg-meta">Instagram · Last 30 days</div>
+        <div class="pg-meta">Instagram · Last 30 days · 5 pages</div>
       </div>
-      <div class="page-chips">
-        <div class="page-chip"><span class="chip-dot" style="background:var(--p1)"></span>BusinessFocus | 商業、投資、創科平台</div>
-        <span class="vs">vs</span>
-        <div class="page-chip"><span class="chip-dot" style="background:var(--p2)"></span>POPLADY</div>
-      </div>
+      <div class="page-chips" id="page-chips"></div>
     </div>
 
     <div class="subtabs-bar">
@@ -233,7 +264,7 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
         </div>
       </div>
 
-      <!-- 1. Category Bars — "{Lens} vs Post Volume" -->
+      <!-- 1. Category Bars — "{Lens} vs {Metric}" -->
       <div class="section" id="section-bars"></div>
 
       <!-- 2. Avg Engagements vs Posts — scatter (identical in both modes) -->
@@ -255,27 +286,20 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
         <div class="cards-row" id="combo-cards"></div>
       </div>
 
-      <!-- 5. Top categories table — click a category to break it down by page -->
+      <!-- 5. Top categories table — one column per page, driven by the Metric selector -->
       <div class="section">
         <div class="card" style="padding:0;overflow:hidden;">
           <div style="padding:20px 20px 0;">
             <div class="card-title">Top categories</div>
-            <div class="card-sub" id="top-sub">Ranked by combined Contents of both pages · click a category to break it down by page</div>
+            <div class="card-sub" id="top-sub"></div>
           </div>
-          <table class="top-table">
-            <thead>
-              <tr>
-                <th style="width:26px;padding-left:14px;">#</th>
-                <th>Category</th>
-                <th class="r top-th-sort" onclick="setTopSort('contents')" id="top-th-contents">Contents</th>
-                <th class="r top-th-sort" onclick="setTopSort('eng')" id="top-th-eng">Engagements</th>
-                <th class="r top-th-sort" onclick="setTopSort('avgEng')" id="top-th-avgeng">Avg Engagements</th>
-              </tr>
-            </thead>
-            <tbody id="top-tbody"></tbody>
-          </table>
+          <div class="top-wrap">
+            <table class="top-table">
+              <thead><tr id="top-thead-row"></tr></thead>
+              <tbody id="top-tbody"></tbody>
+            </table>
+          </div>
           <div class="top-pagination" id="top-pagination"></div>
-          <div style="padding:16px 20px;"><div class="page-legend-pill" id="pill-table"></div></div>
         </div>
       </div>
 
@@ -284,16 +308,34 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
 </div>
 
 <script>
-const P1 = {name:'BusinessFocus | 商業、投資、創科平台', color:'#23A9F6'};
-const P2 = {name:'POPLADY', color:'#F5A623'};
+/* ---------- Pages ----------
+   Colors are the production compare palette, in production order:
+   ['#0C8CD8','#F9A501','#7EB235','#2E95A7','#D63B67'] — assigned by page index,
+   same as colorPalette[index % colorPalette.length] in the compare pages. */
+const PALETTE = ['#0C8CD8','#F9A501','#7EB235','#2E95A7','#D63B67'];
+const PAGE_NAMES = [
+  'BusinessFocus | 商業、投資、創科平台',
+  'POPLADY',
+  'GirlStyle 女生日常',
+  'HolidaySmart 假期日常',
+  'UrbanLife Health 健康新態度',
+];
+const PAGES = PAGE_NAMES.map((name,i)=>({name, color:PALETTE[i % PALETTE.length]}));
 
-const TOTAL_COLOR = '#6B4BD8'; // distinct purple — was grey, which read as "no data"/disabled
+const TOTAL_COLOR = '#6B4BD8'; // distinct purple for "Total" rows — grey read as "no data"/disabled
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 function pageLegendHTML(withTotal){
   const totalItem = withTotal ? `<div class="page-legend-item"><span class="page-legend-sq" style="background:${TOTAL_COLOR}"></span>Total</div>` : '';
-  return `${totalItem}<div class="page-legend-item"><span class="page-legend-sq" style="background:${P1.color}"></span>${P1.name}</div>
-          <div class="page-legend-item"><span class="page-legend-sq" style="background:${P2.color}"></span>${P2.name}</div>`;
+  return totalItem + PAGES.map(p=>
+    `<div class="page-legend-item"><span class="page-legend-sq" style="background:${p.color}"></span>${esc(p.name)}</div>`
+  ).join('');
 }
+
+document.getElementById('page-chips').innerHTML = PAGES.map(p=>
+  `<div class="page-chip" title="${esc(p.name)}"><span class="chip-dot" style="background:${p.color}"></span><span class="page-chip-name">${esc(p.name)}</span></div>`
+).join('');
 
 // ---------- Taxonomies ----------
 const CONTENT_CATS = ['News & Current Affairs','Technology & Innovation','Science & Environment','Entertainment & Pop Culture','Business & Finance','Lifestyle & Personal Development','Sports & Recreation','Society & Culture','Opinion & Editorial','Trends & Viral Content','Miscellaneous & Niche Topics'];
@@ -304,41 +346,42 @@ const POST_FORMATS = ['Photo','Video','Album','Reel','Link','Status'];
 // deterministic pseudo-random so numbers stay stable across renders
 function seedRand(seed){let s=seed;return()=>{s=(s*9301+49297)%233280;return s/233280;};}
 
-function buildCategoryData(names, seed, skewP1){
+// Every row carries one stats object per page, in PAGES order.
+function makePageStats(rnd, volumeFactor){
+  const posts = Math.max(1, Math.round(volumeFactor));
+  const er = +(1.5 + rnd()*7).toFixed(1);
+  const eng = Math.round(posts*(300+rnd()*1800));
+  const likes = Math.round(eng*(0.55+rnd()*0.1));
+  const comments = Math.round(eng*(0.12+rnd()*0.08));
+  const shares = Math.max(0, eng-likes-comments);
+  return {posts, eng, likes, comments, shares, er};
+}
+
+function buildCategoryData(names, seed, skewFirst){
   const rnd = seedRand(seed);
-  return names.map((name)=>{
+  return names.map(name=>{
     const base = Math.round(4 + rnd()*30);
-    const p1 = Math.max(1, Math.round(base*(skewP1?0.55+rnd()*0.35:0.25+rnd()*0.4)));
-    const p2 = Math.max(1, Math.round(base*(0.25+rnd()*0.5)));
-    const er1 = +(1.5 + rnd()*7).toFixed(1);
-    const er2 = +(1.5 + rnd()*7).toFixed(1);
-    const eng1 = Math.round(p1*(300+rnd()*1800));
-    const eng2 = Math.round(p2*(300+rnd()*1800));
-    // Engagements splits roughly into likes/comments/shares — deterministic mock breakdown.
-    const likes1 = Math.round(eng1*(0.55+rnd()*0.1));
-    const likes2 = Math.round(eng2*(0.55+rnd()*0.1));
-    const comments1 = Math.round(eng1*(0.12+rnd()*0.08));
-    const comments2 = Math.round(eng2*(0.12+rnd()*0.08));
-    const shares1 = Math.max(0, eng1-likes1-comments1);
-    const shares2 = Math.max(0, eng2-likes2-comments2);
-    return {name, p1, p2, er1, er2, eng1, eng2, likes1, likes2, comments1, comments2, shares1, shares2};
+    const pages = PAGES.map((p,idx)=>{
+      const factor = (skewFirst && idx===0) ? 0.55+rnd()*0.35 : 0.18+rnd()*0.45;
+      return makePageStats(rnd, base*factor);
+    });
+    return {name, pages};
   });
 }
+
+const sumMetric = (row,key)=>row.pages.reduce((s,p)=>s+p[key],0);
 
 // Combinations are always ranked by Engagements (same in both My Page and Competitors modes).
 function buildCombos(namesA, namesB, seed, n){
   const rnd = seedRand(seed);
-  const pairs = [];
+  const out = [];
   for(let i=0;i<n;i++){
     const a = namesA[Math.floor(rnd()*namesA.length)];
     const b = namesB[Math.floor(rnd()*namesB.length)];
-    const p1 = Math.max(1, Math.round(2 + rnd()*14));
-    const p2 = Math.max(1, Math.round(2 + rnd()*14));
-    const eng1 = Math.round(p1*(300+rnd()*1800));
-    const eng2 = Math.round(p2*(300+rnd()*1800));
-    pairs.push({name:`${a} × ${b}`, p1, p2, eng1, eng2});
+    const pages = PAGES.map(()=>makePageStats(rnd, 2+rnd()*14));
+    out.push({name:`${a} × ${b}`, pages});
   }
-  return pairs.sort((x,y)=>(y.eng1+y.eng2)-(x.eng1+x.eng2)).slice(0,6);
+  return out.sort((x,y)=>sumMetric(y,'eng')-sumMetric(x,'eng')).slice(0,6);
 }
 
 function buildHeatmap(names, seed){
@@ -355,10 +398,10 @@ const LENSES = {
   content: {
     label: 'Content category',
     categories: buildCategoryData(CONTENT_CATS, 11, true),
-    heatmap: {p1: buildHeatmap(CONTENT_CATS, 51), p2: buildHeatmap(CONTENT_CATS, 52)},
+    heatmap: PAGES.map((p,i)=>buildHeatmap(CONTENT_CATS, 51+i)),
     combos: [
-      {title:'Content category × Ad category', sub:'Top pairings ranked by combined engagements of both pages', data: buildCombos(CONTENT_CATS, AD_CATS, 21, 40)},
-      {title:'Content category × Image category', sub:'Top pairings ranked by combined engagements of both pages', data: buildCombos(CONTENT_CATS, IMAGE_CATS, 22, 40)},
+      {title:'Content category × Ad category', sub:'Top pairings ranked by combined engagements of all pages', data: buildCombos(CONTENT_CATS, AD_CATS, 21, 40)},
+      {title:'Content category × Image category', sub:'Top pairings ranked by combined engagements of all pages', data: buildCombos(CONTENT_CATS, IMAGE_CATS, 22, 40)},
     ]
   },
   ad: {
@@ -366,7 +409,7 @@ const LENSES = {
     categories: buildCategoryData(AD_CATS, 31, false),
     heatmap: null,
     combos: [
-      {title:'Ad category × Image category', sub:'Top pairings ranked by combined engagements of both pages', data: buildCombos(AD_CATS, IMAGE_CATS, 32, 40)},
+      {title:'Ad category × Image category', sub:'Top pairings ranked by combined engagements of all pages', data: buildCombos(AD_CATS, IMAGE_CATS, 32, 40)},
     ]
   },
   image: {
@@ -374,8 +417,8 @@ const LENSES = {
     categories: buildCategoryData(IMAGE_CATS, 41, false),
     heatmap: null,
     combos: [
-      {title:'Image category × Content category', sub:'Top pairings ranked by combined engagements of both pages', data: buildCombos(IMAGE_CATS, CONTENT_CATS, 42, 40)},
-      {title:'Image category × Ad category', sub:'Top pairings ranked by combined engagements of both pages', data: buildCombos(IMAGE_CATS, AD_CATS, 43, 40)},
+      {title:'Image category × Content category', sub:'Top pairings ranked by combined engagements of all pages', data: buildCombos(IMAGE_CATS, CONTENT_CATS, 42, 40)},
+      {title:'Image category × Ad category', sub:'Top pairings ranked by combined engagements of all pages', data: buildCombos(IMAGE_CATS, AD_CATS, 43, 40)},
     ]
   }
 };
@@ -384,48 +427,49 @@ let currentLens = 'content';
 
 function fmt(n){return n>=1000?(n/1000).toFixed(1)+'K':String(n);}
 
-// ---------- Metric options per mode (only cards 1 & 5 respond to this; cards 2/3/4 are fixed) ----------
+// ---------- Metric options per mode (cards 1 & 5 respond; cards 2/3/4 are fixed) ----------
 const METRIC_META = {
-  posts:    {label:'Posts',       k1:'p1',        k2:'p2'},
-  eng:      {label:'Engagements', k1:'eng1',      k2:'eng2'},
-  likes:    {label:'Likes',       k1:'likes1',    k2:'likes2'},
-  comments: {label:'Comments',    k1:'comments1', k2:'comments2'},
-  shares:   {label:'Shares',      k1:'shares1',   k2:'shares2'},
+  posts:    {label:'Posts',       key:'posts'},
+  eng:      {label:'Engagements', key:'eng'},
+  likes:    {label:'Likes',       key:'likes'},
+  comments: {label:'Comments',    key:'comments'},
+  shares:   {label:'Shares',      key:'shares'},
 };
 const MODE_METRICS = {
-  mypage:      {options:['eng','likes','comments','shares'], default:'eng'},
-  competitors: {options:['posts','eng'],                     default:'posts'},
+  mypage:      {options:['posts','eng','likes','comments','shares'], default:'eng'},
+  competitors: {options:['posts','eng'],                             default:'posts'},
 };
 let selectedMetric = MODE_METRICS.mypage.default;
 
 // ---------- Shared rank card (Category Bars + Combinations) ----------
-// metric: any key from METRIC_META. Both modes reuse this — only the metric fed in
-// (and the title/sub text) differs between My Page and Competitors.
+// Bar geometry is the production .cbar-track / .cbar-fill spec: a full-width 4px track,
+// filled to value/max, with the fill split into one segment per page.
 function rankCardHTML(title, sub, rows, showAll, metric){
   const meta = METRIC_META[metric];
-  const key1 = meta.k1, key2 = meta.k2, metricLabel = meta.label;
-  const withTotal = rows.map(r=>({...r, v1:r[key1], v2:r[key2], total:r[key1]+r[key2]}));
+  const key = meta.key, metricLabel = meta.label;
+  const withTotal = rows.map(r=>({...r, vals:r.pages.map(p=>p[key]), total:sumMetric(r,key)}));
   const sorted = [...withTotal].sort((a,b)=>b.total-a.total).slice(0, showAll?rows.length:8);
   const grandTotal = withTotal.reduce((s,r)=>s+r.total,0);
-  const max = sorted[0]?sorted[0].total:1;
+  const max = sorted[0] ? sorted[0].total : 1;
   const items = sorted.map((r,i)=>{
     const pct = grandTotal ? Math.round(r.total/grandTotal*100) : 0;
-    const w1 = Math.round(r.v1/max*100);
-    const w2 = Math.round(r.v2/max*100);
+    const fillW = max ? (r.total/max*100) : 0;
+    const segs = r.vals.map((v,idx)=>
+      `<div class="stack-seg" style="width:${r.total?(v/r.total*100):0}%;background:${PAGES[idx].color};"></div>`
+    ).join('');
+    const ttRows = r.vals.map((v,idx)=>
+      `<div class="tt-row"><span class="tt-dot" style="background:${PAGES[idx].color}"></span>${esc(PAGES[idx].name)} ${metricLabel}: ${fmt(v)}</div>`
+    ).join('');
     return `<div class="rank-item">
       <div class="rank-item-top">
         <span class="rank-num">${i+1}</span>
-        <span class="rank-name">${r.name}</span>
+        <span class="rank-name">${esc(r.name)}</span>
         <span class="rank-val">${fmt(r.total)} (${pct}%)</span>
       </div>
-      <div class="stack-track" style="width:${w1+w2}%;">
-        <div class="stack-seg" style="width:${w1/(w1+w2)*100}%;background:${P1.color};"></div>
-        <div class="stack-seg" style="width:${w2/(w1+w2)*100}%;background:${P2.color};"></div>
-      </div>
+      <div class="stack-track"><div class="stack-fill" style="width:${fillW}%;">${segs}</div></div>
       <div class="tt">
-        <div class="tt-title">${r.name}</div>
-        <div class="tt-row"><span class="tt-dot" style="background:${P1.color}"></span>${P1.name} ${metricLabel}: ${fmt(r.v1)}</div>
-        <div class="tt-row"><span class="tt-dot" style="background:${P2.color}"></span>${P2.name} ${metricLabel}: ${fmt(r.v2)}</div>
+        <div class="tt-title">${esc(r.name)}</div>
+        ${ttRows}
       </div>
     </div>`;
   }).join('');
@@ -443,7 +487,7 @@ function renderBars(){
   const metricLabel = METRIC_META[selectedMetric].label;
   document.getElementById('section-bars').innerHTML = rankCardHTML(
     `${lens.label} vs ${metricLabel}`,
-    `Ranked by combined ${metricLabel.toLowerCase()} of both pages · hover a bar for the breakdown`,
+    `Ranked by combined ${metricLabel.toLowerCase()} of all ${PAGES.length} pages · hover a bar for the breakdown`,
     lens.categories, false, selectedMetric
   );
 }
@@ -451,18 +495,21 @@ function renderBars(){
 // ---------- 2. Avg Engagements vs Posts (same in both modes) ----------
 function renderScatter(){
   const lens = LENSES[currentLens];
-  const cats = lens.categories.map(c=>({...c, avgEng1:c.eng1/c.p1, avgEng2:c.eng2/c.p2}));
   const svg = document.getElementById('scatter-svg');
   const W=900,H=360,padL=50,padR=20,padT=16,padB=36;
-  const maxPosts = Math.max(...cats.map(c=>Math.max(c.p1,c.p2)));
-  const maxAvgEng = Math.max(...cats.map(c=>Math.max(c.avgEng1,c.avgEng2)));
-  const maxER = Math.max(...cats.map(c=>Math.max(c.er1,c.er2)));
+  let maxPosts=0, maxAvgEng=0, maxER=0;
+  lens.categories.forEach(c=>c.pages.forEach(p=>{
+    if(p.posts>maxPosts)maxPosts=p.posts;
+    const avg = p.eng/p.posts;
+    if(avg>maxAvgEng)maxAvgEng=avg;
+    if(p.er>maxER)maxER=p.er;
+  }));
 
   function x(v){return padL + (v/maxPosts)*(W-padL-padR);}
   function y(v){return H-padB - (v/(maxAvgEng*1.15))*(H-padT-padB);}
   function r(v){return 5 + (v/maxER)*16;}
 
-  let axes = `<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H-padB}" stroke="#E4E9ED"/>
+  const axes = `<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H-padB}" stroke="#E4E9ED"/>
               <line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="#E4E9ED"/>
               <text x="${padL-8}" y="${padT+4}" font-size="10" fill="#828282" text-anchor="end">${fmt(Math.round(maxAvgEng))}</text>
               <text x="${padL-8}" y="${H-padB}" font-size="10" fill="#828282" text-anchor="end">0</text>
@@ -470,9 +517,11 @@ function renderScatter(){
               <text x="${W-padR}" y="${H-14}" font-size="10" fill="#828282" text-anchor="end">${maxPosts} posts</text>`;
 
   let dots = '';
-  cats.forEach(c=>{
-    dots += `<circle cx="${x(c.p1)}" cy="${y(c.avgEng1)}" r="${r(c.er1)}" fill="${P1.color}" opacity="0.55" stroke="${P1.color}" stroke-width="1.2"><title>${c.name} · ${P1.name}\nPosts: ${c.p1}  Avg Eng/Post: ${fmt(Math.round(c.avgEng1))}  ER: ${c.er1}%</title></circle>`;
-    dots += `<circle cx="${x(c.p2)}" cy="${y(c.avgEng2)}" r="${r(c.er2)}" fill="${P2.color}" opacity="0.55" stroke="${P2.color}" stroke-width="1.2"><title>${c.name} · ${P2.name}\nPosts: ${c.p2}  Avg Eng/Post: ${fmt(Math.round(c.avgEng2))}  ER: ${c.er2}%</title></circle>`;
+  lens.categories.forEach(c=>{
+    c.pages.forEach((p,idx)=>{
+      const avg = p.eng/p.posts;
+      dots += `<circle cx="${x(p.posts)}" cy="${y(avg)}" r="${r(p.er)}" fill="${PAGES[idx].color}" opacity="0.5" stroke="${PAGES[idx].color}" stroke-width="1.2"><title>${esc(c.name)} · ${esc(PAGES[idx].name)}\nPosts: ${p.posts}  Avg Eng/Post: ${fmt(Math.round(avg))}  ER: ${p.er}%</title></circle>`;
+    });
   });
 
   svg.innerHTML = axes + dots;
@@ -480,89 +529,169 @@ function renderScatter(){
   document.getElementById('pill-scatter').innerHTML = pageLegendHTML();
 }
 
-// ---------- 3. Which format wins in each category (heatmap, Content lens only) ----------
-// Default: one row per category = combined total across all pages. Click a row to expand
-// into a per-page breakdown (BusinessFocus in blue, POPLADY in orange) for that category.
-let hmExpanded = new Set();
+// ---------- 3. Which format wins in each category (Content lens only) ----------
+// Level 1: pages × formats. Every page is a row, every post format a column; the best
+// format for each page carries a "Best" badge, and a Format leader row closes the table.
+// Level 2: click a page row to expand that page's categories × formats underneath.
+let fwExpanded = null;          // page index, or null
+let fwSort = 'default';         // 'default' (page order) | 'desc' | 'asc' by total engagements
 
-function sumOrNull(a,b){
-  if(a==null && b==null) return null;
-  return (a||0)+(b||0);
+const FMT_ICON = {
+  Photo:  '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>',
+  Video:  '<circle cx="12" cy="12" r="10"/><polygon points="10 8 16.5 12 10 16 10 8"/>',
+  Album:  '<rect x="7" y="3" width="14" height="14" rx="2"/><path d="M3 7v12a2 2 0 0 0 2 2h12"/>',
+  Reel:   '<rect x="2" y="4" width="20" height="16" rx="2"/><line x1="7" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="17" y2="20"/>',
+  Link:   '<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
+  Status: '<path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.2A8.4 8.4 0 0 1 4 11.5a8.5 8.5 0 0 1 17 0z"/>',
+};
+function fmtIcon(f){
+  return `<svg class="fw-th-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${FMT_ICON[f]||''}</svg>`;
 }
 
-function heatmapGridHTML(names, hmP1, hmP2){
-  // totals across all pages, for the default (collapsed) view
-  const totals = {};
-  names.forEach(n=>{
-    totals[n] = {};
-    POST_FORMATS.forEach(f=> totals[n][f] = sumOrNull((hmP1[n]||{})[f], (hmP2[n]||{})[f]) );
-  });
-
-  let totalMax = 0;
-  names.forEach(n=>POST_FORMATS.forEach(f=>{const v=totals[n][f]; if(v&&v>totalMax)totalMax=v;}));
-  let pageMax = 0;
-  names.forEach(n=>POST_FORMATS.forEach(f=>{
-    const v1=(hmP1[n]||{})[f], v2=(hmP2[n]||{})[f];
-    if(v1&&v1>pageMax)pageMax=v1;
-    if(v2&&v2>pageMax)pageMax=v2;
-  }));
-
-  function bg(v, max, tint){
-    if(!v) return '#F7F7F7';
-    const t = v/max;
-    const from = {r:238,g:243,b:246};
-    const to = tint==='p2' ? {r:245,g:166,b:35} : tint==='p1' ? {r:35,g:169,b:246} : {r:107,g:75,b:216};
-    const r = Math.round(from.r+t*(to.r-from.r));
-    const g = Math.round(from.g+t*(to.g-from.g));
-    const b = Math.round(from.b+t*(to.b-from.b));
-    return `rgb(${r},${g},${b})`;
-  }
-  function col(v, max){return (v/max) > 0.55 ? '#fff' : '#102532';}
-
-  function cellHTML(v, max, tint){
-    if(!v) return `<td><div class="hm-cell hm-null">—</div></td>`;
-    return `<td><div class="hm-cell" style="background:${bg(v,max,tint)};color:${col(v,max)};"><div class="hm-v">${fmt(v)}</div></div></td>`;
-  }
-
-  function chevron(open){
-    return `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="transition:transform .2s;transform:rotate(${open?180:0}deg);flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>`;
-  }
-
-  const heads = POST_FORMATS.map(f=>`<th class="hm-th">${f}</th>`).join('');
-
-  const rows = names.map(n=>{
-    const open = hmExpanded.has(n);
-    const totalCells = POST_FORMATS.map(f=>cellHTML(totals[n][f], totalMax, null)).join('');
-    const mainRow = `<tr class="hm-main-row" onclick="toggleHmRow('${n}')">
-      <td><div class="hm-rh hm-rh-clickable">${chevron(open)}<span>${n}</span></div></td>
-      ${totalCells}
-    </tr>`;
-    if(!open) return mainRow;
-    const p1Cells = POST_FORMATS.map(f=>cellHTML((hmP1[n]||{})[f], pageMax, 'p1')).join('');
-    const p2Cells = POST_FORMATS.map(f=>cellHTML((hmP2[n]||{})[f], pageMax, 'p2')).join('');
-    const p1Row = `<tr class="hm-sub-row"><td><div class="hm-rh"><span class="page-legend-sq" style="background:${P1.color};display:inline-block;width:8px;height:8px;margin-right:6px;vertical-align:middle;"></span>${P1.name}</div></td>${p1Cells}</tr>`;
-    const p2Row = `<tr class="hm-sub-row"><td><div class="hm-rh"><span class="page-legend-sq" style="background:${P2.color};display:inline-block;width:8px;height:8px;margin-right:6px;vertical-align:middle;"></span>${P2.name}</div></td>${p2Cells}</tr>`;
-    return mainRow + p1Row + p2Row;
-  }).join('');
-
-  return `<table class="hm-table"><thead><tr><th></th>${heads}</tr></thead><tbody>${rows}</tbody></table>`;
+// One page's engagements for one format = that page's total across every category.
+function fwFormatTotal(hm, f){
+  let sum = 0, any = false;
+  CONTENT_CATS.forEach(n=>{ const v=(hm[n]||{})[f]; if(v!=null){sum+=v; any=true;} });
+  return any ? sum : null;
 }
 
-function toggleHmRow(name){
-  if(hmExpanded.has(name)) hmExpanded.delete(name);
-  else hmExpanded.add(name);
+// value + proportional mini bar, coloured with the page's own colour
+function fwCellHTML(v, max, color, isBest){
+  if(v==null) return `<td><div class="fw-val muted">–</div><div class="fw-bar"><div class="fw-bar-fill" style="width:0"></div></div></td>`;
+  const badge = isBest ? `<span class="fw-best" style="background:${color}">Best</span>` : '';
+  return `<td>
+    <div class="fw-val">${fmt(v)}${badge}</div>
+    <div class="fw-bar"><div class="fw-bar-fill" style="width:${max?(v/max*100):0}%;background:${color}"></div></div>
+  </td>`;
+}
+
+function toggleFwPage(idx){
+  fwExpanded = (fwExpanded===idx) ? null : idx;
   renderHeatmap();
+}
+
+function toggleFwSort(){
+  fwSort = fwSort==='default' ? 'desc' : fwSort==='desc' ? 'asc' : 'default';
+  renderHeatmap();
+}
+
+// Level 2 — categories × formats for one page
+function fwDetailHTML(idx){
+  const p = PAGES[idx];
+  const hm = LENSES[currentLens].heatmap[idx];
+  const rows = CONTENT_CATS.map(n=>({name:n, vals:POST_FORMATS.map(f=>(hm[n]||{})[f])}));
+  let max = 0;
+  rows.forEach(r=>r.vals.forEach(v=>{ if(v!=null && v>max) max=v; }));
+
+  const heads = POST_FORMATS.map(f=>`<th><div class="fw-th-inner">${fmtIcon(f)}${f}</div></th>`).join('');
+  const body = rows.map(r=>
+    `<tr><td><div class="fw-cat-name">${esc(r.name)}</div></td>${r.vals.map(v=>fwCellHTML(v, max, p.color, false)).join('')}</tr>`
+  ).join('');
+
+  return `<div class="fw-detail">
+    <div class="fw-detail-hd">
+      <div class="fw-detail-caret" style="background:${p.color}" onclick="toggleFwPage(${idx})" title="Collapse">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+      </div>
+      <div class="fw-detail-name" title="${esc(p.name)}">${esc(p.name)}</div>
+      <div class="fw-detail-sub">Category performance across formats</div>
+    </div>
+    <div class="fw-wrap"><div class="fw-detail-scroll">
+      <table class="fw-detail-table">
+        <thead><tr><th style="min-width:210px;">Category</th>${heads}</tr></thead>
+        <tbody>${body}</tbody>
+      </table>
+    </div></div>
+  </div>`;
 }
 
 function renderHeatmap(){
   const lens = LENSES[currentLens];
   const el = document.getElementById('section-heatmap');
-  if(!lens.heatmap){ el.innerHTML=''; return; }
+  if(!lens.heatmap){ el.innerHTML=''; fwExpanded = null; return; }
+  const hmList = lens.heatmap;
+
+  // page × format matrix
+  const matrix = PAGES.map((p,idx)=>{
+    const vals = {};
+    POST_FORMATS.forEach(f=> vals[f] = fwFormatTotal(hmList[idx], f));
+    const total = POST_FORMATS.reduce((s,f)=>s+(vals[f]||0), 0);
+    let best=null, bestV=-1;
+    POST_FORMATS.forEach(f=>{ if(vals[f]!=null && vals[f]>bestV){ bestV=vals[f]; best=f; } });
+    return {idx, page:p, vals, total, best};
+  });
+
+  // one shared scale across the whole grid, so bars are comparable between pages
+  let gridMax = 0;
+  matrix.forEach(r=>POST_FORMATS.forEach(f=>{ if(r.vals[f]>gridMax) gridMax=r.vals[f]; }));
+
+  // strongest page per format
+  const leaders = {};
+  POST_FORMATS.forEach(f=>{
+    let bi=null, bv=-1;
+    matrix.forEach(r=>{ if(r.vals[f]!=null && r.vals[f]>bv){ bv=r.vals[f]; bi=r.idx; } });
+    leaders[f] = bi==null ? null : {idx:bi, v:bv};
+  });
+
+  const ordered = [...matrix];
+  if(fwSort==='desc') ordered.sort((a,b)=>b.total-a.total);
+  if(fwSort==='asc')  ordered.sort((a,b)=>a.total-b.total);
+  const sortCaret = fwSort==='desc' ? '▼' : fwSort==='asc' ? '▲' : '⇅';
+
+  const heads = POST_FORMATS.map(f=>`<th><div class="fw-th-inner">${fmtIcon(f)}${f}</div></th>`).join('');
+
+  const rows = ordered.map(r=>{
+    const cells = POST_FORMATS.map(f=>fwCellHTML(r.vals[f], gridMax, r.page.color, f===r.best)).join('');
+    return `<tr class="fw-row${fwExpanded===r.idx?' active':''}" onclick="toggleFwPage(${r.idx})">
+      <td>
+        <div class="fw-page-inner">
+          <span class="fw-page-dot" style="background:${r.page.color}"></span>
+          <div style="min-width:0;">
+            <div class="fw-page-name" title="${esc(r.page.name)}">${esc(r.page.name)}</div>
+            <div class="fw-page-total">Total engagements ${fmt(r.total)}</div>
+          </div>
+        </div>
+      </td>
+      ${cells}
+    </tr>`;
+  }).join('');
+
+  const leaderCells = POST_FORMATS.map(f=>{
+    const L = leaders[f];
+    if(!L) return `<td><div class="fw-val muted">–</div></td>`;
+    const p = PAGES[L.idx];
+    return `<td>
+      <div class="fw-leader-name" title="${esc(p.name)}"><span class="fw-page-dot" style="background:${p.color};margin-top:0"></span><span class="n">${esc(p.name)}</span></div>
+      <div class="fw-leader-val">${fmt(L.v)}</div>
+    </td>`;
+  }).join('');
+
   el.innerHTML = `<div class="card">
     <div class="card-hd"><div class="card-title">Which format wins in each category</div></div>
-    <div class="card-sub">Total engagements by category and post format across all pages · click a category to break it down by page · showing 10 rows, scroll for more</div>
-    <div class="hm-scroll"><div class="hm-wrap">${heatmapGridHTML(CONTENT_CATS, lens.heatmap.p1, lens.heatmap.p2)}</div></div>
-    <div class="page-legend-pill">${pageLegendHTML(true)}</div>
+    <div class="card-sub">Compare up to ${PAGES.length} pages. The best format for each page is labeled "Best". Leaders show which page performs strongest in each format · click a page to expand its categories.</div>
+    <div class="fw-wrap">
+      <table class="fw-table">
+        <thead><tr>
+          <th class="fw-sortable${fwSort==='default'?'':' active'}" style="min-width:230px;" onclick="toggleFwSort()">Page<span class="fw-sort-caret">${sortCaret}</span></th>
+          ${heads}
+        </tr></thead>
+        <tbody>
+          ${rows}
+          <tr class="fw-leader-row">
+            <td>
+              <div class="fw-leader-title">Format leader</div>
+              <div class="fw-leader-sub">Top performer per format</div>
+            </td>
+            ${leaderCells}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    ${fwExpanded!=null ? fwDetailHTML(fwExpanded) : ''}
+    <div class="fw-foot">
+      <span>Engagements include reactions, comments, shares, saves and clicks.</span>
+      <span>Date range: Last 30 days</span>
+    </div>
   </div>`;
 }
 
@@ -575,21 +704,13 @@ function renderCombos(){
 }
 
 // ---------- 5. Top categories table ----------
-// Fixed 3 metrics (Contents / Engagements / Avg Engagements), independent of the Metric selector
-// (that selector only drives card 1). Default row per category = combined total across all
-// pages. Click a category to expand into a per-page breakdown, same interaction as the
-// "Which format wins" heatmap card.
+// Columns = Category + one column per page. The value in every page column is that page's
+// value for the metric picked in the Metric selector at the top of the tab.
+// Sorting: click a page column to sort by that page; default is combined total, desc.
 const TOP_PAGE_SIZE = 10;
 let topPage = 1;
-let topExpanded = new Set();
-let topSortKey = 'contents';
+let topSortKey = 'total';   // 'total' | page index (0..4)
 let topSortDir = 'desc';
-
-const TOP_SORT_LABEL = {contents:'Contents', eng:'Engagements', avgEng:'Avg Engagements'};
-
-function topChevron(open){
-  return `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="top-chevron${open?' open':''}"><polyline points="6 9 12 15 18 9"/></svg>`;
-}
 
 function setTopSort(key){
   if(topSortKey===key){ topSortDir = topSortDir==='desc' ? 'asc' : 'desc'; }
@@ -598,65 +719,52 @@ function setTopSort(key){
   renderTopTable();
 }
 
-function toggleTopRow(name){
-  if(topExpanded.has(name)) topExpanded.delete(name);
-  else topExpanded.add(name);
-  renderTopTable();
-}
-
 function renderTopTable(){
   const lens = LENSES[currentLens];
+  const metric = METRIC_META[selectedMetric];
+  const metricLabel = metric.label;
 
-  document.getElementById('top-sub').textContent = `Ranked by combined ${TOP_SORT_LABEL[topSortKey].toLowerCase()} of both pages · click a category to break it down by page`;
-  ['contents','eng','avgEng'].forEach(k=>{
-    const th = document.getElementById('top-th-'+(k==='avgEng'?'avgeng':k));
-    th.classList.toggle('active', topSortKey===k);
-    th.innerHTML = `${TOP_SORT_LABEL[k]}<span class="top-sort-caret">${topSortKey===k ? (topSortDir==='desc'?'▼':'▲') : '▾'}</span>`;
-  });
+  document.getElementById('top-sub').textContent = `${metricLabel} by category`;
 
-  const withTotals = lens.categories.map(c=>{
-    const contents = c.p1+c.p2;
-    const eng = c.eng1+c.eng2;
-    const avgEng = contents ? Math.round(eng/contents) : 0;
-    return {...c, contents, eng, avgEng};
-  });
+  // header: # / Category / one column per page
+  const caret = key => `<span class="top-sort-caret">${topSortKey===key ? (topSortDir==='desc'?'▼':'▲') : '▾'}</span>`;
+  document.getElementById('top-thead-row').innerHTML =
+    `<th style="width:26px;padding-left:14px;">#</th>
+     <th class="top-th-sort${topSortKey==='total'?' active':''}" onclick="setTopSort('total')">Category${caret('total')}</th>` +
+    PAGES.map((p,idx)=>
+      `<th class="r top-th-sort top-th-page${topSortKey===idx?' active':''}" onclick="setTopSort(${idx})" title="${esc(p.name)} — ${metricLabel}">
+         <div class="top-th-page-inner">
+           <span class="top-page-dot" style="background:${p.color}"></span>
+           <span class="top-th-page-name">${esc(p.name)}</span>
+           ${caret(idx)}
+         </div>
+       </th>`
+    ).join('');
+
+  const rows = lens.categories.map(c=>({
+    name: c.name,
+    vals: c.pages.map(p=>p[metric.key]),
+    total: sumMetric(c, metric.key),
+  }));
   const dir = topSortDir==='desc' ? -1 : 1;
-  const sorted = [...withTotals].sort((a,b)=>(a[topSortKey]-b[topSortKey])*dir);
+  const valueOf = r => topSortKey==='total' ? r.total : r.vals[topSortKey];
+  const sorted = [...rows].sort((a,b)=>(valueOf(a)-valueOf(b))*dir);
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / TOP_PAGE_SIZE));
   if(topPage > totalPages) topPage = totalPages;
   const start = (topPage-1)*TOP_PAGE_SIZE;
   const pageRows = sorted.slice(start, start+TOP_PAGE_SIZE);
 
-  const PAGES = [
-    {name:P1.name, color:P1.color, posts:'p1', eng:'eng1'},
-    {name:P2.name, color:P2.color, posts:'p2', eng:'eng2'},
-  ];
-
-  document.getElementById('top-tbody').innerHTML = pageRows.map((c,i)=>{
-    const open = topExpanded.has(c.name);
-    const mainRow = `<tr class="top-main-row" onclick="toggleTopRow('${c.name}')">
+  document.getElementById('top-tbody').innerHTML = pageRows.map((r,i)=>{
+    const cells = r.vals.map((v,idx)=>
+      v ? `<td class="r">${fmt(v)}</td>` : `<td class="r top-empty">—</td>`
+    ).join('');
+    return `<tr>
       <td style="padding-left:14px;" class="rank-badge">${start+i+1}</td>
-      <td><div class="top-cat-cell">${topChevron(open)}<span class="top-cat-name">${c.name}</span></div></td>
-      <td class="r">${fmt(c.contents)}</td>
-      <td class="r">${fmt(c.eng)}</td>
-      <td class="r">${fmt(c.avgEng)}</td>
+      <td><div class="top-cat-cell"><span class="top-cat-name">${esc(r.name)}</span></div></td>
+      ${cells}
     </tr>`;
-    if(!open) return mainRow;
-    const subRows = PAGES.map(p=>{
-      const posts = c[p.posts], eng = c[p.eng];
-      const avgEng = posts ? Math.round(eng/posts) : 0;
-      return `<tr class="top-sub-row">
-        <td></td>
-        <td><div class="top-cat-cell"><span class="top-page-dot" style="background:${p.color}"></span>${p.name}</div></td>
-        <td class="r" style="color:${p.color};">${fmt(posts)}</td>
-        <td class="r" style="color:${p.color};">${fmt(eng)}</td>
-        <td class="r" style="color:${p.color};">${fmt(avgEng)}</td>
-      </tr>`;
-    }).join('');
-    return mainRow + subRows;
   }).join('');
-  document.getElementById('pill-table').innerHTML = pageLegendHTML();
 
   const pageBtns = [];
   for(let p=1;p<=totalPages;p++){
@@ -678,15 +786,14 @@ function goToTopPage(p){
 
 function setLens(lens, el){
   currentLens = lens;
-  hmExpanded = new Set();
-  topExpanded = new Set();
+  fwExpanded = null;
   topPage = 1;
   document.querySelectorAll('#lens-toggle .lens-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   renderAll();
 }
 
-// ---------- Metric selector — options depend on MODE, only affects card 1 (Category Bars) ----------
+// ---------- Metric selector — options depend on MODE, drives cards 1 and 5 ----------
 function renderMetricToggle(){
   const options = MODE_METRICS[MODE].options;
   document.getElementById('metric-toggle').innerHTML = options.map(key=>
@@ -699,6 +806,7 @@ function setMetric(key, el){
   document.querySelectorAll('#metric-toggle .lens-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   renderBars();
+  renderTopTable();
 }
 
 // ---------- Mode switch: My Page · Compare vs Competitors · Compare ----------
@@ -714,8 +822,7 @@ function setMode(mode, el){
   document.getElementById('pg-title').textContent = mode==='mypage' ? 'My Pages · Compare' : 'Competitors · Compare';
   document.getElementById('nav-mypages').classList.toggle('active', mode==='mypage');
   document.getElementById('nav-competitors').classList.toggle('active', mode==='competitors');
-  hmExpanded = new Set();
-  topExpanded = new Set();
+  fwExpanded = null;
   topPage = 1;
   renderMetricToggle();
   renderAll();
