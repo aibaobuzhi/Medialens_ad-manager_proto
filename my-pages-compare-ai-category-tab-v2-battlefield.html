@@ -723,7 +723,7 @@ function renderHeatmap(){
       const sel = bfDrill && bfDrill.cat===r.name && bfDrill.pageIdx===pi;
       if(x.muted){
         return `<div class="bf-cell muted${sel?' sel':''}" onclick="setBfDrill(${r.ci},${pi})" title="${esc(PAGES[pi].name)} · ${esc(r.name)}\nAvg Eng / Post: ${fmt(Math.round(x.avg))}\nOnly ${x.n} posts — below the ${BF_MIN_N}-post floor, so it is excluded from the row winner">
-          <div class="bf-v">${fmt(Math.round(x.avg))}</div><div class="bf-n">n=${x.n}</div>
+          <div class="bf-v">${fmt(Math.round(x.avg))}</div>
         </div>`;
       }
       const t = hi===lo ? 1 : (x.avg-lo)/(hi-lo);
