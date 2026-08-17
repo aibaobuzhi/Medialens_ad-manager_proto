@@ -123,9 +123,14 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
 .src-ai{background:#F0ECFF;color:#6B4BD8;}
 
 /* metric switcher */
-.metric-group{display:inline-flex;flex-wrap:wrap;background:#eef2f5;border-radius:8px;padding:2px;gap:1px;}
+.metric-group{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0;}
+.metric-strip{display:inline-flex;flex-wrap:wrap;background:#eef2f5;border-radius:8px;padding:2px;gap:1px;min-width:0;max-width:100%;}
 .metric-btn{border:none;background:transparent;font-family:inherit;font-size:11.5px;color:var(--muted);padding:5px 11px;border-radius:6px;cursor:pointer;font-weight:500;white-space:nowrap;}
 .metric-btn.active{background:#fff;color:var(--brand);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08);}
+.metric-btn.disabled{opacity:.45;cursor:not-allowed;}
+.metric-btn.disabled.active{background:transparent;box-shadow:none;color:var(--muted);}
+.metric-toggle{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted);white-space:nowrap;margin-left:auto;flex-shrink:0;}
+.toggle.disabled{opacity:.45;cursor:not-allowed;}
 
 /* ===== CAT-ROW BAR CHART (reference style) ===== */
 .bars{display:flex;flex-direction:column;margin-top:4px;}
@@ -486,23 +491,31 @@ body{font-family:'Poppins','Noto Sans HK',sans-serif;background:var(--bg);color:
         <!-- B. AVG ENGAGEMENT BY CATEGORY (bars) -->
         <div class="card" style="margin-bottom:16px;">
           <div class="card-hd">
-            <div class="card-title" id="barsTitle">Engagement per post by category
+            <div class="card-title" id="barsTitle">Category vs Engagements
               <span class="has-tooltip"><span class="qm">?</span>
-                <span class="tooltip-box"><span class="tt-r">Shows the average result per post, so categories can be compared fairly regardless of posting volume.</span></span>
+                <span class="tooltip-box"><span class="tt-r">Shows how each category performs for the selected metric, with the average toggle controlling whether the view is per-post or total.</span></span>
               </span>
             </div>
             <div class="metric-group" id="metricGroup">
-              <button class="metric-btn active" data-m="aeng" onclick="setMetric('aeng')">Avg Engagement</button>
-              <button class="metric-btn" data-m="eng" onclick="setMetric('eng')">Engagement</button>
-              <button class="metric-btn" data-m="er" onclick="setMetric('er')">ER</button>
-              <button class="metric-btn" data-m="pageer" onclick="setMetric('pageer')">Page ER</button>
-              <button class="metric-btn" data-m="avv" onclick="setMetric('avv')">Avg Video Views</button>
-              <button class="metric-btn" data-m="ctr" onclick="setMetric('ctr')">CTR</button>
-              <button class="metric-btn" data-m="nfr" onclick="setMetric('nfr')">Non-Fans Reach</button>
+              <div class="metric-strip" id="metricStrip">
+                <button class="metric-btn active" data-m="engagements" onclick="setMetric('engagements')">Engagements</button>
+                <button class="metric-btn" data-m="comments" onclick="setMetric('comments')">Comments</button>
+                <button class="metric-btn" data-m="shares" onclick="setMetric('shares')">Shares</button>
+                <button class="metric-btn" data-m="er" onclick="setMetric('er')">ER</button>
+                <button class="metric-btn" data-m="pageer" onclick="setMetric('pageer')">Page ER</button>
+                <button class="metric-btn" data-m="pageerbp" onclick="setMetric('pageerbp')">Page ER(bp)</button>
+                <button class="metric-btn" data-m="videoviews" onclick="setMetric('videoviews')">Video Views</button>
+                <button class="metric-btn" data-m="ctr" onclick="setMetric('ctr')">CTR</button>
+                <button class="metric-btn" data-m="nfr" onclick="setMetric('nfr')">Non-Fans Reach</button>
+              </div>
+              <div class="metric-toggle">
+                <span>Avg</span>
+                <button class="toggle on" id="avgToggle" onclick="toggleAverage()" aria-label="Average toggle"></button>
+              </div>
             </div>
           </div>
           <div class="card-sub" id="barsSub">
-            <span id="barsSubText">Ranked by avg engagement. Δ = vs prior 7 days.</span>
+            <span id="barsSubText">Ranked by average engagements. Δ = vs prior 7 days.</span>
           </div>
           <!-- main bars view -->
           <div id="mainBarsView">
@@ -867,31 +880,63 @@ var TOPPOSTS=[
   {th:'🚇',name:'Breaking: new MTR line opens ahead of schedule',fmt:'LINK',cat:'News & Current Affairs',sub:'Local & Regional News',adcat:'Text-Only Graphic',eng:1240,likes:680,comments:360,vv:2100,d:-6}
 ];
 
-var METRIC_LABEL = {aeng:'Avg Engagement',eng:'Engagement',er:'ER',pageer:'Page ER',avv:'Avg Video Views',ctr:'CTR',nfr:'Non-Fans Reach'};
-var METRIC_UNIT  = {aeng:'per post',eng:'total',er:'vs followers',pageer:'daily · vs followers',avv:'per post',ctr:'per post',nfr:'total'};
+var METRIC_LABEL = {
+  engagements:'Engagements',
+  comments:'Comments',
+  shares:'Shares',
+  er:'ER',
+  pageer:'Page ER',
+  pageerbp:'Page ER(bp)',
+  videoviews:'Video Views',
+  ctr:'CTR',
+  nfr:'Non-Fans Reach'
+};
+var METRIC_DEFAULT_AVG = {engagements:true,comments:true,shares:true,videoviews:true,er:false,pageer:false,pageerbp:false,ctr:false,nfr:false};
+var METRIC_NO_TOGGLE_ON = {er:true,pageer:true,pageerbp:true,ctr:true,nfr:true};
+var METRIC_UNIT  = {
+  engagements:'per post',comments:'per post',shares:'per post',videoviews:'per post',
+  er:'vs followers',pageer:'vs followers',pageerbp:'vs followers',ctr:'per post',nfr:'total'
+};
 
 /* ============ STATE ============ */
-var lens='content', metric='aeng', comboLevel='main';
+var lens='content', metric='engagements', avgOn=true, comboLevel='main';
 
 /* ============ HELPERS ============ */
 function fmt(n){return n>=1000?(n/1000).toFixed(n>=10000?0:1)+'k':String(Math.round(n));}
 function fmtK(n){if(n>=1000000)return (n/1000000).toFixed(1)+'M';if(n>=1000)return (n/1000).toFixed(n>=10000?0:1)+'K';return String(Math.round(n));}
+function fmtMetricNumber(n,m){
+  if(m==='er'||m==='pageer'||m==='pageerbp'||m==='ctr') return n.toFixed(2)+'%';
+  return fmtK(n);
+}
 function val(row,m){return row[m];}
 function subVal(subEng,m){return m==='eng'?subEng:Math.round(subEng*SUB_RATIO[m]);}
+function metricKeyLabel(){
+  var base=METRIC_LABEL[metric]||metric;
+  if(metric==='pageerbp') return 'Page ER(bp)';
+  if(metric==='engagements' || metric==='comments' || metric==='shares' || metric==='videoviews'){
+    return (avgOn ? 'Avg ' : '') + base;
+  }
+  return base;
+}
 function metricVal(r,m){
-  if(m==='aeng')  return r.eng;
-  if(m==='eng')   return r.posts*r.eng;
-  if(m==='er')    return r.eng/FOLLOWERS*100;
-  if(m==='pageer')return (r.posts*r.eng)/12000000*100;
-  if(m==='avv')   return r.vv;                          /* avg video views per post */
-  if(m==='ctr')   return +(r.eng/FOLLOWERS*2.8).toFixed(2); /* mock CTR */
-  if(m==='nfr')   return Math.round(r.posts*r.eng*4.2); /* mock non-fans reach */
-  return 0;
+  var base = {
+    engagements: r.eng,
+    comments: r.cm,
+    shares: Math.round(r.eng*0.22),
+    videoviews: r.vv,
+    er: r.eng/FOLLOWERS*100,
+    pageer: (r.posts*r.eng)/12000000*100,
+    pageerbp: (r.posts*r.eng)/12000000*100,
+    ctr: +(r.eng/FOLLOWERS*2.8).toFixed(2),
+    nfr: Math.round(r.posts*r.eng*4.2)
+  }[m];
+  if(m==='engagements' || m==='comments' || m==='shares' || m==='videoviews'){
+    return avgOn ? base : base * r.posts;
+  }
+  return base;
 }
 function barValText(v){
-  if(metric==='er'||metric==='pageer') return v.toFixed(1)+'%';
-  if(metric==='ctr') return v.toFixed(2)+'%';
-  return fmt(v);
+  return fmtMetricNumber(v,metric);
 }
 function overallAvg(d,m){ // weighted by posts
   var tp=0,tv=0; d.rows.forEach(function(r){tp+=r.posts;tv+=r.posts*val(r,m);});
@@ -934,8 +979,8 @@ function renderBars(){
   var d=DATA[lens];
   var rows=d.rows.slice().sort(function(a,b){return metricVal(b,metric)-metricVal(a,metric);});
   renderBarRows(rows, document.getElementById('catBars'), false);
-  document.getElementById('barsTitle').childNodes[0].nodeValue='Category vs '+METRIC_LABEL[metric]+' ';
-  document.getElementById('barsSubText').textContent='Ranked by '+METRIC_LABEL[metric].toLowerCase()+'. % = share of total engagement. Δ = vs prior 7 days.';
+  document.getElementById('barsTitle').childNodes[0].nodeValue='Category vs '+metricKeyLabel()+' ';
+  document.getElementById('barsSubText').textContent='Ranked by '+metricKeyLabel().toLowerCase()+'. Δ = vs prior 7 days.';
   backToMain();
 }
 
@@ -1083,10 +1128,13 @@ function closePostModal(){
 /* ============ RENDER: BEST COMBINATIONS ============ */
 function comboMetricVal(baseV){
   /* scale the base avg-engagement combo value to the selected metric */
-  if(metric==='aeng'||metric==='eng') return baseV;
-  if(metric==='avv') return Math.round(baseV*3.2);
+  if(metric==='engagements') return avgOn ? baseV : Math.round(baseV*5.2);
+  if(metric==='comments') return avgOn ? Math.round(baseV*0.18) : Math.round(baseV*0.18*5.2);
+  if(metric==='shares') return avgOn ? Math.round(baseV*0.09) : Math.round(baseV*0.09*5.2);
+  if(metric==='videoviews') return avgOn ? Math.round(baseV*3.2) : Math.round(baseV*3.2*5.2);
   if(metric==='er')  return +(baseV/FOLLOWERS*100).toFixed(2);
   if(metric==='pageer') return +(baseV*0.0004).toFixed(3);
+  if(metric==='pageerbp') return +(baseV*0.0004).toFixed(3);
   if(metric==='ctr') return +(baseV/FOLLOWERS*2.8).toFixed(2);
   if(metric==='nfr') return Math.round(baseV*4.2);
   return baseV;
@@ -1116,12 +1164,12 @@ function renderCombo(elId, data, labelA, labelB){
     return '<div class="cbar-row" style="cursor:pointer" onclick="openComboPostModal(\''+aEsc+'\',\''+bEsc+'\',\''+laEsc+'\',\''+lbEsc+'\')" title="Click to see posts">'+
       '<div><div class="cbar-label" title="'+label+'">'+label+'</div>'+
       '<div class="cbar-track"><div class="cbar-fill" style="width:'+w+'%;background:'+r.c+'"></div></div></div>'+
-      '<div class="cbar-val">'+disp+' <span class="cbar-pct">('+share+')</span><br>'+dtext+'</div></div>';
+      '<div class="cbar-val">'+disp+'<br>'+dtext+'</div></div>';
   }).join('');
 }
 function renderCombos(){
   var c=COMBOS[lens];
-  var lbl=METRIC_LABEL[metric];
+  var lbl=metricKeyLabel();
   document.getElementById('comboTitle1').childNodes[0].nodeValue=c.c1.t+' ';
   document.getElementById('comboTitle2').childNodes[0].nodeValue=c.c2.t+' ';
   document.getElementById('comboSub1').textContent='Best combinations by '+lbl+'.';
@@ -1185,18 +1233,20 @@ function toggleAdvExpand(){
 
 /* ============ RENDER: TOP CONTENT (per-post) ============ */
 function postMetricVal(p,m){
-  if(m==='aeng'||m==='eng') return p.eng;
-  if(m==='avv') return p.vv;
+  if(m==='engagements') return avgOn ? p.eng : p.eng*6;
+  if(m==='comments') return avgOn ? p.comments : p.comments*6;
+  if(m==='shares') return avgOn ? Math.round(p.eng*0.22) : Math.round(p.eng*0.22*6);
+  if(m==='videoviews') return avgOn ? p.vv : p.vv*6;
   if(m==='er')  return +(p.eng/FOLLOWERS*100).toFixed(2);
-  if(m==='pageer') return +(p.eng*0.0004).toFixed(3);
+  if(m==='pageer' || m==='pageerbp') return +(p.eng*0.0004).toFixed(3);
   if(m==='ctr') return +(p.eng/FOLLOWERS*2.8).toFixed(2);
   if(m==='nfr') return Math.round(p.eng*4.2);
   return p.eng;
 }
 function renderTopContent(){
-  var lbl=METRIC_LABEL[metric];
+  var lbl=metricKeyLabel();
   document.getElementById('topMetricLabel').textContent=lbl;
-  var isPct=metric==='er'||metric==='pageer'||metric==='ctr';
+  var isPct=metric==='er'||metric==='pageer'||metric==='pageerbp'||metric==='ctr';
   var rows=TOPPOSTS.slice().sort(function(a,b){return postMetricVal(b,metric)-postMetricVal(a,metric);});
   document.getElementById('topContent').innerHTML=rows.map(function(p,i){
     var mv=postMetricVal(p,metric);
@@ -1255,8 +1305,8 @@ function renderMatrix(){
     leg+='<div class="sl-item"><span class="sl-num" style="background:'+r.c+'">'+(i+1)+'</span>'+r.n+'</div>';
   });
   document.getElementById('scatterLegend').innerHTML=leg;
-  document.getElementById('matrixAxisY').textContent=METRIC_LABEL[metric]+' →';
-  document.getElementById('matrixSub').textContent='Dashed lines = channel average '+METRIC_LABEL[metric]+'. Bubble size = total engagement the category earned.';
+  document.getElementById('matrixAxisY').textContent=metricKeyLabel()+' →';
+  document.getElementById('matrixSub').textContent='Dashed lines = channel average '+metricKeyLabel()+'. Bubble size = total engagement the category earned.';
 }
 
 /* ============ RENDER: FORMAT HEATMAP ============ */
@@ -1281,7 +1331,7 @@ function renderFormatHeat(){
     }).join('')+'</tr>';
   }).join('');
   document.getElementById('heatmap').innerHTML=head+body;
-  document.getElementById('heatSub').textContent='Index 100 = channel average '+METRIC_LABEL[metric]+'. Darker = stronger. Format = Meta post type (Link / Share / Photo / Album / Video / Status).';
+  document.getElementById('heatSub').textContent='Index 100 = channel average '+metricKeyLabel()+'. Darker = stronger. Format = Meta post type (Link / Share / Photo / Album / Video / Status).';
 }
 
 /* ============ ORCHESTRATION ============ */
@@ -1301,10 +1351,32 @@ function setLens(l){
 }
 function setMetric(m){
   metric=m;
-  document.querySelectorAll('#metricGroup .metric-btn').forEach(function(b){b.classList.toggle('active',b.dataset.m===m);});
+  if(METRIC_DEFAULT_AVG[m]===false || METRIC_NO_TOGGLE_ON[m]) avgOn=false;
+  else if(typeof METRIC_DEFAULT_AVG[m] !== 'undefined') avgOn=METRIC_DEFAULT_AVG[m];
+  document.querySelectorAll('#metricStrip .metric-btn').forEach(function(b){
+    var isActive=b.dataset.m===m;
+    b.classList.toggle('active',isActive);
+    b.classList.toggle('disabled',!!METRIC_NO_TOGGLE_ON[b.dataset.m]);
+  });
+  syncAvgToggle();
   renderAll();
   renderTopContent();
 }
+function syncAvgToggle(){
+  var t=document.getElementById('avgToggle');
+  if(!t) return;
+  t.classList.toggle('on',!!avgOn);
+  t.classList.toggle('disabled',!!METRIC_NO_TOGGLE_ON[metric]);
+  t.setAttribute('aria-disabled', METRIC_NO_TOGGLE_ON[metric] ? 'true' : 'false');
+}
+function toggleAverage(){
+  if(METRIC_NO_TOGGLE_ON[metric]) return;
+  avgOn=!avgOn;
+  syncAvgToggle();
+  renderAll();
+  renderTopContent();
+}
+syncAvgToggle();
 renderAll();
 renderTopContent();
 
