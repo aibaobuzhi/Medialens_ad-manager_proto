@@ -16801,6 +16801,85 @@ header.el-header, aside.el-aside, .page-menu, .demo-disclaimer { display:none !i
 .sl-root .component-page-section { margin-bottom:24px; }
 .sl-root .page-dashboard { display:block !important; }
 
+
+/* ======================= mobile ======================= */
+@media (max-width: 768px) {
+  .sl-root { padding:18px 12px 40px; }
+  .sl-brand { margin-bottom:16px; }
+  .sl-brand img { height:22px; }
+
+  .sl-header { padding:22px 18px; border-radius:16px; margin-bottom:20px; }
+  .sl-header-title { font-size:1.45rem; margin:0 0 12px; }
+  .sl-header-sub { margin-bottom:12px; }
+  .sl-header-sub-text { font-size:.92rem; }
+  .sl-header-emoji { width:28px; height:28px; font-size:14px; }
+  .sl-header-meta { font-size:.8rem; gap:4px 8px; }
+  .sl-header-meta .sl-dot { display:none; }
+  .sl-header-meta > span { flex:0 0 100%; }
+  .sl-export { position:static; width:100%; margin:0 0 16px; }
+
+  .sl-body { padding:18px 14px 26px; border-radius:16px; }
+  .sl-kw-title { font-size:.98rem; }
+  .sl-kw-row { gap:8px; margin-bottom:14px; }
+  .sl-kw-chip { font-size:.95rem; padding:7px 12px; }
+  .sl-kw-lock { flex:0 0 100%; }
+  .sl-kw-actions { margin-left:0; flex:0 0 100%; }
+  .sl-kw-action { flex:1; }
+
+  .sl-tabbar { flex-wrap:wrap; }
+  .sl-tab { flex:1; padding:10px 12px; font-size:.9rem; }
+  .sl-datepicker { order:3; flex:0 0 100%; box-sizing:border-box; margin:10px 0 8px; justify-content:center; }
+
+  .sl-ai-head { font-size:1rem; }
+  .sl-ai-card { padding:18px 16px; border-radius:12px; }
+  .sl-ai-card p, .sl-ai-card li { font-size:.88rem; }
+  .sl-ai-card ul { padding-left:16px; }
+
+  /* filter bar: the app renders it as a fixed-track grid — let it wrap */
+  /* the filter row's inner nodes keep fixed widths well past the viewport, so
+     wrap what wraps and let the rest pan rather than bleed out of the panel */
+  .sl-filter-wrap { padding:10px 12px; overflow-x:auto; }
+  .sl-filter-wrap .filters { display:flex !important; flex-wrap:wrap; gap:8px 14px; }
+
+  /* Dashboard stat boxes: two per row.
+     Switch the container to flex — the app lays these out with grid tracks, and
+     overriding grid-template-columns is fragile; changing `display` makes those
+     track rules inert instead of fighting the cascade.
+     The section must NOT be a scroll container here, or the boxes would size
+     against the 620px min-width the Posts chart forces (that's what kept them
+     on one row); only the chart wrapper inside it scrolls. */
+  .sl-body .section-overview { overflow-x:visible !important; }
+  .sl-body .section-overview .chart-wrapper { overflow-x:auto; }
+  .sl-body .section-overview .content {
+    display:flex !important; flex-wrap:wrap !important; gap:10px !important; }
+  .sl-body .section-overview .content > * {
+    flex:1 1 calc(50% - 5px) !important; min-width:0 !important; }
+  .sl-body .section-overview .content > .chart-wrapper,
+  .sl-body .section-overview .content > .data-box.chart {
+    flex:1 1 100% !important; }
+
+  /* post masonry: single column (columns carry an inline width:25%) */
+  .sl-body .section-posts [style*="width: 25%"],
+  .sl-body .section-posts [style*="width:25%"] { width:100% !important; border-left-width:0 !important; }
+
+  /* Charts and tables would become unreadable if squeezed to ~340px, so keep
+     them at a legible width and let the card pan horizontally instead. */
+  .sl-body .component-page-section,
+  .sl-body .section-keywords, .sl-body .section-keywords-table { overflow-x:auto; }
+  .sl-body svg[data-fitted] { min-width:620px; }
+  .sl-body .el-table__header-wrapper, .sl-body .el-table__body-wrapper { overflow-x:auto; }
+}
+
+@media (max-width: 430px) {
+  .sl-header-title { font-size:1.25rem; }
+  .sl-kw-chip { font-size:.9rem; }
+}
+
+/* only drop to one stat card per row when two genuinely can't fit */
+@media (max-width: 340px) {
+  .sl-body .section-overview .content > * { flex:1 1 100% !important; }
+}
+
 /* ---- toast ---- */
 #sl-toast { position:fixed; left:50%; bottom:40px; transform:translateX(-50%) translateY(20px); background:#1a2540;
   color:#fff; padding:13px 22px; border-radius:10px; font-size:.87rem; opacity:0; transition:.25s; z-index:9999;
