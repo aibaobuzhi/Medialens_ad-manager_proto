@@ -72,7 +72,7 @@ a{color:inherit;text-decoration:none;}
 .aicat-list{flex:1;display:grid;grid-gap:18px;align-content:start;}
 .cat-row{cursor:default;}
 .cat-row.clickable{cursor:pointer;}
-.cat-line{display:flex;align-items:center;justify-content:space-between;font-size:.8125rem;color:#061d22;}
+.cat-line{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;font-size:.8125rem;color:#061d22;}
 .cat-name{display:flex;align-items:center;gap:8px;min-width:0;}
 .cat-index{color:#ff6b57;font-weight:500;}
 .cat-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -163,17 +163,67 @@ html,body{background:#f4f6f9;}
 .ai-card{background:#fff;border:1px solid #e5e9ef;border-radius:.625rem;box-shadow:rgba(6,29,34,.08) 2px 1px 20px;padding:20px 24px;}
 .ai-card h4{font-size:.9375rem;margin:14px 0 6px;}
 .ai-card h4:first-child{margin-top:0;}
+.ai-card .ai-lede{font-size:.9375rem;line-height:1.65;color:#061d22;margin:0 0 16px;}
+.ai-card h5{font-size:.8125rem;font-weight:600;color:#27383d;margin:12px 0 4px;letter-spacing:.01em;}
+.ai-card .ai-group{border-left:2px solid #e9eef4;padding-left:14px;margin:6px 0 14px;}
+.ai-card .ai-group p{margin:0 0 8px;}
+.ai-card .ai-group ul{margin:0 0 10px;}
+.ai-card h4:first-child{margin-top:0;}
 .ai-card p{font-size:.875rem;line-height:1.6;margin:0 0 12px;}
 .ai-card ul{margin:0 0 12px;padding-left:18px;font-size:.875rem;line-height:1.7;}
 .ai-skel-bar{border-radius:6px;animation:mlPulse 1.4s ease-in-out infinite;}
-.kol-meta{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 16px;}
-.kol-chip{background:#f2f8ff;color:#0b6fbc;border-radius:6px;padding:6px 12px;font-size:.75rem;}
-.kol-score{display:flex;align-items:center;gap:16px;margin-bottom:16px;}
-.kol-score .num{font-size:2.25rem;font-weight:700;color:#23a9f6;line-height:1;}
-.kol-score .lbl{font-size:.8125rem;color:#606266;}
-.kol-bar{height:8px;border-radius:5px;background:#eef1f5;flex:1;overflow:hidden;}
+.kol-fit-card{padding:0;overflow:hidden;}
+.kol-fit-top{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:22px;padding:22px 24px 20px;border-bottom:1px solid #e9eef4;background:linear-gradient(180deg,#fbfdff 0%,#fff 100%);}
+.kol-meta{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;}
+.kol-chip{background:#f4f8fc;color:#0b6fbc;border-radius:6px;padding:5px 10px;font-size:.75rem;line-height:1.35;}
+.kol-verdict{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;}
+.kol-verdict .num{font-size:2.25rem;font-weight:700;color:#23a9f6;line-height:1;}
+.kol-verdict .label{font-size:1.375rem;font-weight:600;color:#061d22;line-height:1.1;}
+.kol-verdict .sub{width:100%;font-size:.8125rem;color:#606266;line-height:1.5;}
+.kol-summary{margin-top:12px;max-width:760px;font-size:.875rem;line-height:1.55;color:#27383d;}
+.kol-score-panel{align-self:stretch;border-left:1px solid #e9eef4;padding-left:22px;display:flex;flex-direction:column;justify-content:center;gap:10px;}
+.kol-score-label{display:flex;justify-content:space-between;gap:12px;font-size:.75rem;color:#606266;}
+.kol-score-label b{font-size:1rem;color:#061d22;}
+.kol-bar{height:8px;border-radius:5px;background:#edf2f7;overflow:hidden;}
 .kol-bar span{display:block;height:100%;background:linear-gradient(90deg,#23a9f6,#7bd3ff);}
+.kol-score-note{font-size:.75rem;color:#909399;line-height:1.45;}
+.kol-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:#e9eef4;border-bottom:1px solid #e9eef4;}
+.kol-metric{background:#fff;padding:14px 18px;}
+.kol-metric .v{font-size:1.25rem;font-weight:700;color:#061d22;line-height:1.1;}
+.kol-metric .l{margin-top:4px;font-size:.75rem;color:#606266;line-height:1.35;}
+.kol-fit-body{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:0;border-top:0;}
+.kol-panel{padding:20px 22px 22px;border-right:1px solid #e9eef4;}
+.kol-panel:last-child{border-right:0;}
+.kol-panel h4{font-size:.875rem;margin:0 0 12px;color:#061d22;}
+.kol-lede{font-size:.875rem;line-height:1.6;color:#27383d;margin:0 0 14px;}
+.kol-proof-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.kol-proof{background:#f7f9fc;border:1px solid #edf1f5;border-radius:8px;padding:10px 12px;}
+.kol-proof .v{font-size:1rem;font-weight:700;color:#061d22;line-height:1.2;}
+.kol-proof .l{margin-top:3px;font-size:.75rem;color:#606266;line-height:1.35;}
+.kol-action-list,.kol-risk-list{display:grid;gap:10px;margin:0;padding:0;list-style:none;}
+.kol-action-list li,.kol-risk-list li{position:relative;padding-left:24px;font-size:.8125rem;line-height:1.5;color:#27383d;}
+.kol-action-list li::before{content:attr(data-step);position:absolute;left:0;top:1px;width:16px;height:16px;border-radius:50%;background:#e8f6ff;color:#0b6fbc;font-size:.6875rem;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.kol-risk-list li::before{content:"";position:absolute;left:3px;top:8px;width:8px;height:8px;border-radius:50%;background:#f7a52b;}
+.kol-list-title{font-weight:600;color:#061d22;}
+.kol-footnote{padding:12px 24px;background:#fbfcfe;border-top:1px solid #edf1f5;color:#909399;font-size:.75rem;line-height:1.45;}
 .report-filter-note{font-size:.75rem;color:#909399;font-style:italic;margin-top:10px;}
+@media (max-width:900px){
+  .report-wrap{padding:20px 14px 44px;}
+  .report-header{padding:30px 24px 28px;}
+  .report-identity{grid-template-columns:72px minmax(0,1fr);gap:18px;}
+  .report-identity .bio{grid-column:1 / -1;}
+  #ml-export-slides-wrap{position:static;margin-bottom:18px;}
+  .page-root,.section,.section-head,.stat-grid,.stat-card,.stat-body,.stat-inline,.aicat-grid,.aicat-card,.posts-area,.posts-main{min-width:0;width:100%;}
+  .aicat-list,.cat-row,.cat-line,.cat-bar{min-width:0;width:100%;max-width:100%;}
+  .section-head{align-items:flex-start;gap:8px;flex-direction:column;}
+  .kol-fit-top,.kol-fit-body{grid-template-columns:1fr;}
+  .kol-score-panel{border-left:0;border-top:1px solid #e9eef4;padding-left:0;padding-top:16px;}
+  .kol-metrics{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .kol-panel{border-right:0;border-bottom:1px solid #e9eef4;}
+  .kol-panel:last-child{border-bottom:0;}
+  .stat-grid,.aicat-grid,.posts-area{grid-template-columns:1fr;}
+  .post-grid{columns:1;}
+}
 </style></head>
 <body>
 <div class="report-wrap">
@@ -192,6 +242,9 @@ html,body{background:#f4f6f9;}
 </section>
 
   
+
+
+  
 <section class="ai-section" id="ml-kol-fit-section">
   <div class="ai-section-head"><span style="color:#23a9f6;"><svg viewBox='0 0 24 24' width='20' height='20'><path fill='currentColor' d='M12 2.5c.35 0 .66.23.77.56l1.3 3.98a4 4 0 0 0 2.53 2.53l3.98 1.3a.81.81 0 0 1 0 1.54l-3.98 1.3a4 4 0 0 0-2.53 2.53l-1.3 3.98a.81.81 0 0 1-1.54 0l-1.3-3.98a4 4 0 0 0-2.53-2.53l-3.98-1.3a.81.81 0 0 1 0-1.54l3.98-1.3a4 4 0 0 0 2.53-2.53l1.3-3.98A.81.81 0 0 1 12 2.5Z'/><path fill='currentColor' d='M19 2.5c.18 0 .34.12.4.29l.53 1.62c.1.31.35.55.66.66l1.62.53a.42.42 0 0 1 0 .8l-1.62.53a1.05 1.05 0 0 0-.66.66l-.53 1.62a.42.42 0 0 1-.8 0l-.53-1.62a1.05 1.05 0 0 0-.66-.66l-1.62-.53a.42.42 0 0 1 0-.8l1.62-.53c.31-.1.55-.35.66-.66l.53-1.62A.42.42 0 0 1 19 2.5Z'/></svg></span><span class="t">AI KOL-Product Fit</span></div>
   <div class="ai-card" id="ml-kol-skeleton">
@@ -201,45 +254,34 @@ html,body{background:#f4f6f9;}
     <div class="ai-skel-bar" style="height:12px;width:64%;background:rgba(35,169,246,.1);"></div>
   </div>
   <div class="ai-card" id="ml-kol-content" style="display:none;">
-    <div class="kol-meta">
-      <span class="kol-chip">Product link · www.examplebrand.com</span>
-      <span class="kol-chip">Evaluated against 18 posts · 2026-07-17 to 2026-08-16</span>
-      <span class="kol-chip">Generated by MediaLens AI</span>
-    </div>
-    <div class="kol-score">
-      <div><div class="num">Strong Fit</div><div class="lbl">Family &amp; lifestyle category</div></div>
-      <div class="kol-bar"><span style="width:82%"></span></div>
-    </div>
-    <h4>Why this KOL fits</h4>
-    <p>Every one of the <b>18 posts</b> in this period is tagged <b>Lifestyle &amp; Personal Development</b> (100% coverage), with
-      <b>Parenting &amp; Family</b> and <b>Travel &amp; Adventure</b> as the two largest sub-themes (2 posts each). The account's
-      declared interests are <b>Beauty</b> and <b>Travel</b>, and the creator publishes as a <b>Blogger / YouTuber</b> in <b>HK</b> —
-      a family-facing consumer product sits inside the content she already makes, not next to it.</p>
-    <h4>Audience &amp; engagement evidence</h4>
+    <h4>KOL Analysis and Commentary</h4>
+    <p>Evaluated against <b>www.examplebrand.com</b>, a family-and-baby care range. This creator's feed is a
+      running family diary rather than a review channel, which is the right register for this category: the
+      product would appear inside a routine her audience already follows, not as an inserted demonstration.
+      Her strongest work is unscripted and domestic; anything requiring ingredient explanation or clinical
+      claims sits outside what she does credibly. Facebook is where her audience actually engages, and her
+      commentary style is warm and first-person, so a brief written as a personal recommendation will read as
+      continuous with her own content.</p>
+
+    <h4>Suitability Evaluation for the client</h4>
+    <p><b>Suitable</b>, with conditions. The audience overlap is the strongest argument: parenting and family
+      material dominates her recent output and the two posts that outperformed everything else this period were
+      both family occasions. The brand's proposition is a daily-use family product, which maps onto that
+      material without asking her to change tone. She is not the right choice for a launch that depends on
+      technical authority or on Instagram-first reach.</p>
     <ul>
-      <li><b>254.8K</b> followers across three platforms (Facebook <b>161.3K</b>, Instagram <b>75.6K</b>, YouTube <b>18K</b>), with Facebook followers up <b>20.32%</b> this period.</li>
-      <li><b>Post ER 4.69%</b> on Facebook and <b>3.55%</b> on Instagram — engagement per post holds up on both feeds.</li>
-      <li>The single Instagram video drew <b>120.1K</b> views at a <b>2.15%</b> Video Like Rate, so video assets travel beyond the follower base.</li>
-      <li>Top posts of the period are family moments: <b>21,249</b> and <b>17,321</b> engagements on the birthday-celebration content.</li>
-    </ul>
-    <h4>Recommended content angles</h4>
-    <ul>
-      <li><b>Lead with a real family moment, not a product demo</b> — the two highest-engagement posts are unstaged family occasions.</li>
-      <li><b>Brief a Facebook-first placement</b> — 17 of 18 posts and the higher Post ER (4.69%) sit on Facebook.</li>
-      <li><b>Add one Instagram video</b> — the only video in the period reached 120.1K views, the widest reach of any asset here.</li>
-      <li><b>Keep the creative in UGC style</b> — <b>66.67%</b> of posts are tagged <i>User-Generated Content (UGC) &amp; Lifestyle Shots</i>, which is the format her audience is used to.</li>
-    </ul>
-    <h4>Watch-outs</h4>
-    <ul>
-      <li>Posting volume dropped <b>82.29%</b> versus the previous period (17 Facebook posts), and Daily Page ER fell <b>84.47%</b> — confirm her publishing cadence before locking a campaign schedule.</li>
-      <li>No branded or paid content was detected in this period (<b>Brands Mentioned: 0</b>), so there is no historical sponsored-post benchmark for this account yet.</li>
-      <li>Instagram carries only <b>1</b> post in the period — Instagram-side figures come from a single data point.</li>
+      <li><b>Where she adds value:</b> credibility inside the family routine, and a demonstrated ability to
+        make an ordinary domestic moment travel.</li>
+      <li><b>Where she does not:</b> expert or clinical positioning, product comparison formats, and
+        Instagram-led campaigns — that channel is barely active in this period.</li>
+      <li><b>What must be settled first:</b> her posting rhythm changed sharply this period, and no prior
+        sponsored work is visible, so deliverable dates, approval rounds and rate expectations all have to be
+        agreed rather than inferred.</li>
     </ul>
   </div>
 </section>
 
-  
-<section class="ai-section">
+  <section class="ai-section">
   <div class="ai-section-head"><span style="color:#23a9f6;"><svg viewBox='0 0 24 24' width='20' height='20'><path fill='currentColor' d='M12 2.5c.35 0 .66.23.77.56l1.3 3.98a4 4 0 0 0 2.53 2.53l3.98 1.3a.81.81 0 0 1 0 1.54l-3.98 1.3a4 4 0 0 0-2.53 2.53l-1.3 3.98a.81.81 0 0 1-1.54 0l-1.3-3.98a4 4 0 0 0-2.53-2.53l-3.98-1.3a.81.81 0 0 1 0-1.54l3.98-1.3a4 4 0 0 0 2.53-2.53l1.3-3.98A.81.81 0 0 1 12 2.5Z'/><path fill='currentColor' d='M19 2.5c.18 0 .34.12.4.29l.53 1.62c.1.31.35.55.66.66l1.62.53a.42.42 0 0 1 0 .8l-1.62.53a1.05 1.05 0 0 0-.66.66l-.53 1.62a.42.42 0 0 1-.8 0l-.53-1.62a1.05 1.05 0 0 0-.66-.66l-1.62-.53a.42.42 0 0 1 0-.8l1.62-.53c.31-.1.55-.35.66-.66l.53-1.62A.42.42 0 0 1 19 2.5Z'/></svg></span><span class="t">AI Summary</span></div>
   <div class="ai-card" id="ml-ai-summary-skeleton">
     <div class="ai-skel-bar" style="height:14px;width:40%;background:rgba(35,169,246,.16);margin-bottom:14px;"></div>
@@ -248,30 +290,71 @@ html,body{background:#f4f6f9;}
     <div class="ai-skel-bar" style="height:12px;width:70%;background:rgba(35,169,246,.1);"></div>
   </div>
   <div class="ai-card" id="ml-ai-summary-content" style="display:none;">
-    <h4>Page Activity &amp; Performance</h4>
-    <p><b>Yumi P</b> published <b>18 posts</b> between <b>2026-07-17</b> and <b>2026-08-16</b> — <b>17</b> on Facebook and
-      <b>1</b> on Instagram — against a combined following of <b>254.8K</b> (Facebook <b>161.3K</b>, Instagram <b>75.6K</b>,
-      YouTube <b>18K</b>). Facebook carries the account: <b>Daily Page ER 2.57%</b> and <b>Post ER 4.69%</b> there, versus
-      <b>0.11%</b> and <b>3.55%</b> on Instagram, with YouTube inactive (<b>0</b> posts) this period.</p>
+    <p class="ai-lede">This is a family-and-lifestyle creator, not a product reviewer. Her output is a continuous personal
+      narrative — family occasions, everyday outings, travel-adjacent scenes — and the audience responds to the
+      moment, not to the item on screen. Facebook is the working channel; Instagram and YouTube are maintained
+      rather than active. Two strengths matter for a buyer: the audience is still growing while she posts less,
+      and her single video asset travelled well beyond her follower base. Two concerns are equally clear: her
+      posting cadence dropped sharply against the previous period, so availability must be confirmed before a
+      schedule is agreed; and engagement is concentrated in a couple of standout family posts, which means an
+      average-case package will not reproduce her best-case numbers.</p>
 
-    <h4>Key Findings &amp; Insights</h4>
+    <h4>Analysis</h4>
+    <div class="ai-group">
+      <h5>What This Account Is</h5>
+      <p><b>Influencer</b> · <b>HK</b> · <b>Blogger / YouTuber</b>, tagged <b>Beauty</b> and <b>Travel</b>.
+        Three linked accounts — Facebook, Instagram, YouTube — carrying <b>18 posts</b> in this period, of which
+        <b>17</b> are on Facebook.</p>
+
+      <h5>Audience &amp; Engagement Reality</h5>
+      <ul>
+        <li><b>Scale sits on Facebook:</b> <b>254.8K</b> followers in total — Facebook <b>161.3K</b>,
+          Instagram <b>75.6K</b>, YouTube <b>18K</b> — and Facebook followers grew <b>20.32%</b> this period.</li>
+        <li><b>Cadence dropped sharply:</b> Facebook posting fell <b>82.29%</b> versus the previous period and
+          Daily Page ER fell <b>84.47%</b>, so the audience grew while output shrank.</li>
+        <li><b>Per-post engagement holds:</b> <b>Post ER 4.69%</b> on Facebook and <b>3.55%</b> on Instagram
+          (based on a single post in this period).</li>
+        <li><b>Engagement is concentrated:</b> the top two posts (<b>21,249</b> and <b>17,321</b>) sit far above
+          the <b>1,595–6,622</b> range of everything else shown, so a package priced on her average will not
+          reproduce her peak.</li>
+      </ul>
+
+      <h5>Content Capability</h5>
+      <ul>
+        <li><b>Single-themed content:</b> <b>Lifestyle &amp; Personal Development</b> is tagged on <b>100%</b>
+          of the 18 posts, with <b>Parenting &amp; Family</b> and <b>Travel &amp; Adventure</b> as the largest
+          sub-themes (2 posts each); a post can carry more than one category.</li>
+        <li><b>Creator-shot formats only:</b> <b>User-Generated Content (UGC) &amp; Lifestyle Shots</b> covers
+          <b>12</b> posts (<b>66.67%</b>), then <b>Text-Only Graphic</b> (<b>4</b>) and <b>Text-Only Image</b>
+          (<b>1</b>); the remainder carry no format tag.</li>
+        <li><b>Video is the reach asset:</b> the one Instagram video recorded <b>120.1K</b> views,
+          <b>159.00%</b> Video View Rate and <b>2.15%</b> Video Like Rate — the only asset here that travelled
+          past the follower base.</li>
+      </ul>
+
+      <h5>Commercial Track Record</h5>
+      <ul>
+        <li><b>No collaboration detected:</b> <b>Brands Mentioned: 0</b> for the last 180 days, and none of the
+          posts shown are boosted or dark — there is no sponsored-post history to price against, so rate
+          expectations have to be set from scratch.</li>
+      </ul>
+    </div>
+
+    <h4>Recommendation</h4>
     <ul>
-      <li><b>Volume down, audience up:</b> Facebook posting fell <b>82.29%</b> and Daily Page ER fell <b>84.47%</b> versus the previous period, yet Facebook followers grew <b>20.32%</b> — reach was gained on fewer posts.</li>
-      <li><b>Engagement is concentrated in a few family moments:</b> the top two posts (<b>21,249</b> and <b>17,321</b> engagements) are the birthday-celebration set, far above the run of 1.5K–6.6K posts.</li>
-      <li><b>One video did the reach work:</b> the single Instagram video recorded <b>120.1K</b> views, <b>159.00%</b> Video View Rate and a <b>2.15%</b> Video Like Rate — the only asset in this period that travelled past the follower base.</li>
-      <li><b>Content is single-themed:</b> <b>Lifestyle &amp; Personal Development</b> covers <b>100%</b> of the 18 posts, with <b>Entertainment &amp; Pop Culture</b> and <b>Society &amp; Culture</b> at <b>16.67%</b> each (a post can carry more than one category, so shares add above 100%).</li>
-      <li><b>Creative form is uniform:</b> <b>User-Generated Content (UGC) &amp; Lifestyle Shots</b> accounts for <b>12</b> posts (<b>66.67%</b>), then <b>Text-Only Graphic</b> (<b>4</b>) and <b>Text-Only Image</b> (<b>1</b>); the remainder carry no format tag.</li>
-      <li><b>No commercial activity detected:</b> <b>Brands Mentioned: 0</b> for the last 180 days — nothing in this window was branded or boosted.</li>
+      <li><b>Make Facebook the primary placement.</b> 17 of 18 posts and the stronger Post ER (4.69%) sit
+        there; treat Instagram as a secondary deliverable.</li>
+      <li><b>Brief a family moment, not a product demo.</b> The two highest-engagement posts are unstaged
+        family occasions, and every post in the period is tagged lifestyle.</li>
+      <li><b>Buy one Instagram video in the package.</b> The only video in this period reached 120.1K views,
+        the widest reach of any asset shown.</li>
+      <li><b>Fix dates and deliverables in the contract.</b> With posting down 82.29% and no sponsored-post
+        history on record, agree the schedule and usage rights explicitly rather than assuming recent cadence.</li>
     </ul>
 
-    <h4>Strategic Recommendations</h4>
-    <ul>
-      <li><b>Rebuild cadence before scale.</b> Posting is down 82.29% on the platform that produces the engagement; restoring frequency on Facebook is the first lever, not new formats.</li>
-      <li><b>Repeat the video format on Instagram.</b> One video produced 120.1K views against 1 Instagram post — this is the clearest under-used channel in the data.</li>
-      <li><b>Lean into Parenting &amp; Family.</b> Family occasions produced the two highest-engagement posts of the period; the sub-category is already the largest tagged theme.</li>
-      <li><b>Open a second content theme deliberately.</b> With one category covering all posts, the tail themes (Entertainment, Society &amp; Culture, Food, Health) are the available white space.</li>
-    </ul>
-    <p style="color:#909399;font-size:.75rem;font-style:italic;margin:0;">Every figure above is read from this report's own cards for the locked period; no external benchmark or competitor data is used.</p>
+    <p style="color:#909399;font-size:.75rem;font-style:italic;margin:0;">Based on 12 posts shown from the last
+      180 days, across Facebook and Instagram · AI category coverage: Facebook + Instagram only · figures read
+      from this report’s own cards · no external benchmark used.</p>
   </div>
 </section>
 
