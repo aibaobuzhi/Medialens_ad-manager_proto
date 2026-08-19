@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buzz Keywords Report - MediaLens</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Poppins,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#fff;color:#102532;min-height:100vh;padding:2.5rem 1.25rem 4rem}
+.report-card{background:#fff;border-radius:.75rem;box-shadow:0 .625rem 2.5rem #00000014;margin:0 auto;max-width:75rem;overflow:hidden;position:relative}
+/* ---- Export Slides ---- */
+.export-slides-btn{position:absolute;right:1.5rem;top:1.5rem;z-index:5}
+.export-btn{align-items:center;background:#fff;border:none;border-radius:8px;box-shadow:0 1px 3px #00000014;color:#23a6f3;cursor:pointer;display:inline-flex;font-family:inherit;font-size:.9375rem;font-weight:500;gap:8px;padding:10px 18px;transition:opacity .2s,box-shadow .2s}
+.export-btn:hover:not(.is-disabled){box-shadow:0 2px 8px #0000001f}
+.export-btn.is-disabled{opacity:.6;cursor:not-allowed}
+/* ---- Header ---- */
+.report-section-header{background:#ebf5ff;border-radius:0 0 1.25rem 1.25rem;padding:2.5rem 4rem 2rem}
+.report-brand{display:inline-flex;align-items:center;gap:.5rem;text-decoration:none;color:#001983;font-weight:700;font-size:1.05rem;letter-spacing:.08em}
+.report-brand .dot{width:18px;height:18px;border-radius:50%;background:conic-gradient(#23a9f6 0 50%,#001983 50% 100%)}
+.report-title{font-size:2.5rem;letter-spacing:.05rem;line-height:1.2;color:#102532;font-weight:500;margin-top:1rem;overflow-wrap:anywhere}
+.report-tag{display:inline-flex;align-items:center;gap:.5rem;margin-top:.625rem;color:#001983;font-weight:500}
+.report-tag .tag-icon{width:34px;height:34px;border-radius:8px;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 1px 3px #00000014}
+.sharing-subheader{margin-top:.875rem}
+.date-range{color:#001983;display:inline-flex;align-items:center;gap:.625rem;font-weight:400}
+.date-range em{margin:0 .25rem;font-style:normal;color:#637380}
+.scope-line{margin-top:.625rem;font-size:.8125rem;color:#102532}
+.scope-line .ml-tag{display:inline-block;background:#fff;color:#409eff;border-radius:4px;padding:2px 10px;font-size:12px;margin:2px 6px 2px 0;box-shadow:0 1px 2px #0000000d}
+.hints{color:#637380;font-size:.75rem;font-style:italic;margin-top:.625rem}
+/* ---- Grid & sections ---- */
+.report-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:1.25rem;row-gap:2.5rem;padding:2.5rem 4rem 4rem}
+.report-grid>section{background:#fff;border-radius:1rem;box-shadow:0 6px 28px #061d220f;padding:1.5rem;grid-column:span 2}
+.section-title{color:#001983;font-size:1.25rem;font-weight:500;letter-spacing:.025rem}
+/* Overview */
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:1.25rem}
+.metric-block .label{color:#637380;font-size:.8125rem}
+.metric-block .count{font-size:1.5rem;font-weight:600;color:#102532;margin-top:.25rem}
+/* AI summary */
+.summary-body.is-collapsed{max-height:13.5rem;overflow:hidden;position:relative}
+.summary-body.is-collapsed:after{background:linear-gradient(180deg,hsla(0,0%,100%,0),#fff 90%);bottom:0;content:"";height:3.5rem;left:0;pointer-events:none;position:absolute;right:0}
+.summary-toggle{align-items:center;background:none;border:none;color:#001983;cursor:pointer;display:flex;font-family:inherit;font-size:.875rem;font-weight:600;gap:.375rem;margin:.75rem auto 0;padding:0;width:fit-content}
+.summary-toggle:hover{text-decoration:underline}
+.summary-toggle .chev{transition:transform .15s ease}
+.summary-toggle.expanded .chev{transform:rotate(180deg)}
+.summary-intro{margin-top:1rem;font-size:.9375rem;line-height:1.7}
+.finding-group{margin-top:1.5rem}
+.group-title{color:#061d22;font-size:1rem;font-weight:600}
+.finding-block{margin-top:1rem}
+.finding-title{color:#061d22;font-size:.9375rem;font-weight:600;line-height:1.4}
+.finding-text{color:#102532;font-size:.9375rem;line-height:1.7;overflow-wrap:anywhere}
+.summary-bullets{margin:.5rem 0 0 1.25rem}
+.bullet-item,.recommendation-item{font-size:.9375rem;line-height:1.7;margin-top:.375rem}
+.recommendation-title{font-weight:600}
+/* skeleton */
+.ai-skeleton .sk-line{height:.875rem;border-radius:6px;background:linear-gradient(90deg,#eef2f6 25%,#f8fafc 50%,#eef2f6 75%);background-size:200% 100%;animation:sk 1.2s infinite;margin-top:.875rem}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.ai-generating{color:#637380;font-size:.8125rem;margin-top:.75rem;display:flex;align-items:center;gap:.5rem}
+.ai-generating .pulse{width:8px;height:8px;border-radius:50%;background:#23a6f3;animation:pu 1s infinite alternate}
+@keyframes pu{from{opacity:.3}to{opacity:1}}
+/* word cloud */
+.wc-box{margin-top:1.25rem;text-align:center;line-height:1.35;padding:1rem .5rem}
+.wc-word{display:inline-block;margin:.1em .32em;font-weight:600;white-space:nowrap}
+.wc-legend{display:flex;justify-content:center;align-items:center;gap:1.5rem;color:#637380;font-size:.75rem;margin-top:1rem}
+.wc-legend .dots span{display:inline-block;width:9px;height:9px;border-radius:50%;margin:0 1.5px}
+/* table */
+.result-table{width:100%;border-collapse:collapse;margin-top:1.25rem;font-size:.875rem}
+.result-table th{text-align:left;color:#637380;font-weight:500;padding:.625rem .75rem;border-bottom:1px solid #ebeef5}
+.result-table td{padding:.625rem .75rem;border-bottom:1px solid #f4f6f8}
+.result-table tr:hover td{background:#eaf6fe33}
+.kw-chip{display:inline-block;border-radius:4px;padding:2px 8px;font-weight:600;font-size:.8125rem}
+.sub{color:#909399;font-size:.75rem}
+.tbl-note{color:#637380;font-size:.75rem;font-style:italic;margin-top:.75rem}
+@media(max-width:640px){
+ body{padding:1rem .5rem 2.5rem}
+ .report-section-header{padding:1.5rem 1rem}
+ .report-title{font-size:1.5rem}
+ .report-grid{grid-template-columns:1fr;padding:1.5rem .625rem 2rem}
+ .report-grid>section{grid-column:auto;padding:1.5rem .875rem}
+ .metric-grid{grid-template-columns:repeat(2,1fr)}
+ .export-slides-btn{right:1rem;top:1rem}
+ .export-btn{gap:0;padding:.5rem} .export-label{display:none}
+}
+</style>
+</head>
+<body>
+<div class="report-card">
+  <div class="export-slides export-slides-btn">
+    <button class="export-btn is-disabled" id="export-btn" type="button" title="Export slides as PDF" onclick="mlExportSlides()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+      <span class="export-label" id="export-label">Data loading...</span>
+    </button>
+  </div>
+
+  <div class="report-section-header">
+    <a class="report-brand" href="https://app.medialens.io/" target="_blank" rel="noopener"><span class="dot"></span>MEDIA LENS</a>
+    <div class="report-title">Buzz Keywords</div>
+    <div class="report-tag"><span class="tag-icon">&#128293;</span><span>Buzz Keywords Report</span></div>
+    <div class="sharing-subheader">
+      <span class="date-range"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#001983" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2026-08-17 <em>to</em> 2026-08-19</span>
+      <div class="scope-line">
+        <span class="ml-tag">What's Viral</span><span class="ml-tag">Hong Kong and Macau</span><span class="ml-tag">Top 25% Engagements</span><span class="ml-tag">Page Type: Influencer</span><span class="ml-tag">Page Type: Publisher</span>
+      </div>
+      <div class="hints">This Buzz Keywords report is shared publicly for a limited time period</div>
+    </div>
+  </div>
+
+  <div class="report-grid">
+    <section class="report-section-overview section-overview">
+      <h2 class="section-title">Overview</h2>
+      <div class="metric-grid">
+        <div class="metric-block"><div class="label">Keywords</div><div class="count">50</div></div>
+        <div class="metric-block"><div class="label">Number of Posts</div><div class="count">871</div></div>
+        <div class="metric-block"><div class="label">Engagements</div><div class="count">1.0M</div></div>
+        <div class="metric-block"><div class="label">Average Engagements</div><div class="count">1,153</div></div>
+      </div>
+    </section>
+
+    <section class="report-section-ai-summary section-ai-summary">
+      <h2 class="section-title">AI Summary</h2>
+      <div class="ai-skeleton" id="ai-skeleton">
+        <div class="ai-generating"><span class="pulse"></span>MediaLens AI is generating the summary...</div>
+        <div class="sk-line" style="width:92%"></div>
+        <div class="sk-line" style="width:100%"></div>
+        <div class="sk-line" style="width:84%"></div>
+        <div class="sk-line" style="width:96%"></div>
+        <div class="sk-line" style="width:60%"></div>
+      </div>
+      <div class="summary-body is-collapsed" id="summary-body" style="display:none">
+        <p class="summary-intro">Between 17&ndash;19 Aug 2026, Hong Kong and Macau influencer and publisher pages in the top 25% engagement tier produced 871 posts across the Top 50 trending keywords, generating just over 1.0M engagements. Attention was heavily concentrated in hyper-local news moments &mdash; the window can be characterised as "locally-anchored, incident-driven, photo-led conversation with celebrity moments as the engagement multiplier."</p>
+        <div class="finding-group">
+          <h3 class="group-title">Key Findings</h3>
+          <div class="finding-block">
+            <h4 class="finding-title">Local incident cluster dominates volume</h4>
+            <p class="finding-text">&#20803;&#26391; is the single largest keyword by both posts (89, 10.22% of all posts) and engagements (117,459, 11.70%), and it travels with a connected cluster &mdash; &#28417;&#35703;&#32626; (58 posts / 81,509 engagements), YOHO (24 / 50,910) and &#20803;&#26391;YOHO (30 / 41,268) &mdash; indicating one localised news event powering four of the top five keywords.</p>
+          </div>
+          <div class="finding-block">
+            <h4 class="finding-title">Celebrity keywords convert attention most efficiently</h4>
+            <p class="finding-text">Jennie averages 1,776 engagements per post and G-DRAGON follows the same pattern &mdash; far above the report-wide average of 1,153 &mdash; showing K-pop moments outperform on a per-post basis even with modest posting volume.</p>
+          </div>
+          <div class="finding-block">
+            <h4 class="finding-title">Publisher-style coverage is high-volume, lower-yield</h4>
+            <p class="finding-text">Media-heavy keywords such as &#25991;&#21295;&#22577; (30 posts, 400 average engagements) sit well below the overall average, a familiar publisher pattern of frequency over per-post depth.</p>
+          </div>
+          <div class="finding-block">
+            <h4 class="finding-title">Photo-led formats carry the window</h4>
+            <p class="finding-text">Across the top keywords, photo is the dominant post type (e.g. 72 of 89 &#20803;&#26391; posts), with video concentrated in celebrity and event keywords &mdash; format choice tracks topic type rather than page habit.</p>
+          </div>
+        </div>
+        <div class="finding-group">
+          <h3 class="group-title">Strategic Recommendations</h3>
+          <ul class="summary-bullets">
+            <li class="recommendation-item"><span class="recommendation-title">Ride the incident cluster while it peaks:</span> <span class="recommendation-detail">the &#20803;&#26391; / &#28417;&#35703;&#32626; / YOHO cluster is still the volume centre &mdash; content published against it inherits an audience 4&times; larger than the median keyword.</span></li>
+            <li class="recommendation-item"><span class="recommendation-title">Prioritize celebrity angles for efficiency:</span> <span class="recommendation-detail">Jennie-class keywords deliver ~1.5&times; the average engagements per post; a single well-timed post beats volume plays.</span></li>
+            <li class="recommendation-item"><span class="recommendation-title">Replicate the photo-first format on local topics:</span> <span class="recommendation-detail">photo posts dominate the highest-engagement local keywords; lead with strong stills before investing in video for this topic class.</span></li>
+          </ul>
+        </div>
+      </div>
+      <button type="button" class="summary-toggle" id="summary-toggle" style="display:none" onclick="mlToggleSummary()">
+        <span id="summary-toggle-label">Show more</span>
+        <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+    </section>
+
+    <section class="report-section-keyword-cloud section-keyword-cloud">
+      <h2 class="section-title">Top 50 Keywords</h2>
+      <div class="wc-box"><span class="wc-word" style="font-size:13px;color:#8cc063" title="鄧炳強 · Posts 9 · Engagements 14,626">鄧炳強</span><span class="wc-word" style="font-size:31px;color:#8cc063" title="特朗普 · Posts 22 · Engagements 14,915">特朗普</span><span class="wc-word" style="font-size:33px;color:#8cc063" title="北京 · Posts 24 · Engagements 16,720">北京</span><span class="wc-word" style="font-size:19px;color:#c3c93f" title="深水埗 · Posts 12 · Engagements 23,147">深水埗</span><span class="wc-word" style="font-size:32px;color:#e0b73f" title="Jennie · Posts 23 · Engagements 40,849">Jennie</span><span class="wc-word" style="font-size:22px;color:#5aa7d1" title="歐洲 · Posts 14 · Engagements 5,887">歐洲</span><span class="wc-word" style="font-size:20px;color:#67bd8b" title="社會 · Posts 13 · Engagements 13,179">社會</span><span class="wc-word" style="font-size:20px;color:#c3c93f" title="太子站 · Posts 13 · Engagements 27,571">太子站</span><span class="wc-word" style="font-size:15px;color:#67bd8b" title="CHANEL · Posts 10 · Engagements 12,439">CHANEL</span><span class="wc-word" style="font-size:34px;color:#8cc063" title="東京 · Posts 26 · Engagements 18,305">東京</span><span class="wc-word" style="font-size:26px;color:#67bd8b" title="立法會 · Posts 17 · Engagements 12,085">立法會</span><span class="wc-word" style="font-size:20px;color:#8cc063" title="廣州 · Posts 13 · Engagements 16,597">廣州</span><span class="wc-word" style="font-size:23px;color:#c3c93f" title="G-DRAGON · Posts 15 · Engagements 21,997">G-DRAGON</span><span class="wc-word" style="font-size:37px;color:#e0b73f" title="元朗YOHO · Posts 30 · Engagements 41,268">元朗YOHO</span><span class="wc-word" style="font-size:23px;color:#57b6c5" title="廣東 · Posts 15 · Engagements 8,046">廣東</span><span class="wc-word" style="font-size:15px;color:#57b6c5" title="毛守救援 · Posts 10 · Engagements 8,353">毛守救援</span><span class="wc-word" style="font-size:22px;color:#c3c93f" title="Kent · Posts 14 · Engagements 25,494">Kent</span><span class="wc-word" style="font-size:19px;color:#8cc063" title="大阪 · Posts 12 · Engagements 14,887">大阪</span><span class="wc-word" style="font-size:20px;color:#67bd8b" title="上海 · Posts 13 · Engagements 10,800">上海</span><span class="wc-word" style="font-size:60px;color:#e35b3c" title="元朗 · Posts 89 · Engagements 117,459">元朗</span><span class="wc-word" style="font-size:15px;color:#57b6c5" title="泰國 · Posts 10 · Engagements 6,452">泰國</span><span class="wc-word" style="font-size:33px;color:#8cc063" title="澳門 · Posts 25 · Engagements 17,034">澳門</span><span class="wc-word" style="font-size:17px;color:#67bd8b" title="日落下的彩虹 · Posts 11 · Engagements 11,691">日落下的彩虹</span><span class="wc-word" style="font-size:20px;color:#7b90c9" title="白宮 · Posts 13 · Engagements 3,530">白宮</span><span class="wc-word" style="font-size:22px;color:#57b6c5" title="周星馳 · Posts 14 · Engagements 7,511">周星馳</span><span class="wc-word" style="font-size:27px;color:#67bd8b" title="香港郵政 · Posts 18 · Engagements 12,178">香港郵政</span><span class="wc-word" style="font-size:17px;color:#67bd8b" title="HYROX · Posts 11 · Engagements 12,776">HYROX</span><span class="wc-word" style="font-size:13px;color:#8cc063" title="《功夫女足》 · Posts 9 · Engagements 16,639">《功夫女足》</span><span class="wc-word" style="font-size:22px;color:#8cc063" title="新加坡 · Posts 14 · Engagements 15,067">新加坡</span><span class="wc-word" style="font-size:17px;color:#57b6c5" title="OPATRA LONDON · Posts 11 · Engagements 6,453">OPATRA LONDON</span><span class="wc-word" style="font-size:15px;color:#5aa7d1" title="灣仔 · Posts 10 · Engagements 5,792">灣仔</span><span class="wc-word" style="font-size:24px;color:#57b6c5" title="伊朗 · Posts 16 · Engagements 8,909">伊朗</span><span class="wc-word" style="font-size:37px;color:#67bd8b" title="文匯報 · Posts 30 · Engagements 12,009">文匯報</span><span class="wc-word" style="font-size:19px;color:#5aa7d1" title="港鐵 · Posts 12 · Engagements 5,957">港鐵</span><span class="wc-word" style="font-size:19px;color:#8cc063" title="拉里 · Posts 12 · Engagements 18,719">拉里</span><span class="wc-word" style="font-size:17px;color:#7b90c9" title="維港 · Posts 11 · Engagements 2,653">維港</span><span class="wc-word" style="font-size:13px;color:#5aa7d1" title="中年好聲音4 · Posts 9 · Engagements 5,384">中年好聲音4</span><span class="wc-word" style="font-size:33px;color:#ef8f3a" title="YOHO · Posts 24 · Engagements 50,910">YOHO</span><span class="wc-word" style="font-size:22px;color:#67bd8b" title="台北 · Posts 14 · Engagements 12,838">台北</span><span class="wc-word" style="font-size:20px;color:#57b6c5" title="啟德 · Posts 13 · Engagements 8,454">啟德</span><span class="wc-word" style="font-size:26px;color:#e0b73f" title="《尼古喵喵》 · Posts 17 · Engagements 37,533">《尼古喵喵》</span><span class="wc-word" style="font-size:17px;color:#67bd8b" title="Jisoo · Posts 11 · Engagements 11,633">Jisoo</span><span class="wc-word" style="font-size:19px;color:#e0b73f" title="牛來 · Posts 12 · Engagements 37,416">牛來</span><span class="wc-word" style="font-size:27px;color:#c3c93f" title="薇薇 · Posts 18 · Engagements 30,160">薇薇</span><span class="wc-word" style="font-size:19px;color:#8cc063" title="Dior · Posts 12 · Engagements 18,678">Dior</span><span class="wc-word" style="font-size:17px;color:#8cc063" title="BIGBANG · Posts 11 · Engagements 18,542">BIGBANG</span><span class="wc-word" style="font-size:22px;color:#8cc063" title="功夫女足 · Posts 14 · Engagements 18,296">功夫女足</span><span class="wc-word" style="font-size:51px;color:#e35b3c" title="漁護署 · Posts 58 · Engagements 81,509">漁護署</span><span class="wc-word" style="font-size:23px;color:#e0b73f" title="尼古喵喵 · Posts 15 · Engagements 37,049">尼古喵喵</span><span class="wc-word" style="font-size:31px;color:#57b6c5" title="尖沙咀 · Posts 22 · Engagements 7,676">尖沙咀</span></div>
+      <div class="wc-legend"><span>Word size: Number of posts</span><span class="dots">Low Engagements <span style="background:#7b90c9"></span><span style="background:#5aa7d1"></span><span style="background:#57b6c5"></span><span style="background:#67bd8b"></span><span style="background:#8cc063"></span><span style="background:#c3c93f"></span><span style="background:#e0b73f"></span><span style="background:#ef8f3a"></span><span style="background:#e35b3c"></span> High Engagements</span></div>
+    </section>
+
+    <section class="report-section-keyword-table section-keyword-table">
+      <h2 class="section-title">Top 50 Keywords Table</h2>
+      <table class="result-table">
+        <thead><tr><th>Keyword</th><th>Number of Posts</th><th>Engagements</th><th>Average Engagements</th></tr></thead>
+        <tbody><tr>
+<td><span class="kw-chip" style="background:#e35b3c1a;color:#e35b3c">元朗</span></td>
+<td>89 <span class="sub">(10.22%)</span></td>
+<td>117,459 <span class="sub">(11.70%)</span></td>
+<td>1,320</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#e35b3c1a;color:#e35b3c">漁護署</span></td>
+<td>58 <span class="sub">(6.66%)</span></td>
+<td>81,509 <span class="sub">(8.12%)</span></td>
+<td>1,405</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#ef8f3a1a;color:#ef8f3a">YOHO</span></td>
+<td>24 <span class="sub">(2.76%)</span></td>
+<td>50,910 <span class="sub">(5.07%)</span></td>
+<td>2,121</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#e0b73f1a;color:#e0b73f">元朗YOHO</span></td>
+<td>30 <span class="sub">(3.44%)</span></td>
+<td>41,268 <span class="sub">(4.11%)</span></td>
+<td>1,376</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#e0b73f1a;color:#e0b73f">Jennie</span></td>
+<td>23 <span class="sub">(2.64%)</span></td>
+<td>40,849 <span class="sub">(4.07%)</span></td>
+<td>1,776</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#e0b73f1a;color:#e0b73f">《尼古喵喵》</span></td>
+<td>17 <span class="sub">(1.95%)</span></td>
+<td>37,533 <span class="sub">(3.74%)</span></td>
+<td>2,208</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#e0b73f1a;color:#e0b73f">牛來</span></td>
+<td>12 <span class="sub">(1.38%)</span></td>
+<td>37,416 <span class="sub">(3.73%)</span></td>
+<td>3,118</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#e0b73f1a;color:#e0b73f">尼古喵喵</span></td>
+<td>15 <span class="sub">(1.72%)</span></td>
+<td>37,049 <span class="sub">(3.69%)</span></td>
+<td>2,470</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#c3c93f1a;color:#c3c93f">薇薇</span></td>
+<td>18 <span class="sub">(2.07%)</span></td>
+<td>30,160 <span class="sub">(3.00%)</span></td>
+<td>1,676</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#c3c93f1a;color:#c3c93f">太子站</span></td>
+<td>13 <span class="sub">(1.49%)</span></td>
+<td>27,571 <span class="sub">(2.75%)</span></td>
+<td>2,121</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#c3c93f1a;color:#c3c93f">Kent</span></td>
+<td>14 <span class="sub">(1.61%)</span></td>
+<td>25,494 <span class="sub">(2.54%)</span></td>
+<td>1,821</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#c3c93f1a;color:#c3c93f">深水埗</span></td>
+<td>12 <span class="sub">(1.38%)</span></td>
+<td>23,147 <span class="sub">(2.31%)</span></td>
+<td>1,929</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#c3c93f1a;color:#c3c93f">G-DRAGON</span></td>
+<td>15 <span class="sub">(1.72%)</span></td>
+<td>21,997 <span class="sub">(2.19%)</span></td>
+<td>1,466</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#8cc0631a;color:#8cc063">拉里</span></td>
+<td>12 <span class="sub">(1.38%)</span></td>
+<td>18,719 <span class="sub">(1.86%)</span></td>
+<td>1,560</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#8cc0631a;color:#8cc063">Dior</span></td>
+<td>12 <span class="sub">(1.38%)</span></td>
+<td>18,678 <span class="sub">(1.86%)</span></td>
+<td>1,556</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#8cc0631a;color:#8cc063">BIGBANG</span></td>
+<td>11 <span class="sub">(1.26%)</span></td>
+<td>18,542 <span class="sub">(1.85%)</span></td>
+<td>1,686</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#8cc0631a;color:#8cc063">東京</span></td>
+<td>26 <span class="sub">(2.99%)</span></td>
+<td>18,305 <span class="sub">(1.82%)</span></td>
+<td>704</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#8cc0631a;color:#8cc063">功夫女足</span></td>
+<td>14 <span class="sub">(1.61%)</span></td>
+<td>18,296 <span class="sub">(1.82%)</span></td>
+<td>1,307</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#8cc0631a;color:#8cc063">澳門</span></td>
+<td>25 <span class="sub">(2.87%)</span></td>
+<td>17,034 <span class="sub">(1.70%)</span></td>
+<td>681</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#8cc0631a;color:#8cc063">北京</span></td>
+<td>24 <span class="sub">(2.76%)</span></td>
+<td>16,720 <span class="sub">(1.67%)</span></td>
+<td>697</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#8cc0631a;color:#8cc063">《功夫女足》</span></td>
+<td>9 <span class="sub">(1.03%)</span></td>
+<td>16,639 <span class="sub">(1.66%)</span></td>
+<td>1,849</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#8cc0631a;color:#8cc063">廣州</span></td>
+<td>13 <span class="sub">(1.49%)</span></td>
+<td>16,597 <span class="sub">(1.65%)</span></td>
+<td>1,277</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#8cc0631a;color:#8cc063">新加坡</span></td>
+<td>14 <span class="sub">(1.61%)</span></td>
+<td>15,067 <span class="sub">(1.50%)</span></td>
+<td>1,076</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#8cc0631a;color:#8cc063">特朗普</span></td>
+<td>22 <span class="sub">(2.53%)</span></td>
+<td>14,915 <span class="sub">(1.49%)</span></td>
+<td>678</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#8cc0631a;color:#8cc063">大阪</span></td>
+<td>12 <span class="sub">(1.38%)</span></td>
+<td>14,887 <span class="sub">(1.48%)</span></td>
+<td>1,241</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#8cc0631a;color:#8cc063">鄧炳強</span></td>
+<td>9 <span class="sub">(1.03%)</span></td>
+<td>14,626 <span class="sub">(1.46%)</span></td>
+<td>1,625</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#67bd8b1a;color:#67bd8b">社會</span></td>
+<td>13 <span class="sub">(1.49%)</span></td>
+<td>13,179 <span class="sub">(1.31%)</span></td>
+<td>1,014</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#67bd8b1a;color:#67bd8b">台北</span></td>
+<td>14 <span class="sub">(1.61%)</span></td>
+<td>12,838 <span class="sub">(1.28%)</span></td>
+<td>917</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#67bd8b1a;color:#67bd8b">HYROX</span></td>
+<td>11 <span class="sub">(1.26%)</span></td>
+<td>12,776 <span class="sub">(1.27%)</span></td>
+<td>1,161</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#67bd8b1a;color:#67bd8b">CHANEL</span></td>
+<td>10 <span class="sub">(1.15%)</span></td>
+<td>12,439 <span class="sub">(1.24%)</span></td>
+<td>1,244</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#67bd8b1a;color:#67bd8b">香港郵政</span></td>
+<td>18 <span class="sub">(2.07%)</span></td>
+<td>12,178 <span class="sub">(1.21%)</span></td>
+<td>677</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#67bd8b1a;color:#67bd8b">立法會</span></td>
+<td>17 <span class="sub">(1.95%)</span></td>
+<td>12,085 <span class="sub">(1.20%)</span></td>
+<td>711</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#67bd8b1a;color:#67bd8b">文匯報</span></td>
+<td>30 <span class="sub">(3.44%)</span></td>
+<td>12,009 <span class="sub">(1.20%)</span></td>
+<td>400</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#67bd8b1a;color:#67bd8b">日落下的彩虹</span></td>
+<td>11 <span class="sub">(1.26%)</span></td>
+<td>11,691 <span class="sub">(1.16%)</span></td>
+<td>1,063</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#67bd8b1a;color:#67bd8b">Jisoo</span></td>
+<td>11 <span class="sub">(1.26%)</span></td>
+<td>11,633 <span class="sub">(1.16%)</span></td>
+<td>1,058</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#67bd8b1a;color:#67bd8b">上海</span></td>
+<td>13 <span class="sub">(1.49%)</span></td>
+<td>10,800 <span class="sub">(1.08%)</span></td>
+<td>831</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#57b6c51a;color:#57b6c5">伊朗</span></td>
+<td>16 <span class="sub">(1.84%)</span></td>
+<td>8,909 <span class="sub">(0.89%)</span></td>
+<td>557</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#57b6c51a;color:#57b6c5">啟德</span></td>
+<td>13 <span class="sub">(1.49%)</span></td>
+<td>8,454 <span class="sub">(0.84%)</span></td>
+<td>650</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#57b6c51a;color:#57b6c5">毛守救援</span></td>
+<td>10 <span class="sub">(1.15%)</span></td>
+<td>8,353 <span class="sub">(0.83%)</span></td>
+<td>835</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#57b6c51a;color:#57b6c5">廣東</span></td>
+<td>15 <span class="sub">(1.72%)</span></td>
+<td>8,046 <span class="sub">(0.80%)</span></td>
+<td>536</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#57b6c51a;color:#57b6c5">尖沙咀</span></td>
+<td>22 <span class="sub">(2.53%)</span></td>
+<td>7,676 <span class="sub">(0.76%)</span></td>
+<td>349</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#57b6c51a;color:#57b6c5">周星馳</span></td>
+<td>14 <span class="sub">(1.61%)</span></td>
+<td>7,511 <span class="sub">(0.75%)</span></td>
+<td>536</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#57b6c51a;color:#57b6c5">OPATRA LONDON</span></td>
+<td>11 <span class="sub">(1.26%)</span></td>
+<td>6,453 <span class="sub">(0.64%)</span></td>
+<td>587</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#57b6c51a;color:#57b6c5">泰國</span></td>
+<td>10 <span class="sub">(1.15%)</span></td>
+<td>6,452 <span class="sub">(0.64%)</span></td>
+<td>645</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#5aa7d11a;color:#5aa7d1">港鐵</span></td>
+<td>12 <span class="sub">(1.38%)</span></td>
+<td>5,957 <span class="sub">(0.59%)</span></td>
+<td>496</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#5aa7d11a;color:#5aa7d1">歐洲</span></td>
+<td>14 <span class="sub">(1.61%)</span></td>
+<td>5,887 <span class="sub">(0.59%)</span></td>
+<td>420</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#5aa7d11a;color:#5aa7d1">灣仔</span></td>
+<td>10 <span class="sub">(1.15%)</span></td>
+<td>5,792 <span class="sub">(0.58%)</span></td>
+<td>579</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#5aa7d11a;color:#5aa7d1">中年好聲音4</span></td>
+<td>9 <span class="sub">(1.03%)</span></td>
+<td>5,384 <span class="sub">(0.54%)</span></td>
+<td>598</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#7b90c91a;color:#7b90c9">白宮</span></td>
+<td>13 <span class="sub">(1.49%)</span></td>
+<td>3,530 <span class="sub">(0.35%)</span></td>
+<td>272</td>
+</tr><tr>
+<td><span class="kw-chip" style="background:#7b90c91a;color:#7b90c9">維港</span></td>
+<td>11 <span class="sub">(1.26%)</span></td>
+<td>2,653 <span class="sub">(0.26%)</span></td>
+<td>241</td>
+</tr></tbody>
+      </table>
+      <div class="tbl-note">Top 50 keywords by engagements &middot; shares are of the Top 50 total (871 posts / 1,004,072 engagements)</div>
+    </section>
+  </div>
+</div>
+
+<script>
+// AI Summary: skeleton -> reveal (house pattern)
+setTimeout(function(){
+  document.getElementById('ai-skeleton').style.display = 'none';
+  document.getElementById('summary-body').style.display = '';
+  document.getElementById('summary-toggle').style.display = '';
+  // data ready -> Export Slides becomes clickable
+  var b = document.getElementById('export-btn');
+  b.classList.remove('is-disabled');
+  document.getElementById('export-label').textContent = 'Export Slides';
+}, 2200);
+
+function mlToggleSummary(){
+  var body = document.getElementById('summary-body');
+  var t = document.getElementById('summary-toggle');
+  var collapsed = body.classList.toggle('is-collapsed');
+  t.classList.toggle('expanded', !collapsed);
+  document.getElementById('summary-toggle-label').textContent = collapsed ? 'Show more' : 'Show less';
+}
+
+function mlExportSlides(){
+  var b = document.getElementById('export-btn');
+  if(b.classList.contains('is-disabled')) return;
+  b.classList.add('is-disabled');
+  document.getElementById('export-label').textContent = 'Report generating...';
+  setTimeout(function(){
+    b.classList.remove('is-disabled');
+    document.getElementById('export-label').textContent = 'Export Slides';
+  }, 2500);
+}
+</script>
+</body>
+</html>
