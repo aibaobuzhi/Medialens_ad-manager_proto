@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ad Intelligence · Advertisers — Industry SOV Share</title>
+<style>
+  :root{
+    --pink:#ff3b6b; --pink-dark:#e8285a; --ink:#1b1e28; --sub:#6b7280;
+    --line:#e7e8ec; --bg:#f5f6f8; --card:#ffffff; --sidebar:#171923; --sidebar-active:#262a38;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);}
+  a{text-decoration:none;color:inherit;}
+  .app{display:flex;min-height:100vh;}
+
+  /* Sidebar */
+  .sidebar{width:220px;background:var(--sidebar);color:#c9cbd6;flex-shrink:0;padding:16px 0;}
+  .brand{display:flex;align-items:center;gap:8px;padding:0 20px 20px;color:#fff;font-weight:700;font-size:16px;}
+  .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--pink);}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13.5px;cursor:pointer;color:#9497a6;}
+  .nav-item .ic{width:16px;text-align:center;opacity:.8;}
+  .nav-item.active{background:var(--sidebar-active);color:#fff;border-left:3px solid var(--pink);padding-left:17px;}
+  .nav-item:hover:not(.active){color:#e5e6ee;}
+
+  /* Main */
+  .main{flex:1;min-width:0;}
+  .topbar{display:flex;align-items:center;justify-content:flex-end;gap:14px;padding:10px 24px;background:#fff;border-bottom:1px solid var(--line);}
+  .org-switch{font-size:12.5px;color:var(--sub);display:flex;align-items:center;gap:6px;}
+  .org-switch b{color:var(--ink);}
+  .avatar{width:28px;height:28px;border-radius:50%;background:#d9b382;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;}
+
+  .content{padding:20px 24px 60px;}
+
+  /* Module tabs */
+  .tabs{display:flex;gap:22px;border-bottom:1px solid var(--line);margin-bottom:16px;overflow-x:auto;}
+  .tab{padding:10px 2px;font-size:13.5px;color:var(--sub);white-space:nowrap;cursor:pointer;border-bottom:2px solid transparent;}
+  .tab.active{color:var(--ink);font-weight:600;border-bottom-color:var(--pink);}
+
+  /* Search row */
+  .search-row{display:flex;gap:10px;margin-bottom:12px;}
+  .search-box{flex:1;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:9px 14px;color:var(--sub);font-size:13px;}
+  .btn-filters{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:9px 16px;font-size:13px;color:var(--ink);cursor:pointer;}
+  .btn-search{background:var(--pink);color:#fff;border:none;border-radius:8px;padding:9px 22px;font-size:13px;font-weight:600;cursor:pointer;}
+
+  /* Filter chip row */
+  .chip-row{display:flex;align-items:center;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+  .chip{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:6px 12px;font-size:12.5px;color:var(--ink);}
+  .chip .x{color:var(--sub);cursor:pointer;font-weight:700;margin-left:2px;}
+  .chip.category{background:#fff1f5;border-color:#ffd3e0;color:#c81a52;}
+  .spacer{flex:1;}
+  .toggle-wrap{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink);}
+  .toggle{width:34px;height:19px;border-radius:12px;background:var(--pink);position:relative;cursor:pointer;flex-shrink:0;}
+  .toggle::after{content:"";position:absolute;top:2px;right:2px;width:15px;height:15px;border-radius:50%;background:#fff;}
+
+  .btn-share{display:flex;align-items:center;gap:7px;background:var(--pink);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:0 2px 8px rgba(255,59,107,.35);}
+  .btn-share:hover{background:var(--pink-dark);}
+  .btn-share svg{width:14px;height:14px;}
+
+  /* Section cards */
+  .section-title{font-size:14px;font-weight:700;color:var(--ink);margin:26px 0 12px;}
+  .cards-row{display:flex;gap:16px;}
+  .card{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;min-width:0;}
+  .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .card-head h4{margin:0;font-size:13.5px;font-weight:700;color:var(--ink);}
+  .dropdown{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--sub);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer;}
+
+  .donut-wrap{display:flex;align-items:center;gap:20px;}
+  .donut{position:relative;width:150px;height:150px;flex-shrink:0;}
+  .donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+  .donut-center .num{font-size:16px;font-weight:700;color:var(--ink);}
+  .donut-center .lbl{font-size:10.5px;color:var(--sub);}
+  .legend{flex:1;display:flex;flex-direction:column;gap:7px;font-size:12px;}
+  .legend-item{display:flex;align-items:center;gap:8px;}
+  .legend-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+  .legend-name{flex:1;color:var(--ink);}
+  .legend-val{color:var(--sub);}
+
+  .bar-chart{display:flex;flex-direction:column;gap:14px;padding-top:6px;}
+  .bar-row{display:flex;align-items:center;gap:10px;font-size:12px;}
+  .bar-label{width:64px;color:var(--sub);flex-shrink:0;}
+  .bar-track{flex:1;height:16px;background:#f1f2f5;border-radius:4px;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#ff3b6b,#ff7a9c);}
+  .bar-val{width:44px;text-align:right;color:var(--ink);font-weight:600;flex-shrink:0;}
+
+  .ranked-list{display:flex;flex-direction:column;gap:9px;font-size:12px;margin-top:2px;}
+  .rank-item{display:flex;align-items:center;gap:10px;}
+  .rank-num{width:16px;color:var(--sub);font-weight:600;}
+  .rank-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+  .rank-name{flex:1;color:var(--ink);}
+  .rank-val{color:var(--sub);white-space:nowrap;}
+
+  .hbar-row{display:flex;align-items:center;gap:8px;font-size:11.5px;margin-bottom:10px;}
+  .hbar-name{width:110px;color:var(--ink);flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .hbar-track{flex:1;height:14px;background:#f1f2f5;border-radius:3px;overflow:hidden;}
+  .hbar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#7c8cff,#a3b0ff);}
+  .hbar-val{width:52px;text-align:right;color:var(--sub);flex-shrink:0;}
+
+  /* ===== Share Modal (state machine — reused from Category share reference) ===== */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(20,20,30,.45);align-items:center;justify-content:center;z-index:999;}
+  .modal-overlay.open{display:flex;}
+  .modal{width:440px;background:#fff;border-radius:14px;padding:26px 26px 22px;box-shadow:0 20px 60px rgba(0,0,0,.25);}
+  .modal-title{font-size:16px;font-weight:700;color:var(--ink);margin:0 0 4px;}
+  .modal-sub{font-size:12.5px;color:var(--sub);margin:0 0 20px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12px;font-weight:600;color:var(--ink);margin-bottom:6px;}
+  .field .value-box{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--ink);}
+  .field .value-box.locked{background:#f6f7f9;color:var(--sub);}
+  .field .value-box select{border:none;background:transparent;font-size:13px;color:var(--ink);width:100%;outline:none;}
+  .date-inputs{display:flex;align-items:center;gap:8px;}
+  .date-inputs input{flex:1;border:1px solid var(--line);border-radius:8px;padding:9px 10px;font-size:13px;color:var(--ink);}
+  .modal-actions{display:flex;gap:10px;margin-top:22px;}
+  .modal-actions button{flex:1;border-radius:8px;padding:10px 0;font-size:13.5px;font-weight:600;cursor:pointer;border:none;}
+  .btn-primary{background:var(--pink);color:#fff;}
+  .btn-primary:hover{background:var(--pink-dark);}
+  .btn-secondary{background:#fff;border:1px solid var(--line) !important;color:var(--ink);}
+  .btn-danger{background:#fff;border:1px solid #f3c6cf !important;color:#d32f4a;}
+  .link-box{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:#f9fafb;}
+  .link-box input{flex:1;border:none;background:transparent;font-size:12.5px;color:var(--sub);outline:none;}
+  .link-box button{border:none;background:var(--pink);color:#fff;border-radius:6px;padding:6px 10px;font-size:11.5px;cursor:pointer;flex-shrink:0;}
+  .status-pill{display:inline-flex;align-items:center;gap:6px;background:#e9fbf0;color:#1a9b53;font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:20px;margin-bottom:14px;}
+  .status-pill .dot{width:6px;height:6px;border-radius:50%;background:#1a9b53;}
+  .close-x{position:absolute;top:20px;right:22px;cursor:pointer;color:var(--sub);font-size:16px;}
+  .modal{position:relative;}
+  .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#1b1e28;color:#fff;padding:11px 20px;border-radius:8px;font-size:13px;display:none;z-index:1200;}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="brand"><span class="dot"></span>MediaLens</div>
+    <div class="nav-item"><span class="ic">▦</span>Dashboard</div>
+    <div class="nav-item"><span class="ic">▤</span>My Pages</div>
+    <div class="nav-item"><span class="ic">◎</span>Competitor Analysis</div>
+    <div class="nav-item"><span class="ic">✺</span>Buzz (Market Insights)</div>
+    <div class="nav-item"><span class="ic">☆</span>Leader Board</div>
+    <div class="nav-item"><span class="ic">◈</span>Social Listening</div>
+    <div class="nav-item"><span class="ic">◉</span>Social Pulses</div>
+    <div class="nav-item"><span class="ic">🎯</span>Ad Manager</div>
+    <div class="nav-item active"><span class="ic">📣</span>Ad Intelligence</div>
+    <div class="nav-item"><span class="ic">🕒</span>Report Scheduler</div>
+    <div class="nav-item"><span class="ic">✨</span>AIGC</div>
+    <div class="nav-item"><span class="ic">🏷</span>Tag Management</div>
+    <div class="nav-item"><span class="ic">💬</span>AI Chat</div>
+    <div class="nav-item"><span class="ic">🤖</span>AI Agent</div>
+    <div class="nav-item"><span class="ic">🗂</span>Assets</div>
+    <div class="nav-item"><span class="ic">📤</span>Content Publish</div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div class="org-switch">🏢 <b>PL - Hong Kong</b> / Admin - Julie Li ⌄</div>
+      <div class="avatar">JL</div>
+    </div>
+
+    <div class="content">
+      <div class="tabs">
+        <div class="tab">Contents</div>
+        <div class="tab">Groups</div>
+        <div class="tab active">Advertisers</div>
+        <div class="tab">Pages</div>
+        <div class="tab">Youtube Channels</div>
+        <div class="tab">Products</div>
+        <div class="tab">Videos</div>
+        <div class="tab">Hashtags</div>
+        <div class="tab">Adv. Categories</div>
+        <div class="tab">Stories</div>
+        <div class="tab">Campaigns</div>
+      </div>
+
+      <div class="search-row">
+        <div class="search-box">🔍&nbsp; Search advertiser name...</div>
+        <div class="btn-filters">☰ Filters</div>
+        <button class="btn-search">Search</button>
+      </div>
+
+      <div class="chip-row">
+        <div class="chip">📍 Country / Region: HK&amp;MO</div>
+        <div class="chip">✉ Paid, Branded</div>
+        <div class="chip category">▤ Product Categories: Beauty, Slimming &amp; Fitness <span class="x">✕</span></div>
+        <div class="spacer"></div>
+        <div class="toggle-wrap">Paid Ad Only <span class="toggle"></span></div>
+        <button class="btn-share" id="shareBtn" onclick="openShareModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.6" x2="15.4" y2="6.4"/><line x1="8.6" y1="13.4" x2="15.4" y2="17.6"/></svg>
+          Share Industry SOV Insights
+        </button>
+      </div>
+
+      <!-- Market Summary by Contents -->
+      <div class="section-title">Market Summary by Contents</div>
+      <div class="cards-row">
+        <div class="card">
+          <div class="card-head"><h4>Number of Contents</h4><div class="dropdown">Contents ⌄</div></div>
+          <div class="donut-wrap">
+            <div class="donut">
+              <svg viewBox="0 0 36 36" width="150" height="150">
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f1f2f5" stroke-width="4"></circle>
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#ff6b8f" stroke-width="4" stroke-dasharray="5.4 94.6" stroke-dashoffset="25"></circle>
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#c7ccd6" stroke-width="4" stroke-dasharray="0.1 99.9" stroke-dashoffset="19.6"></circle>
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#7c8cff" stroke-width="4" stroke-dasharray="12.4 87.6" stroke-dashoffset="19.5"></circle>
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#ff3b6b" stroke-width="4" stroke-dasharray="37.7 62.3" stroke-dashoffset="7.1"></circle>
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#ffb648" stroke-width="4" stroke-dasharray="22.9 77.1" stroke-dashoffset="-30.6"></circle>
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#38c793" stroke-width="4" stroke-dasharray="21.5 78.5" stroke-dashoffset="-53.5"></circle>
+              </svg>
+              <div class="donut-center"><div class="num">5.8K</div><div class="lbl">Contents</div></div>
+            </div>
+            <div class="legend">
+              <div class="legend-item"><span class="legend-dot" style="background:#ff6b8f"></span><span class="legend-name">Link</span><span class="legend-val">5.4%</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#c7ccd6"></span><span class="legend-name">Share</span><span class="legend-val">0.0%</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#7c8cff"></span><span class="legend-name">Photo</span><span class="legend-val">12.4%</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#ff3b6b"></span><span class="legend-name">Album</span><span class="legend-val">37.7%</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#ffb648"></span><span class="legend-name">Video</span><span class="legend-val">22.9%</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#38c793"></span><span class="legend-name">Stories</span><span class="legend-val">21.5%</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#e5e6ee"></span><span class="legend-name">Livestream</span><span class="legend-val">0.0%</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h4>Ad Types Distribution</h4><div class="dropdown">Contents ⌄</div></div>
+          <div class="bar-chart">
+            <div class="bar-row"><div class="bar-label">Official</div><div class="bar-track"><div class="bar-fill" style="width:1%"></div></div><div class="bar-val">12</div></div>
+            <div class="bar-row"><div class="bar-label">Branded</div><div class="bar-track"><div class="bar-fill" style="width:38%"></div></div><div class="bar-val">2.2K</div></div>
+            <div class="bar-row"><div class="bar-label">Paid</div><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><div class="bar-val">3.6K</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top 10 Advertisers Summary -->
+      <div class="section-title">Top 10 Advertisers Summary</div>
+      <div class="cards-row">
+        <div class="card">
+          <div class="card-head"><h4>Number of Contents</h4><div class="dropdown">Bar Chart ⌄</div></div>
+          <div class="donut-wrap">
+            <div class="donut">
+              <svg viewBox="0 0 36 36" width="150" height="150">
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f1f2f5" stroke-width="4"></circle>
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#ff3b6b" stroke-width="4" stroke-dasharray="19 81" stroke-dashoffset="25"></circle>
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#ff8a5c" stroke-width="4" stroke-dasharray="16 84" stroke-dashoffset="6"></circle>
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#ffb648" stroke-width="4" stroke-dasharray="14 86" stroke-dashoffset="-10"></circle>
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#38c793" stroke-width="4" stroke-dasharray="12 88" stroke-dashoffset="-24"></circle>
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#4fd1e5" stroke-width="4" stroke-dasharray="10 90" stroke-dashoffset="-36"></circle>
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#7c8cff" stroke-width="4" stroke-dasharray="9 91" stroke-dashoffset="-46"></circle>
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#b47cff" stroke-width="4" stroke-dasharray="8 92" stroke-dashoffset="-55"></circle>
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#c7ccd6" stroke-width="4" stroke-dasharray="12 88" stroke-dashoffset="-63"></circle>
+              </svg>
+              <div class="donut-center"><div class="num">3.6K</div><div class="lbl">Top 10</div></div>
+            </div>
+            <div class="ranked-list">
+              <div class="rank-item"><span class="rank-num">1</span><span class="rank-dot" style="background:#ff3b6b"></span><span class="rank-name">SASA</span><span class="rank-val">684 · 19%</span></div>
+              <div class="rank-item"><span class="rank-num">2</span><span class="rank-dot" style="background:#ff8a5c"></span><span class="rank-name">Watsons</span><span class="rank-val">576 · 16%</span></div>
+              <div class="rank-item"><span class="rank-num">3</span><span class="rank-dot" style="background:#ffb648"></span><span class="rank-name">Sephora HK</span><span class="rank-val">504 · 14%</span></div>
+              <div class="rank-item"><span class="rank-num">4</span><span class="rank-dot" style="background:#38c793"></span><span class="rank-name">Innisfree</span><span class="rank-val">432 · 12%</span></div>
+              <div class="rank-item"><span class="rank-num">5</span><span class="rank-dot" style="background:#4fd1e5"></span><span class="rank-name">Kiehl's</span><span class="rank-val">360 · 10%</span></div>
+              <div class="rank-item"><span class="rank-num">6</span><span class="rank-dot" style="background:#7c8cff"></span><span class="rank-name">L'Occitane</span><span class="rank-val">324 · 9%</span></div>
+              <div class="rank-item"><span class="rank-num">7</span><span class="rank-dot" style="background:#b47cff"></span><span class="rank-name">The Body Shop</span><span class="rank-val">288 · 8%</span></div>
+              <div class="rank-item"><span class="rank-num">8</span><span class="rank-dot" style="background:#c7ccd6"></span><span class="rank-name">Charles &amp; Keith Beauty</span><span class="rank-val">432 · 12%</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h4>Total Engagements</h4><div class="dropdown">Metric: Contents ⌄</div></div>
+          <div style="margin-top:8px;">
+            <div class="hbar-row"><div class="hbar-name">SASA</div><div class="hbar-track"><div class="hbar-fill" style="width:100%"></div></div><div class="hbar-val">128.4K</div></div>
+            <div class="hbar-row"><div class="hbar-name">Sephora HK</div><div class="hbar-track"><div class="hbar-fill" style="width:88%"></div></div><div class="hbar-val">112.9K</div></div>
+            <div class="hbar-row"><div class="hbar-name">Watsons</div><div class="hbar-track"><div class="hbar-fill" style="width:74%"></div></div><div class="hbar-val">95.1K</div></div>
+            <div class="hbar-row"><div class="hbar-name">Innisfree</div><div class="hbar-track"><div class="hbar-fill" style="width:63%"></div></div><div class="hbar-val">80.6K</div></div>
+            <div class="hbar-row"><div class="hbar-name">L'Occitane</div><div class="hbar-track"><div class="hbar-fill" style="width:52%"></div></div><div class="hbar-val">66.4K</div></div>
+            <div class="hbar-row"><div class="hbar-name">Kiehl's</div><div class="hbar-track"><div class="hbar-fill" style="width:44%"></div></div><div class="hbar-val">56.3K</div></div>
+            <div class="hbar-row"><div class="hbar-name">The Body Shop</div><div class="hbar-track"><div class="hbar-fill" style="width:35%"></div></div><div class="hbar-val">44.8K</div></div>
+            <div class="hbar-row"><div class="hbar-name">Charles &amp; Keith Beauty</div><div class="hbar-track"><div class="hbar-fill" style="width:29%"></div></div><div class="hbar-val">37.1K</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= Share Modal (state machine) ================= -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalBox">
+    <span class="close-x" onclick="closeShareModal()">✕</span>
+
+    <!-- DRAFT STATE -->
+    <div id="draftState">
+      <h3 class="modal-title">Share Industry SOV report</h3>
+      <p class="modal-sub">Share this industry's Advertiser Share of Voice breakdown as a public, time-limited link.</p>
+      <div class="field">
+        <label>Product Category</label>
+        <div class="value-box">
+          <select id="categorySelect">
+            <option selected>Beauty, Slimming &amp; Fitness</option>
+            <option>Fashion &amp; Apparel</option>
+            <option>Travel &amp; Leisure</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Country / Region</label>
+        <div class="value-box locked">HK &amp; MO (locked)</div>
+      </div>
+      <div class="field">
+        <label>Ad Type</label>
+        <div class="value-box locked">Paid + Branded (locked)</div>
+      </div>
+      <div class="field">
+        <label>Date Range</label>
+        <div class="date-inputs">
+          <input type="text" value="2026-05-19" id="dateStartDraft">
+          <span style="color:var(--sub)">→</span>
+          <input type="text" value="2026-08-16" id="dateEndDraft">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeShareModal()">Cancel</button>
+        <button class="btn-primary" onclick="doShare()">Share</button>
+      </div>
+    </div>
+
+    <!-- SHARED STATE -->
+    <div id="sharedState" style="display:none;">
+      <span class="status-pill"><span class="dot"></span>Live</span>
+      <h3 class="modal-title">Share Industry SOV report</h3>
+      <p class="modal-sub" id="expiryText">This Industry SOV report is live. Expired on 2026-11-19.</p>
+      <div class="field">
+        <label>Product Category</label>
+        <div class="value-box locked">Beauty, Slimming &amp; Fitness (locked)</div>
+      </div>
+      <div class="field">
+        <label>Country / Region</label>
+        <div class="value-box locked">HK &amp; MO (locked)</div>
+      </div>
+      <div class="field">
+        <label>Ad Type</label>
+        <div class="value-box locked">Paid + Branded (locked)</div>
+      </div>
+      <div class="field">
+        <label>Date Range</label>
+        <div class="date-inputs">
+          <input type="text" value="2026-05-19" id="dateStartShared" oninput="checkDateChanged()">
+          <span style="color:var(--sub)">→</span>
+          <input type="text" value="2026-08-16" id="dateEndShared" oninput="checkDateChanged()">
+        </div>
+      </div>
+      <div class="field">
+        <label>Public Link</label>
+        <div class="link-box">
+          <input type="text" id="publicLink" readonly value="https://demo.medialens.io/r/industry-sov/beauty-slimming-fitness-8f2a1c">
+          <button onclick="copyLink()">Copy</button>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="viewReport()">View</button>
+        <button class="btn-primary" id="publishBtn" style="display:none;" onclick="doPublish()">Publish</button>
+        <button class="btn-danger" onclick="doUnpublish()">Unpublish</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  var shared = false; // demo persistence: whether this Category+A-filter fingerprint has already been shared
+  var savedStart = "2026-05-19", savedEnd = "2026-08-16";
+
+  function openShareModal(){
+    document.getElementById('modalOverlay').classList.add('open');
+    if(shared){
+      document.getElementById('draftState').style.display = 'none';
+      document.getElementById('sharedState').style.display = 'block';
+      document.getElementById('publishBtn').style.display = 'none';
+    } else {
+      document.getElementById('draftState').style.display = 'block';
+      document.getElementById('sharedState').style.display = 'none';
+    }
+  }
+  function closeShareModal(){
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+  function doShare(){
+    shared = true;
+    savedStart = document.getElementById('dateStartDraft').value;
+    savedEnd = document.getElementById('dateEndDraft').value;
+    document.getElementById('dateStartShared').value = savedStart;
+    document.getElementById('dateEndShared').value = savedEnd;
+    document.getElementById('draftState').style.display = 'none';
+    document.getElementById('sharedState').style.display = 'block';
+    document.getElementById('publishBtn').style.display = 'none';
+    showToast('Industry SOV report is now live — link generated & AI Summary created.');
+  }
+  function checkDateChanged(){
+    var s = document.getElementById('dateStartShared').value;
+    var e = document.getElementById('dateEndShared').value;
+    document.getElementById('publishBtn').style.display = (s !== savedStart || e !== savedEnd) ? 'inline-block' : 'none';
+  }
+  function doPublish(){
+    savedStart = document.getElementById('dateStartShared').value;
+    savedEnd = document.getElementById('dateEndShared').value;
+    document.getElementById('publishBtn').style.display = 'none';
+    showToast('Date Range saved — link unchanged, AI Summary regenerated.');
+  }
+  function doUnpublish(){
+    shared = false;
+    closeShareModal();
+    showToast('Report unpublished. The old link is now invalid.');
+  }
+  function copyLink(){
+    var el = document.getElementById('publicLink');
+    el.select();
+    document.execCommand('copy');
+    showToast('Link copied to clipboard.');
+  }
+  function viewReport(){
+    window.open('demo-site-industry-sov-report.html', '_blank');
+  }
+  function showToast(msg){
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(function(){ t.style.display = 'none'; }, 2600);
+  }
+</script>
+</body>
+</html>
