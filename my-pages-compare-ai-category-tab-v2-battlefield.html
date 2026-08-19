@@ -157,6 +157,28 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
 .bf-legend-item{display:flex;align-items:center;gap:8px;}
 .bf-ramp{width:150px;height:11px;border-radius:3px;background:linear-gradient(90deg,#7DAFEB,#3F84DB,#2359B2,#14346E);}
 .bf-foot{font-size:11.5px;color:var(--ac-secondary);margin-top:8px;}
+.bf-metarow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:11.5px;}
+.bf-meta-label{color:var(--ac-secondary);font-weight:600;}
+.bf-meta-val{color:var(--ac-text);font-weight:700;}
+
+/* Winning-combos style table — Combo / Best page / n / Avg per Post / Lift */
+.ct-wrap{overflow-x:auto;}
+.ct-table{width:100%;border-collapse:collapse;min-width:560px;}
+.ct-table th{font-size:11px;font-weight:600;color:var(--ac-secondary);text-align:left;padding:9px 14px;background:#F7F9FC;border-bottom:1px solid var(--ac-divider);white-space:nowrap;}
+.ct-table th.r,.ct-table td.r{text-align:right;}
+.ct-table td{font-size:12.5px;padding:11px 14px;border-bottom:1px solid var(--ac-divider);vertical-align:middle;}
+.ct-table tr:last-child td{border-bottom:none;}
+.ct-table tr:hover td{background:#FAFCFE;}
+.ct-name{font-weight:700;color:var(--ac-title);}
+.ct-best{display:inline-flex;align-items:center;gap:7px;font-weight:600;color:var(--ac-title);}
+.ct-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.ct-lift{color:#1E8E3E;font-weight:700;}
+.ct-gap{color:#1E8E3E;font-weight:700;}
+.ct-gap.neg{color:#C0392B;}
+.bf-page-select{background:var(--ac-pill-active-bg);border:1px solid var(--ac-border);border-radius:8px;color:var(--ac-text);cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:600;padding:7px 12px;}
+.bf-fmt-group{display:flex;align-items:center;gap:2px;flex-wrap:wrap;background:var(--ac-pill-track);border-radius:var(--ac-r);padding:3px;margin-bottom:14px;width:fit-content;}
+.bf-fmt-btn{background:transparent;border:none;border-radius:8px;color:var(--ac-muted);cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:500;padding:7px 14px;white-space:nowrap;}
+.bf-fmt-btn.active{background:var(--ac-pill-active-bg);box-shadow:0 1px 3px rgba(0,0,0,.08);color:var(--ac-brand);font-weight:600;}
 
 /* drill-down — one category, formats × pages */
 .bf-drill{border-top:1px solid var(--ac-divider);margin-top:18px;padding-top:16px;}
@@ -389,7 +411,7 @@ function buildCombos(namesA, namesB, seed, n){
     const pages = PAGES.map(()=>makePageStats(rnd, 2+rnd()*14));
     out.push({name:`${a} × ${b}`, pages});
   }
-  return out.sort((x,y)=>sumMetric(y,'eng')-sumMetric(x,'eng')).slice(0,6);
+  return out.sort((x,y)=>sumMetric(y,'eng')-sumMetric(x,'eng')).slice(0,8);
 }
 
 // Split a whole number across weighted buckets so the parts sum back to the total exactly.
@@ -417,9 +439,12 @@ function buildFormatSplit(categories, seed){
       // engagement weight = posts × a per-format "quality" multiplier
       const engW = postSplit.map(pv=> pv>0 ? pv*(0.5+rnd()*1.6) : 0);
       const engSplit = splitAcross(st.eng, engW);
+      const likesSplit = splitAcross(st.likes, engW);
+      const commentsSplit = splitAcross(st.comments, engW);
+      const sharesSplit = splitAcross(st.shares, engW);
       const row = {};
       POST_FORMATS.forEach((f,i)=>{
-        row[f] = postSplit[i]>0 ? {posts:postSplit[i], eng:engSplit[i]} : null;
+        row[f] = postSplit[i]>0 ? {posts:postSplit[i], eng:engSplit[i], likes:likesSplit[i], comments:commentsSplit[i], shares:sharesSplit[i]} : null;
       });
       byCat[c.name] = row;
     });
@@ -570,194 +595,104 @@ function renderScatter(){
 // rather than "who is biggest". Cells below the sample-size floor are muted and are
 // excluded from the row winner. Level 2: click a cell to drill into that category's
 // formats × pages as a grouped bar chart.
-const BF_MIN_N = 5;             // sample-size floor — below this a cell is muted
-let bfSort = 'portfolio';       // 'portfolio' | 'spread' | 'az'
-let bfShowLowSignal = false;
-let bfDrill = null;             // {cat, pageIdx} or null
+const BF_MIN_N = 5;             // sample-size floor — a page needs at least this many posts to count for Best/Gap
 
-function setBfSort(key, el){
-  bfSort = key;
-  document.querySelectorAll('#section-heatmap .bf-sort-btn').forEach(b=>b.classList.remove('active'));
+// ---------- 3. Category Battlefield — one row per category, benchmarking one chosen page against the row's best page ----------
+// Top-right "Compare page" dropdown picks the benchmarked page. Top-left format tabs
+// (content lens only — that's the only lens with a per-format split) filter every number
+// in the table down to just that post format; "All" pools every format together.
+// Gap = (compare page's avg − best page's avg) ÷ compare page's avg, so it reads as
+// "how far behind (negative) or ahead (positive) BusinessFocus is, relative to itself".
+let bfPageIdx = 0;
+let bfFormat = 'All';
+
+function setBfPage(idx){ bfPageIdx = Number(idx); renderHeatmap(); }
+function setBfFormat(f, el){
+  bfFormat = f;
+  document.querySelectorAll('#section-heatmap .bf-fmt-btn').forEach(b=>b.classList.remove('active'));
   if(el) el.classList.add('active');
   renderHeatmap();
 }
-function toggleBfLowSignal(){ bfShowLowSignal = !bfShowLowSignal; renderHeatmap(); }
-function closeBfDrill(){ bfDrill = null; renderHeatmap(); }
-function setBfDrill(catIdx, pageIdx){
-  const cat = LENSES[currentLens].categories[catIdx].name;
-  bfDrill = (bfDrill && bfDrill.cat===cat && bfDrill.pageIdx===pageIdx) ? null : {cat, pageIdx};
-  renderHeatmap();
-}
 
-// avg engagements per post, the metric the whole card is built on
-function bfAvg(st){ return st.posts ? st.eng/st.posts : 0; }
-
-// row-normalized blue ramp: lightest = weakest page in the row, darkest = best
-function bfShade(t){
-  // floor is kept mid-blue on purpose: every non-muted cell carries white text,
-  // so the lightest shade still has to pass contrast
-  const stops = [{p:0,c:[125,175,235]},{p:.45,c:[63,132,219]},{p:.78,c:[35,89,178]},{p:1,c:[20,52,110]}];
-  let a=stops[0], b=stops[stops.length-1];
-  for(let i=0;i<stops.length-1;i++){ if(t>=stops[i].p && t<=stops[i+1].p){ a=stops[i]; b=stops[i+1]; break; } }
-  const k = b.p===a.p ? 0 : (t-a.p)/(b.p-a.p);
-  const c = a.c.map((v,i)=>Math.round(v+k*(b.c[i]-v)));
-  return `rgb(${c[0]},${c[1]},${c[2]})`;
-}
-
-// Level 2 — grouped bar chart: one group per post format, one bar per page
-function bfDrillHTML(catName, pageIdx){
-  const fmtSplit = LENSES[currentLens].formats;
-  // [format][page] = avg eng/post (null when the page never used that format here)
-  const series = POST_FORMATS.map(f=>({
-    format: f,
-    vals: PAGES.map((p,pi)=>{
-      const cell = (fmtSplit[pi][catName]||{})[f];
-      return cell && cell.posts ? {avg:cell.eng/cell.posts, posts:cell.posts, eng:cell.eng} : null;
-    })
-  }));
-
-  let yMax = 0;
-  series.forEach(s=>s.vals.forEach(v=>{ if(v && v.avg>yMax) yMax=v.avg; }));
-  yMax = yMax*1.12 || 1;
-
-  const W=980, H=330, padL=56, padR=16, padT=16, padB=54;
-  const plotW = W-padL-padR, plotH = H-padT-padB;
-  const groupW = plotW/POST_FORMATS.length;
-  const barW = Math.min(26, (groupW-18)/PAGES.length);
-  const y = v => padT+plotH - (v/yMax)*plotH;
-
-  // gridlines
-  let grid = '';
-  for(let i=0;i<=4;i++){
-    const val = yMax*i/4, yy = y(val);
-    grid += `<line x1="${padL}" y1="${yy}" x2="${W-padR}" y2="${yy}" stroke="${i?'#EEF2F6':'#DCE3E9'}"/>
-             <text x="${padL-9}" y="${yy+3.5}" font-size="10" fill="#828282" text-anchor="end">${i?fmt(Math.round(val)):'0'}</text>`;
-  }
-
-  let bars = '', labels = '';
-  series.forEach((s,gi)=>{
-    const gx = padL + gi*groupW;
-    const inner = barW*PAGES.length + 3*(PAGES.length-1);
-    const x0 = gx + (groupW-inner)/2;
-    s.vals.forEach((v,pi)=>{
-      const bx = x0 + pi*(barW+3);
-      // the clicked page is emphasised, but the others stay readable — the whole point
-      // of the drill-down is comparing every page's format mix inside this category
-      const dim = (pageIdx!=null && pi!==pageIdx) ? 0.62 : 1;
-      if(!v){
-        bars += `<rect x="${bx}" y="${padT+plotH-2}" width="${barW}" height="2" fill="#E4E9ED"><title>${esc(PAGES[pi].name)} · ${s.format}\nNo posts in this format</title></rect>`;
-        return;
-      }
-      const h = Math.max(2, (v.avg/yMax)*plotH);
-      bars += `<rect x="${bx}" y="${padT+plotH-h}" width="${barW}" height="${h}" rx="3" fill="${PAGES[pi].color}" opacity="${dim}"><title>${esc(PAGES[pi].name)} · ${s.format}\nAvg Eng / Post: ${fmt(Math.round(v.avg))}\nPosts: ${v.posts} · Engagements: ${fmt(v.eng)}</title></rect>`;
-      if(h>16) bars += `<text x="${bx+barW/2}" y="${padT+plotH-h-4}" font-size="8.5" font-weight="700" fill="#5B6B78" text-anchor="middle" opacity="${dim}">${fmt(Math.round(v.avg))}</text>`;
-    });
-    labels += `<text x="${gx+groupW/2}" y="${H-30}" font-size="11.5" font-weight="600" fill="#102532" text-anchor="middle">${s.format}</text>`;
+// per-category, per-page {posts, avg} for whichever format is selected (or pooled, for "All")
+// — always uses the metric picked in the shared Metric selector, whether pooled or format-filtered.
+function bfCatPageStats(lens, c, metricKey){
+  return c.pages.map((st,pi)=>{
+    if(bfFormat==='All' || !lens.formats){
+      return {pi, posts:st.posts, avg: st.posts ? st[metricKey]/st.posts : 0};
+    }
+    const cell = (lens.formats[pi][c.name]||{})[bfFormat];
+    const posts = cell ? cell.posts : 0;
+    const val = cell ? cell[metricKey] : 0;
+    return {pi, posts, avg: posts ? val/posts : 0};
   });
-
-  // each page's own best format inside this category
-  const chips = PAGES.map((p,pi)=>{
-    let best=null, bv=-1;
-    series.forEach(s=>{ const v=s.vals[pi]; if(v && v.avg>bv){ bv=v.avg; best=s.format; } });
-    if(!best) return `<span class="bf-best-chip"><span class="bf-best-dot" style="background:${p.color}"></span><span class="p" title="${esc(p.name)}">${esc(p.short)}</span><span class="f">no posts</span></span>`;
-    return `<span class="bf-best-chip"><span class="bf-best-dot" style="background:${p.color}"></span><span class="p" title="${esc(p.name)}">${esc(p.short)}</span><span class="f">${best} · ${fmt(Math.round(bv))}</span></span>`;
-  }).join('');
-
-  const focus = pageIdx!=null ? PAGES[pageIdx] : null;
-
-  return `<div class="bf-drill">
-    <div class="bf-drill-hd">
-      <div>
-        <div class="bf-drill-title">${esc(catName)} — Avg Eng / Post by format</div>
-        <div class="bf-drill-sub">Every page's format mix inside this one category${focus?` · highlighting <b style="color:${focus.color}">${esc(focus.name)}</b>`:''} · hover a bar for posts and engagements</div>
-      </div>
-      <button class="bf-drill-close" onclick="closeBfDrill()">Close</button>
-    </div>
-    <div class="bf-chart-wrap"><svg width="100%" height="330" viewBox="0 0 ${W} ${H}">${grid}${bars}${labels}</svg></div>
-    <div class="bf-best-strip"><span class="bf-best-label">Best format per page</span>${chips}</div>
-    <div class="page-legend-pill">${pageLegendHTML()}</div>
-  </div>`;
 }
 
 function renderHeatmap(){
   const lens = LENSES[currentLens];
   const el = document.getElementById('section-heatmap');
-  if(!lens.formats){ el.innerHTML=''; bfDrill = null; return; }
+  if(!lens.formats) bfFormat = 'All';
+  const metricKey = METRIC_META[selectedMetric].key;
+  const metricLabel = METRIC_META[selectedMetric].label;
+  const cmpPage = PAGES[bfPageIdx];
 
-  // one row per category: each page's avg eng/post + its sample size
-  const rows = lens.categories.map((c,ci)=>{
-    const cells = c.pages.map(st=>({avg:bfAvg(st), n:st.posts, muted:st.posts<BF_MIN_N}));
-    const valid = cells.filter(x=>!x.muted);
-    const pooledEng = c.pages.reduce((s,st)=>s+st.eng,0);
-    const pooledPosts = c.pages.reduce((s,st)=>s+st.posts,0);
-    let winner = -1, wv = -1;
-    cells.forEach((x,i)=>{ if(!x.muted && x.avg>wv){ wv=x.avg; winner=i; } });
-    const avgs = valid.map(x=>x.avg);
-    return {
-      ci, name:c.name, cells, winner,
-      portfolio: pooledPosts ? pooledEng/pooledPosts : 0,
-      spread: avgs.length>1 ? Math.max(...avgs)-Math.min(...avgs) : 0,
-      lowSignal: valid.length < 2,   // can't compare a row with fewer than 2 usable cells
-    };
+  // Every category the lens has is always listed, regardless of which format tab is active —
+  // a category with no qualifying page for this format still shows a row, with "—" in place
+  // of Best page / Avg / Gap, instead of disappearing from the table.
+  const rows = lens.categories.map(c=>{
+    const pageAgg = bfCatPageStats(lens, c, metricKey);
+    const best = pageAgg.filter(p=>p.posts>=BF_MIN_N).sort((a,b)=>b.avg-a.avg)[0] || null;
+    const sel = pageAgg[bfPageIdx];
+    const selQualifies = sel.posts >= BF_MIN_N;
+    const isSelBest = best && sel.pi===best.pi;
+    const gap = (best && selQualifies && sel.avg>0) ? Math.round((sel.avg-best.avg)/sel.avg*100) : null;
+    return {name:c.name, best, sel, selQualifies, isSelBest, gap};
   });
 
-  const main = rows.filter(r=>!r.lowSignal);
-  const low  = rows.filter(r=>r.lowSignal);
-  if(bfSort==='portfolio') main.sort((a,b)=>b.portfolio-a.portfolio);
-  if(bfSort==='spread')    main.sort((a,b)=>b.spread-a.spread);
-  if(bfSort==='az')        main.sort((a,b)=>a.name.localeCompare(b.name));
-  const shown = bfShowLowSignal ? [...main, ...low] : main;
+  rows.sort((a,b)=>(b.best?b.best.avg:-1)-(a.best?a.best.avg:-1));
 
-  const cols = `minmax(210px,1.35fr) repeat(${PAGES.length}, minmax(112px,1fr))`;
+  const pageOptions = PAGES.map((p,i)=>`<option value="${i}"${i===bfPageIdx?' selected':''}>${esc(p.short)}</option>`).join('');
+  const fmtTabs = lens.formats ? ['All', ...POST_FORMATS].map(f=>
+    `<button class="bf-fmt-btn${f===bfFormat?' active':''}" onclick="setBfFormat('${f}',this)">${esc(f)}</button>`
+  ).join('') : '';
 
-  const head = `<div class="bf-head-cat">${esc(lens.label)}</div>` + PAGES.map(p=>
-    `<div class="bf-head-page" title="${esc(p.name)}"><span class="bf-head-dot" style="background:${p.color}"></span><span class="bf-head-name">${esc(p.short)}</span></div>`
-  ).join('');
-
-  const body = shown.map(r=>{
-    // normalize within the row, across usable cells only
-    const usable = r.cells.filter(x=>!x.muted).map(x=>x.avg);
-    const lo = usable.length ? Math.min(...usable) : 0;
-    const hi = usable.length ? Math.max(...usable) : 1;
-    const cells = r.cells.map((x,pi)=>{
-      const sel = bfDrill && bfDrill.cat===r.name && bfDrill.pageIdx===pi;
-      if(x.muted){
-        return `<div class="bf-cell muted${sel?' sel':''}" onclick="setBfDrill(${r.ci},${pi})" title="${esc(PAGES[pi].name)} · ${esc(r.name)}\nAvg Eng / Post: ${fmt(Math.round(x.avg))}\nOnly ${x.n} posts — below the ${BF_MIN_N}-post floor, so it is excluded from the row winner">
-          <div class="bf-v">${fmt(Math.round(x.avg))}</div>
-        </div>`;
-      }
-      const t = hi===lo ? 1 : (x.avg-lo)/(hi-lo);
-      const star = r.winner===pi ? '<span class="bf-star">★</span>' : '';
-      return `<div class="bf-cell${sel?' sel':''}" style="background:${bfShade(t)}" onclick="setBfDrill(${r.ci},${pi})" title="${esc(PAGES[pi].name)} · ${esc(r.name)}\nAvg Eng / Post: ${fmt(Math.round(x.avg))}\nBased on ${x.n} posts">
-        ${star}<div class="bf-v" style="color:#fff">${fmt(Math.round(x.avg))}</div>
-      </div>`;
-    }).join('');
-    return `<div class="bf-row-name">${esc(r.name)}</div>${cells}`;
+  const body = rows.map(r=>{
+    const bestChip = r.best
+      ? `<span class="ct-best"><span class="ct-dot" style="background:${PAGES[r.best.pi].color}"></span>${esc(PAGES[r.best.pi].short)}</span>`
+      : '<span class="top-empty">—</span>';
+    const bestAvg = r.best ? fmt(Math.round(r.best.avg)) : '—';
+    const selAvg = r.selQualifies ? fmt(Math.round(r.sel.avg)) : '—';
+    const gapHTML = r.isSelBest
+      ? `<span class="ct-lift" style="color:var(--ac-secondary);font-weight:600;">Best</span>`
+      : (r.gap!=null ? `<span class="ct-gap${r.gap<0?' neg':''}">${r.gap>0?'+':''}${r.gap}%</span>` : '<span class="top-empty">—</span>');
+    return `<tr>
+      <td class="ct-name">${esc(r.name)}</td>
+      <td>${bestChip}</td>
+      <td class="r">${bestAvg}</td>
+      <td class="r">${selAvg}</td>
+      <td class="r">${gapHTML}</td>
+    </tr>`;
   }).join('');
 
-  const lowBtn = low.length
-    ? `<button class="bf-lowsig" onclick="toggleBfLowSignal()">${bfShowLowSignal?'Hide':'Show'} ${low.length} low-signal categor${low.length>1?'ies':'y'} (${low.map(r=>esc(r.name)).join(', ')})</button>`
-    : '';
-
   el.innerHTML = `<div class="card">
-    <div class="card-hd"><div class="card-title bf-title">Category Battlefield — ${esc(lens.label)} by Avg Eng / Post</div></div>
-    <div class="card-sub">Cell shade is normalized within each row — darkest = best page for that topic · ★ = row winner (n ≥ ${BF_MIN_N}) · click a cell to drill down</div>
-    <div class="bf-sortbar">
-      <span class="bf-sort-label">Sort</span>
-      <div class="bf-sort-group">
-        <button class="bf-sort-btn${bfSort==='portfolio'?' active':''}" onclick="setBfSort('portfolio',this)">Portfolio total</button>
-        <button class="bf-sort-btn${bfSort==='spread'?' active':''}" onclick="setBfSort('spread',this)">Biggest spread</button>
-        <button class="bf-sort-btn${bfSort==='az'?' active':''}" onclick="setBfSort('az',this)">A–Z</button>
+    <div class="card-hd">
+      <div class="card-title bf-title">Category Battlefield — ${esc(lens.label)}</div>
+      <div class="metric-select-wrap">
+        <span class="metric-select-label">Compare page:</span>
+        <select class="bf-page-select" onchange="setBfPage(this.value)">${pageOptions}</select>
       </div>
     </div>
-    <div class="bf-scroll"><div class="bf-grid" style="grid-template-columns:${cols}">${head}${body}</div></div>
-    ${lowBtn}
-    <div class="bf-legend">
-      <div class="bf-legend-item"><span>Row-normalized shade:</span><span class="bf-ramp"></span><span>low → best in row</span></div>
-      <div class="bf-legend-item"><span>Muted cells: n &lt; ${BF_MIN_N} (excluded from ★ and insights)</span></div>
-    </div>
-    <div class="bf-foot">Portfolio = pooled Avg Eng / Post across selected pages · sample sizes stated in tooltips</div>
-    ${bfDrill ? bfDrillHTML(bfDrill.cat, bfDrill.pageIdx) : ''}
+    <div class="card-sub">Ranked by best page's Avg ${esc(metricLabel)} / Post per category · Gap = (${esc(cmpPage.short)} − best) ÷ ${esc(cmpPage.short)} (n ≥ ${BF_MIN_N}) · every ${esc(lens.label.toLowerCase())} is listed, even with no qualifying page for this format</div>
+    ${fmtTabs ? `<div class="bf-fmt-group">${fmtTabs}</div>` : ''}
+    <div class="ct-wrap"><table class="ct-table">
+      <thead><tr>
+        <th>${esc(lens.label)}</th><th>Best page</th>
+        <th class="r">Best Avg / Post</th><th class="r">${esc(cmpPage.short)} Avg / Post</th>
+        <th class="r">Gap</th>
+      </tr></thead>
+      <tbody>${body}</tbody>
+    </table></div>
+    <div class="page-legend-pill">${pageLegendHTML()}</div>
   </div>`;
 }
 
@@ -882,8 +817,7 @@ function goToTopPage(p){
 
 function setLens(lens, el){
   currentLens = lens;
-  bfDrill = null;
-  bfShowLowSignal = false;
+  bfFormat = 'All';
   topPage = 1;
   topExpanded = new Set();
   document.querySelectorAll('#lens-toggle .lens-btn').forEach(b=>b.classList.remove('active'));
@@ -921,8 +855,6 @@ function setMode(mode, el){
   document.getElementById('pg-title').textContent = mode==='mypage' ? 'My Pages · Compare' : 'Competitors · Compare';
   document.getElementById('nav-mypages').classList.toggle('active', mode==='mypage');
   document.getElementById('nav-competitors').classList.toggle('active', mode==='competitors');
-  bfDrill = null;
-  bfShowLowSignal = false;
   topPage = 1;
   topExpanded = new Set();
   // Competitors lead with volume, My Page with engagement — same split as card 1
