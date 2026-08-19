@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<!-- MY PAGES — COMPARE · AI CATEGORY TAB — V2 "CATEGORY BATTLEFIELD" VARIANT
+     Differs from my-pages-compare-ai-category-tab.html in card 3 only:
+     that version is pages × formats (drill into categories);
+     this version is categories × pages (drill into formats, as a grouped bar chart). -->
+<!-- 5-page compare. Palette taken from production compare pages:
+     pages/organization/_orgId/{fb,ig}/{my-pages,competitor-analysis}/compare/{overview,page}.vue
+     const colorPalette = ['#0C8CD8', '#F9A501', '#7EB235', '#2E95A7', '#D63B67'] -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediaLens — My Pages · Compare · AI Category</title>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ac-brand:#23A9F6;--ac-brand-tint:#EEF6FF;
+  --ac-title:#0A1F2C;--ac-text:#102532;--ac-muted:#707070;--ac-secondary:#828282;
+  --ac-border:#D9E3E6;--ac-divider:#E8EEF0;--ac-bg:#F7F7F7;
+  --ac-pill-track:#EEF2F5;--ac-pill-active-bg:#FFFFFF;
+  --ac-r-card:12px;--ac-r:10px;
+  --ac-card-shadow:0 1px 3px rgba(0,0,0,.06);
+  --ac-card-padding:20px;--ac-card-gap:20px;--ac-row-gap:14px;
+  --ac-font-card-title-size:15px;--ac-font-card-sub-size:12.5px;
+  --ac-font-body-size:13px;--ac-font-value-size:13.5px;--ac-font-meta-size:11.5px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:var(--ac-text);font-size:14px;line-height:1.5;}
+
+.topnav{background:#fff;height:64px;display:flex;align-items:center;padding:0 24px;border-bottom:1px solid var(--ac-border);position:sticky;top:0;z-index:90;}
+.logo{display:flex;align-items:center;gap:8px;color:var(--ac-brand);font-weight:700;font-size:19px;letter-spacing:.2px;}
+.logo-mark{width:22px;height:22px;border-radius:50%;background:conic-gradient(from 0deg,#23A9F6,#F5A623,#23A9F6);}
+.nav-user{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--ac-text);font-size:13.5px;}
+.nav-avatar{width:28px;height:28px;border-radius:50%;background:var(--ac-brand-tint);color:var(--ac-brand);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;}
+
+.shell{display:flex;min-height:calc(100vh - 64px);}
+.sidebar{width:212px;background:#fff;border-right:1px solid var(--ac-divider);padding:14px 0;flex-shrink:0;}
+.org{padding:0 16px 12px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--ac-divider);margin-bottom:6px;}
+.org-badge{width:34px;height:34px;border-radius:8px;background:var(--ac-brand-tint);color:var(--ac-brand);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;}
+.org-name{font-weight:600;font-size:12.5px;}
+.org-sub{font-size:10px;color:var(--ac-secondary);}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 16px;color:var(--ac-muted);font-size:12.5px;cursor:pointer;border-left:3px solid transparent;}
+.nav-item:hover{background:#fafcfe;color:var(--ac-text);}
+.nav-item.active{background:var(--ac-brand-tint);color:var(--ac-brand);border-left-color:var(--ac-brand);font-weight:600;}
+.content{flex:1;min-width:0;}
+
+.pg-head{display:flex;align-items:flex-start;padding:20px 26px 0;gap:12px;flex-wrap:wrap;}
+.pg-title{font-size:18px;font-weight:700;color:var(--ac-title);}
+.pg-meta{font-size:11.5px;color:var(--ac-secondary);margin-top:1px;}
+
+/* Mode switch — My Page vs Competitors (prototype-only control, not part of the real page chrome) */
+.mode-switch{display:flex;align-items:center;gap:8px;padding:12px 26px 0;}
+.mode-switch-label{font-size:11px;color:var(--ac-secondary);font-weight:600;}
+.mode-group{background:var(--ac-pill-track);border-radius:var(--ac-r);display:inline-flex;gap:2px;padding:3px;}
+.mode-btn{background:transparent;border:none;border-radius:8px;color:var(--ac-muted);cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:500;padding:6px 14px;white-space:nowrap;}
+.mode-btn.active{background:var(--ac-pill-active-bg);box-shadow:0 1px 3px rgba(0,0,0,.08);color:var(--ac-brand);font-weight:600;}
+
+/* 5 pages — chips wrap instead of a single "A vs B" line */
+.page-chips{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;max-width:660px;}
+.page-chip{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;background:#fff;border:1px solid var(--ac-border);border-radius:20px;padding:5px 12px 5px 6px;max-width:230px;}
+.page-chip-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.chip-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-left:4px;}
+
+.subtabs-bar{padding:12px 26px 0;border-bottom:1px solid var(--ac-divider);display:flex;gap:0;overflow-x:auto;}
+.subtab{padding:9px 16px;font-size:13px;color:var(--ac-muted);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;font-weight:500;}
+.subtab:hover{color:var(--ac-text);}
+.subtab.active{color:var(--ac-brand);border-bottom-color:var(--ac-brand);font-weight:600;}
+.badge-new{display:inline-block;font-size:8px;font-weight:700;background:var(--ac-brand);color:#fff;border-radius:6px;padding:1px 5px;margin-left:5px;vertical-align:middle;}
+
+.tabbody{padding:20px 26px 60px;}
+
+/* Lens selector — matches production .lens-group / .lens-btn tokens */
+.lens-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--ac-space-xl,24px);flex-wrap:wrap;gap:10px;}
+.lens-group{background:var(--ac-pill-track);border-radius:var(--ac-r);display:inline-flex;gap:2px;padding:3px;}
+.lens-btn{background:transparent;border:none;border-radius:8px;color:var(--ac-muted);cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;padding:8px 18px;transition:all .2s ease;white-space:nowrap;}
+.lens-btn.active{background:var(--ac-pill-active-bg);box-shadow:0 1px 3px rgba(0,0,0,.08);color:var(--ac-brand);font-weight:600;}
+
+/* Metric selector — options depend on mode (My Page vs Competitors); drives cards 1 & 5 */
+.metric-select-wrap{display:flex;align-items:center;gap:8px;}
+.metric-select-label{font-size:11px;color:var(--ac-secondary);font-weight:600;}
+
+.section{margin-bottom:var(--ac-card-gap);}
+
+/* Card — matches production .ac-category-bars / card-hd / card-title / card-sub tokens */
+.card{background:#fff;border:1px solid var(--ac-border);border-radius:var(--ac-r-card);box-shadow:var(--ac-card-shadow);padding:var(--ac-card-padding);}
+.card-hd{align-items:center;display:flex;gap:12px;justify-content:space-between;margin-bottom:2px;flex-wrap:wrap;}
+.card-title{color:var(--ac-text);font-size:var(--ac-font-card-title-size);font-weight:600;text-transform:capitalize;}
+.card-sub{color:var(--ac-secondary);font-size:var(--ac-font-card-sub-size);margin-bottom:14px;}
+.cards-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--ac-card-gap);}
+@media(max-width:1100px){.cards-row{grid-template-columns:1fr;}}
+
+/* Page identity pill — shown under every card */
+.page-legend-pill{display:inline-flex;align-items:center;gap:14px;flex-wrap:wrap;background:#fff;border-radius:24px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:8px 16px;font-size:12px;font-weight:600;color:var(--ac-text);margin-top:16px;}
+.page-legend-item{display:flex;align-items:center;gap:8px;}
+.page-legend-sq{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+
+/* stacked rank list (Category Bars + Combinations)
+   Bar geometry is a 1:1 copy of the production .cbar-track / .cbar-fill spec:
+     track  → background:#f1f5f9; border-radius:2px; height:4px; margin-top:5px; width:100%
+     fill   → border-radius:2px; height:100%; width = value / max
+   The only prototype-side addition is splitting the fill into one segment per page. */
+.rank-list{display:flex;flex-direction:column;gap:var(--ac-row-gap);}
+.rank-item{position:relative;cursor:pointer;}
+.rank-item-top{display:flex;align-items:flex-start;gap:8px;justify-content:space-between;min-width:0;}
+.rank-num{font-size:12px;font-weight:700;color:var(--ac-accent-rank,#FFA500);width:16px;flex-shrink:0;line-height:1.35;}
+.rank-name{font-size:13px;font-weight:500;color:#1e293b;flex:1 1 auto;min-width:0;line-height:1.35;word-wrap:anywhere;}
+.rank-val{font-size:.8rem;color:var(--ac-text);font-weight:600;line-height:1.4;min-width:110px;text-align:right;flex-shrink:0;}
+.stack-track{background:#f1f5f9;border-radius:2px;height:4px;margin-top:5px;overflow:hidden;width:100%;}
+.stack-fill{border-radius:2px;height:100%;display:flex;transition:width .45s ease;}
+.stack-seg{height:100%;transition:width .45s ease;}
+.rank-item:hover .stack-track{box-shadow:0 0 0 2px rgba(35,169,246,.22);}
+
+.tt{position:absolute;left:24px;top:100%;margin-top:6px;background:var(--ac-title);color:#fff;font-size:11px;border-radius:8px;padding:8px 11px;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.18);z-index:20;opacity:0;pointer-events:none;transition:opacity .12s;}
+.rank-item:hover .tt{opacity:1;}
+.tt-row{display:flex;align-items:center;gap:6px;margin-top:2px;}
+.tt-title{font-weight:600;margin-bottom:2px;}
+.tt-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+/* Performance vs volume matrix — bubble scatter */
+.scatter-wrap{position:relative;}
+.scatter-note{font-size:11px;color:var(--ac-secondary);margin-top:8px;}
+
+/* Category Battlefield — rows = categories, columns = pages.
+   Cell shade is normalized WITHIN EACH ROW (darkest = best page for that topic),
+   so the colour answers "who wins this topic", not "who is biggest overall".
+   Click a cell to drill into that category's formats × pages. */
+.bf-title{text-transform:none;}
+.bf-sortbar{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+.bf-sort-label{font-size:11px;font-weight:700;letter-spacing:.9px;color:var(--ac-secondary);text-transform:uppercase;}
+.bf-sort-group{display:inline-flex;align-items:center;gap:2px;border:1px solid var(--ac-border);border-radius:9px;padding:3px;background:#fff;}
+.bf-sort-btn{background:transparent;border:none;border-radius:7px;color:var(--ac-muted);cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:600;padding:6px 14px;white-space:nowrap;}
+.bf-sort-btn:hover{color:var(--ac-text);}
+.bf-sort-btn.active{background:#111827;color:#fff;}
+
+.bf-scroll{overflow-x:auto;}
+.bf-grid{display:grid;gap:8px;min-width:760px;}
+.bf-head-cat{font-size:13px;font-weight:700;color:var(--ac-title);align-self:end;padding-bottom:4px;}
+.bf-head-page{display:flex;align-items:center;justify-content:center;gap:7px;font-size:13px;font-weight:700;color:var(--ac-title);align-self:end;padding-bottom:4px;min-width:0;}
+.bf-head-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.bf-head-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bf-row-name{font-size:13.5px;font-weight:600;color:var(--ac-title);display:flex;align-items:center;padding-right:12px;}
+
+.bf-cell{position:relative;border-radius:9px;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .12s,box-shadow .12s;}
+.bf-cell:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(16,37,50,.16);}
+.bf-cell.sel{box-shadow:0 0 0 3px #fff,0 0 0 5px var(--ac-brand);}
+.bf-v{font-size:15px;font-weight:700;line-height:1.1;}
+.bf-n{font-size:10.5px;font-weight:600;margin-top:2px;opacity:.85;}
+.bf-star{position:absolute;top:6px;right:8px;font-size:11px;color:#fff;line-height:1;}
+.bf-cell.muted{background:#E9F0F9;}
+.bf-cell.muted .bf-v{color:#9AA6B5;font-weight:600;}
+.bf-cell.muted .bf-n{color:#A9B4C1;}
+
+.bf-lowsig{background:none;border:none;padding:10px 0 0;font-family:inherit;font-size:12.5px;color:var(--ac-secondary);cursor:pointer;text-align:left;}
+.bf-lowsig:hover{color:var(--ac-brand);text-decoration:underline;}
+.bf-legend{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin-top:14px;font-size:11.5px;color:var(--ac-secondary);}
+.bf-legend-item{display:flex;align-items:center;gap:8px;}
+.bf-ramp{width:150px;height:11px;border-radius:3px;background:linear-gradient(90deg,#7DAFEB,#3F84DB,#2359B2,#14346E);}
+.bf-foot{font-size:11.5px;color:var(--ac-secondary);margin-top:8px;}
+.bf-fmt-group{display:flex;align-items:center;gap:2px;flex-wrap:wrap;background:var(--ac-pill-track);border-radius:var(--ac-r);padding:3px;margin-bottom:14px;width:fit-content;}
+.bf-fmt-btn{background:transparent;border:none;border-radius:8px;color:var(--ac-muted);cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:500;padding:7px 14px;white-space:nowrap;}
+.bf-fmt-btn.active{background:var(--ac-pill-active-bg);box-shadow:0 1px 3px rgba(0,0,0,.08);color:var(--ac-brand);font-weight:600;}
+
+/* drill-down — one category, formats × pages */
+.bf-drill{border-top:1px solid var(--ac-divider);margin-top:18px;padding-top:16px;}
+.bf-drill-hd{display:flex;align-items:flex-start;gap:12px;margin-bottom:4px;flex-wrap:wrap;}
+.bf-drill-title{font-size:14.5px;font-weight:700;color:var(--ac-title);}
+.bf-drill-sub{font-size:12px;color:var(--ac-secondary);margin-top:1px;}
+.bf-drill-close{margin-left:auto;background:#fff;border:1px solid var(--ac-border);border-radius:8px;color:var(--ac-muted);cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;padding:5px 12px;}
+.bf-drill-close:hover{border-color:var(--ac-brand);color:var(--ac-brand);}
+.bf-chart-wrap{overflow-x:auto;}
+.bf-best-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;}
+.bf-best-label{font-size:11.5px;font-weight:700;color:var(--ac-secondary);text-transform:uppercase;letter-spacing:.5px;}
+.bf-best-chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--ac-border);border-radius:20px;padding:5px 12px;font-size:12px;background:#fff;}
+.bf-best-chip .p{font-weight:700;color:var(--ac-title);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bf-best-chip .f{color:var(--ac-secondary);}
+.bf-best-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* Top categories table — one column per page */
+.top-wrap{overflow-x:auto;}
+.top-table{width:100%;border-collapse:collapse;min-width:820px;}
+.top-table th{font-size:11px;font-weight:600;color:var(--ac-secondary);text-align:left;padding:9px 14px;background:#F7F9FC;border-bottom:1px solid var(--ac-divider);white-space:nowrap;vertical-align:bottom;}
+.top-table th.r{text-align:right;}
+.top-table td{font-size:12.5px;padding:10px 14px;border-bottom:1px solid var(--ac-divider);vertical-align:middle;}
+.top-table td.r{text-align:right;font-weight:600;}
+.top-table tr:last-child td{border-bottom:none;}
+.top-table tr:hover td{background:#FAFCFE;}
+.rank-badge{font-size:10.5px;font-weight:700;color:var(--ac-secondary);width:18px;}
+
+.top-th-sort{cursor:pointer;user-select:none;}
+.top-th-sort:hover{color:var(--ac-brand);}
+.top-sort-caret{display:inline-block;margin-left:3px;font-size:9px;opacity:.5;}
+.top-th-sort.active .top-sort-caret{opacity:1;color:var(--ac-brand);}
+/* long page names: single line, ellipsis, full name on hover via title= */
+.top-th-page{max-width:132px;}
+.top-th-page-inner{display:flex;align-items:center;justify-content:flex-end;gap:6px;min-width:0;}
+.top-th-page-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+.top-cat-cell{display:flex;align-items:center;gap:6px;}
+.top-cat-name{font-weight:500;}
+.top-page-dot{width:8px;height:8px;border-radius:3px;flex-shrink:0;}
+.top-empty{color:var(--ac-secondary);font-weight:500;}
+
+.top-pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--ac-divider);}
+.top-pagination-info{font-size:11.5px;color:var(--ac-secondary);}
+.top-pagination-btns{display:flex;align-items:center;gap:4px;}
+.pg-btn{border:1px solid var(--ac-border);background:#fff;color:var(--ac-text);font-family:inherit;font-size:12px;border-radius:6px;padding:5px 10px;cursor:pointer;min-width:30px;}
+.pg-btn:hover:not(:disabled){border-color:var(--ac-brand);color:var(--ac-brand);}
+.pg-btn.active{background:var(--ac-brand);border-color:var(--ac-brand);color:#fff;font-weight:600;}
+.pg-btn:disabled{opacity:.4;cursor:not-allowed;}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="logo"><div class="logo-mark"></div>MEDIA LENS</div>
+  <div class="nav-user"><div class="nav-avatar">J</div>Julie Li</div>
+</nav>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="org">
+      <div class="org-badge">P</div>
+      <div><div class="org-name">PL - Hong Kong</div><div class="org-sub">Admin · Julie Li</div></div>
+    </div>
+    <div class="nav-item">Dashboard</div>
+    <div class="nav-item active" id="nav-mypages">My Pages</div>
+    <div class="nav-item" id="nav-competitors">Competitor Analysis</div>
+    <div class="nav-item">Buzz (Market Insights)</div>
+    <div class="nav-item">Leader Board</div>
+    <div class="nav-item">Social Listening</div>
+    <div class="nav-item">Social Pulses</div>
+    <div class="nav-item">Ad Manager</div>
+    <div class="nav-item">Ad Intelligence</div>
+    <div class="nav-item">Report Scheduler</div>
+    <div class="nav-item">AIGC</div>
+  </aside>
+
+  <div class="content">
+    <div class="mode-switch">
+      <span class="mode-switch-label">Prototype mode:</span>
+      <div class="mode-group" id="mode-toggle">
+        <button class="mode-btn active" onclick="setMode('mypage',this)">My Page · Compare</button>
+        <button class="mode-btn" onclick="setMode('competitors',this)">Competitors · Compare</button>
+      </div>
+    </div>
+    <div class="pg-head">
+      <div>
+        <div class="pg-title" id="pg-title">My Pages · Compare</div>
+        <div class="pg-meta">Instagram · Last 30 days · 5 pages</div>
+      </div>
+      <div class="page-chips" id="page-chips"></div>
+    </div>
+
+    <div class="subtabs-bar">
+      <div class="subtab">Overview</div>
+      <div class="subtab">Posts</div>
+      <div class="subtab">Hashtags</div>
+      <div class="subtab active">AI Category<span class="badge-new">NEW</span></div>
+      <div class="subtab">Audience</div>
+    </div>
+
+    <div class="tabbody">
+
+      <div class="lens-bar">
+        <div class="lens-group" id="lens-toggle">
+          <button class="lens-btn active" onclick="setLens('content',this)">Content category</button>
+          <button class="lens-btn" onclick="setLens('ad',this)">Ad category</button>
+          <button class="lens-btn" onclick="setLens('image',this)">Image category</button>
+        </div>
+        <div class="metric-select-wrap">
+          <span class="metric-select-label">Metric:</span>
+          <div class="lens-group" id="metric-toggle"></div>
+        </div>
+      </div>
+
+      <!-- 1. Category Bars — "{Lens} vs {Metric}" -->
+      <div class="section" id="section-bars"></div>
+
+      <!-- 2. Avg Engagements vs Posts — scatter (identical in both modes) -->
+      <div class="section">
+        <div class="card scatter-wrap">
+          <div class="card-hd"><div class="card-title">Avg Engagements vs Posts</div></div>
+          <div class="card-sub" id="scatter-sub">Each dot is one category for one page · x = posts, y = avg engagements per post</div>
+          <svg id="scatter-svg" width="100%" height="360" viewBox="0 0 900 360"></svg>
+          <div class="scatter-note">Bubble size = engagement rate for that category</div>
+          <div class="page-legend-pill" id="pill-scatter"></div>
+        </div>
+      </div>
+
+      <!-- 3. Which format wins in each category — heatmap (Content lens only) -->
+      <div class="section" id="section-heatmap"></div>
+
+      <!-- 4. Combinations -->
+      <div class="section">
+        <div class="cards-row" id="combo-cards"></div>
+      </div>
+
+      <!-- 5. Top categories table — one column per page, driven by the Metric selector -->
+      <div class="section">
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div style="padding:20px 20px 0;">
+            <div class="card-title">Top categories</div>
+            <div class="card-sub" id="top-sub"></div>
+          </div>
+          <div class="top-wrap">
+            <table class="top-table">
+              <thead><tr id="top-thead-row"></tr></thead>
+              <tbody id="top-tbody"></tbody>
+            </table>
+          </div>
+          <div class="top-pagination" id="top-pagination"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- Pages ----------
+   Colors are the production compare palette, in production order:
+   ['#0C8CD8','#F9A501','#7EB235','#2E95A7','#D63B67'] — assigned by page index,
+   same as colorPalette[index % colorPalette.length] in the compare pages. */
+const PALETTE = ['#0C8CD8','#F9A501','#7EB235','#2E95A7','#D63B67'];
+// `short` is only used where a column header must stay narrow (the Battlefield grid);
+// every other surface shows the full page name.
+const PAGE_NAMES = [
+  ['BusinessFocus | 商業、投資、創科平台', 'BusinessFocus'],
+  ['POPLADY',                              'POPLADY'],
+  ['GirlStyle 女生日常',                    'GirlStyle'],
+  ['HolidaySmart 假期日常',                 'HolidaySmart'],
+  ['UrbanLife Health 健康新態度',            'UrbanLife'],
+];
+const PAGES = PAGE_NAMES.map(([name,short],i)=>({name, short, color:PALETTE[i % PALETTE.length]}));
+
+const TOTAL_COLOR = '#6B4BD8'; // distinct purple for "Total" rows — grey read as "no data"/disabled
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function pageLegendHTML(withTotal){
+  const totalItem = withTotal ? `<div class="page-legend-item"><span class="page-legend-sq" style="background:${TOTAL_COLOR}"></span>Total</div>` : '';
+  return totalItem + PAGES.map(p=>
+    `<div class="page-legend-item"><span class="page-legend-sq" style="background:${p.color}"></span>${esc(p.name)}</div>`
+  ).join('');
+}
+
+document.getElementById('page-chips').innerHTML = PAGES.map(p=>
+  `<div class="page-chip" title="${esc(p.name)}"><span class="chip-dot" style="background:${p.color}"></span><span class="page-chip-name">${esc(p.name)}</span></div>`
+).join('');
+
+// ---------- Taxonomies ----------
+const CONTENT_CATS = ['News & Current Affairs','Technology & Innovation','Science & Environment','Entertainment & Pop Culture','Business & Finance','Lifestyle & Personal Development','Sports & Recreation','Society & Culture','Opinion & Editorial','Trends & Viral Content','Miscellaneous & Niche Topics'];
+const AD_CATS = ['Before & After Comparison','Call-To-Action (CTA) Image','Customer Review & Testimonial','Face-Only Image','Giveaway & Contest Announcement','Infographic & Data Visualization','Product-Only Image','Promotional Offer & Discount Graphics','Text-Only Graphic','User-Generated Content (UGC) & Lifestyle Shots'];
+const IMAGE_CATS = ['Animals & Wildlife','Business & Finance','Entertainment & Pop Culture','Lifestyle & Fashion','Nature & Landscapes','People & Portraits','Science & Medicine','Social & Cultural Themes','Symbols & Abstract Concepts','Technology & Digital','Transportation & Vehicles','Urban & Architecture','Weather & Natural Phenomena'];
+const POST_FORMATS = ['Photo','Video','Album','Reel','Link','Status'];
+
+// deterministic pseudo-random so numbers stay stable across renders
+function seedRand(seed){let s=seed;return()=>{s=(s*9301+49297)%233280;return s/233280;};}
+
+// Every row carries one stats object per page, in PAGES order.
+function makePageStats(rnd, volumeFactor){
+  const posts = Math.max(1, Math.round(volumeFactor));
+  const er = +(1.5 + rnd()*7).toFixed(1);
+  const eng = Math.round(posts*(300+rnd()*1800));
+  const likes = Math.round(eng*(0.55+rnd()*0.1));
+  const comments = Math.round(eng*(0.12+rnd()*0.08));
+  const shares = Math.max(0, eng-likes-comments);
+  // Prior-period posts/engagements for the same page — feeds the Avg Engagements WoW
+  // trend triangle in Category Battlefield. Posts held roughly level; per-post value
+  // shifts by a random factor so the trend can land either up or down.
+  const priorPosts = Math.max(1, Math.round(posts*(0.85+rnd()*0.3)));
+  const priorPerPost = (eng/posts)*(0.65+rnd()*0.7);
+  const priorEng = Math.round(priorPerPost*priorPosts);
+  return {posts, eng, likes, comments, shares, er, priorPosts, priorEng};
+}
+
+function buildCategoryData(names, seed, skewFirst){
+  const rnd = seedRand(seed);
+  return names.map(name=>{
+    const base = Math.round(4 + rnd()*30);
+    const pages = PAGES.map((p,idx)=>{
+      const factor = (skewFirst && idx===0) ? 0.55+rnd()*0.35 : 0.18+rnd()*0.45;
+      return makePageStats(rnd, base*factor);
+    });
+    return {name, pages};
+  });
+}
+
+const sumMetric = (row,key)=>row.pages.reduce((s,p)=>s+p[key],0);
+
+// Combinations are always ranked by Engagements (same in both My Page and Competitors modes).
+function buildCombos(namesA, namesB, seed, n){
+  const rnd = seedRand(seed);
+  const out = [];
+  for(let i=0;i<n;i++){
+    const a = namesA[Math.floor(rnd()*namesA.length)];
+    const b = namesB[Math.floor(rnd()*namesB.length)];
+    const pages = PAGES.map(()=>makePageStats(rnd, 2+rnd()*14));
+    out.push({name:`${a} × ${b}`, pages});
+  }
+  return out.sort((x,y)=>sumMetric(y,'eng')-sumMetric(x,'eng')).slice(0,8);
+}
+
+// Split a whole number across weighted buckets so the parts sum back to the total exactly.
+function splitAcross(total, weights){
+  const sw = weights.reduce((a,b)=>a+b,0);
+  if(sw<=0 || total<=0) return weights.map(()=>0);
+  const out = weights.map(w=>Math.floor(total*w/sw));
+  let rem = total - out.reduce((a,b)=>a+b,0);
+  const order = weights.map((w,i)=>i).sort((a,b)=>weights[b]-weights[a]);
+  for(let k=0; rem>0; k++, rem--) out[order[k % order.length]]++;
+  return out;
+}
+
+// Format-level data is DERIVED from the category data, so a page's posts/engagements
+// for a category always equal the sum of its per-format numbers. Shape:
+//   fmtSplit[pageIdx][category][format] = {posts, eng} | null
+function buildFormatSplit(categories, seed){
+  const rnd = seedRand(seed);
+  return PAGES.map((p,pi)=>{
+    const byCat = {};
+    categories.forEach(c=>{
+      const st = c.pages[pi];
+      const w = POST_FORMATS.map(()=> rnd()>0.2 ? 0.2+rnd() : 0);
+      const postSplit = splitAcross(st.posts, w);
+      // engagement weight = posts × a per-format "quality" multiplier
+      const engW = postSplit.map(pv=> pv>0 ? pv*(0.5+rnd()*1.6) : 0);
+      const engSplit = splitAcross(st.eng, engW);
+      const likesSplit = splitAcross(st.likes, engW);
+      const commentsSplit = splitAcross(st.comments, engW);
+      const sharesSplit = splitAcross(st.shares, engW);
+      const row = {};
+      POST_FORMATS.forEach((f,i)=>{
+        row[f] = postSplit[i]>0 ? {posts:postSplit[i], eng:engSplit[i], likes:likesSplit[i], comments:commentsSplit[i], shares:sharesSplit[i]} : null;
+      });
+      byCat[c.name] = row;
+    });
+    return byCat;
+  });
+}
+
+const CONTENT_CATEGORIES = buildCategoryData(CONTENT_CATS, 11, true);
+
+const LENSES = {
+  content: {
+    label: 'Content category',
+    categories: CONTENT_CATEGORIES,
+    formats: buildFormatSplit(CONTENT_CATEGORIES, 71),
+    combos: [
+      {title:'Content category × Ad category', sub:'Top pairings ranked by combined engagements of all pages', data: buildCombos(CONTENT_CATS, AD_CATS, 21, 40)},
+      {title:'Content category × Image category', sub:'Top pairings ranked by combined engagements of all pages', data: buildCombos(CONTENT_CATS, IMAGE_CATS, 22, 40)},
+    ]
+  },
+  ad: {
+    label: 'Ad category',
+    categories: buildCategoryData(AD_CATS, 31, false),
+    formats: null,
+    combos: [
+      {title:'Ad category × Image category', sub:'Top pairings ranked by combined engagements of all pages', data: buildCombos(AD_CATS, IMAGE_CATS, 32, 40)},
+    ]
+  },
+  image: {
+    label: 'Image category',
+    categories: buildCategoryData(IMAGE_CATS, 41, false),
+    formats: null,
+    combos: [
+      {title:'Image category × Content category', sub:'Top pairings ranked by combined engagements of all pages', data: buildCombos(IMAGE_CATS, CONTENT_CATS, 42, 40)},
+      {title:'Image category × Ad category', sub:'Top pairings ranked by combined engagements of all pages', data: buildCombos(IMAGE_CATS, AD_CATS, 43, 40)},
+    ]
+  }
+};
+
+let currentLens = 'content';
+
+function fmt(n){return n>=1000?(n/1000).toFixed(1)+'K':String(n);}
+
+// ---------- Metric options per mode (cards 1 & 5 respond; cards 2/3/4 are fixed) ----------
+const METRIC_META = {
+  posts:    {label:'Posts',       key:'posts'},
+  eng:      {label:'Engagements', key:'eng'},
+  likes:    {label:'Likes',       key:'likes'},
+  comments: {label:'Comments',    key:'comments'},
+  shares:   {label:'Shares',      key:'shares'},
+};
+const MODE_METRICS = {
+  mypage:      {options:['posts','eng','likes','comments','shares'], default:'eng'},
+  competitors: {options:['posts','eng'],                             default:'posts'},
+};
+let selectedMetric = MODE_METRICS.mypage.default;
+
+// ---------- Shared rank card (Category Bars + Combinations) ----------
+// Bar geometry is the production .cbar-track / .cbar-fill spec: a full-width 4px track,
+// filled to value/max, with the fill split into one segment per page.
+// Ranked segmented-bar list body (rank list + legend pill) — shared by any card that
+// ranks named rows (categories, combos, ...) by one metric, split by page contribution.
+function rankCardBodyHTML(rows, showAll, metric){
+  const meta = METRIC_META[metric];
+  const key = meta.key, metricLabel = meta.label;
+  const withTotal = rows.map(r=>({...r, vals:r.pages.map(p=>p[key]), total:sumMetric(r,key)}));
+  const sorted = [...withTotal].sort((a,b)=>b.total-a.total).slice(0, showAll?rows.length:8);
+  const grandTotal = withTotal.reduce((s,r)=>s+r.total,0);
+  const max = sorted[0] ? sorted[0].total : 1;
+  const items = sorted.map((r,i)=>{
+    const pct = grandTotal ? Math.round(r.total/grandTotal*100) : 0;
+    const fillW = max ? (r.total/max*100) : 0;
+    const segs = r.vals.map((v,idx)=>
+      `<div class="stack-seg" style="width:${r.total?(v/r.total*100):0}%;background:${PAGES[idx].color};"></div>`
+    ).join('');
+    const ttRows = r.vals.map((v,idx)=>
+      `<div class="tt-row"><span class="tt-dot" style="background:${PAGES[idx].color}"></span>${esc(PAGES[idx].name)} ${metricLabel}: ${fmt(v)}</div>`
+    ).join('');
+    return `<div class="rank-item">
+      <div class="rank-item-top">
+        <span class="rank-num">${i+1}</span>
+        <span class="rank-name">${esc(r.name)}</span>
+        <span class="rank-val">${fmt(r.total)} (${pct}%)</span>
+      </div>
+      <div class="stack-track"><div class="stack-fill" style="width:${fillW}%;">${segs}</div></div>
+      <div class="tt">
+        <div class="tt-title">${esc(r.name)}</div>
+        ${ttRows}
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="rank-list">${items}</div>
+    <div class="page-legend-pill">${pageLegendHTML()}</div>`;
+}
+
+function rankCardHTML(title, sub, rows, showAll, metric){
+  return `<div class="card">
+    <div class="card-hd"><div class="card-title">${title}</div></div>
+    <div class="card-sub">${sub}</div>
+    ${rankCardBodyHTML(rows, showAll, metric)}
+  </div>`;
+}
+
+// ---------- 1. Category Bars — metric picked via the Metric selector ----------
+function renderBars(){
+  const lens = LENSES[currentLens];
+  const metricLabel = METRIC_META[selectedMetric].label;
+  document.getElementById('section-bars').innerHTML = rankCardHTML(
+    `${lens.label} vs ${metricLabel}`,
+    `Ranked by combined ${metricLabel.toLowerCase()} of all ${PAGES.length} pages · hover a bar for the breakdown`,
+    lens.categories, false, selectedMetric
+  );
+}
+
+// ---------- 2. Avg Engagements vs Posts (same in both modes) ----------
+function renderScatter(){
+  const lens = LENSES[currentLens];
+  const svg = document.getElementById('scatter-svg');
+  const W=900,H=360,padL=50,padR=20,padT=16,padB=36;
+  let maxPosts=0, maxAvgEng=0, maxER=0;
+  lens.categories.forEach(c=>c.pages.forEach(p=>{
+    if(p.posts>maxPosts)maxPosts=p.posts;
+    const avg = p.eng/p.posts;
+    if(avg>maxAvgEng)maxAvgEng=avg;
+    if(p.er>maxER)maxER=p.er;
+  }));
+
+  function x(v){return padL + (v/maxPosts)*(W-padL-padR);}
+  function y(v){return H-padB - (v/(maxAvgEng*1.15))*(H-padT-padB);}
+  function r(v){return 5 + (v/maxER)*16;}
+
+  const axes = `<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H-padB}" stroke="#E4E9ED"/>
+              <line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="#E4E9ED"/>
+              <text x="${padL-8}" y="${padT+4}" font-size="10" fill="#828282" text-anchor="end">${fmt(Math.round(maxAvgEng))}</text>
+              <text x="${padL-8}" y="${H-padB}" font-size="10" fill="#828282" text-anchor="end">0</text>
+              <text x="${padL}" y="${H-14}" font-size="10" fill="#828282">0</text>
+              <text x="${W-padR}" y="${H-14}" font-size="10" fill="#828282" text-anchor="end">${maxPosts} posts</text>`;
+
+  let dots = '';
+  lens.categories.forEach(c=>{
+    c.pages.forEach((p,idx)=>{
+      const avg = p.eng/p.posts;
+      dots += `<circle cx="${x(p.posts)}" cy="${y(avg)}" r="${r(p.er)}" fill="${PAGES[idx].color}" opacity="0.5" stroke="${PAGES[idx].color}" stroke-width="1.2"><title>${esc(c.name)} · ${esc(PAGES[idx].name)}\nPosts: ${p.posts}  Avg Eng/Post: ${fmt(Math.round(avg))}  ER: ${p.er}%</title></circle>`;
+    });
+  });
+
+  svg.innerHTML = axes + dots;
+  document.getElementById('scatter-sub').textContent = `Each dot is one ${lens.label.toLowerCase()} for one page · x = posts, y = avg engagements per post, size = engagement rate`;
+  document.getElementById('pill-scatter').innerHTML = pageLegendHTML();
+}
+
+// ---------- 3. Category Battlefield (Content lens only) ----------
+// Level 1: rows = categories, columns = pages. The metric is Avg Eng / Post, and each
+// cell's shade is normalized WITHIN ITS ROW, so colour reads as "who owns this topic"
+// rather than "who is biggest". Cells below the sample-size floor are muted and are
+// excluded from the row winner. Level 2: click a cell to drill into that category's
+// formats × pages as a grouped bar chart.
+const BF_MIN_N = 5;             // sample-size floor — a page needs at least this many posts to count for Best/Gap
+
+// ---------- 3. Category Battlefield — {category × format} combos, as a ranked segmented-bar list ----------
+// Format tabs (content lens only — the other lenses have no per-format split) narrow the
+// list down to just that post format; "All" ranks every category × format combo together.
+let bfFormat = 'All';
+
+function setBfFormat(f, el){
+  bfFormat = f;
+  document.querySelectorAll('#section-heatmap .bf-fmt-btn').forEach(b=>b.classList.remove('active'));
+  if(el) el.classList.add('active');
+  renderHeatmap();
+}
+
+// One row per {category, format} pair (or per plain category, for lenses without a format split),
+// each carrying a `.pages` array shaped like PAGES so it can go straight into rankCardHTML.
+function buildBfRows(lens){
+  if(!lens.formats) return lens.categories.map(c=>({name:c.name, pages:c.pages}));
+  const formats = bfFormat==='All' ? POST_FORMATS : [bfFormat];
+  const rows = [];
+  lens.categories.forEach(c=>{
+    formats.forEach(f=>{
+      const pages = PAGES.map((p,pi)=>{
+        const cell = (lens.formats[pi][c.name]||{})[f];
+        return cell ? {posts:cell.posts, eng:cell.eng, likes:cell.likes, comments:cell.comments, shares:cell.shares}
+                     : {posts:0, eng:0, likes:0, comments:0, shares:0};
+      });
+      rows.push({name: bfFormat==='All' ? `${c.name} × ${f}` : c.name, pages});
+    });
+  });
+  return rows;
+}
+
+function renderHeatmap(){
+  const lens = LENSES[currentLens];
+  const el = document.getElementById('section-heatmap');
+  if(!lens.formats) bfFormat = 'All';
+  const metricLabel = METRIC_META[selectedMetric].label;
+
+  const fmtTabs = lens.formats ? ['All', ...POST_FORMATS].map(f=>
+    `<button class="bf-fmt-btn${f===bfFormat?' active':''}" onclick="setBfFormat('${f}',this)">${esc(f)}</button>`
+  ).join('') : '';
+
+  const rows = buildBfRows(lens);
+  const title = !lens.formats
+    ? `Category Battlefield — ${lens.label}`
+    : bfFormat==='All'
+      ? `Category Battlefield — ${lens.label} × Post Format`
+      : `Category Battlefield — ${lens.label} × ${bfFormat}`;
+  const sub = !lens.formats
+    ? `Ranked by combined ${metricLabel.toLowerCase()} of all ${PAGES.length} pages · hover a bar for the breakdown`
+    : bfFormat==='All'
+      ? `Top ${lens.label.toLowerCase()} × format combos ranked by combined ${metricLabel.toLowerCase()} of all ${PAGES.length} pages · hover a bar for the breakdown`
+      : `Every ${lens.label.toLowerCase()} paired with ${bfFormat}, ranked by combined ${metricLabel.toLowerCase()} of all ${PAGES.length} pages · hover a bar for the breakdown`;
+
+  el.innerHTML = `<div class="card">
+    <div class="card-hd"><div class="card-title bf-title">${esc(title)}</div></div>
+    <div class="card-sub">${esc(sub)}</div>
+    ${fmtTabs ? `<div class="bf-fmt-group">${fmtTabs}</div>` : ''}
+    ${rankCardBodyHTML(rows, bfFormat!=='All', selectedMetric)}
+  </div>`;
+}
+
+// ---------- 4. Combinations — always vs Engagements (same in both modes) ----------
+function renderCombos(){
+  const lens = LENSES[currentLens];
+  document.getElementById('combo-cards').innerHTML = lens.combos.map(c=>
+    rankCardHTML(`${c.title} vs Engagements`, c.sub, c.data, true, 'eng')
+  ).join('');
+}
+
+// ---------- 5. Top categories table ----------
+// Columns = Category + one column per METRIC (all metrics shown at once, so this table is
+// independent of the Metric selector — that selector only drives cards 1 and 3).
+// Each row is a category with the combined totals of every selected page; click a category
+// to expand one sub-row per page, tinted with that page's colour.
+const TOP_METRICS = [
+  {key:'posts',    label:'Posts'},
+  {key:'eng',      label:'Engagements'},
+  {key:'avgEng',   label:'Avg Engagements'},   // derived: engagements ÷ posts
+  {key:'comments', label:'Comments'},
+  {key:'shares',   label:'Shares'},
+];
+const TOP_PAGE_SIZE = 10;
+let topPage = 1;
+let topExpanded = new Set();
+let topSortKey = 'eng';     // one of TOP_METRICS keys
+let topSortDir = 'desc';
+
+function setTopSort(key){
+  if(topSortKey===key){ topSortDir = topSortDir==='desc' ? 'asc' : 'desc'; }
+  else { topSortKey = key; topSortDir = 'desc'; }
+  topPage = 1;
+  renderTopTable();
+}
+
+function toggleTopRow(name){
+  if(topExpanded.has(name)) topExpanded.delete(name);
+  else topExpanded.add(name);
+  renderTopTable();
+}
+
+function topChevron(open){
+  return `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="top-chevron${open?' open':''}"><polyline points="6 9 12 15 18 9"/></svg>`;
+}
+
+// all five metrics for one page's stats object (or for a combined total)
+function topMetricValues(posts, eng, comments, shares){
+  return {posts, eng, avgEng: posts ? Math.round(eng/posts) : 0, comments, shares};
+}
+
+function renderTopTable(){
+  const lens = LENSES[currentLens];
+  const sortLabel = (TOP_METRICS.find(m=>m.key===topSortKey)||TOP_METRICS[1]).label;
+
+  document.getElementById('top-sub').textContent =
+    `Ranked by combined ${sortLabel.toLowerCase()} of all ${PAGES.length} pages · click a category to break it down by page`;
+
+  // header: # / Category / one column per metric
+  const caret = key => `<span class="top-sort-caret">${topSortKey===key ? (topSortDir==='desc'?'▼':'▲') : '▾'}</span>`;
+  document.getElementById('top-thead-row').innerHTML =
+    `<th style="width:26px;padding-left:14px;">#</th>
+     <th style="min-width:230px;">Category</th>` +
+    TOP_METRICS.map(m=>
+      `<th class="r top-th-sort${topSortKey===m.key?' active':''}" onclick="setTopSort('${m.key}')">${m.label}${caret(m.key)}</th>`
+    ).join('');
+
+  const rows = lens.categories.map(c=>{
+    const posts    = c.pages.reduce((s,p)=>s+p.posts,0);
+    const eng      = c.pages.reduce((s,p)=>s+p.eng,0);
+    const comments = c.pages.reduce((s,p)=>s+p.comments,0);
+    const shares   = c.pages.reduce((s,p)=>s+p.shares,0);
+    return {name:c.name, pages:c.pages, ...topMetricValues(posts, eng, comments, shares)};
+  });
+  const dir = topSortDir==='desc' ? -1 : 1;
+  const sorted = [...rows].sort((a,b)=>(a[topSortKey]-b[topSortKey])*dir);
+
+  const totalPages = Math.max(1, Math.ceil(sorted.length / TOP_PAGE_SIZE));
+  if(topPage > totalPages) topPage = totalPages;
+  const start = (topPage-1)*TOP_PAGE_SIZE;
+  const pageRows = sorted.slice(start, start+TOP_PAGE_SIZE);
+
+  document.getElementById('top-tbody').innerHTML = pageRows.map((r,i)=>{
+    const open = topExpanded.has(r.name);
+    const cells = TOP_METRICS.map(m=>`<td class="r">${fmt(r[m.key])}</td>`).join('');
+    const mainRow = `<tr class="top-main-row" onclick="toggleTopRow('${r.name.replace(/'/g,"\\'")}')">
+      <td style="padding-left:14px;" class="rank-badge">${start+i+1}</td>
+      <td><div class="top-cat-cell">${topChevron(open)}<span class="top-cat-name">${esc(r.name)}</span></div></td>
+      ${cells}
+    </tr>`;
+    if(!open) return mainRow;
+    const subRows = PAGES.map((p,pi)=>{
+      const st = r.pages[pi];
+      const v = topMetricValues(st.posts, st.eng, st.comments, st.shares);
+      const sub = TOP_METRICS.map(m=>`<td class="r" style="color:${p.color};">${fmt(v[m.key])}</td>`).join('');
+      return `<tr class="top-sub-row">
+        <td></td>
+        <td><div class="top-cat-cell" title="${esc(p.name)}"><span class="top-page-dot" style="background:${p.color}"></span>${esc(p.name)}</div></td>
+        ${sub}
+      </tr>`;
+    }).join('');
+    return mainRow + subRows;
+  }).join('');
+
+  const pageBtns = [];
+  for(let p=1;p<=totalPages;p++){
+    pageBtns.push(`<button class="pg-btn${p===topPage?' active':''}" onclick="goToTopPage(${p})">${p}</button>`);
+  }
+  document.getElementById('top-pagination').innerHTML = `
+    <div class="top-pagination-info">Showing ${start+1}–${Math.min(start+TOP_PAGE_SIZE, sorted.length)} of ${sorted.length} categories</div>
+    <div class="top-pagination-btns">
+      <button class="pg-btn" onclick="goToTopPage(${topPage-1})" ${topPage===1?'disabled':''}>‹</button>
+      ${pageBtns.join('')}
+      <button class="pg-btn" onclick="goToTopPage(${topPage+1})" ${topPage===totalPages?'disabled':''}>›</button>
+    </div>`;
+}
+
+function goToTopPage(p){
+  topPage = p;
+  renderTopTable();
+}
+
+function setLens(lens, el){
+  currentLens = lens;
+  bfFormat = 'All';
+  topPage = 1;
+  topExpanded = new Set();
+  document.querySelectorAll('#lens-toggle .lens-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderAll();
+}
+
+// ---------- Metric selector — options depend on MODE, drives cards 1 and 3 ----------
+// (Top categories shows every metric as its own column, so it does NOT follow this.)
+function renderMetricToggle(){
+  const options = MODE_METRICS[MODE].options;
+  document.getElementById('metric-toggle').innerHTML = options.map(key=>
+    `<button class="lens-btn${key===selectedMetric?' active':''}" onclick="setMetric('${key}',this)">${METRIC_META[key].label}</button>`
+  ).join('');
+}
+
+function setMetric(key, el){
+  selectedMetric = key;
+  document.querySelectorAll('#metric-toggle .lens-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderBars();
+  renderHeatmap();   // the index card is built on the selected metric too
+}
+
+// ---------- Mode switch: My Page · Compare vs Competitors · Compare ----------
+// Page chrome (chips/tabs/lenses) stays the same; we swap the page title, sidebar highlight,
+// and the Metric selector's available options + default to signal context.
+let MODE = 'mypage';
+
+function setMode(mode, el){
+  MODE = mode;
+  selectedMetric = MODE_METRICS[mode].default;
+  document.querySelectorAll('#mode-toggle .mode-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('pg-title').textContent = mode==='mypage' ? 'My Pages · Compare' : 'Competitors · Compare';
+  document.getElementById('nav-mypages').classList.toggle('active', mode==='mypage');
+  document.getElementById('nav-competitors').classList.toggle('active', mode==='competitors');
+  topPage = 1;
+  topExpanded = new Set();
+  // Competitors lead with volume, My Page with engagement — same split as card 1
+  topSortKey = mode==='competitors' ? 'posts' : 'eng';
+  topSortDir = 'desc';
+  renderMetricToggle();
+  renderAll();
+}
+
+function renderAll(){
+  renderBars();
+  renderScatter();
+  renderHeatmap();
+  renderCombos();
+  renderTopTable();
+}
+
+renderMetricToggle();
+renderAll();
+</script>
+</body>
+</html>
