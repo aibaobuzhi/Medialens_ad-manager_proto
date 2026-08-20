@@ -81,6 +81,9 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
 .metric-select-label{font-size:11px;color:var(--ac-secondary);font-weight:600;}
 
 .section{margin-bottom:var(--ac-card-gap);}
+/* A scenario that doesn't offer a card leaves its section empty (e.g. Instagram has no
+   Category Battlefield) — collapse it so the layout closes up instead of leaving a gap. */
+.section:empty{margin-bottom:0;}
 
 /* Card — matches production .ac-category-bars / card-hd / card-title / card-sub tokens */
 .card{background:#fff;border:1px solid var(--ac-border);border-radius:var(--ac-r-card);box-shadow:var(--ac-card-shadow);padding:var(--ac-card-padding);}
@@ -261,27 +264,18 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
 
   <div class="content">
     <div class="mode-switch">
-      <span class="mode-switch-label">Prototype mode:</span>
-      <div class="mode-group" id="mode-toggle">
-        <button class="mode-btn active" onclick="setMode('mypage',this)">My Page · Compare</button>
-        <button class="mode-btn" onclick="setMode('competitors',this)">Competitors · Compare</button>
-      </div>
+      <span class="mode-switch-label">Prototype scenario:</span>
+      <div class="mode-group" id="mode-toggle"></div>
     </div>
     <div class="pg-head">
       <div>
         <div class="pg-title" id="pg-title">My Pages · Compare</div>
-        <div class="pg-meta">Instagram · Last 30 days · 5 pages</div>
+        <div class="pg-meta" id="pg-meta">Instagram · Last 30 days · 5 pages</div>
       </div>
       <div class="page-chips" id="page-chips"></div>
     </div>
 
-    <div class="subtabs-bar">
-      <div class="subtab">Overview</div>
-      <div class="subtab">Posts</div>
-      <div class="subtab">Hashtags</div>
-      <div class="subtab active">AI Category<span class="badge-new">NEW</span></div>
-      <div class="subtab">Audience</div>
-    </div>
+    <div class="subtabs-bar" id="subtabs-bar"></div>
 
     <div class="tabbody">
 
@@ -306,7 +300,7 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
           <div class="card-hd"><div class="card-title">Avg Engagements vs Posts</div></div>
           <div class="card-sub" id="scatter-sub">Each dot is one category for one page · x = posts, y = avg engagements per post</div>
           <svg id="scatter-svg" width="100%" height="360" viewBox="0 0 900 360"></svg>
-          <div class="scatter-note">Bubble size = engagement rate for that category</div>
+          <div class="scatter-note" id="scatter-note">Bubble size = engagement rate for that category</div>
           <div class="page-legend-pill" id="pill-scatter"></div>
         </div>
       </div>
@@ -357,6 +351,10 @@ const PAGE_NAMES = [
 ];
 const PAGES = PAGE_NAMES.map(([name,short],i)=>({name, short, color:PALETTE[i % PALETTE.length]}));
 
+// Follower base per page — drives ER by Followers / Page ER so the two ratio metrics
+// aren't just a rescaled Engagement.
+const PAGE_FOLLOWERS = [412000, 268000, 735000, 522000, 190000];
+
 const TOTAL_COLOR = '#6B4BD8'; // distinct purple for "Total" rows — grey read as "no data"/disabled
 
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -376,26 +374,41 @@ document.getElementById('page-chips').innerHTML = PAGES.map(p=>
 const CONTENT_CATS = ['News & Current Affairs','Technology & Innovation','Science & Environment','Entertainment & Pop Culture','Business & Finance','Lifestyle & Personal Development','Sports & Recreation','Society & Culture','Opinion & Editorial','Trends & Viral Content','Miscellaneous & Niche Topics'];
 const AD_CATS = ['Before & After Comparison','Call-To-Action (CTA) Image','Customer Review & Testimonial','Face-Only Image','Giveaway & Contest Announcement','Infographic & Data Visualization','Product-Only Image','Promotional Offer & Discount Graphics','Text-Only Graphic','User-Generated Content (UGC) & Lifestyle Shots'];
 const IMAGE_CATS = ['Animals & Wildlife','Business & Finance','Entertainment & Pop Culture','Lifestyle & Fashion','Nature & Landscapes','People & Portraits','Science & Medicine','Social & Cultural Themes','Symbols & Abstract Concepts','Technology & Digital','Transportation & Vehicles','Urban & Architecture','Weather & Natural Phenomena'];
-const POST_FORMATS = ['Photo','Video','Album','Reel','Link','Status'];
+// Superset of every post format across all scenarios; each scenario picks its own
+// subset (see SCENARIOS.formats). Verified against MediaLens config:
+//   FB mediaTypes      = Link / Share / Photo / Album / Video / Status
+//   FB myPageMediaTypes= + Reels  (My Page only — Competitor Analysis never gets Reels)
+//   IG mediaTypes      = Image / Video / Album  (IG has no format card, see SCENARIOS)
+const POST_FORMATS = ['Photo','Video','Album','Reels','Link','Share','Status'];
 
 // deterministic pseudo-random so numbers stay stable across renders
 function seedRand(seed){let s=seed;return()=>{s=(s*9301+49297)%233280;return s/233280;};}
 
 // Every row carries one stats object per page, in PAGES order.
-function makePageStats(rnd, volumeFactor){
+function makePageStats(rnd, volumeFactor, followers){
   const posts = Math.max(1, Math.round(volumeFactor));
   const er = +(1.5 + rnd()*7).toFixed(1);
   const eng = Math.round(posts*(300+rnd()*1800));
   const likes = Math.round(eng*(0.55+rnd()*0.1));
   const comments = Math.round(eng*(0.12+rnd()*0.08));
   const shares = Math.max(0, eng-likes-comments);
+  // Raw counters behind the rate metrics. Kept as counts (not pre-computed rates) so
+  // a pooled ER/CTR across several pages is a proper weighted figure, not an average
+  // of averages.
+  const reach = Math.round(eng/(er/100));
+  const impressions = Math.round(reach*(1.2+rnd()*0.6));
+  const clicks = Math.round(impressions*(0.005+rnd()*0.025));
+  const nonFansReach = Math.round(reach*(0.15+rnd()*0.45));
+  const videoViews = Math.round(posts*(400+rnd()*2600));
   // Prior-period posts/engagements for the same page — feeds the Avg Engagements WoW
   // trend triangle in Category Battlefield. Posts held roughly level; per-post value
   // shifts by a random factor so the trend can land either up or down.
   const priorPosts = Math.max(1, Math.round(posts*(0.85+rnd()*0.3)));
   const priorPerPost = (eng/posts)*(0.65+rnd()*0.7);
   const priorEng = Math.round(priorPerPost*priorPosts);
-  return {posts, eng, likes, comments, shares, er, priorPosts, priorEng};
+  return {posts, eng, likes, comments, shares, er, priorPosts, priorEng,
+          reach, impressions, clicks, nonFansReach, videoViews,
+          followers: followers || 250000};
 }
 
 function buildCategoryData(names, seed, skewFirst){
@@ -404,7 +417,7 @@ function buildCategoryData(names, seed, skewFirst){
     const base = Math.round(4 + rnd()*30);
     const pages = PAGES.map((p,idx)=>{
       const factor = (skewFirst && idx===0) ? 0.55+rnd()*0.35 : 0.18+rnd()*0.45;
-      return makePageStats(rnd, base*factor);
+      return makePageStats(rnd, base*factor, PAGE_FOLLOWERS[idx]);
     });
     return {name, pages};
   });
@@ -419,7 +432,7 @@ function buildCombos(namesA, namesB, seed, n){
   for(let i=0;i<n;i++){
     const a = namesA[Math.floor(rnd()*namesA.length)];
     const b = namesB[Math.floor(rnd()*namesB.length)];
-    const pages = PAGES.map(()=>makePageStats(rnd, 2+rnd()*14));
+    const pages = PAGES.map((p,idx)=>makePageStats(rnd, 2+rnd()*14, PAGE_FOLLOWERS[idx]));
     out.push({name:`${a} × ${b}`, pages});
   }
   return out.sort((x,y)=>sumMetric(y,'eng')-sumMetric(x,'eng')).slice(0,8);
@@ -449,13 +462,17 @@ function buildFormatSplit(categories, seed){
       const postSplit = splitAcross(st.posts, w);
       // engagement weight = posts × a per-format "quality" multiplier
       const engW = postSplit.map(pv=> pv>0 ? pv*(0.5+rnd()*1.6) : 0);
-      const engSplit = splitAcross(st.eng, engW);
-      const likesSplit = splitAcross(st.likes, engW);
-      const commentsSplit = splitAcross(st.comments, engW);
-      const sharesSplit = splitAcross(st.shares, engW);
+      // Every counter is split on the same weights, so a format-filtered cell can feed
+      // any metric in METRIC_META and still reconcile back to the category total.
+      const SPLIT_FIELDS = ['eng','likes','comments','shares','reach','impressions','clicks','nonFansReach','videoViews'];
+      const splits = {};
+      SPLIT_FIELDS.forEach(f=>{ splits[f] = splitAcross(st[f], engW); });
       const row = {};
       POST_FORMATS.forEach((f,i)=>{
-        row[f] = postSplit[i]>0 ? {posts:postSplit[i], eng:engSplit[i], likes:likesSplit[i], comments:commentsSplit[i], shares:sharesSplit[i]} : null;
+        if(postSplit[i]<=0){ row[f] = null; return; }
+        const cell = {posts:postSplit[i], followers:st.followers};
+        SPLIT_FIELDS.forEach(k=>{ cell[k] = splits[k][i]; });
+        row[f] = cell;
       });
       byCat[c.name] = row;
     });
@@ -496,46 +513,169 @@ const LENSES = {
 
 let currentLens = 'content';
 
-function fmt(n){return n>=1000?(n/1000).toFixed(1)+'K':String(n);}
+// "pages" vs "competitors" in card copy — the compared subjects are not always own pages.
+function subjectNoun(){ return sc().section==='mypage' ? 'pages' : 'competitors'; }
 
-// ---------- Metric options per mode (cards 1 & 5 respond; cards 2/3/4 are fixed) ----------
+function fmt(n){
+  if(n>=1000000) return (n/1000000).toFixed(1)+'M';
+  if(n>=1000) return (n/1000).toFixed(1)+'K';
+  return String(n);
+}
+
+// ---------- Metric catalogue ----------
+// Labels and availability mirror the shipped single-page AI Category tabs:
+//   FB  METRIC_OPTIONS = Avg Engagement / Engagement / ER / Page ER (bp) /
+//                        Avg Video Views / CTR / Non-Fans Reach          (7)
+//   IG  METRIC_OPTIONS = Avg Engagement / Engagement / ER by reaches /
+//                        ER by Followers / Avg Video Views               (5)
+// Competitor scenarios are limited to Engagement + Average, because ER / CTR /
+// Reach come from a page's private Insights and are not available for pages the
+// org does not own.
+//
+// `type` decides how several pages are pooled into one headline figure:
+//   count → straight sum        (Posts, Engagement, Non-Fans Reach)
+//   avg   → sum(num) / sum(den) (Avg Engagement, Avg Video Views)
+//   rate  → sum(num) / sum(den) × mult, rendered as a percentage / index
 const METRIC_META = {
-  posts:    {label:'Posts',       key:'posts'},
-  eng:      {label:'Engagements', key:'eng'},
-  likes:    {label:'Likes',       key:'likes'},
-  comments: {label:'Comments',    key:'comments'},
-  shares:   {label:'Shares',      key:'shares'},
+  posts:  {label:'Posts',             type:'count', field:'posts'},
+  eng:    {label:'Engagement',        type:'count', field:'eng'},
+  aeng:   {label:'Avg Engagement',    type:'avg',   num:'eng',        den:'posts'},
+  avv:    {label:'Avg Video Views',   type:'avg',   num:'videoViews', den:'posts'},
+  er:     {label:'ER',                type:'rate',  num:'eng',    den:'reach',       mult:100,   unit:'%'},
+  erf:    {label:'ER by Followers',   type:'rate',  num:'eng',    den:'followers',   mult:100,   unit:'%'},
+  pageer: {label:'Page ER (bp)',      type:'rate',  num:'eng',    den:'followers',   mult:10000, unit:''},
+  ctr:    {label:'CTR',               type:'rate',  num:'clicks', den:'impressions', mult:100,   unit:'%'},
+  nfr:    {label:'Non-Fans Reach',    type:'count', field:'nonFansReach'},
 };
-const MODE_METRICS = {
-  mypage:      {options:['posts','eng','likes','comments','shares'], default:'eng'},
-  competitors: {options:['posts','eng'],                             default:'posts'},
+
+// ---------- The four scenarios this prototype covers ----------
+// Each entry is the whole contract for one page: which metrics its selector offers,
+// whether the format-based Battlefield card exists, which post formats it can split
+// by, and how the surrounding page chrome reads.
+const SCENARIOS = {
+  'fb-mypage': {
+    label:'My Page · Facebook',
+    platform:'Facebook',
+    section:'mypage',
+    title:'My Pages · Compare',
+    accountTabLabel:'Page',
+    metrics:['aeng','eng','er','pageer','avv','ctr','nfr'],
+    defaultMetric:'aeng',
+    // FB My Page is the only scenario that gets Reels (config: myPageMediaTypes).
+    formats:['Photo','Video','Album','Reels','Link','Share','Status'],
+    hasBattlefield:true,
+    hasTrend:true,
+    subtabs:['Overview','Page','Posts','Top Posts','Keywords','Hashtags'],
+  },
+  'ig-mypage': {
+    label:'My Page · Instagram',
+    platform:'Instagram',
+    section:'mypage',
+    title:'My Pages · Compare',
+    accountTabLabel:'Account',
+    metrics:['aeng','eng','er','erf','avv'],
+    defaultMetric:'aeng',
+    // IG drops the format heatmap entirely, so it has no format axis to split by.
+    formats:null,
+    hasBattlefield:false,
+    hasTrend:false,
+    subtabs:['Overview','Account','Posts','Top Posts','Hashtags'],
+    tailTabs:['Stories Analytics','Stories Library'],
+  },
+  'fb-competitors': {
+    label:'Competitors · Facebook',
+    platform:'Facebook',
+    section:'competitors',
+    title:'Competitors · Compare',
+    accountTabLabel:'Page',
+    metrics:['aeng','eng'],
+    defaultMetric:'eng',
+    // No Reels: myPageMediaTypes is never mixed in on the competitor side.
+    formats:['Photo','Video','Album','Link','Share','Status'],
+    hasBattlefield:true,
+    hasTrend:true,
+    subtabs:['Overview','Page','Posts','Top Posts','Keywords','Hashtags'],
+  },
+  'ig-competitors': {
+    label:'Competitors · Instagram',
+    platform:'Instagram',
+    section:'competitors',
+    title:'Competitors · Compare',
+    accountTabLabel:'Account',
+    metrics:['aeng','eng'],
+    defaultMetric:'eng',
+    formats:null,
+    hasBattlefield:false,
+    hasTrend:false,
+    subtabs:['Overview','Account','Posts','Top Posts','Hashtags'],
+    tailTabs:['Stories Analytics','Stories Library'],
+  },
 };
-let selectedMetric = MODE_METRICS.mypage.default;
+
+let SCENARIO = 'fb-mypage';
+const sc = () => SCENARIOS[SCENARIO];
+let selectedMetric = SCENARIOS['fb-mypage'].defaultMetric;
+
+// ---------- Metric maths ----------
+// One page's own value for a metric.
+function pageMetricVal(st, key){
+  const m = METRIC_META[key];
+  if(!m) return 0;
+  if(m.type==='count') return st[m.field] || 0;
+  const den = st[m.den];
+  return den ? (st[m.num]/den)*(m.mult||1) : 0;
+}
+// Several pages pooled into one figure — counts add up, rates re-derive from the
+// pooled numerator and denominator so they stay weighted by volume.
+function pooledMetricVal(pages, key){
+  const m = METRIC_META[key];
+  if(!m) return 0;
+  if(m.type==='count') return pages.reduce((t,p)=>t+(p[m.field]||0),0);
+  const num = pages.reduce((t,p)=>t+(p[m.num]||0),0);
+  const den = pages.reduce((t,p)=>t+(p[m.den]||0),0);
+  return den ? (num/den)*(m.mult||1) : 0;
+}
+// Rates print with two decimals + unit; counts print abbreviated.
+function fmtMetric(v, key){
+  const m = METRIC_META[key];
+  if(m && (m.type==='rate')) return v.toFixed(2)+(m.unit||'');
+  return fmt(Math.round(v));
+}
 
 // ---------- Shared rank card (Category Bars + Combinations) ----------
 // Bar geometry is the production .cbar-track / .cbar-fill spec: a full-width 4px track,
 // filled to value/max, with the fill split into one segment per page.
 function rankCardHTML(title, sub, rows, showAll, metric){
   const meta = METRIC_META[metric];
-  const key = meta.key, metricLabel = meta.label;
-  const withTotal = rows.map(r=>({...r, vals:r.pages.map(p=>p[key]), total:sumMetric(r,key)}));
+  const metricLabel = meta.label;
+  const isCount = meta.type === 'count';
+  // total = the headline figure for the row. For counts that is the sum of the pages,
+  // so a segment's share of the bar is a true share of the total. For rates/averages
+  // it is the pooled (volume-weighted) figure, and the bar is only a visual read of
+  // which page sits high or low — so no "% of total" is printed for those.
+  const withTotal = rows.map(r=>({
+    ...r,
+    vals: r.pages.map(p=>pageMetricVal(p, metric)),
+    total: pooledMetricVal(r.pages, metric)
+  }));
   const sorted = [...withTotal].sort((a,b)=>b.total-a.total).slice(0, showAll?rows.length:8);
   const grandTotal = withTotal.reduce((s,r)=>s+r.total,0);
   const max = sorted[0] ? sorted[0].total : 1;
   const items = sorted.map((r,i)=>{
-    const pct = grandTotal ? Math.round(r.total/grandTotal*100) : 0;
+    const pct = (isCount && grandTotal) ? Math.round(r.total/grandTotal*100) : null;
     const fillW = max ? (r.total/max*100) : 0;
+    const segSum = r.vals.reduce((t,v)=>t+v,0);
     const segs = r.vals.map((v,idx)=>
-      `<div class="stack-seg" style="width:${r.total?(v/r.total*100):0}%;background:${PAGES[idx].color};"></div>`
+      `<div class="stack-seg" style="width:${segSum?(v/segSum*100):0}%;background:${PAGES[idx].color};"></div>`
     ).join('');
     const ttRows = r.vals.map((v,idx)=>
-      `<div class="tt-row"><span class="tt-dot" style="background:${PAGES[idx].color}"></span>${esc(PAGES[idx].name)} ${metricLabel}: ${fmt(v)}</div>`
+      `<div class="tt-row"><span class="tt-dot" style="background:${PAGES[idx].color}"></span>${esc(PAGES[idx].name)} ${metricLabel}: ${fmtMetric(v, metric)}</div>`
     ).join('');
     return `<div class="rank-item">
       <div class="rank-item-top">
         <span class="rank-num">${i+1}</span>
         <span class="rank-name">${esc(r.name)}</span>
-        <span class="rank-val">${fmt(r.total)} (${pct}%)</span>
+        <span class="rank-val">${fmtMetric(r.total, metric)}${pct!=null?` (${pct}%)`:''}</span>
       </div>
       <div class="stack-track"><div class="stack-fill" style="width:${fillW}%;">${segs}</div></div>
       <div class="tt">
@@ -558,7 +698,7 @@ function renderBars(){
   const metricLabel = METRIC_META[selectedMetric].label;
   document.getElementById('section-bars').innerHTML = rankCardHTML(
     `${lens.label} vs ${metricLabel}`,
-    `Ranked by combined ${metricLabel.toLowerCase()} of all ${PAGES.length} pages · hover a bar for the breakdown`,
+    `Ranked by combined ${metricLabel.toLowerCase()} of all ${PAGES.length} ${subjectNoun()} · hover a bar for the breakdown`,
     lens.categories, false, selectedMetric
   );
 }
@@ -568,17 +708,20 @@ function renderScatter(){
   const lens = LENSES[currentLens];
   const svg = document.getElementById('scatter-svg');
   const W=900,H=360,padL=50,padR=20,padT=16,padB=36;
-  let maxPosts=0, maxAvgEng=0, maxER=0;
+  const hasER = sc().metrics.indexOf('er') !== -1;
+  let maxPosts=0, maxAvgEng=0, maxER=0, maxSize=0;
   lens.categories.forEach(c=>c.pages.forEach(p=>{
     if(p.posts>maxPosts)maxPosts=p.posts;
     const avg = p.eng/p.posts;
     if(avg>maxAvgEng)maxAvgEng=avg;
     if(p.er>maxER)maxER=p.er;
+    const sv = hasER ? p.er : avg;
+    if(sv>maxSize)maxSize=sv;
   }));
 
   function x(v){return padL + (v/maxPosts)*(W-padL-padR);}
   function y(v){return H-padB - (v/(maxAvgEng*1.15))*(H-padT-padB);}
-  function r(v){return 5 + (v/maxER)*16;}
+  function r(v){return 5 + (maxSize ? (v/maxSize) : 0)*16;}
 
   const axes = `<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H-padB}" stroke="#E4E9ED"/>
               <line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="#E4E9ED"/>
@@ -591,12 +734,19 @@ function renderScatter(){
   lens.categories.forEach(c=>{
     c.pages.forEach((p,idx)=>{
       const avg = p.eng/p.posts;
-      dots += `<circle cx="${x(p.posts)}" cy="${y(avg)}" r="${r(p.er)}" fill="${PAGES[idx].color}" opacity="0.5" stroke="${PAGES[idx].color}" stroke-width="1.2"><title>${esc(c.name)} · ${esc(PAGES[idx].name)}\nPosts: ${p.posts}  Avg Eng/Post: ${fmt(Math.round(avg))}  ER: ${p.er}%</title></circle>`;
+      // Competitor scenarios have no ER (no reach data), so the bubble falls back to
+      // sizing on avg engagement there instead of silently showing a rate we can't get.
+      const sizeVal = hasER ? p.er : avg;
+      const erText = hasER ? `  ER: ${p.er}%` : '';
+      dots += `<circle cx="${x(p.posts)}" cy="${y(avg)}" r="${r(sizeVal)}" fill="${PAGES[idx].color}" opacity="0.5" stroke="${PAGES[idx].color}" stroke-width="1.2"><title>${esc(c.name)} · ${esc(PAGES[idx].name)}\nPosts: ${p.posts}  Avg Eng/Post: ${fmt(Math.round(avg))}${erText}</title></circle>`;
     });
   });
 
   svg.innerHTML = axes + dots;
-  document.getElementById('scatter-sub').textContent = `Each dot is one ${lens.label.toLowerCase()} for one page · x = posts, y = avg engagements per post, size = engagement rate`;
+  document.getElementById('scatter-sub').textContent = `Each dot is one ${lens.label.toLowerCase()} for one page · x = posts, y = avg engagement per post, size = ${hasER?'engagement rate':'avg engagement'}`;
+  document.getElementById('scatter-note').textContent = hasER
+    ? 'Bubble size = engagement rate for that category'
+    : 'Bubble size = avg engagement per post (engagement rate needs reach data, which is not available for competitor pages)';
   document.getElementById('pill-scatter').innerHTML = pageLegendHTML();
 }
 
@@ -631,16 +781,18 @@ function setBfFormat(f, el){
 // numbers (prior-period data isn't split by format), independent of the Metric selector / format tab.
 function bfCatPageStats(lens, c, metricKey){
   return c.pages.map((st,pi)=>{
+    // The trend arrow always tracks Avg Engagement period-over-period, whatever the
+    // Metric selector says — prior-period data is not split by format either, so it
+    // is read off the pooled category numbers.
     const curAvgEng = st.posts ? st.eng/st.posts : 0;
     const priorAvgEng = st.priorPosts ? st.priorEng/st.priorPosts : 0;
     const engTrendPct = priorAvgEng>0 ? Math.round((curAvgEng-priorAvgEng)/priorAvgEng*100) : null;
     if(bfFormat==='All' || !lens.formats){
-      return {pi, posts:st.posts, avg: st.posts ? st[metricKey]/st.posts : 0, engTrendPct};
+      return {pi, posts:st.posts, avg: pageMetricVal(st, metricKey), engTrendPct};
     }
     const cell = (lens.formats[pi][c.name]||{})[bfFormat];
-    const posts = cell ? cell.posts : 0;
-    const val = cell ? cell[metricKey] : 0;
-    return {pi, posts, avg: posts ? val/posts : 0, engTrendPct};
+    if(!cell) return {pi, posts:0, avg:0, engTrendPct};
+    return {pi, posts:cell.posts, avg: pageMetricVal(cell, metricKey), engTrendPct};
   });
 }
 
@@ -655,8 +807,18 @@ function bfTrendHTML(pct){
 function renderHeatmap(){
   const lens = LENSES[currentLens];
   const el = document.getElementById('section-heatmap');
+
+  // Instagram has no format card at all — the shipped IG AI Category tab drops the
+  // format heatmap (and the period-over-period trend that rides on it). So on the two
+  // IG scenarios this whole card is absent, not just emptied of its format tabs.
+  if(!sc().hasBattlefield){ el.innerHTML = ''; return; }
+
+  const scenarioFormats = sc().formats || [];
+  if(!lens.formats || scenarioFormats.indexOf(bfFormat)===-1) {
+    if(bfFormat!=='All' && scenarioFormats.indexOf(bfFormat)===-1) bfFormat = 'All';
+  }
   if(!lens.formats) bfFormat = 'All';
-  const metricKey = METRIC_META[selectedMetric].key;
+  const metricKey = selectedMetric;
   const metricLabel = METRIC_META[selectedMetric].label;
   const cmpPage = PAGES[bfPageIdx];
 
@@ -676,7 +838,7 @@ function renderHeatmap(){
   rows.sort((a,b)=>(b.best?b.best.avg:-1)-(a.best?a.best.avg:-1));
 
   const pageOptions = PAGES.map((p,i)=>`<option value="${i}"${i===bfPageIdx?' selected':''}>${esc(p.short)}</option>`).join('');
-  const fmtTabs = lens.formats ? ['All', ...POST_FORMATS].map(f=>
+  const fmtTabs = lens.formats ? ['All', ...scenarioFormats].map(f=>
     `<button class="bf-fmt-btn${f===bfFormat?' active':''}" onclick="setBfFormat('${f}',this)">${esc(f)}</button>`
   ).join('') : '';
 
@@ -684,9 +846,10 @@ function renderHeatmap(){
     const bestChip = r.best
       ? `<span class="ct-best"><span class="ct-dot" style="background:${PAGES[r.best.pi].color}"></span>${esc(PAGES[r.best.pi].short)}</span>`
       : '<span class="top-empty">—</span>';
+    const trend = sc().hasTrend;
     const bestN = r.best ? fmt(r.best.posts) : '—';
-    const bestAvg = r.best ? `${fmt(Math.round(r.best.avg))}${bfTrendHTML(r.best.engTrendPct)}` : '—';
-    const selAvg = r.selQualifies ? `${fmt(Math.round(r.sel.avg))}${bfTrendHTML(r.sel.engTrendPct)}` : '—';
+    const bestAvg = r.best ? `${fmtMetric(r.best.avg, metricKey)}${trend?bfTrendHTML(r.best.engTrendPct):''}` : '—';
+    const selAvg = r.selQualifies ? `${fmtMetric(r.sel.avg, metricKey)}${trend?bfTrendHTML(r.sel.engTrendPct):''}` : '—';
     const gapHTML = r.isSelBest
       ? `<span class="ct-lift" style="color:var(--ac-secondary);font-weight:600;">Best</span>`
       : (r.gap!=null ? `<span class="ct-gap${r.gap<0?' neg':''}">${r.gap>0?'+':''}${r.gap}%</span>` : '<span class="top-empty">—</span>');
@@ -708,12 +871,12 @@ function renderHeatmap(){
         <select class="bf-page-select" onchange="setBfPage(this.value)">${pageOptions}</select>
       </div>
     </div>
-    <div class="card-sub">Ranked by best page's Avg ${esc(metricLabel)} per category · vs Best = (${esc(cmpPage.short)} − best) ÷ ${esc(cmpPage.short)} (n ≥ ${BF_MIN_N}) · every ${esc(lens.label.toLowerCase())} is listed, even with no qualifying page for this format</div>
+    <div class="card-sub">Ranked by best page's ${esc(metricLabel)} per category · vs Best = (${esc(cmpPage.short)} − best) ÷ ${esc(cmpPage.short)} (n ≥ ${BF_MIN_N}) · every ${esc(lens.label.toLowerCase())} is listed, even with no qualifying page for this format</div>
     ${fmtTabs ? `<div class="bf-fmt-group">${fmtTabs}</div>` : ''}
     <div class="ct-wrap"><table class="ct-table">
       <thead><tr>
         <th>${esc(lens.label)}</th><th>Best page</th><th class="r">Best page n</th>
-        <th class="r">Best page Avg ${esc(metricLabel)}</th><th class="r">${esc(cmpPage.short)} page Avg ${esc(metricLabel)}</th>
+        <th class="r">Best page ${esc(metricLabel)}</th><th class="r">${esc(cmpPage.short)} ${esc(metricLabel)}</th>
         <th class="r">vs Best</th>
       </tr></thead>
       <tbody>${body}</tbody>
@@ -735,17 +898,16 @@ function renderCombos(){
 // independent of the Metric selector — that selector only drives cards 1 and 3).
 // Each row is a category with the combined totals of every selected page; click a category
 // to expand one sub-row per page, tinted with that page's colour.
-const TOP_METRICS = [
-  {key:'posts',    label:'Posts'},
-  {key:'eng',      label:'Engagements'},
-  {key:'avgEng',   label:'Avg Engagements'},   // derived: engagements ÷ posts
-  {key:'comments', label:'Comments'},
-  {key:'shares',   label:'Shares'},
-];
+// Columns = Posts + whatever metrics the current scenario actually offers. That is why
+// the two Competitor scenarios show three data columns and My Page shows the full set:
+// the missing columns are metrics competitor data does not carry, not a display choice.
+function topMetrics(){
+  return ['posts', ...sc().metrics].map(k=>({key:k, label:METRIC_META[k].label}));
+}
 const TOP_PAGE_SIZE = 10;
 let topPage = 1;
 let topExpanded = new Set();
-let topSortKey = 'eng';     // one of TOP_METRICS keys
+let topSortKey = 'eng';     // one of topMetrics() keys
 let topSortDir = 'desc';
 
 function setTopSort(key){
@@ -766,33 +928,37 @@ function topChevron(open){
 }
 
 // all five metrics for one page's stats object (or for a combined total)
-function topMetricValues(posts, eng, comments, shares){
-  return {posts, eng, avgEng: posts ? Math.round(eng/posts) : 0, comments, shares};
+// Values for every column of one row, from a list of page stat objects (one page, or
+// all of them pooled). Rates re-derive from pooled numerator/denominator via
+// pooledMetricVal, so a category row is never an average of averages.
+function topMetricValues(pagesArr){
+  const out = {};
+  topMetrics().forEach(m=>{ out[m.key] = pooledMetricVal(pagesArr, m.key); });
+  return out;
 }
 
 function renderTopTable(){
   const lens = LENSES[currentLens];
-  const sortLabel = (TOP_METRICS.find(m=>m.key===topSortKey)||TOP_METRICS[1]).label;
+  const cols = topMetrics();
+  // The scenario may have just dropped the column we were sorting by (e.g. switching
+  // from FB My Page to a Competitor scenario loses ER / CTR) — fall back to Engagement.
+  if(!cols.some(m=>m.key===topSortKey)) topSortKey = 'eng';
+  const sortLabel = (cols.find(m=>m.key===topSortKey)||cols[1]).label;
 
   document.getElementById('top-sub').textContent =
-    `Ranked by combined ${sortLabel.toLowerCase()} of all ${PAGES.length} pages · click a category to break it down by page`;
+    `Ranked by combined ${sortLabel.toLowerCase()} of all ${PAGES.length} ${subjectNoun()} · click a category to break it down`;
 
   // header: # / Category / one column per metric
   const caret = key => `<span class="top-sort-caret">${topSortKey===key ? (topSortDir==='desc'?'▼':'▲') : '▾'}</span>`;
   document.getElementById('top-thead-row').innerHTML =
     `<th style="width:26px;padding-left:14px;">#</th>
      <th style="min-width:230px;">Category</th>` +
-    TOP_METRICS.map(m=>
+    cols.map(m=>
       `<th class="r top-th-sort${topSortKey===m.key?' active':''}" onclick="setTopSort('${m.key}')">${m.label}${caret(m.key)}</th>`
     ).join('');
 
-  const rows = lens.categories.map(c=>{
-    const posts    = c.pages.reduce((s,p)=>s+p.posts,0);
-    const eng      = c.pages.reduce((s,p)=>s+p.eng,0);
-    const comments = c.pages.reduce((s,p)=>s+p.comments,0);
-    const shares   = c.pages.reduce((s,p)=>s+p.shares,0);
-    return {name:c.name, pages:c.pages, ...topMetricValues(posts, eng, comments, shares)};
-  });
+  const rows = lens.categories.map(c=>
+    ({name:c.name, pages:c.pages, ...topMetricValues(c.pages)}));
   const dir = topSortDir==='desc' ? -1 : 1;
   const sorted = [...rows].sort((a,b)=>(a[topSortKey]-b[topSortKey])*dir);
 
@@ -803,7 +969,7 @@ function renderTopTable(){
 
   document.getElementById('top-tbody').innerHTML = pageRows.map((r,i)=>{
     const open = topExpanded.has(r.name);
-    const cells = TOP_METRICS.map(m=>`<td class="r">${fmt(r[m.key])}</td>`).join('');
+    const cells = cols.map(m=>`<td class="r">${fmtMetric(r[m.key], m.key)}</td>`).join('');
     const mainRow = `<tr class="top-main-row" onclick="toggleTopRow('${r.name.replace(/'/g,"\\'")}')">
       <td style="padding-left:14px;" class="rank-badge">${start+i+1}</td>
       <td><div class="top-cat-cell">${topChevron(open)}<span class="top-cat-name">${esc(r.name)}</span></div></td>
@@ -811,9 +977,8 @@ function renderTopTable(){
     </tr>`;
     if(!open) return mainRow;
     const subRows = PAGES.map((p,pi)=>{
-      const st = r.pages[pi];
-      const v = topMetricValues(st.posts, st.eng, st.comments, st.shares);
-      const sub = TOP_METRICS.map(m=>`<td class="r" style="color:${p.color};">${fmt(v[m.key])}</td>`).join('');
+      const v = topMetricValues([r.pages[pi]]);
+      const sub = cols.map(m=>`<td class="r" style="color:${p.color};">${fmtMetric(v[m.key], m.key)}</td>`).join('');
       return `<tr class="top-sub-row">
         <td></td>
         <td><div class="top-cat-cell" title="${esc(p.name)}"><span class="top-page-dot" style="background:${p.color}"></span>${esc(p.name)}</div></td>
@@ -851,10 +1016,10 @@ function setLens(lens, el){
   renderAll();
 }
 
-// ---------- Metric selector — options depend on MODE, drives cards 1 and 3 ----------
+// ---------- Metric selector — options come from the active scenario, drives cards 1 and 3 ----------
 // (Top categories shows every metric as its own column, so it does NOT follow this.)
 function renderMetricToggle(){
-  const options = MODE_METRICS[MODE].options;
+  const options = sc().metrics;
   document.getElementById('metric-toggle').innerHTML = options.map(key=>
     `<button class="lens-btn${key===selectedMetric?' active':''}" onclick="setMetric('${key}',this)">${METRIC_META[key].label}</button>`
   ).join('');
@@ -871,21 +1036,46 @@ function setMetric(key, el){
 // ---------- Mode switch: My Page · Compare vs Competitors · Compare ----------
 // Page chrome (chips/tabs/lenses) stays the same; we swap the page title, sidebar highlight,
 // and the Metric selector's available options + default to signal context.
-let MODE = 'mypage';
+// ---------- Scenario switch (prototype-only control) ----------
+// Swaps the whole page contract at once: metric selector, which cards exist, which
+// post formats the Battlefield can split by, and the surrounding chrome (title,
+// sidebar highlight, sub-tab row, platform label).
+function renderScenarioToggle(){
+  document.getElementById('mode-toggle').innerHTML = Object.entries(SCENARIOS).map(([key,cfg])=>
+    `<button class="mode-btn${key===SCENARIO?' active':''}" onclick="setScenario('${key}')">${esc(cfg.label)}</button>`
+  ).join('');
+}
 
-function setMode(mode, el){
-  MODE = mode;
-  selectedMetric = MODE_METRICS[mode].default;
-  document.querySelectorAll('#mode-toggle .mode-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('pg-title').textContent = mode==='mypage' ? 'My Pages · Compare' : 'Competitors · Compare';
-  document.getElementById('nav-mypages').classList.toggle('active', mode==='mypage');
-  document.getElementById('nav-competitors').classList.toggle('active', mode==='competitors');
+// Sub-tab row mirrors the real Compare pages: Facebook has Keywords and calls the
+// account tab "Page"; Instagram calls it "Account" and carries the two Stories tabs
+// after AI Category. AI Category itself always sits directly after Hashtags.
+function renderSubtabs(){
+  const cfg = sc();
+  const head = cfg.subtabs.map(t=>`<div class="subtab">${esc(t)}</div>`).join('');
+  const tail = (cfg.tailTabs||[]).map(t=>`<div class="subtab">${esc(t)}</div>`).join('');
+  document.getElementById('subtabs-bar').innerHTML =
+    head + `<div class="subtab active">AI Category<span class="badge-new">NEW</span></div>` + tail;
+}
+
+function setScenario(key){
+  SCENARIO = key;
+  const cfg = sc();
+  selectedMetric = cfg.defaultMetric;
+  bfFormat = 'All';
+  bfPageIdx = 0;
   topPage = 1;
   topExpanded = new Set();
-  // Competitors lead with volume, My Page with engagement — same split as card 1
-  topSortKey = mode==='competitors' ? 'posts' : 'eng';
+  topSortKey = cfg.metrics.indexOf('eng')!==-1 ? 'eng' : cfg.metrics[0];
   topSortDir = 'desc';
+
+  document.getElementById('pg-title').textContent = cfg.title;
+  document.getElementById('pg-meta').textContent =
+    `${cfg.platform} · Last 30 days · ${PAGES.length} ${cfg.section==='mypage'?'pages':'competitors'}`;
+  document.getElementById('nav-mypages').classList.toggle('active', cfg.section==='mypage');
+  document.getElementById('nav-competitors').classList.toggle('active', cfg.section==='competitors');
+
+  renderScenarioToggle();
+  renderSubtabs();
   renderMetricToggle();
   renderAll();
 }
@@ -898,8 +1088,7 @@ function renderAll(){
   renderTopTable();
 }
 
-renderMetricToggle();
-renderAll();
+setScenario('fb-mypage');
 </script>
 </body>
 </html>
