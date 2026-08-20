@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Creation &amp; Autopilot Studio · MediaLens</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lato:wght@400;500;600;700&family=Roboto:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════════════════════════
+   MediaLens Ad Manager design system (dm-*) — tokens from
+   assets/css/snippets/dashboard-tokens.scss + app.scss + real components
+   Content: 100% from Ryan's MediaLens_2.0_B_Creation_Autopilot_Studio proto
+   ══════════════════════════════════════════════════════════════════ */
+:root{
+  --brand-blue:#23A9F6; --brand-blue-hover:#1E90E0; --brand-light-blue:#73DFFF;
+  --brand-blue-tint:#EEF6FF; --highlight-navy:#001983;
+  --title:#0A1F2C; --text-primary:#102532; --text-regular:#707070; --text-secondary:#828282;
+  --surface-ai:#F6F8FD; --border:#D9E3E6; --divider:#E8EEF0;
+  --danger:#FF3F41; --danger-light:#FFECEC; --success:#52C41A; --success-light:#E6FBEB;
+  --warning:#FFC960; --warning-light:#FFF8EB;
+  --dm-primary:#23A9F6; --dm-primary-hover:#1E90E0; --dm-primary-light:#E8F4FE;
+  --dm-accent:#409EFF;
+  --dm-text-primary:#4A4A4A; --dm-text-secondary:#939EAB; --dm-text-heading:#1E293B;
+  --dm-slate-900:#0F172A; --dm-slate-700:#334155; --dm-slate-600:#475569; --dm-slate-500:#64748B;
+  --dm-slate-400:#94A3B8; --dm-slate-200:#E2E8F0; --dm-slate-100:#F1F5F9; --dm-slate-50:#F8FAFC;
+  --dm-bg-page:#F5F7FA; --dm-bg-card:#FFFFFF;
+  --dm-border:rgba(203,213,225,.6); --dm-border-light:rgba(226,232,240,.5);
+  --dm-positive:#67C23A; --dm-negative:#F56C6C; --dm-warning:#E6A23C; --dm-neutral:#909399;
+  --delta-up:#059669; --delta-down:#DC2626;
+  --chart-1:#3B82F6; --chart-2:#6366F1; --chart-3:#06B6D4; --chart-4:#14B8A6;
+  --chart-5:#8B5CF6; --chart-6:#0EA5E9; --chart-7:#A78BFA; --chart-8:#2DD4BF;
+  --chart-grid:#E4E7ED; --chart-tooltip-bg:#303133;
+  --g:#059669; --gl:#F0FDF4; --a:#B45309; --al:#FFFBEB; --r:#DC2626; --rl:#FEF2F2;
+  --b:#2563EB; --bl:#EFF6FF; --p:#7C3AED; --pl:#F5F3FF; --n:#475569; --nl:#F1F5F9;
+  --font-heading:'Poppins',sans-serif; --font-body:'Lato',sans-serif; --font-metric:'Roboto',sans-serif;
+  --header-h:70px; --sidebar-w:270px; --content-max:1300px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-body);background:var(--dm-bg-page);color:var(--dm-text-primary);font-size:13px;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+
+/* ── App shell ───────────────────────────────────────────── */
+.ml-header{position:fixed;top:0;left:0;right:0;z-index:102;height:var(--header-h);background:#FFF;display:flex;align-items:center;font-family:var(--font-heading);border-bottom:1px solid var(--divider)}
+.ml-header__logo{padding:0 30px;display:flex;align-items:center;gap:8px}
+.ml-header__logo .mark{width:26px;height:26px}
+.ml-header__logo .word{font-size:18px;font-weight:600;color:var(--title)}
+.ml-header__logo .v2{font-size:9px;font-weight:700;color:#FFF;background:var(--brand-blue);border-radius:8px;padding:2px 6px;margin-left:2px}
+.ml-header__ctx{display:flex;align-items:center;gap:10px;margin-left:18px}
+.ml-page-badge{display:inline-flex;align-items:center;gap:6px;background:var(--brand-blue-tint);color:var(--highlight-navy);border-radius:8px;padding:5px 12px;font-family:var(--font-body);font-size:12px;font-weight:600}
+.ml-voice-status{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-body);font-size:12px;color:var(--dm-slate-500)}
+.ml-voice-status::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--dm-positive);box-shadow:0 0 0 2px rgba(103,194,58,.2)}
+.ml-header__right{margin-left:auto;display:flex;align-items:center;gap:10px;padding-right:24px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font-heading);font-size:13px;font-weight:500;line-height:20px;padding:7px 14px;border-radius:8px;border:1px solid transparent;cursor:pointer;transition:background .15s,border-color .15s;white-space:nowrap;background:none}
+.btn--primary{background:var(--brand-blue);color:#FFF;border-color:var(--brand-blue);font-weight:600}
+.btn--primary:hover{background:#1B9BEA;border-color:#1B9BEA}
+.btn--secondary{background:#FFF;color:var(--text-regular);border-color:var(--border)}
+.btn--secondary:hover{background:#F7F7F7}
+.btn--sm{font-size:12px;padding:5px 12px;border-radius:6px}
+
+.ml-sidebar{position:fixed;top:var(--header-h);bottom:0;left:0;z-index:101;width:var(--sidebar-w);background:#FFF;box-shadow:0 0 5px rgba(0,25,131,.10);padding:20px 0 30px;overflow-y:auto;font-family:var(--font-heading)}
+.ml-sidebar__section{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--dm-slate-400);padding:16px 24px 6px}
+.ml-sidebar__item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;color:#5F5F5F;font-size:13.5px;border-left:4px solid transparent;transition:color .15s}
+.ml-sidebar__item:hover{color:var(--brand-blue)}
+.ml-sidebar__item.is-active{border-left-color:var(--brand-blue);color:var(--dm-accent);background:var(--brand-blue-tint)}
+.ml-sidebar__item .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ml-sidebar__item.is-sub{padding-left:38px;font-size:13px}
+.ml-sidebar__new{font-size:8px;font-weight:700;color:#FFF;background:var(--chart-5);border-radius:6px;padding:2px 5px;margin-left:6px;letter-spacing:.5px}
+
+.ml-main{padding-top:calc(var(--header-h) + 20px);margin-left:var(--sidebar-w);min-height:100vh;background:var(--dm-bg-page)}
+.ml-content{max-width:var(--content-max);margin:0 auto;padding:0 24px 80px}
+
+/* ── Titles / labels ─────────────────────────────────────── */
+.dm-title-page{font:600 22px/1.3 var(--font-heading);color:var(--dm-text-heading);margin:6px 0 4px}
+.dm-page-sub{font:400 12.5px/1.55 var(--font-body);color:var(--dm-text-secondary);margin:0 0 18px;max-width:920px}
+.dm-title-section{font:600 16px/1.4 var(--font-heading);color:var(--dm-text-heading);margin:0 0 4px}
+.dm-title-card{font:500 14px/1.4 var(--font-heading);color:var(--dm-text-heading);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dm-subtitle{display:block;font:400 12px/1.6 var(--font-body);color:var(--dm-text-secondary);margin:4px 0 14px;max-width:980px}
+.sec-head{margin:26px 0 12px}
+.sec-head .dm-subtitle{margin-bottom:0}
+
+/* ── Tabs (Ad Manager pill sub-nav) ──────────────────────── */
+.dm-page-menu{position:sticky;top:var(--header-h);z-index:90;background:var(--dm-bg-page);margin:0 -24px;padding:8px 24px 10px;border-bottom:1px solid var(--dm-border-light)}
+.dm-page-menu .menu-list{display:flex;gap:4px;flex-wrap:nowrap;overflow-x:auto}
+.dm-page-menu .menu-item{font-family:var(--font-body);font-size:13px;font-weight:500;color:#64748B;padding:7px 14px;border-radius:20px;transition:all .15s;white-space:nowrap;cursor:pointer;border:none;background:none}
+.dm-page-menu .menu-item:hover{color:#1E293B;background:#F1F5F9}
+.dm-page-menu .menu-item.is-active{color:#FFF;background:var(--dm-primary);font-weight:600}
+
+/* ── Control bar: date picker + filters ───────────────────── */
+.dm-controls-row{display:flex;align-items:center;gap:10px;padding:14px 0;flex-wrap:wrap}
+.dm-controls-row .spacer{flex:1}
+.dm-meta-label{font:400 12px var(--font-body);color:var(--dm-slate-400);white-space:nowrap}
+.dm-ctl-label{font:500 11px var(--font-body);color:var(--dm-slate-600);text-transform:uppercase;letter-spacing:.4px;margin-right:-2px}
+.dm-period-group{position:relative}
+.dm-period-trigger{display:inline-flex;align-items:center;gap:6px;background:#FFF;color:var(--dm-slate-700);font:500 13px/1 var(--font-body);padding:0 14px;height:34px;border-radius:8px;border:1px solid var(--dm-slate-200);box-shadow:0 1px 3px rgba(0,0,0,.04);cursor:pointer;transition:all .15s;white-space:nowrap}
+.dm-period-trigger:hover{border-color:#CBD5E1;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.dm-period-trigger__date{color:#94A3B8;font-weight:400}
+.dm-period-trigger .ic{font-size:13px;color:#94A3B8;line-height:1}
+.dm-period-menu{position:absolute;top:40px;left:0;z-index:95;background:#FFF;border:1px solid var(--dm-slate-200);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.08);padding:4px;min-width:250px;display:none}
+.dm-period-menu.open{display:block}
+.dm-period-menu__item{display:flex;justify-content:space-between;align-items:center;gap:12px;font-family:var(--font-body);font-size:13px;color:var(--dm-slate-600);padding:8px 14px;border-radius:6px;line-height:1.5;cursor:pointer}
+.dm-period-menu__item:hover{background:var(--dm-slate-50);color:#1E293B}
+.dm-period-menu__item.is-active{color:var(--dm-slate-900);font-weight:600;background:var(--dm-slate-100)}
+.dm-period-menu__date{color:#94A3B8;font-weight:400;font-size:12px}
+.dm-period-menu__divider{height:1px;background:var(--dm-slate-100);margin:4px 0}
+.dm-select{height:34px;font:500 13px/32px var(--font-body);color:var(--dm-slate-700);background:#FFF;border:1px solid var(--dm-slate-200);border-radius:8px;padding:0 28px 0 12px;box-shadow:0 1px 3px rgba(0,0,0,.04);transition:all .15s;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%2394A3B8' stroke-width='1.5' stroke-linecap='round'/></svg>");background-repeat:no-repeat;background-position:right 10px center}
+.dm-select:hover,.dm-select:focus{border-color:#CBD5E1;box-shadow:0 2px 6px rgba(0,0,0,.06);outline:none}
+
+/* ── Cards & layout ──────────────────────────────────────── */
+.dm-card{background:var(--dm-bg-card);border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 1px 2px rgba(0,0,0,.03);transition:box-shadow .2s ease;margin-bottom:20px}
+.dm-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04)}
+.dm-card--hl{border:1.5px solid var(--dm-primary)}
+.dm-row{display:flex;gap:20px;align-items:stretch}
+.dm-row>*{flex:1;min-width:0}
+.dm-row .dm-card{margin-bottom:20px}
+.dm-chart-area{width:100%;height:280px;position:relative}
+.dm-chart-area.short{height:170px}
+.dm-chart-area svg{display:block;width:100%;height:100%}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ── KPI cards ───────────────────────────────────────────── */
+.dm-kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:1200px){.dm-kpi-row{grid-template-columns:repeat(3,1fr)}}
+.dm-kpi-card{background:var(--dm-bg-card);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 1px 2px rgba(0,0,0,.03);padding:16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.kpi__label{font:500 11px/1.4 var(--font-body);color:var(--dm-slate-600);text-transform:uppercase;letter-spacing:.3px}
+.kpi__metric{font:600 26px/1.15 var(--font-metric);color:var(--dm-slate-900);letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.kpi__sub{font:400 11px/1.35 var(--font-body);color:var(--dm-text-secondary)}
+.kpi__sub.up{color:var(--delta-up)}
+.kpi__sub.down{color:var(--delta-down)}
+.kpi-range{margin-top:4px}
+.kpi-range__rail{position:relative;height:5px;border-radius:3px;background:var(--dm-slate-100)}
+.kpi-range__fill{position:absolute;top:0;bottom:0;border-radius:3px;background:var(--brand-blue);opacity:.75}
+.kpi-range__marker{position:absolute;top:-2px;width:2px;height:9px;background:var(--delta-up);border-radius:1px}
+.kpi-range__axis{display:flex;justify-content:space-between;font:400 9px var(--font-metric);color:var(--dm-slate-400);margin-top:3px}
+
+/* ── Tables ──────────────────────────────────────────────── */
+.dm-table-scroll{overflow-x:auto}
+.dm-modern-table{width:100%;border-collapse:collapse}
+.dm-modern-table th{font-family:var(--font-body);font-size:12px;font-weight:400;color:var(--dm-slate-600);text-align:left;border-bottom:1px solid rgba(226,232,240,.6);padding:8px 12px;white-space:nowrap}
+.dm-modern-table td{font-family:var(--font-body);font-size:12.5px;color:var(--dm-slate-700);border-bottom:1px solid rgba(241,245,249,.7);padding:11px 12px;font-variant-numeric:tabular-nums;vertical-align:top;line-height:1.5}
+.dm-modern-table tbody tr{transition:background-color .15s ease}
+.dm-modern-table tbody tr:hover td{background:rgba(248,250,252,.5)}
+.dm-modern-table td:first-child{font-weight:500;color:var(--dm-slate-900)}
+.dm-modern-table tr.row-g td{background:var(--gl)}
+.dm-modern-table tr.row-a td{background:var(--al)}
+.dm-modern-table tr.row-r td{background:var(--rl)}
+.dm-modern-table td .num{font-family:var(--font-metric)}
+.dm-cell-sub{display:block;color:#94A3B8;font-size:10px;line-height:1.4;margin-top:2px;font-weight:400}
+.dm-modern-table--compact th{padding:7px 7px;white-space:normal;font-size:11px;line-height:1.35}
+.dm-modern-table--compact td{padding:9px 7px;font-size:11.5px}
+.dm-modern-table--compact .tg{font-size:9.5px;padding:3px 6px}
+
+/* ── Tags / chips / badges ───────────────────────────────── */
+.tg{display:inline-block;font:600 10.5px/1 var(--font-body);padding:4px 8px;border-radius:20px;white-space:nowrap}
+.tg-g{background:var(--gl);color:var(--g)}.tg-a{background:var(--al);color:var(--a)}
+.tg-r{background:var(--rl);color:var(--r)}.tg-b{background:var(--bl);color:var(--b)}
+.tg-p{background:var(--pl);color:var(--p)}.tg-n{background:var(--nl);color:var(--n)}
+.mf{display:inline-flex;align-items:center;gap:4px;background:#E5F1FC;color:var(--highlight-navy);border-radius:8px;padding:3px 8px;font:600 10px/1.3 var(--font-body);white-space:nowrap}
+.mf::before{content:'◈';font-size:9px}
+.dmode{display:inline-flex;align-items:center;font:700 9px/1 var(--font-metric);letter-spacing:.6px;padding:3px 7px;border-radius:4px;margin-left:auto}
+.dmode-live{background:var(--gl);color:var(--g)}
+.dmode-agg{background:var(--bl);color:var(--b)}
+.dmode-mock{background:var(--al);color:var(--a)}
+.tg-new{display:inline-block;font:700 8.5px/1 var(--font-metric);letter-spacing:.5px;color:#FFF;background:var(--chart-5);border-radius:6px;padding:3px 6px}
+.dm-status-dot{display:inline-flex;align-items:center;gap:6px;font:500 12px var(--font-body)}
+.dm-status-dot::before{content:'';width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dm-status-dot--active::before{background:var(--dm-positive);box-shadow:0 0 0 2px rgba(103,194,58,.2)}
+.dm-status-dot--active{color:#2D6A1E}
+
+/* ── Score bars (voice / hook / composite) ───────────────── */
+.sbar{margin-bottom:12px}
+.sbar__top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:5px}
+.sbar__name{font:500 12px/1.4 var(--font-body);color:var(--dm-slate-700)}
+.sbar__val{font:600 13px var(--font-metric);color:var(--dm-slate-900)}
+.sbar__rail{height:6px;border-radius:3px;background:var(--dm-slate-100);overflow:hidden}
+.sbar__fill{height:100%;border-radius:3px}
+.f-g{background:#34D399}.f-a{background:#FBBF24}.f-r{background:#F87171}.f-b{background:#60A5FA}.f-p{background:#A78BFA}.f-pk{background:#F472B6}
+.sbar__tag{margin-left:6px}
+
+/* ── Callouts ────────────────────────────────────────────── */
+.callout{background:#FFF;border-radius:12px;padding:16px 18px;margin-bottom:20px;border:1px solid var(--dm-border-light);border-left:4px solid var(--b);box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.callout--r{border-left-color:var(--r);background:#FFFBFB}
+.callout--a{border-left-color:var(--dm-warning);background:#FFFDF7}
+.callout--b{border-left-color:var(--b)}
+.callout__title{font:600 13px/1.4 var(--font-heading);color:var(--dm-text-heading);margin-bottom:6px}
+.callout__body{font:400 12.5px/1.7 var(--font-body);color:var(--dm-slate-600)}
+.callout__meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font:400 11.5px var(--font-body);color:var(--dm-slate-500)}
+.callout__meta b{color:var(--dm-slate-900)}
+
+/* ── Spine / level / category / reference / asset grids ──── */
+.spine-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.spine-cell{border:1px solid var(--dm-border-light);border-radius:10px;padding:12px;background:var(--dm-slate-50)}
+.spine-cell.hl{border-color:var(--brand-blue);background:var(--brand-blue-tint)}
+.spine-cell__t{font:600 12px var(--font-heading);color:var(--dm-text-heading);display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px}
+.spine-cell__b{font:400 11px/1.6 var(--font-body);color:var(--dm-slate-600)}
+.lvl-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.lvl-card{background:#FFF;border:1px solid var(--dm-border-light);border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.lvl-card.hl{border:1.5px solid var(--brand-blue)}
+.lvl-card__t{font:600 12.5px var(--font-heading);color:var(--dm-text-heading);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.lvl-card__s{font:500 10px var(--font-body);color:var(--dm-slate-400);margin:4px 0 8px}
+.lvl-card__b{font:400 11px/1.65 var(--font-body);color:var(--dm-slate-600)}
+.lvl-card__b b{color:var(--dm-slate-800,#1E293B)}
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.cat-tile{display:flex;align-items:center;gap:10px;border:1px solid var(--dm-border-light);border-radius:10px;padding:12px;background:#FFF}
+.cat-tile .em{font-size:20px}
+.cat-tile__n{font:600 12px var(--font-body);color:var(--dm-slate-800,#1E293B)}
+.cat-tile__s{font:400 11px var(--font-metric);color:var(--dm-slate-500)}
+.cat-tile__s b{color:var(--dm-slate-900);font-weight:600}
+.ref-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.asset-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.thumb{position:relative;border-radius:8px;background:linear-gradient(135deg,#E8F4FE,#F1F5F9);min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:12px;text-align:center}
+.thumb .l1{font:600 11.5px/1.4 var(--font-body);color:var(--dm-slate-600)}
+.thumb .l2{font:400 10px/1.4 var(--font-body);color:var(--dm-slate-400)}
+.corner-tl{position:absolute;top:8px;left:8px}
+.corner-tr{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;background:var(--highlight-navy);color:#FFF;font:600 10px/20px var(--font-metric);text-align:center}
+.ref-card,.asset-card{background:#FFF;border:1px solid var(--dm-border-light);border-radius:12px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:8px}
+.ref-card__n{font:600 12px/1.5 var(--font-body);color:var(--dm-slate-800,#1E293B)}
+.stat4{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.stat4 .s{font:400 10.5px/1.5 var(--font-body);color:var(--dm-slate-500)}
+.stat4 .s b{display:block;font:600 13px var(--font-metric);color:var(--dm-slate-900)}
+.ref-card__f{font:400 10.5px/1.5 var(--font-body);color:var(--dm-slate-400);border-top:1px solid var(--dm-slate-100);padding-top:7px}
+
+/* ── Variant post cards ──────────────────────────────────── */
+.var-card{background:#FFF;border:1px solid var(--dm-border-light);border-radius:12px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04);margin-bottom:12px;display:flex;gap:18px}
+.var-card.pick{border:1.5px solid var(--brand-blue)}
+.var-card.bad{border:1.5px solid #FECACA;background:#FFFBFB}
+.var-card__main{flex:1;min-width:0}
+.var-card__t{font:600 13.5px/1.5 var(--font-heading);color:var(--dm-text-heading);margin-bottom:7px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.var-card__body{font:400 12.5px/1.75 var(--font-body);color:var(--dm-slate-600);margin-bottom:10px}
+.var-card__tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.var-card__meta{display:flex;gap:16px;flex-wrap:wrap;font:400 11px var(--font-body);color:var(--dm-slate-500)}
+.var-card__meta b{color:var(--dm-slate-900);font-family:var(--font-metric)}
+.var-card__score{flex-shrink:0;width:86px;text-align:center;align-self:flex-start;border-left:1px solid var(--dm-slate-100);padding-left:18px}
+.var-card__score .n{font:600 34px/1.1 var(--font-metric);letter-spacing:-1px}
+.var-card__score .n.g{color:var(--g)}.var-card__score .n.a{color:var(--a)}.var-card__score .n.r{color:var(--r)}
+.var-card__score .l{font:600 8.5px/1.4 var(--font-metric);letter-spacing:1px;color:var(--dm-slate-400)}
+
+/* ── Pills row (filters as chips) ────────────────────────── */
+.pill-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.pill{font:500 12px/1 var(--font-body);color:#64748B;background:#FFF;border:1px solid var(--dm-slate-200);border-radius:20px;padding:7px 14px;cursor:pointer;transition:all .15s}
+.pill:hover{color:#1E293B;background:#F1F5F9}
+.pill.is-active{color:#FFF;background:var(--dm-primary);border-color:var(--dm-primary);font-weight:600}
+
+/* ── Storyboard beats ────────────────────────────────────── */
+.beats{position:relative;padding-left:18px}
+.beats::before{content:'';position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--dm-slate-100);border-radius:1px}
+.beat{position:relative;padding:0 0 16px 12px}
+.beat::before{content:'';position:absolute;left:-17px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--brand-blue);border:2px solid #FFF;box-shadow:0 0 0 1.5px var(--brand-blue)}
+.beat__t{font:600 12px var(--font-heading);color:var(--dm-text-heading);margin-bottom:4px}
+.beat__l{font:400 11.5px/1.6 var(--font-body);color:var(--dm-slate-600)}
+.beat__l b{color:var(--dm-slate-800,#1E293B);font-weight:600}
+
+/* ── Score ring ──────────────────────────────────────────── */
+.ring-wrap{display:flex;gap:18px;align-items:center;margin-bottom:16px}
+.ring{width:110px;height:110px;flex-shrink:0}
+.ring .num{font:600 30px var(--font-metric);fill:var(--dm-slate-900)}
+.ring-side .h{font:600 14px var(--font-heading);color:var(--g);margin-bottom:4px}
+.ring-side .b{font:400 12px/1.65 var(--font-body);color:var(--dm-slate-600)}
+
+/* ── Calendar month grid ─────────────────────────────────── */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-grid .hd{font:600 10.5px var(--font-body);color:var(--dm-slate-400);text-transform:uppercase;letter-spacing:.5px;text-align:center;padding:4px 0}
+.cal-cell{border-radius:8px;padding:8px;min-height:56px;border:1px solid var(--dm-border-light);background:var(--dm-slate-50)}
+.cal-cell .d{font:600 11px var(--font-metric);color:var(--dm-slate-700)}
+.cal-cell .m{font:400 10px/1.4 var(--font-body);color:var(--dm-slate-500);margin-top:2px}
+.cal-pub{background:var(--gl);border-color:#BBF7D0}.cal-pub .d{color:var(--g)}
+.cal-sch{background:var(--bl);border-color:#BFDBFE}.cal-sch .d{color:var(--b)}
+.cal-app{background:var(--al);border-color:#FDE68A}.cal-app .d{color:var(--a)}
+.cal-dft{background:var(--pl);border-color:#DDD6FE}.cal-dft .d{color:var(--p)}
+.cal-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font:400 11px var(--font-body);color:var(--dm-slate-500)}
+.cal-legend .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+/* ── Rotation planner ────────────────────────────────────── */
+.rot-grid{display:grid;grid-template-columns:44px repeat(7,1fr);gap:5px;margin-bottom:14px}
+.rot-grid .hd{font:600 10px var(--font-body);color:var(--dm-slate-400);text-align:center;padding:3px 0}
+.rot-grid .wk{font:600 10.5px var(--font-metric);color:var(--dm-slate-500);display:flex;align-items:center}
+.rot-chip{font:500 10.5px/1.3 var(--font-body);text-align:center;border-radius:6px;padding:6px 2px;background:var(--dm-slate-50);color:var(--dm-slate-400)}
+.rc-edu{background:var(--bl);color:var(--b)}.rc-trust{background:var(--gl);color:var(--g)}
+.rc-emo{background:var(--pl);color:var(--p)}.rc-ugc{background:#ECFEFF;color:#0E7490}
+.rc-comm{background:#FDF2F8;color:#BE185D}.rc-promo{background:var(--rl);color:var(--r)}
+.rc-draft{background:var(--dm-slate-100);color:var(--dm-slate-500)}
+
+/* ── Proposal cards / action queue ───────────────────────── */
+.prop-card{background:#FFF;border:1px solid var(--dm-border-light);border-radius:12px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04);margin-bottom:12px;display:flex;gap:18px}
+.prop-card__main{flex:1;min-width:0}
+.prop-card__t{font:600 13.5px/1.5 var(--font-heading);color:var(--dm-text-heading);margin-bottom:6px}
+.prop-card__e{font:400 12px/1.7 var(--font-body);color:var(--dm-slate-600);margin-bottom:10px}
+.prop-card__tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.prop-card__foot{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.prop-card__by{margin-left:auto;font:400 11px var(--font-body);color:var(--dm-slate-400)}
+.prop-card__fx{flex-shrink:0;width:150px;border-left:1px solid var(--dm-slate-100);padding-left:18px;align-self:center}
+.prop-card__fx .l{font:600 8.5px/1.4 var(--font-metric);letter-spacing:1px;color:var(--dm-slate-400);margin-bottom:4px}
+.prop-card__fx .v1{font:600 17px var(--font-metric);color:var(--g)}
+.prop-card__fx .v2{font:400 12px var(--font-metric);color:var(--dm-slate-600);margin-top:2px}
+
+/* ── AI insights panel (Ad Manager ai-card surface) ──────── */
+.ai-card{background:var(--surface-ai);border:1px solid #DBE6FF;border-radius:12px;padding:20px;margin-bottom:26px}
+.ai-card__head{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.ai-icon{width:32px;height:32px;border-radius:8px;color:#FFF;font-size:15px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--brand-blue),var(--brand-light-blue));flex-shrink:0}
+.ai-card__title{font:600 14px var(--font-heading);color:var(--dm-text-heading)}
+.ai-card__sub{font:400 11.5px/1.5 var(--font-body);color:var(--dm-slate-500);margin:2px 0 14px}
+.ai-insight-item{background:#FFF;border-radius:8px;padding:12px 14px;border-left:3px solid var(--brand-blue);font:400 12.5px/1.75 var(--font-body);color:var(--dm-slate-600);margin-bottom:10px}
+.ai-insight-item b{color:var(--dm-slate-900)}
+.ai-insight-item.warn{border-left-color:var(--dm-warning)}
+.ai-insight-item.alert{border-left-color:var(--danger)}
+.ai-insight-item.good{border-left-color:var(--dm-positive)}
+.ai-insight-item.new{border-left-color:var(--chart-5)}
+.ib{display:inline-block;font:700 9px/1 var(--font-metric);letter-spacing:.8px;text-transform:uppercase;padding:4px 7px;border-radius:4px;margin-right:8px;vertical-align:1px}
+.ib-b{background:var(--bl);color:var(--b)}.ib-a{background:var(--al);color:var(--a)}
+.ib-r{background:var(--rl);color:var(--r)}.ib-p{background:var(--pl);color:var(--p)}
+.ib-g{background:var(--gl);color:var(--g)}
+.ai-ask{display:flex;gap:8px;margin-top:4px}
+.ai-ask input{flex:1;height:36px;border:1px solid var(--dm-slate-200);border-radius:8px;padding:0 14px;font:400 12.5px var(--font-body);color:var(--dm-slate-700);background:#FFF}
+.ai-ask input::placeholder{color:var(--dm-slate-400)}
+.ai-ask input:focus{outline:none;border-color:var(--brand-blue)}
+
+/* ── Brief block / misc ──────────────────────────────────── */
+.brief-block{border:1px solid var(--dm-slate-200);border-radius:10px;background:var(--dm-slate-50);padding:16px;font:400 12.5px/1.9 var(--font-body);color:var(--dm-slate-700);margin-bottom:14px}
+.brief-block b{color:var(--dm-slate-900)}
+.action-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:4px 0 22px}
+.action-row .who{margin-left:auto;font:400 11.5px var(--font-body);color:var(--dm-slate-400)}
+.mini-info{border:1px solid var(--dm-border-light);border-radius:10px;padding:12px;background:var(--dm-slate-50);margin-bottom:10px}
+.mini-info__t{font:600 12px var(--font-body);color:var(--dm-slate-800,#1E293B);margin-bottom:4px}
+.mini-info__b{font:400 11.5px/1.65 var(--font-body);color:var(--dm-slate-600)}
+.mini-info__b code{font:500 10.5px var(--font-metric);background:var(--dm-slate-100);border-radius:4px;padding:1px 5px;color:var(--p)}
+.split2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.ctl-inline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;font:400 12px var(--font-body);color:var(--dm-slate-500)}
+.foot-note{font:400 11.5px/1.7 var(--font-body);color:var(--dm-slate-500);border-top:1px solid var(--dm-slate-100);padding-top:10px;margin-top:12px}
+.foot-note b{color:var(--dm-slate-900)}
+.proto-badge{position:fixed;right:18px;bottom:16px;z-index:200;background:var(--chart-5);color:#FFF;font:700 10px/1 var(--font-metric);letter-spacing:.8px;padding:8px 12px;border-radius:20px;box-shadow:0 4px 16px rgba(124,58,237,.35)}
+.legend-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;font:400 11px var(--font-body);color:var(--text-regular)}
+.legend-row .li{display:inline-flex;align-items:center;gap:6px}
+.legend-row .dotc{width:10px;height:10px;border-radius:50%}
+.legend-row .linec{width:14px;height:3px;border-radius:2px}
+@media(max-width:1100px){.spine-grid,.lvl-grid{grid-template-columns:repeat(2,1fr)}.ref-grid,.asset-grid{grid-template-columns:repeat(2,1fr)}.dm-row{flex-direction:column}.split2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="ml-header">
+  <div class="ml-header__logo">
+    <svg class="mark" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="11" stroke="#23A9F6" stroke-width="3"/><path d="M13 2a11 11 0 0 1 11 11" stroke="#001983" stroke-width="3" stroke-linecap="round"/></svg>
+    <span class="word">MediaLens</span><span class="v2">2.0</span>
+  </div>
+  <div class="ml-header__ctx">
+    <span class="ml-page-badge">GirlStyle 女生日常 · IG + FB</span>
+    <span class="ml-voice-status">Brand voice loaded</span>
+  </div>
+  <div class="ml-header__right">
+    <button class="btn btn--secondary">Asset Library</button>
+    <button class="btn btn--primary">+ New Brief</button>
+  </div>
+</header>
+
+<aside class="ml-sidebar">
+  <div class="ml-sidebar__section">Intelligence</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#2d7ff9"></span>My Pages</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#ec4899"></span>Competitor Analysis</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#f59e0b"></span>Buzz (Market Insights)</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#10b981"></span>Leader Board</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#7c5cfc"></span>Social Listening</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#06b6a0"></span>Social Pulses</div>
+  <div class="ml-sidebar__section">Ads</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#2d7ff9"></span>Ad Manager</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#f97316"></span>Ad Intelligence</div>
+  <div class="ml-sidebar__section">Creation</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#23A9F6"></span>Content Publish</div>
+  <div class="ml-sidebar__item is-sub is-active">Creation &amp; Autopilot Studio<span class="ml-sidebar__new">NEW</span></div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#8B5CF6"></span>AI Assets</div>
+  <div class="ml-sidebar__section">Tools</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#94A3B8"></span>Report Scheduler</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#94A3B8"></span>Tag Management</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#94A3B8"></span>AI Chat</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#94A3B8"></span>AI Agent</div>
+</aside>
+
+<main class="ml-main"><div class="ml-content">
+
+<div class="dm-title-page">Creation &amp; Autopilot Studio</div>
+<div class="dm-page-sub">A new module under Content Publish. Brief → generate → score → schedule → boost, grounded on this page's own corpus.</div>
+
+<nav class="dm-page-menu"><div class="menu-list">
+  <button class="menu-item is-active" data-tab="brief">Brief Studio</button>
+  <button class="menu-item" data-tab="post">Post Studio</button>
+  <button class="menu-item" data-tab="visual">Visual Studio</button>
+  <button class="menu-item" data-tab="video">Video Studio</button>
+  <button class="menu-item" data-tab="score">Pre-flight Score</button>
+  <button class="menu-item" data-tab="calendar">Calendar</button>
+  <button class="menu-item" data-tab="autopilot">Autopilot</button>
+</div></nav>
+
+<div class="dm-controls-row">
+  <span class="dm-ctl-label">Grounding window</span>
+  <div class="dm-period-group">
+    <button class="dm-period-trigger" id="periodTrigger">
+      <span class="ic">📅</span>
+      <span>Last 90 Days</span>
+      <span class="dm-period-trigger__date">· May 23 – Aug 20</span>
+      <span class="ic">▾</span>
+    </button>
+    <div class="dm-period-menu" id="periodMenu">
+      <div class="dm-period-menu__item"><span>Last 7 Days</span><span class="dm-period-menu__date">Aug 14 – Aug 20</span></div>
+      <div class="dm-period-menu__item"><span>Last 28 Days</span><span class="dm-period-menu__date">Jul 24 – Aug 20</span></div>
+      <div class="dm-period-menu__item is-active"><span>Last 90 Days</span><span class="dm-period-menu__date">May 23 – Aug 20</span></div>
+      <div class="dm-period-menu__item"><span>Last 12 Months</span><span class="dm-period-menu__date">Aug 21 – Aug 20</span></div>
+      <div class="dm-period-menu__divider"></div>
+      <div class="dm-period-menu__item"><span>📅 Custom Range</span></div>
+    </div>
+  </div>
+  <span class="dm-ctl-label">Model</span>
+  <select class="dm-select"><option>Pre-flight v1</option><option>v0 (legacy)</option></select>
+  <span class="spacer"></span>
+  <span class="dm-meta-label">Aug 2026 · 100 organic posts · 1,284 live topics</span>
+</div>
+<!-- ══════════ TAB 1 · BRIEF STUDIO ══════════ -->
+<div class="tab-panel active" id="tab-brief">
+
+<div class="sec-head">
+  <div class="dm-title-section">Brief Studio — the production line starts with evidence, not a blank page</div>
+  <span class="dm-subtitle">Anyone can generate a caption. Only MediaLens can score a draft against what actually worked in this market, on this page, for this angle, before it is published. Generation is commodity; grounding and pre-flight scoring are the product.</span>
+</div>
+
+<section class="dm-card">
+  <div class="dm-title-card">The five-step spine — where Creation Studio sits, and what is actually working<span class="dmode dmode-live">LIVE</span></div>
+  <span class="dm-subtitle">analyse → categorise → create → publish → boost. Steps 1 and 2 are built. This module is step 3, with the front half of 4. Step 5 arrives through Autopilot. Status is printed rather than implied.</span>
+  <div class="spine-grid">
+    <div class="spine-cell"><div class="spine-cell__t">1 · Analyse <span class="tg tg-g">Built</span></div><div class="spine-cell__b">My Pages, Competitor Analysis, Buzz, Ad Manager benchmarks. This is the corpus everything downstream is grounded on.</div></div>
+    <div class="spine-cell"><div class="spine-cell__t">2 · Categorise <span class="tg tg-g">Built</span></div><div class="spine-cell__b">Angle taxonomy, hook classification, 9 visual categories, keyword correlation. Without this the score has no features.</div></div>
+    <div class="spine-cell hl"><div class="spine-cell__t">3 · Create <span class="tg tg-b">This module</span></div><div class="spine-cell__b">Brief → post → visual → video, generated against 1 and 2, then pre-flight scored. Art, Article, Slide Maker and AI Video Subtitles unify here.</div></div>
+    <div class="spine-cell"><div class="spine-cell__t">4 · Publish <span class="tg tg-a">Partly blocked</span></div><div class="spine-cell__b">Calendar, slots, approval queue all work. The final write to IG/FB is pending Meta permissions — see the Calendar tab.</div></div>
+    <div class="spine-cell"><div class="spine-cell__t">5 · Boost <span class="tg tg-p">Arriving</span></div><div class="spine-cell__b">Organic → paid transfer, budget shifts, creative refresh, all as L3 proposals. Ad pause/resume writes are live today.</div></div>
+  </div>
+</section>
+
+<div class="dm-controls-row" style="padding-top:0">
+  <select class="dm-select"><option>Source: Buzz opportunity gap</option><option>Source: Ad Intelligence winner</option><option>Source: My Pages top post</option><option>Source: Competitor post</option><option>Source: Manual</option></select>
+  <select class="dm-select"><option>Brand: GirlStyle 女生日常</option><option>Brand: TopBeauty</option><option>Brand: POPLADY</option><option>Brand: HolidaySmart 假期日常</option></select>
+  <select class="dm-select"><option>Product: 保濕精華 · 秋冬換季</option><option>Product: 底妝 · 持妝力</option><option>Product: 防曬 · 日常通勤</option><option>Product: 香水 · 節日禮物</option></select>
+  <select class="dm-select"><option>Objective: Consideration</option><option>Objective: Branding</option><option>Objective: Conversion</option></select>
+  <select class="dm-select"><option>Format: Carousel (4:5)</option><option>Format: Reel (9:16)</option><option>Format: Single image</option><option>Format: Link post</option></select>
+  <select class="dm-select"><option>Audience: HK F 18–34, beauty/lifestyle</option><option>Audience: HK F 25–44, skincare buyers</option><option>Audience: HK F 18–24, students</option></select>
+  <button class="btn btn--primary btn--sm">Assemble brief</button>
+</div>
+
+<div class="dm-kpi-row">
+  <div class="dm-kpi-card"><div class="kpi__label">Grounding corpus</div><div class="kpi__metric">100</div><div class="kpi__sub">organic posts · 90D</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Page median ER</div><div class="kpi__metric">2.41%</div><div class="kpi__sub up">P50 baseline</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Top-decile ER</div><div class="kpi__metric">5.86%</div><div class="kpi__sub">P90 · target band</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Predicted ER (this brief)</div><div class="kpi__metric">3.9%</div><div class="kpi__sub up">+62% vs median</div>
+    <div class="kpi-range"><div class="kpi-range__rail"><div class="kpi-range__fill" style="left:0;width:66%"></div><div class="kpi-range__marker" style="left:41%"></div></div><div class="kpi-range__axis"><span>3.1%</span><span>P50 2.41%</span><span>4.8%</span></div></div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Brief confidence</div><div class="kpi__metric">Med</div><div class="kpi__sub">7 of 7 elements traced</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Angle fatigue</div><div class="kpi__metric">2/12</div><div class="kpi__sub up">safe · threshold 4/12</div></div>
+</div>
+
+<section class="dm-card">
+  <div class="dm-title-card">Grounded brief assembly <span class="tg-new">NEW</span><span class="dmode dmode-agg">AGG</span></div>
+  <span class="dm-subtitle">A brief where every choice has a reason and the reason is a number. Each element is traced back to the module that produced the evidence — nothing here is a model preference.</span>
+  <div class="dm-table-scroll"><table class="dm-modern-table">
+    <thead><tr><th>Brief element</th><th>Decision</th><th>Evidence</th><th>Lift vs page default</th><th>Source</th></tr></thead>
+    <tbody>
+      <tr><td>Angle</td><td>教育價值型 — 換季保濕成分拆解</td><td>Education angle ER 4.12% vs page avg 2.41% across 23 posts</td><td><span class="tg tg-g">+71%</span></td><td><span class="mf">Angle / Topic Intel</span></td></tr>
+      <tr><td>Hook type</td><td>Problem Introduction（「換季爆乾脫皮？」）</td><td>3s retention 24.1%, highest of 6 classified hooks in HK beauty</td><td><span class="tg tg-g">+29%</span></td><td><span class="mf">Video Intel · hook classification</span></td></tr>
+      <tr><td>Format</td><td>Carousel 4:5, 5 slides + 9:16 Reel cutdown</td><td>Carousel saves/reach 1.8× single image on this page (28 posts)</td><td><span class="tg tg-g">+80% saves</span></td><td><span class="mf">My Pages · format benchmark</span></td></tr>
+      <tr><td>Copy length</td><td>142–168 characters (繁中)</td><td>Copy-length × ER correlation peaks at 150 chars, r=0.34</td><td><span class="tg tg-g">+18%</span></td><td><span class="mf">Content Intel · length curve</span></td></tr>
+      <tr><td>Keywords</td><td>換季保濕 · 修護屏障 · 平價好用 · 敏感肌</td><td>All 4 rising 90D; 「修護屏障」 +214% search-share, low competitor use</td><td><span class="tg tg-g">+34%</span></td><td><span class="mf">Buzz · rising keywords</span></td></tr>
+      <tr><td>Posting slot</td><td>週三 21:00 HKT</td><td>Online followers peak 20:30–22:00; slot lift +23% vs page median</td><td><span class="tg tg-g">+23%</span></td><td><span class="mf">My Pages · online followers</span></td></tr>
+      <tr><td>Predicted ER</td><td>3.1% – 4.8% (80% CI, point 3.9%)</td><td>Pre-flight model v1, 60 calibration posts, r=0.52</td><td><span class="tg tg-b">Medium conf.</span></td><td><span class="mf">Pre-flight model v1</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<div class="sec-head">
+  <div class="dm-title-section">Winning references pulled into the brief</div>
+  <span class="dm-subtitle">Four references selected by measured outcome, not by recency — each carries the reason it was chosen.</span>
+</div>
+<div class="ref-grid" style="margin-bottom:20px">
+  <div class="ref-card">
+    <div class="thumb"><span class="corner-tl tg tg-a">BUZZ</span><span class="corner-tr">1</span><span class="l1">換季保濕成分對比圖</span><span class="l2">opportunity gap</span></div>
+    <div class="ref-card__n">「保濕唔係塗多啲」拆解貼 — 市場熱度高、GirlStyle 未做過</div>
+    <div class="stat4"><span class="s">Topic heat<b>92</b></span><span class="s">Our coverage<b>0 posts</b></span><span class="s">Comp. ER<b>4.8%</b></span><span class="s">Gap score<b>A</b></span></div>
+    <div class="ref-card__f">Selected: highest-heat topic with zero coverage on this page in 90D.</div>
+  </div>
+  <div class="ref-card">
+    <div class="thumb"><span class="corner-tl tg tg-b">AD INTEL</span><span class="corner-tr">2</span><span class="l1">Before &amp; After 保濕對比</span><span class="l2">winning ad creative</span></div>
+    <div class="ref-card__n">TopBeauty 保濕精華廣告 — Before/After 視覺，CTR 前 5%</div>
+    <div class="stat4"><span class="s">CTR<b>1.94%</b></span><span class="s">vs acct<b>+56%</b></span><span class="s">Spend<b>HK$41k</b></span><span class="s">Days live<b>34</b></span></div>
+    <div class="ref-card__f">Selected: paid-proven visual category we under-use organically.</div>
+  </div>
+  <div class="ref-card">
+    <div class="thumb"><span class="corner-tl tg tg-g">MY PAGES</span><span class="corner-tr">3</span><span class="l1">敏感肌急救 carousel</span><span class="l2">own top post</span></div>
+    <div class="ref-card__n">自家 7 月 top post — 5 格 carousel，收藏率破頁面紀錄</div>
+    <div class="stat4"><span class="s">ER<b>6.42%</b></span><span class="s">Saves<b>4,180</b></span><span class="s">Reach<b>612k</b></span><span class="s">Percentile<b>P97</b></span></div>
+    <div class="ref-card__f">Selected: structural template — problem → 成分 → 用法 → 前後 → CTA.</div>
+  </div>
+  <div class="ref-card">
+    <div class="thumb"><span class="corner-tl tg tg-p">COMPETITOR</span><span class="corner-tr">4</span><span class="l1">@sorra.beauty 成分測評</span><span class="l2">competitor post</span></div>
+    <div class="ref-card__n">競品 8 月測評帖 — 我哋同類內容 ER 落後 1.4pp</div>
+    <div class="stat4"><span class="s">Their ER<b>5.10%</b></span><span class="s">Our ER<b>3.70%</b></span><span class="s">Comments<b>1,240</b></span><span class="s">Gap<b>−1.4pp</b></span></div>
+    <div class="ref-card__f">Selected: closest competitor beating us on the exact angle we're briefing.</div>
+  </div>
+</div>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">Brand voice injection <span class="tg-new">NEW</span><span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">The measured fingerprint of this page's own top-decile posts, applied as generation constraints. Live behaviour: typing <code>@my page: girlstyle</code> auto-injects that page's 品牌調性.</span>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Copy length — target 142–168 chars (draft 155)</span><span class="sbar__val">92</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:92%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Emoji density — target 3–5 per post (draft 4)</span><span class="sbar__val">96</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:96%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Question-opening rate — target 62% (draft: yes)</span><span class="sbar__val">88</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:88%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Cantonese-colloquial ratio — target 0.34 (draft 0.29)</span><span class="sbar__val">71</span></div><div class="sbar__rail"><div class="sbar__fill f-a" style="width:71%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Hashtag count — target 6–9 (draft 7)</span><span class="sbar__val">94</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:94%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">First-line length — target ≤ 22 chars (draft 19)</span><span class="sbar__val">90</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:90%"></div></div></div>
+    <div class="foot-note"><b>Composite voice match 88/100.</b> The one gap is Cantonese-colloquial ratio — the page's top decile uses 「啱用」「唔會」「返嚟」 more freely than the draft. Regenerating with the colloquial constraint raises voice match to an estimated 94.</div>
+  </section>
+  <section class="dm-card">
+    <div class="dm-title-card">Angle performance on this page (90D)<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">Why 教育價值型 was chosen — measured ER by content angle, with post volume in the tooltip.</span>
+    <div class="dm-chart-area" data-chart="brAngle"></div>
+  </section>
+</div>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">Online followers by hour — why 21:00<span class="dmode dmode-agg">AGG</span></div>
+    <span class="dm-subtitle">Hourly online-follower share for GirlStyle IG + FB, with the recommended slot marked.</span>
+    <div class="dm-chart-area" data-chart="brSlot"></div>
+  </section>
+  <section class="dm-card">
+    <div class="dm-title-card">Assembled brief · 繁體中文<span class="dmode dmode-live">LIVE</span></div>
+    <span class="dm-subtitle">Editable. Every line traceable to the table above.</span>
+    <div class="brief-block" contenteditable="true">
+      <b>【內容 Brief · GirlStyle 女生日常 · 2026-08-19（三）21:00】</b><br>
+      <b>主題：</b>換季保濕唔係塗多啲 — 3 個修護屏障成分拆解<br>
+      <b>角度：</b>教育價值型（本頁 ER 4.12%，高於頁面平均 71%）<br>
+      <b>開頭 Hook：</b>Problem Introduction —「換季爆乾脫皮，塗幾多都無用？」<br>
+      <b>格式：</b>5 格 Carousel（4:5）+ 9:16 Reel 剪輯版<br>
+      <b>結構：</b>問題 → 成分拆解 ×3 → 用法示範 → 前後對比 → 收藏 CTA<br>
+      <b>字數：</b>142–168 字；首行 ≤22 字；emoji 3–5 個；hashtag 6–9 個<br>
+      <b>必用關鍵詞：</b>換季保濕、修護屏障、平價好用、敏感肌<br>
+      <b>調性：</b>GirlStyle 姊妹口吻，廣東話口語為主，唔好過度推銷<br>
+      <b>CTA：</b>「收藏返嚟慢慢睇」— 收藏率係本頁演算法主要推力<br>
+      <b>預測 ER：</b>3.1% – 4.8%（80% 信心區間，中位 3.9%）
+    </div>
+    <div class="action-row" style="margin-bottom:0">
+      <button class="btn btn--primary btn--sm">Generate posts →</button>
+      <button class="btn btn--secondary btn--sm">Generate visuals →</button>
+      <button class="btn btn--secondary btn--sm">Generate video →</button>
+      <button class="btn btn--secondary btn--sm">Save to Asset Library</button>
+    </div>
+  </section>
+</div>
+
+<section class="ai-card">
+  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Brief Studio</div></div>
+  <div class="ai-card__sub">Grounded on 100 organic posts, 1,284 live topics, brand voice fingerprint · Confidence: Medium</div>
+  <div class="ai-insight-item"><span class="ib ib-b">Opportunity</span><b>「修護屏障」 is a rising keyword you have never used.</b> Search-share +214% over 90D across HK beauty, and only 2 of 11 tracked competitors have published against it. GirlStyle has 0 posts carrying the term despite 23 education-angle posts in the same window. <b>Ship this brief this week, before @sorra.beauty and TopBeauty close the gap — the window on a keyword this steep is typically 3–4 weeks.</b></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">Watch</span><b>Your brand voice fingerprint is drifting toward written Chinese.</b> Cantonese-colloquial ratio across the last 12 posts is 0.24 versus 0.34 in your top decile; the four lowest-ER posts of August are also the four least colloquial. The generator is inheriting the drift because it grounds on recent posts by default. <b>Pin the voice fingerprint to top-decile posts rather than trailing-30-day posts in generation settings.</b></div>
+  <div class="ai-insight-item new"><span class="ib ib-p">New</span><b>Format choice is worth more than copy choice on this page.</b> Carousel versus single image explains 31% of ER variance in the 90D corpus; copy length explains 8%. The brief already selects carousel, but 6 of your last 10 posts were single-image because that is the faster production path. <b>Set carousel as the default format in the brief template and make single-image the explicit exception.</b></div>
+  <div class="ai-ask"><input type="text" placeholder="Ask about this brief — e.g. 「點解揀教育角度而唔係測評？」"><button class="btn btn--primary btn--sm">Ask</button></div>
+</section>
+
+</div>
+<!-- ══════════ TAB 2 · POST STUDIO ══════════ -->
+<div class="tab-panel" id="tab-post">
+
+<div class="sec-head">
+  <div class="dm-title-section">Post Studio — six variants, each scored before anyone reads them</div>
+  <span class="dm-subtitle">Generation is commodity. The score attached to each variant is the product: it is computed from this page's own angle, hook, length and voice distributions, not from a general model prior.</span>
+</div>
+
+<div class="pill-row">
+  <button class="pill is-active">All variants</button><button class="pill">Education</button><button class="pill">Review</button><button class="pill">Emotional</button><button class="pill">Promo</button><button class="pill">Score ≥ 75</button>
+</div>
+
+<div class="dm-kpi-row">
+  <div class="dm-kpi-card"><div class="kpi__label">Variants generated</div><div class="kpi__metric">6</div><div class="kpi__sub">1 brief · 12s</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Best pre-flight score</div><div class="kpi__metric">84</div><div class="kpi__sub up">V2 · above ship bar 70</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Median predicted ER</div><div class="kpi__metric">3.6%</div><div class="kpi__sub up">+49% vs page P50</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Voice match (avg)</div><div class="kpi__metric">87</div><div class="kpi__sub up">target ≥ 85</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Below ship bar</div><div class="kpi__metric">1</div><div class="kpi__sub down">V6 · 61</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Keyword coverage</div><div class="kpi__metric">4/4</div><div class="kpi__sub up">all rising terms hit</div></div>
+</div>
+
+<div class="var-card">
+  <div class="var-card__main">
+    <div class="var-card__t">V1 ·「換季爆乾脫皮，塗幾多都無用？」</div>
+    <div class="var-card__body">姊妹，換季爆乾唔係你塗得唔夠多，係屏障爛咗😢 3 個修護屏障成分幫你收工：神經醯胺補返磚牆、泛醇鎖水、角鯊烷封層。敏感肌用平價好用嗰款都得，唔一定要買貴。收藏返嚟換季時慢慢睇✨ #換季保濕 #修護屏障 #敏感肌 #平價好用 #護膚 #GirlStyle #秋冬護膚</div>
+    <div class="var-card__tags"><span class="tg tg-b">教育價值型</span><span class="tg tg-p">Problem Introduction</span><span class="tg tg-n">158 chars</span><span class="tg tg-g">Predicted ER 3.7–4.6%</span></div>
+    <div class="var-card__meta"><span>Voice match <b>91</b></span><span>First line <b>19 chars</b></span><span>Emoji <b>3</b></span><span>Keywords <b>4/4</b></span><span>CTA <b>收藏</b></span><span>Fatigue <b>Safe</b></span></div>
+  </div>
+  <div class="var-card__score"><div class="n g">79</div><div class="l">PRE-FLIGHT</div></div>
+</div>
+
+<div class="var-card pick">
+  <div class="var-card__main">
+    <div class="var-card__t">V2 ·「一個月試 9 支保濕，只有 3 支真係做到嘢」 <span class="tg tg-g">Recommended</span></div>
+    <div class="var-card__body">我哋 editor 用咗成個月試 9 支換季保濕，老實講得 3 支真係做到修護屏障🧪 分別喺邊？睇成分表第 3 至 5 位有冇神經醯胺同角鯊烷 — 排最尾嘅基本上係走過場。敏感肌姊妹入手前記住睇呢一點，平價好用嗰啲反而做得幾好👀 收藏返嚟去 sasa 前對返🛍️ #換季保濕 #修護屏障 #敏感肌 #平價好用 #成分黨 #GirlStyle #護膚心得</div>
+    <div class="var-card__tags"><span class="tg tg-b">教育價值型</span><span class="tg tg-p">Stat / Number Reveal</span><span class="tg tg-n">166 chars</span><span class="tg tg-g">Predicted ER 4.1–5.2%</span></div>
+    <div class="var-card__meta"><span>Voice match <b>93</b></span><span>First line <b>21 chars</b></span><span>Emoji <b>4</b></span><span>Keywords <b>4/4</b></span><span>CTA <b>收藏</b></span><span>Fatigue <b>Safe</b></span></div>
+  </div>
+  <div class="var-card__score"><div class="n g">84</div><div class="l">PRE-FLIGHT</div></div>
+</div>
+
+<div class="var-card">
+  <div class="var-card__main">
+    <div class="var-card__t">V3 ·「敏感肌姊妹，呢 3 個成分先係你嘅救星」</div>
+    <div class="var-card__body">敏感肌換季最慘就係咩都唔敢搽😭 但唔搽只會更爛。神經醯胺、泛醇、角鯊烷 — 呢 3 個修護屏障成分溫和到唔會激嬲塊面。由低濃度開始，一星期加一次，唔好一次過齊上陣。平價好用嗰啲已經夠用啦💧 #換季保濕 #修護屏障 #敏感肌 #平價好用 #護膚 #GirlStyle</div>
+    <div class="var-card__tags"><span class="tg tg-b">教育價值型</span><span class="tg tg-p">Problem Introduction</span><span class="tg tg-n">147 chars</span><span class="tg tg-g">Predicted ER 3.4–4.3%</span></div>
+    <div class="var-card__meta"><span>Voice match <b>89</b></span><span>First line <b>20 chars</b></span><span>Emoji <b>3</b></span><span>Keywords <b>4/4</b></span><span>CTA <b>None</b></span><span>Fatigue <b>Safe</b></span></div>
+  </div>
+  <div class="var-card__score"><div class="n g">76</div><div class="l">PRE-FLIGHT</div></div>
+</div>
+
+<div class="var-card">
+  <div class="var-card__main">
+    <div class="var-card__t">V4 ·「編輯部實測：HK$98 嗰支贏咗 HK$680 嗰支」</div>
+    <div class="var-card__body">講出嚟你可能唔信 — 今次換季保濕實測，HK$98 藥房嗰支喺修護屏障呢一項，數據上贏咗 HK$680 嗰支💸 分別唔喺價錢，喺成分排位。平價好用真係存在，只係要識揀。完整對比表喺 carousel 第 3 格，敏感肌記住睇埋第 4 格嘅注意事項⚠️ #換季保濕 #修護屏障 #平價好用 #敏感肌 #實測 #GirlStyle #慳錢護膚</div>
+    <div class="var-card__tags"><span class="tg tg-g">信任建立型</span><span class="tg tg-p">Stat / Number Reveal</span><span class="tg tg-n">163 chars</span><span class="tg tg-g">Predicted ER 3.9–4.9%</span></div>
+    <div class="var-card__meta"><span>Voice match <b>86</b></span><span>First line <b>22 chars</b></span><span>Emoji <b>4</b></span><span>Keywords <b>4/4</b></span><span>CTA <b>Slide ref</b></span><span>Fatigue <b>Safe</b></span></div>
+  </div>
+  <div class="var-card__score"><div class="n g">81</div><div class="l">PRE-FLIGHT</div></div>
+</div>
+
+<div class="var-card">
+  <div class="var-card__main">
+    <div class="var-card__t">V5 ·「我 22 歲個陣完全唔明點解阿媽咁緊張換季」</div>
+    <div class="var-card__body">而家明白晒🥲 換季塊面爆乾嗰種痛，真係要經歷過先知。後尾學識咗睇成分：修護屏障三寶 — 神經醯胺、泛醇、角鯊烷，係我而家換季唯一會做嘅事。敏感肌姊妹唔使花好多錢，平價好用嗰啲一樣得。你哋換季會做咩？comment 話我知👇 #換季保濕 #修護屏障 #敏感肌 #平價好用 #女生日常 #GirlStyle</div>
+    <div class="var-card__tags"><span class="tg tg-p">情感故事型</span><span class="tg tg-p">Talking-head Direct Address</span><span class="tg tg-n">152 chars</span><span class="tg tg-a">Predicted ER 2.9–4.0%</span></div>
+    <div class="var-card__meta"><span>Voice match <b>88</b></span><span>First line <b>23 chars</b></span><span>Emoji <b>2</b></span><span>Keywords <b>4/4</b></span><span>CTA <b>Comment</b></span><span>Fatigue <b>Watch 3/12</b></span></div>
+  </div>
+  <div class="var-card__score"><div class="n a">72</div><div class="l">PRE-FLIGHT</div></div>
+</div>
+
+<div class="var-card bad">
+  <div class="var-card__main">
+    <div class="var-card__t">V6 ·「換季保濕限時優惠，今個星期買一送一」</div>
+    <div class="var-card__body">換季保濕大減價🔥 買一送一，今個星期五截止！修護屏障精華、敏感肌適用、平價好用，唔好錯過。即刻 click link 入手🛒 #換季保濕 #修護屏障 #敏感肌 #平價好用 #優惠 #GirlStyle</div>
+    <div class="var-card__tags"><span class="tg tg-r">促銷轉化型</span><span class="tg tg-p">Product Close-up</span><span class="tg tg-n">94 chars</span><span class="tg tg-r">Predicted ER 1.6–2.4%</span></div>
+    <div class="var-card__meta"><span>Voice match <b>74</b></span><span>First line <b>19 chars</b></span><span>Emoji <b>3</b></span><span>Keywords <b>4/4</b></span><span>CTA <b>Link</b></span><span>Fatigue <b>Heavy 5/12</b></span></div>
+  </div>
+  <div class="var-card__score"><div class="n r">61</div><div class="l">PRE-FLIGHT</div></div>
+</div>
+
+<div class="callout callout--r">
+  <div class="callout__title">V6 is below the ship bar — and the model says why</div>
+  <div class="callout__body">Promo angle has been used 5 times in the last 12 posts on this page and its ER has decayed from 2.9% to 1.8% across that run. Copy is also 48 characters under the length optimum and voice match is 74 (bar: 85). This is not a taste judgement — it is three measured penalties. <b>Recommendation: do not ship as organic; route to paid where promo angle still returns CTR 1.4%.</b></div>
+</div>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">Predicted ER by variant vs page benchmarks<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">Bars are point predictions; dashed lines are this page's own P50 (2.41%) and P75 (4.02%) organic ER over 90D.</span>
+    <div class="dm-chart-area" data-chart="poER"></div>
+  </section>
+  <section class="dm-card">
+    <div class="dm-title-card">Hook type distribution across variants<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">The generator deliberately spreads hooks so the A/B has signal, weighted toward measured winners.</span>
+    <div class="dm-chart-area" data-chart="poHook"></div>
+  </section>
+</div>
+
+<section class="dm-card">
+  <div class="dm-title-card">Variant diffing <span class="tg-new">NEW</span><span class="dmode dmode-agg">AGG</span></div>
+  <span class="dm-subtitle">Variants compared on the dimensions the model actually scores. Best value per column is highlighted — this replaces "which one do you like" with "which one differs how".</span>
+  <div class="dm-table-scroll"><table class="dm-modern-table">
+    <thead><tr><th>Variant</th><th>Angle</th><th>First-line length</th><th>Emoji count</th><th>Question opening</th><th>CTA present</th><th>Keyword coverage</th><th>Voice match</th><th>Pre-flight</th></tr></thead>
+    <tbody>
+      <tr><td>V1</td><td>教育價值型</td><td class="num">19 (≤22 ✓)</td><td class="num">3</td><td><span class="tg tg-g">Yes</span></td><td>收藏</td><td class="num">4/4</td><td class="num">91</td><td class="num">79</td></tr>
+      <tr class="row-g"><td>V2 <span class="tg tg-g">Pick</span></td><td>教育價值型</td><td class="num">21 (≤22 ✓)</td><td class="num"><b>4</b></td><td><span class="tg tg-n">No</span></td><td><b>收藏</b></td><td class="num"><b>4/4</b></td><td class="num"><b>93</b></td><td class="num"><b>84</b></td></tr>
+      <tr><td>V3</td><td>教育價值型</td><td class="num">20</td><td class="num">3</td><td><span class="tg tg-n">No</span></td><td><span class="tg tg-r">None</span></td><td class="num">4/4</td><td class="num">89</td><td class="num">76</td></tr>
+      <tr><td>V4</td><td>信任建立型</td><td class="num">22</td><td class="num">4</td><td><span class="tg tg-n">No</span></td><td>Slide ref</td><td class="num">4/4</td><td class="num">86</td><td class="num">81</td></tr>
+      <tr><td>V5</td><td>情感故事型</td><td class="num" style="color:var(--r)">23 (over)</td><td class="num">2</td><td><span class="tg tg-n">No</span></td><td>Comment</td><td class="num">4/4</td><td class="num">88</td><td class="num">72</td></tr>
+      <tr><td>V6</td><td>促銷轉化型</td><td class="num"><b>19</b></td><td class="num">3</td><td><span class="tg tg-n">No</span></td><td>Link</td><td class="num">4/4</td><td class="num">74</td><td class="num">61</td></tr>
+    </tbody>
+  </table></div>
+  <div class="foot-note">Read across, not down: V1 wins the question-opening dimension (worth +0.3pp ER on this page) while V2 wins voice match and emoji density. A merged V2+V1-opening variant is the highest-scoring configuration the model can construct from this set — estimated 86.</div>
+</section>
+
+<section class="dm-card">
+  <div class="dm-title-card">Carousel &amp; link post support <span class="tg-new">NEW</span><span class="dmode dmode-live">LIVE</span></div>
+  <span class="dm-subtitle">In-flight P1: <i>Full post gen 支持 carousel 和 link</i>. The generator now emits per-slide copy and handles link-post structure, not just a single caption blob.</span>
+  <div class="split2">
+    <div>
+      <div class="mini-info__t" style="margin-bottom:8px">Carousel — 5 slides, per-slide copy generated</div>
+      <div class="dm-table-scroll"><table class="dm-modern-table">
+        <thead><tr><th>Slide</th><th>Role</th><th>On-slide 繁中 copy</th><th>Chars</th><th>Predicted drop-off</th></tr></thead>
+        <tbody>
+          <tr><td class="num">1</td><td>Hook</td><td>換季爆乾脫皮，塗幾多都無用？</td><td class="num">14</td><td>—</td></tr>
+          <tr><td class="num">2</td><td>Problem</td><td>屏障爛咗，水份鎖唔住</td><td class="num">10</td><td><span class="tg tg-g">−8%</span></td></tr>
+          <tr><td class="num">3</td><td>Evidence</td><td>9 支實測對比表：邊 3 支真係做到嘢</td><td class="num">19</td><td><span class="tg tg-g">−11%</span></td></tr>
+          <tr><td class="num">4</td><td>How-to</td><td>敏感肌用法：由低濃度開始，一星期加一次</td><td class="num">19</td><td><span class="tg tg-a">−19%</span></td></tr>
+          <tr><td class="num">5</td><td>CTA</td><td>收藏返嚟，換季時慢慢對返 ✨</td><td class="num">14</td><td><span class="tg tg-g">−6%</span></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div>
+      <div class="mini-info__t" style="margin-bottom:8px">Link post — structure handled separately</div>
+      <div class="mini-info"><div class="mini-info__t">Link preview copy</div><div class="mini-info__b">Headline (≤40 chars), description (≤60 chars) and lead-in caption are generated as three distinct fields, because Meta truncates each differently. Current: 「換季保濕實測：HK$98 打贏 HK$680」 / 「9 支精華，3 個修護屏障成分，完整對比」.</div></div>
+      <div class="mini-info"><div class="mini-info__t">UTM &amp; destination</div><div class="mini-info__b">Auto-appends <code>utm_source=ig&amp;utm_medium=organic&amp;utm_campaign=girlstyle_hydration_aug26</code> so the Ad Manager can attribute organic→site traffic to the originating brief.</div></div>
+      <div class="mini-info"><div class="mini-info__t">Known limitation — stated honestly</div><div class="mini-info__b">Link posts on IG are only available via Stories or link-in-bio; the generator flags this rather than silently producing an unpublishable asset. FB link posts are fully supported.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="action-row">
+  <button class="btn btn--primary">Approve V2</button>
+  <button class="btn btn--secondary">Regenerate</button>
+  <button class="btn btn--secondary">Edit</button>
+  <button class="btn btn--secondary">Send to Calendar →</button>
+  <span class="who">Approver: Karen Chan · Editorial Lead</span>
+</div>
+
+<section class="ai-card">
+  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Post Studio</div></div>
+  <div class="ai-card__sub">Grounded on 100 organic posts · variant scoring model v1 · brand voice fingerprint · Confidence: Medium</div>
+  <div class="ai-insight-item"><span class="ib ib-b">Winner</span><b>V2 wins on a specific, repeatable mechanism — the number in the first line.</b> Across 90D, GirlStyle posts opening with a concrete count («9 支», «3 個», «HK$98») average ER 4.31% versus 2.98% for posts opening with a question alone, over 31 and 44 posts respectively. <b>Ship V2, and add "open with a number" to the brief template as a standing constraint.</b></div>
+  <div class="ai-insight-item alert"><span class="ib ib-r">Risk</span><b>Five of six variants omit a question opening, against a 62% top-decile rate.</b> The generator is over-weighting the number-hook it just learned and under-weighting the question pattern that carries this page's comment volume. Comments per post are down 18% over the last 12 posts. <b>Regenerate two variants with a forced question opening and A/B against V2 before locking the template.</b></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">Angle</span><b>Promo angle is fatigued organically but still healthy in paid.</b> V6 scores 61 organically; the same angle returns CTR 1.42% in the ad account, above the 1.24% account average. The two channels are on different fatigue clocks because paid rotates audiences. <b>Route V6 to Autopilot as a boost candidate instead of discarding it.</b></div>
+  <div class="ai-ask"><input type="text" placeholder="Ask about these variants — e.g. 「合併 V1 個開頭同 V2 個內文會點？」"><button class="btn btn--primary btn--sm">Ask</button></div>
+</section>
+
+</div>
+<!-- ══════════ TAB 3 · VISUAL STUDIO ══════════ -->
+<div class="tab-panel" id="tab-visual">
+
+<div class="sec-head">
+  <div class="dm-title-section">Visual Studio — generate into the categories that work on this page</div>
+  <span class="dm-subtitle">The generator does not pick a look. It picks the visual category with the highest measured ER for this page and this angle, then generates inside it.</span>
+</div>
+
+<div class="dm-controls-row" style="padding-top:0">
+  <select class="dm-select"><option>Reference: 自家 7 月 top carousel</option><option>Reference: TopBeauty Before/After ad</option><option>Reference: @sorra.beauty 成分測評</option><option>Reference: Upload…</option></select>
+  <select class="dm-select"><option>Category: auto (highest ER)</option><option>Category: Before &amp; After</option><option>Category: Infographic</option><option>Category: UGC &amp; Lifestyle</option></select>
+  <select class="dm-select"><option>Aspect: 1:1 + 4:5 + 9:16</option><option>Aspect: 9:16 only</option><option>Aspect: 4:5 only</option></select>
+  <select class="dm-select"><option>Brand kit: GirlStyle HK</option><option>Brand kit: TopBeauty</option></select>
+  <button class="btn btn--primary btn--sm">Generate 8 assets</button>
+</div>
+
+<section class="dm-card">
+  <div class="dm-title-card">Visual generation grounded in winning visual categories <span class="tg-new">NEW</span><span class="dmode dmode-agg">AGG</span></div>
+  <span class="dm-subtitle">This page's own avg ER per visual category over 90D. The generator defaults to the top category for the briefed angle rather than to a house style.</span>
+  <div class="cat-grid">
+    <div class="cat-tile"><span class="em">🔀</span><div><div class="cat-tile__n">Before &amp; After</div><div class="cat-tile__s">avg ER <b>5.24%</b> · 11 posts</div></div></div>
+    <div class="cat-tile"><span class="em">📊</span><div><div class="cat-tile__n">Infographic</div><div class="cat-tile__s">avg ER <b>4.86%</b> · 18 posts</div></div></div>
+    <div class="cat-tile"><span class="em">💬</span><div><div class="cat-tile__n">Customer Review</div><div class="cat-tile__s">avg ER <b>4.11%</b> · 9 posts</div></div></div>
+    <div class="cat-tile"><span class="em">🤳</span><div><div class="cat-tile__n">UGC &amp; Lifestyle</div><div class="cat-tile__s">avg ER <b>3.72%</b> · 21 posts</div></div></div>
+    <div class="cat-tile"><span class="em">😊</span><div><div class="cat-tile__n">Face-Only</div><div class="cat-tile__s">avg ER <b>3.05%</b> · 14 posts</div></div></div>
+    <div class="cat-tile"><span class="em">🧴</span><div><div class="cat-tile__n">Product-Only</div><div class="cat-tile__s">avg ER <b>2.28%</b> · 12 posts</div></div></div>
+    <div class="cat-tile"><span class="em">🎯</span><div><div class="cat-tile__n">CTA Image</div><div class="cat-tile__s">avg ER <b>2.02%</b> · 6 posts</div></div></div>
+    <div class="cat-tile"><span class="em">🏷️</span><div><div class="cat-tile__n">Promo Offer</div><div class="cat-tile__s">avg ER <b>1.84%</b> · 5 posts</div></div></div>
+    <div class="cat-tile"><span class="em">🔤</span><div><div class="cat-tile__n">Text-Only</div><div class="cat-tile__s">avg ER <b>1.41%</b> · 4 posts</div></div></div>
+  </div>
+</section>
+
+<div class="callout callout--b">
+  <div class="callout__title">Why the generator chose Before &amp; After + Infographic for this brief</div>
+  <div class="callout__body">Education angle × Before &amp; After is the strongest cell in the category × angle matrix on this page (ER 5.9%, 6 posts). Infographic is second and carries the highest save rate, which is the metric that drives non-fan reach here. Text-Only, the fastest asset to produce, is this page's worst category — the generator will not select it unless overridden.</div>
+  <div class="callout__meta"><span>Chosen: <b>Before &amp; After (5 assets)</b></span><span>Secondary: <b>Infographic (3 assets)</b></span><span>Blocked: <b>Text-Only</b></span></div>
+</div>
+
+<div class="asset-grid" style="margin-bottom:20px">
+  <div class="asset-card"><div class="thumb"><span class="corner-tl tg tg-b">4:5</span><span class="corner-tr">1</span><span class="l1">Before / After 保濕對比</span><span class="l2">split-frame, 暖米色底</span></div><div class="ref-card__n">前後對比 · 7 日屏障修護</div><div class="stat4"><span class="s">Category<b>B&amp;A</b></span><span class="s">Thumb-stop<b>82</b></span><span class="s">Pred. ER<b>5.1%</b></span><span class="s">Text ratio<b>14%</b></span></div></div>
+  <div class="asset-card"><div class="thumb"><span class="corner-tl tg tg-b">9:16</span><span class="corner-tr">2</span><span class="l1">Before / After 直度版</span><span class="l2">上下分割 + 大字 hook</span></div><div class="ref-card__n">Reel cover · 換季爆乾？</div><div class="stat4"><span class="s">Category<b>B&amp;A</b></span><span class="s">Thumb-stop<b>88</b></span><span class="s">Pred. ER<b>5.4%</b></span><span class="s">Text ratio<b>18%</b></span></div></div>
+  <div class="asset-card"><div class="thumb"><span class="corner-tl tg tg-b">4:5</span><span class="corner-tr">3</span><span class="l1">成分對比 Infographic</span><span class="l2">3 欄表格 + 圖示</span></div><div class="ref-card__n">神經醯胺 / 泛醇 / 角鯊烷</div><div class="stat4"><span class="s">Category<b>Info</b></span><span class="s">Thumb-stop<b>74</b></span><span class="s">Pred. ER<b>4.8%</b></span><span class="s">Text ratio<b>31%</b></span></div></div>
+  <div class="asset-card"><div class="thumb"><span class="corner-tl tg tg-b">1:1</span><span class="corner-tr">4</span><span class="l1">9 支實測排行榜</span><span class="l2">價錢 vs 分數散點</span></div><div class="ref-card__n">HK$98 打贏 HK$680</div><div class="stat4"><span class="s">Category<b>Info</b></span><span class="s">Thumb-stop<b>79</b></span><span class="s">Pred. ER<b>4.6%</b></span><span class="s">Text ratio<b>27%</b></span></div></div>
+  <div class="asset-card"><div class="thumb"><span class="corner-tl tg tg-b">4:5</span><span class="corner-tr">5</span><span class="l1">Before / After 手臂測試</span><span class="l2">近攝紋理對比</span></div><div class="ref-card__n">乾紋前後 · macro shot</div><div class="stat4"><span class="s">Category<b>B&amp;A</b></span><span class="s">Thumb-stop<b>71</b></span><span class="s">Pred. ER<b>4.3%</b></span><span class="s">Text ratio<b>9%</b></span></div></div>
+  <div class="asset-card"><div class="thumb"><span class="corner-tl tg tg-b">9:16</span><span class="corner-tr">6</span><span class="l1">成分表拆解動態圖</span><span class="l2">逐項高亮</span></div><div class="ref-card__n">教你睇成分表第 3–5 位</div><div class="stat4"><span class="s">Category<b>Info</b></span><span class="s">Thumb-stop<b>77</b></span><span class="s">Pred. ER<b>4.4%</b></span><span class="s">Text ratio<b>34%</b></span></div></div>
+  <div class="asset-card"><div class="thumb"><span class="corner-tl tg tg-b">1:1</span><span class="corner-tr">7</span><span class="l1">Before / After 素顏光澤</span><span class="l2">自然光 · 無濾鏡標示</span></div><div class="ref-card__n">7 日後素顏對比</div><div class="stat4"><span class="s">Category<b>B&amp;A</b></span><span class="s">Thumb-stop<b>69</b></span><span class="s">Pred. ER<b>4.0%</b></span><span class="s">Text ratio<b>11%</b></span></div></div>
+  <div class="asset-card"><div class="thumb"><span class="corner-tl tg tg-b">4:5</span><span class="corner-tr">8</span><span class="l1">Before / After 妝前對比</span><span class="l2">上妝服貼度</span></div><div class="ref-card__n">保濕做好，底妝先服貼</div><div class="stat4"><span class="s">Category<b>B&amp;A</b></span><span class="s">Thumb-stop<b>66</b></span><span class="s">Pred. ER<b>3.8%</b></span><span class="s">Text ratio<b>16%</b></span></div></div>
+</div>
+
+<section class="dm-card">
+  <div class="dm-title-card">Ad-clone from a reference <span class="tg-new">NEW</span><span class="dmode dmode-live">LIVE</span></div>
+  <span class="dm-subtitle">A capability that already works in the live agent. Prompt used: <i>"Clone this ad @經濟一週 EDigest: recreate the same visual style, layout, composition and colour palette as the reference image, and rephrase the copy to align with @BusinessFocus 的品牌調性和風格."</i></span>
+  <div class="split2" style="margin-bottom:14px">
+    <div>
+      <div class="mini-info__t" style="margin-bottom:6px">Reference — @經濟一週 EDigest</div>
+      <div class="thumb" style="min-height:120px"><span class="corner-tl tg tg-n">REFERENCE</span><span class="l1">深藍底 · 左字右圖 · 黃色數字強調</span><span class="l2">粗體無襯線標題 · 底部細字免責</span></div>
+    </div>
+    <div>
+      <div class="mini-info__t" style="margin-bottom:6px">Output — @BusinessFocus voice, same construction</div>
+      <div class="thumb" style="min-height:120px"><span class="corner-tl tg tg-g">CLONE ✓</span><span class="l1">深藍底 · 左字右圖 · 黃色數字強調</span><span class="l2">文案已改寫成 BusinessFocus 調性</span></div>
+    </div>
+  </div>
+  <div class="dm-table-scroll"><table class="dm-modern-table">
+    <thead><tr><th>Style attribute</th><th>Extracted from reference</th><th>Applied to output</th><th>Match</th></tr></thead>
+    <tbody>
+      <tr><td>Layout</td><td>Left-weighted text block, 62/38 split, image bleeds right edge</td><td>Same split, same bleed</td><td><span class="tg tg-g">98%</span></td></tr>
+      <tr><td>Colour palette</td><td>#0F2C4C ground · #FFC93C accent · #FFFFFF type · #7F9CB8 muted</td><td>Palette transferred verbatim, brand accent substituted on CTA only</td><td><span class="tg tg-g">94%</span></td></tr>
+      <tr><td>Type treatment</td><td>Bold condensed sans headline 46pt, numeric emphasis 1.7× body</td><td>Same hierarchy, 繁中 headline face swapped for readability</td><td><span class="tg tg-g">91%</span></td></tr>
+      <tr><td>Composition</td><td>Single focal subject upper-right third, high contrast against ground</td><td>Reproduced; subject swapped to BusinessFocus category imagery</td><td><span class="tg tg-g">89%</span></td></tr>
+      <tr><td>Copy voice</td><td>經濟一週: 報導式、數據前置、正式書面語</td><td>BusinessFocus: 分析式、觀點前置、口語化收尾</td><td><span class="tg tg-b">Rephrased</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="foot-note"><b>Why this matters commercially:</b> style cloning turns a competitor's proven ad construction into a first draft in this brand's voice, in seconds. The style attributes are extracted and shown, so a human can veto any single one — it is not a black-box copy.</div>
+</section>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">Visual category × predicted ER<span class="dmode dmode-agg">AGG</span></div>
+    <span class="dm-subtitle">Predicted ER for the 8 generated assets, grouped by category, against this page's measured category averages.</span>
+    <div class="dm-chart-area" style="height:320px" data-chart="viCat"></div>
+  </section>
+  <section class="dm-card">
+    <div class="dm-title-card">Thumb-stop score distribution vs page benchmark<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">Predicted thumb-stop for the generated set against the distribution of this page's last 90 days of published assets.</span>
+    <div class="dm-chart-area" style="height:320px" data-chart="viThumb"></div>
+  </section>
+</div>
+
+<section class="dm-card">
+  <div class="dm-title-card">Asset governance<span class="dmode dmode-live">LIVE</span></div>
+  <span class="dm-subtitle">What was produced, in what ratios, for which placements.</span>
+  <div class="dm-table-scroll"><table class="dm-modern-table">
+    <thead><tr><th>Aspect ratio</th><th>Assets</th><th>Placements</th><th>Priority</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>9:16</td><td class="num">2</td><td>IG Reels · IG Stories · FB Reels · Advantage+ vertical</td><td><span class="tg tg-g">P1</span></td><td>Vertical is the priority format per Ad Manager feedback — vertical placements carry the majority of delivered impressions on this account.</td></tr>
+      <tr><td>4:5</td><td class="num">4</td><td>IG Feed · FB Feed</td><td><span class="tg tg-b">P2</span></td><td>Tallest permitted feed ratio; maximises screen share on mobile feed.</td></tr>
+      <tr><td>1:1</td><td class="num">2</td><td>IG Feed (carousel) · FB Feed · Audience Network</td><td><span class="tg tg-n">P3</span></td><td>Generated for carousel consistency and cross-placement safety only.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="ai-card">
+  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Visual Studio</div></div>
+  <div class="ai-card__sub">Grounded on 100 organic posts · 9-category visual classifier · thumb-stop model v1 · Confidence: Medium</div>
+  <div class="ai-insight-item"><span class="ib ib-b">Category</span><b>You produce the category that is cheapest, not the one that performs.</b> Text-Only and Product-Only are 16% of your published assets and your two worst categories (ER 1.41% and 2.28%); Before &amp; After is 11% of output and your best (5.24%). Before &amp; After needs a shoot, which is why it is rare. <b>Batch-shoot one Before/After session per month — at current ER deltas it is worth roughly 1.1pp of page-level ER.</b></div>
+  <div class="ai-insight-item new"><span class="ib ib-p">New</span><b>Vertical assets score 14 points higher on thumb-stop than square in this set.</b> Asset 2 (9:16) scores 88 versus asset 7 (1:1) at 69 on materially the same content. That matches the Ad Manager finding that vertical placements dominate delivered impressions. <b>Make 9:16 the first asset generated for every brief and derive 4:5 and 1:1 from it, not the other way round.</b></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">Watch</span><b>Text ratio on the two infographic assets is above the placement comfort band.</b> Assets 3 and 6 carry 31% and 34% text coverage; assets above 30% in your history average 22% lower reach, consistent with reduced distribution on dense-text creative. <b>Split asset 6 into two slides to drop text ratio under 25% before scheduling.</b></div>
+  <div class="ai-ask"><input type="text" placeholder="Ask about these assets — e.g. 「用 @sorra.beauty 個 layout clone 一版睇下？」"><button class="btn btn--primary btn--sm">Ask</button></div>
+</section>
+
+</div>
+<!-- ══════════ TAB 4 · VIDEO STUDIO ══════════ -->
+<div class="tab-panel" id="tab-video">
+
+<div class="sec-head">
+  <div class="dm-title-section">Video Studio — start from the hook, not the script</div>
+  <span class="dm-subtitle">The first three seconds decide the video. We generate them from what actually retained viewers in this market.</span>
+</div>
+
+<div class="dm-kpi-row">
+  <div class="dm-kpi-card"><div class="kpi__label">Source video</div><div class="kpi__metric">0:47</div><div class="kpi__sub">organic Reel master</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Predicted 3s view rate</div><div class="kpi__metric">24.1%</div><div class="kpi__sub up">Problem Introduction hook</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Predicted ThruPlay</div><div class="kpi__metric">12.4%</div><div class="kpi__sub down">long-form penalty</div>
+    <div class="kpi-range"><div class="kpi-range__rail"><div class="kpi-range__fill" style="left:0;width:33%;background:var(--dm-warning)"></div><div class="kpi-range__marker" style="left:62%"></div></div><div class="kpi-range__axis"><span>0%</span><span>15s bench 38%</span><span>40%</span></div></div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Cutdowns generated</div><div class="kpi__metric">4</div><div class="kpi__sub">2× 15s · 2× 6s</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Best cutdown ThruPlay</div><div class="kpi__metric">41.2%</div><div class="kpi__sub up">15s · Stat Reveal</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Subtitle languages</div><div class="kpi__metric">3</div><div class="kpi__sub">繁中 · 简中 · EN</div></div>
+</div>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">Hook-first video generation <span class="tg-new">NEW</span><span class="dmode dmode-live">LIVE</span></div>
+    <span class="dm-subtitle">The 3-second hook taxonomy ranked by measured retention in HK beauty/lifestyle. The generator writes the hook first and derives the script from it, rather than writing a script and hoping the opening lands.</span>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Problem Introduction <span class="tg tg-g sbar__tag">selected</span></span><span class="sbar__val">24.1%</span></div><div class="sbar__rail"><div class="sbar__fill f-b" style="width:100%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Stat / Number Reveal <span class="tg tg-b sbar__tag">cutdown</span></span><span class="sbar__val">22.8%</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:95%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Animated Character Question</span><span class="sbar__val">21.4%</span></div><div class="sbar__rail"><div class="sbar__fill f-a" style="width:89%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Talking-head Direct Address</span><span class="sbar__val">18.6%</span></div><div class="sbar__rail"><div class="sbar__fill f-p" style="width:77%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Product Close-up</span><span class="sbar__val">15.2%</span></div><div class="sbar__rail"><div class="sbar__fill f-pk" style="width:63%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Slow Establishing Shot <span class="tg tg-r sbar__tag">avoid</span></span><span class="sbar__val">9.8%</span></div><div class="sbar__rail"><div class="sbar__fill f-r" style="width:41%"></div></div></div>
+    <div class="foot-note">The spread between the best and worst hook is <b>2.5×</b>. No amount of script quality recovers a Slow Establishing Shot opening — 90% of viewers are gone before the script begins. This ranking is computed from this account's own classified video corpus, not a general benchmark.</div>
+  </section>
+  <section class="dm-card">
+    <div class="dm-title-card">Storyboard — 6 beats, hook-derived<span class="dmode dmode-live">LIVE</span></div>
+    <span class="dm-subtitle">Each beat carries its on-screen 繁中 text and the retention reason it exists.</span>
+    <div class="beats">
+      <div class="beat"><div class="beat__t">0:00–0:03 · Hook — Problem Introduction</div><div class="beat__l"><b>Visual:</b> 手指撥開乾到起皮嘅面頰 macro，硬光<br><b>On-screen:</b> 「換季爆乾脫皮，塗幾多都無用？」<br><b>Rationale:</b> highest measured 3s retention (24.1%); visible problem beats stated problem.</div></div>
+      <div class="beat"><div class="beat__t">0:03–0:09 · Agitate — why moisturiser fails</div><div class="beat__l"><b>Visual:</b> 水滴喺爛磚牆上流走嘅動畫比喻<br><b>On-screen:</b> 「屏障爛咗，水份鎖唔住」<br><b>Rationale:</b> 25%-mark drop-off is where explanation must start; metaphor beats text.</div></div>
+      <div class="beat"><div class="beat__t">0:09–0:21 · Evidence — 3 ingredients</div><div class="beat__l"><b>Visual:</b> 3 支精華排列，逐支高亮 + 成分表放大<br><b>On-screen:</b> 「神經醯胺 / 泛醇 / 角鯊烷」<br><b>Rationale:</b> education angle carries this page's highest ER (4.12%); named specifics drive saves.</div></div>
+      <div class="beat"><div class="beat__t">0:21–0:31 · Proof — the number</div><div class="beat__l"><b>Visual:</b> 對比表 push-in，HK$98 vs HK$680 並排<br><b>On-screen:</b> 「HK$98 嗰支贏咗 HK$680」<br><b>Rationale:</b> number reveal is the second-best hook; used mid-roll it arrests the 50% drop-off.</div></div>
+      <div class="beat"><div class="beat__t">0:31–0:41 · How-to — sensitive skin</div><div class="beat__l"><b>Visual:</b> 手部示範，由低濃度開始，日曆疊加<br><b>On-screen:</b> 「敏感肌：一星期加一次，唔好一次過齊上」<br><b>Rationale:</b> actionable segment predicts saves; saves drive non-fan reach on this page.</div></div>
+      <div class="beat"><div class="beat__t">0:41–0:47 · CTA — save, not buy</div><div class="beat__l"><b>Visual:</b> 收藏圖示動畫 + 品牌收尾<br><b>On-screen:</b> 「收藏返嚟，換季時慢慢對返 ✨」<br><b>Rationale:</b> save-CTA outperforms link-CTA by 2.3× on organic Reels here.</div></div>
+    </div>
+  </section>
+</div>
+
+<section class="dm-card">
+  <div class="dm-title-card">Auto cutdowns for paid <span class="tg-new">NEW</span><span class="dmode dmode-mock">MOCK</span></div>
+  <span class="dm-subtitle">Videos over 30s drop to ~12% ThruPlay versus ~38% under 15s. The cutdown is where the paid performance is.</span>
+  <div class="dm-table-scroll"><table class="dm-modern-table">
+    <thead><tr><th>Variant</th><th>Duration</th><th>Beats kept</th><th>Opening hook</th><th>Predicted 3s rate</th><th>Predicted ThruPlay</th><th>Intended use</th></tr></thead>
+    <tbody>
+      <tr><td>Master (organic)</td><td class="num">0:47</td><td class="num">1–6 (all)</td><td>Problem Introduction</td><td class="num">24.1%</td><td><span class="tg tg-a">12.4%</span></td><td>IG Reel · FB Reel organic</td></tr>
+      <tr class="row-g"><td>Cutdown A — 15s <span class="tg tg-g">Best</span></td><td class="num">0:15</td><td class="num">4 → 1 → 6</td><td>Stat / Number Reveal（HK$98 vs HK$680）</td><td class="num">26.4%</td><td><span class="tg tg-g">41.2%</span></td><td>Paid TOFU · Advantage+ vertical</td></tr>
+      <tr><td>Cutdown B — 15s</td><td class="num">0:15</td><td class="num">1 → 3 → 6</td><td>Problem Introduction</td><td class="num">24.1%</td><td><span class="tg tg-g">38.0%</span></td><td>Paid TOFU · retarget cold</td></tr>
+      <tr><td>Cutdown C — 6s</td><td class="num">0:06</td><td class="num">4 (compressed)</td><td>Stat / Number Reveal</td><td class="num">27.1%</td><td><span class="tg tg-g">63.5%</span></td><td>Bumper · reach objective</td></tr>
+      <tr><td>Cutdown D — 6s</td><td class="num">0:06</td><td class="num">1 (compressed)</td><td>Problem Introduction</td><td class="num">25.0%</td><td><span class="tg tg-g">59.8%</span></td><td>Bumper · frequency capping</td></tr>
+    </tbody>
+  </table></div>
+  <div class="foot-note">Cutdown A reorders beats rather than truncating: it opens on the proof number (beat 4), states the problem (beat 1), then closes (beat 6). Truncation alone — first 15 seconds of the master — predicts 33.1% ThruPlay, eight points worse. <b>Reordering is the whole trick, and it is only possible because the beats are labelled.</b></div>
+</section>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">AI Video Subtitles<span class="dmode dmode-live">LIVE</span></div>
+    <span class="dm-subtitle">Auto subtitle generation and burn-in, three languages from one pass.</span>
+    <div class="dm-table-scroll"><table class="dm-modern-table">
+      <thead><tr><th>Language</th><th>Status</th><th>Style</th><th>Placement</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>繁體中文</td><td><span class="tg tg-g">Burned in</span></td><td>白字黑描邊 · 28pt · 每行 ≤12 字</td><td>下三分一，安全區內</td><td>Primary — HK audience</td></tr>
+        <tr><td>简体中文</td><td><span class="tg tg-g">Sidecar SRT</span></td><td>同款式</td><td>Toggle</td><td>For GirlStyle TW/MY/SG reuse</td></tr>
+        <tr><td>English</td><td><span class="tg tg-g">Sidecar SRT</span></td><td>Sentence case · 24pt</td><td>Toggle</td><td>For client decks and paid QA</td></tr>
+      </tbody>
+    </table></div>
+    <div class="mini-info" style="margin-top:12px"><div class="mini-info__t">What the logs say about how this is actually used</div><div class="mini-info__b">Usage logs show users generate <b>2–3 scripts per video</b> before settling — the subtitle tool is being used as a scripting surface, not just an accessibility step. The studio therefore keeps every generated script version attached to the asset and lets you diff them, rather than overwriting on regenerate.</div></div>
+  </section>
+  <section class="dm-card">
+    <div class="dm-title-card">Predicted retention curve by hook<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">Impression → 3s → 25% → 50% → 75% → Complete, for the three hooks under consideration.</span>
+    <div class="dm-chart-area" data-chart="vdRet"></div>
+  </section>
+</div>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">Video length vs predicted ThruPlay<span class="dmode dmode-agg">AGG</span></div>
+    <span class="dm-subtitle">The measured curve on this account, with the master and the four cutdowns plotted against it.</span>
+    <div class="dm-chart-area" data-chart="vdLen"></div>
+  </section>
+  <section class="dm-card">
+    <div class="dm-title-card">Where the master loses viewers<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">Beat-level predicted drop-off for the 0:47 organic master — the reason the cutdowns exist.</span>
+    <div class="dm-chart-area" data-chart="vdBeat"></div>
+  </section>
+</div>
+
+<section class="ai-card">
+  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Video Studio</div></div>
+  <div class="ai-card__sub">Grounded on classified video corpus · hook retention model · length/ThruPlay curve · Confidence: Medium</div>
+  <div class="ai-insight-item"><span class="ib ib-b">Hook</span><b>Your last six Reels opened on an establishing shot.</b> Slow Establishing Shot returns 9.8% 3s retention against 24.1% for Problem Introduction — a 2.5× gap, and it is the single largest controllable lever in video on this page. The establishing shot survives because it is how the edit template starts. <b>Change the Reel template's first three seconds to a problem frame and re-cut the six existing Reels; nothing else about them needs to change.</b></div>
+  <div class="ai-insight-item new"><span class="ib ib-p">New</span><b>Reordered cutdowns beat truncated cutdowns by 8 points of ThruPlay.</b> Cutdown A (beat 4 → 1 → 6) predicts 41.2% versus 33.1% for a straight first-15-seconds trim of the same master. The gain comes entirely from opening on the number rather than the problem. <b>Never ship a truncated cutdown to paid — always take the reordered variant.</b></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">Length</span><b>You are producing at the worst point on the length curve.</b> Median organic video length here is 44 seconds, which sits in the 12% ThruPlay trough; under 15 seconds returns ~38%, and 6-second bumpers return above 60%. Organic Reels do tolerate length, but every one of these becomes a paid asset later. <b>Produce every video as a 15s core with optional extension, not as a 45s master to be cut down afterwards.</b></div>
+  <div class="ai-ask"><input type="text" placeholder="Ask about this video — e.g. 「6 秒版用邊個 hook 最好？」"><button class="btn btn--primary btn--sm">Ask</button></div>
+</section>
+
+</div>
+<!-- ══════════ TAB 5 · PRE-FLIGHT SCORE ══════════ -->
+<div class="tab-panel" id="tab-score">
+
+<div class="sec-head">
+  <div class="dm-title-section">Pre-flight Score</div>
+  <span class="dm-subtitle">Score the draft before it ships. This is the feature that separates a generator from a system.</span>
+</div>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">Composite pre-flight score — V2 「一個月試 9 支保濕」<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">Weighted sum of seven components, each measured against this page's own distribution. Ship bar is 70; auto-publish bar is 80.</span>
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 110 110">
+        <circle cx="55" cy="55" r="46" fill="none" stroke="#F1F5F9" stroke-width="10"/>
+        <circle cx="55" cy="55" r="46" fill="none" stroke="#34D399" stroke-width="10" stroke-linecap="round" stroke-dasharray="225.5 289" transform="rotate(-90 55 55)"/>
+        <text class="num" x="55" y="66" text-anchor="middle">78</text>
+      </svg>
+      <div class="ring-side">
+        <div class="h">Cleared for scheduling</div>
+        <div class="b">Above the 70 ship bar, below the 80 auto-publish bar — so this draft goes to the approval queue rather than straight to the scheduler. Two components are dragging: keyword timeliness and format fit.</div>
+      </div>
+    </div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Angle fit for this page · weight 20%</span><span class="sbar__val">91</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:91%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Hook strength vs benchmark · weight 20%</span><span class="sbar__val">86</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:86%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Visual category fit · weight 15%</span><span class="sbar__val">82</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:82%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Brand voice match · weight 15%</span><span class="sbar__val">93</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:93%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Keyword / topic timeliness · weight 15%</span><span class="sbar__val">54</span></div><div class="sbar__rail"><div class="sbar__fill f-a" style="width:54%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Format &amp; length fit · weight 10%</span><span class="sbar__val">61</span></div><div class="sbar__rail"><div class="sbar__fill f-a" style="width:61%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Fatigue risk (angle recently overused) · weight 5%</span><span class="sbar__val">88</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:88%"></div></div></div>
+    <div class="dm-table-scroll" style="margin-top:14px"><table class="dm-modern-table">
+      <thead><tr><th>Component</th><th>Score</th><th>Weight</th><th>Contribution</th><th>Headroom</th></tr></thead>
+      <tbody>
+        <tr><td>Angle fit for this page</td><td class="num">91</td><td class="num">20%</td><td class="num">18.2</td><td class="num">1.8</td></tr>
+        <tr><td>Hook strength vs benchmark</td><td class="num">86</td><td class="num">20%</td><td class="num">17.2</td><td class="num">2.8</td></tr>
+        <tr><td>Visual category fit</td><td class="num">82</td><td class="num">15%</td><td class="num">12.3</td><td class="num">2.7</td></tr>
+        <tr><td>Brand voice match</td><td class="num">93</td><td class="num">15%</td><td class="num">14.0</td><td class="num">1.0</td></tr>
+        <tr class="row-a"><td>Keyword / topic timeliness</td><td class="num">54</td><td class="num">15%</td><td class="num">8.1</td><td class="num"><b>6.9</b></td></tr>
+        <tr class="row-a"><td>Format &amp; length fit</td><td class="num">61</td><td class="num">10%</td><td class="num">6.1</td><td class="num"><b>3.9</b></td></tr>
+        <tr><td>Fatigue risk</td><td class="num">88</td><td class="num">5%</td><td class="num">4.4</td><td class="num">0.6</td></tr>
+        <tr><td><b>Composite</b></td><td>—</td><td class="num">100%</td><td class="num"><b>80.3 → 78</b></td><td>—</td></tr>
+      </tbody>
+    </table></div>
+    <div class="foot-note">Raw weighted sum is 80.3; the printed score is 78 after a −2.3 penalty for near-duplication with V1, which shares this draft's angle and keyword set within the same 7-day window. Penalties are always shown, never folded silently into a component.</div>
+    <div class="foot-note" style="border-top:none;padding-top:0"><b>Biggest available gain:</b> keyword timeliness at 54. The draft uses 「修護屏障」 (rising, good) but its other three terms are all past peak. Swapping 「平價好用」 for 「屏障修復」 lifts the component to an estimated 74 and the composite to 81 — which would clear the auto-publish bar.</div>
+  </section>
+
+  <section class="dm-card">
+    <div class="dm-title-card">Predicted outcome<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">Point predictions with 80% confidence intervals. Intervals are wide by design — the model has 60 calibration posts, not 6,000.</span>
+    <div style="margin-bottom:18px">
+      <div class="kpi__label" style="margin-bottom:4px">Predicted engagement rate</div>
+      <div style="font:600 20px var(--font-metric);color:var(--dm-slate-900)">4.1% <span style="font:400 12px var(--font-body);color:var(--dm-slate-500)">(80% CI 3.2% – 5.2%)</span></div>
+      <div class="kpi-range"><div class="kpi-range__rail"><div class="kpi-range__fill" style="left:32%;width:34%"></div><div class="kpi-range__marker" style="left:24%"></div><div class="kpi-range__marker" style="left:40%;background:var(--delta-up)"></div></div><div class="kpi-range__axis"><span>0%</span><span>P50 2.41% · P75 4.02%</span><span>10%</span></div></div>
+    </div>
+    <div style="margin-bottom:18px">
+      <div class="kpi__label" style="margin-bottom:4px">Predicted reach</div>
+      <div style="font:600 20px var(--font-metric);color:var(--dm-slate-900)">486k <span style="font:400 12px var(--font-body);color:var(--dm-slate-500)">(80% CI 361k – 642k)</span></div>
+      <div class="kpi-range"><div class="kpi-range__rail"><div class="kpi-range__fill" style="left:36%;width:28%;background:var(--chart-5)"></div><div class="kpi-range__marker" style="left:31%"></div></div><div class="kpi-range__axis"><span>0</span><span>page median 392k</span><span>1.0M</span></div></div>
+    </div>
+    <div style="margin-bottom:18px">
+      <div class="kpi__label" style="margin-bottom:4px">Predicted algorithmic lift (non-fan share)</div>
+      <div style="font:600 20px var(--font-metric);color:var(--dm-slate-900)">+34% <span style="font:400 12px var(--font-body);color:var(--dm-slate-500)">(80% CI +18% – +52%)</span></div>
+      <div class="kpi-range"><div class="kpi-range__rail"><div class="kpi-range__fill" style="left:29%;width:34%;background:var(--chart-4)"></div><div class="kpi-range__marker" style="left:20%"></div></div><div class="kpi-range__axis"><span>−20%</span><span>page median +8%</span><span>+80%</span></div></div>
+    </div>
+    <div style="margin-bottom:18px">
+      <div class="kpi__label" style="margin-bottom:4px">Predicted saves</div>
+      <div style="font:600 20px var(--font-metric);color:var(--dm-slate-900)">3,240 <span style="font:400 12px var(--font-body);color:var(--dm-slate-500)">(80% CI 2,110 – 4,860)</span></div>
+      <div class="kpi-range"><div class="kpi-range__rail"><div class="kpi-range__fill" style="left:27%;width:35%;background:#F472B6"></div><div class="kpi-range__marker" style="left:22%"></div></div><div class="kpi-range__axis"><span>0</span><span>page median 1,780</span><span>8,000</span></div></div>
+    </div>
+    <div class="foot-note">Saves is the load-bearing prediction on this page: saves-per-reach explains 41% of the variance in non-fan reach across the 90D corpus. If you only watch one predicted number, watch this one.</div>
+  </section>
+</div>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">Fatigue guard <span class="tg-new">NEW</span><span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">Refuses to ship when an angle has been used too often too recently. Threshold is configurable per page.</span>
+    <div class="dm-table-scroll"><table class="dm-modern-table dm-modern-table--compact">
+      <thead><tr><th>Angle</th><th>Used in last 12 posts</th><th>Last used</th><th>Current ER vs first use</th><th>Guard state</th></tr></thead>
+      <tbody>
+        <tr><td>教育價值型 <span class="tg tg-g">this draft</span></td><td class="num">2 / 12</td><td>11 days ago</td><td class="num">4.12% → 4.06% <span class="tg tg-g">flat</span></td><td><span class="tg tg-g">Clear</span></td></tr>
+        <tr><td>信任建立型</td><td class="num">3 / 12</td><td>6 days ago</td><td class="num">3.80% → 3.41% <span class="tg tg-a">−10%</span></td><td><span class="tg tg-a">Watch</span></td></tr>
+        <tr><td>情感故事型</td><td class="num">3 / 12</td><td>4 days ago</td><td class="num">3.55% → 3.02% <span class="tg tg-a">−15%</span></td><td><span class="tg tg-a">Watch</span></td></tr>
+        <tr><td>促銷轉化型</td><td class="num">5 / 12</td><td>2 days ago</td><td class="num">2.90% → 1.80% <span class="tg tg-r">−38%</span></td><td><span class="tg tg-r">Blocked</span></td></tr>
+        <tr><td>社區互動型</td><td class="num">0 / 12</td><td>63 days ago</td><td>—</td><td><span class="tg tg-b">Recommended</span></td></tr>
+      </tbody>
+    </table></div>
+    <div class="dm-chart-area short" style="margin-top:14px" data-chart="scFatigue"></div>
+    <div class="ctl-inline"><span>Refuse-to-ship threshold</span><select class="dm-select" style="width:220px"><option>4 uses in last 12 posts</option><option>3 uses in last 12 posts</option><option>5 uses in last 12 posts</option><option>Disabled (warn only)</option></select><span>· 促銷轉化型 currently exceeds it</span></div>
+  </section>
+
+  <section class="dm-card">
+    <div class="dm-title-card">Score-to-outcome calibration <span class="tg-new">NEW</span><span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">The score is only worth anything if it predicts. Here's the evidence.</span>
+    <div class="dm-chart-area" style="height:300px" data-chart="scCal"></div>
+    <div class="foot-note"><b>Pearson r = 0.52 across 60 published posts (Jun–Aug 2026); R² = 0.27; MAE 0.9pp on predicted ER.</b> <span style="color:var(--r);font-weight:600">Honest read:</span> this is weak-to-moderate. The score separates the top and bottom thirds reliably — posts scoring ≥80 delivered median ER 4.4% versus 2.1% for posts under 65 — but it cannot rank two drafts three points apart, and it should not be trusted to. Calibration improves with volume: the model retrains weekly and needs roughly 250 posts per page before the interval narrows meaningfully. <b>Treat the score as a gate, not a leaderboard.</b></div>
+  </section>
+</div>
+
+<section class="dm-card">
+  <div class="dm-title-card">Five drafts scored side by side<span class="dmode dmode-mock">MOCK</span></div>
+  <span class="dm-subtitle">Component scores, composite, and the model's recommended pick with its reason.</span>
+  <div class="dm-table-scroll"><table class="dm-modern-table dm-modern-table--compact">
+    <thead><tr><th>Draft</th><th>Angle fit 20%</th><th>Hook 20%</th><th>Visual fit 15%</th><th>Voice 15%</th><th>Keyword 15%</th><th>Format 10%</th><th>Fatigue 5%</th><th>Composite</th><th>Predicted ER</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr class="row-g"><td>V2 · 9 支實測</td><td class="num">91</td><td class="num">86</td><td class="num">82</td><td class="num">93</td><td class="num">54</td><td class="num">61</td><td class="num">88</td><td class="num"><b style="color:var(--g)">78</b></td><td class="num">4.1%</td><td><span class="tg tg-g">Pick — highest composite, clears ship bar, angle clear on fatigue</span></td></tr>
+      <tr><td>V4 · HK$98 打贏 HK$680</td><td class="num">84</td><td class="num">88</td><td class="num">79</td><td class="num">86</td><td class="num">58</td><td class="num">72</td><td class="num">84</td><td class="num"><b>79</b></td><td class="num">4.0%</td><td><span class="tg tg-b">Hold — scores 1 higher but trust angle is on Watch; keep as next week's lead</span></td></tr>
+      <tr><td>V1 · 換季爆乾</td><td class="num">91</td><td class="num">81</td><td class="num">82</td><td class="num">91</td><td class="num">51</td><td class="num">66</td><td class="num">88</td><td class="num"><b>77</b></td><td class="num">3.9%</td><td><span class="tg tg-n">Reserve — near-duplicate of V2's angle; do not run in same week</span></td></tr>
+      <tr><td>V3 · 敏感肌救星</td><td class="num">91</td><td class="num">79</td><td class="num">74</td><td class="num">89</td><td class="num">49</td><td class="num">58</td><td class="num">88</td><td class="num"><b>75</b></td><td class="num">3.7%</td><td><span class="tg tg-n">Reserve — no CTA; add save-CTA to recover ~3 points</span></td></tr>
+      <tr><td>V6 · 限時優惠</td><td class="num">52</td><td class="num">61</td><td class="num">48</td><td class="num">74</td><td class="num">44</td><td class="num">55</td><td class="num">21</td><td class="num"><b style="color:var(--r)">55</b></td><td class="num">2.0%</td><td><span class="tg tg-r">Blocked — fatigue guard; route to paid instead</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="foot-note"><b>Recommended pick: V2</b>, despite V4 scoring one point higher. The model does not resolve a one-point gap — it is inside the noise band (MAE 0.9pp). The tiebreak is fatigue: V4's 信任建立型 angle is 6 days old and down 10%, V2's 教育價值型 is 11 days old and flat. This tiebreak logic is printed rather than hidden.</div>
+</section>
+
+<section class="ai-card">
+  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Pre-flight Score</div></div>
+  <div class="ai-card__sub">Grounded on 60 calibration posts · pre-flight model v1 (r=0.52) · fatigue curves · Confidence: Medium</div>
+  <div class="ai-insight-item"><span class="ib ib-b">Lever</span><b>One keyword swap moves this draft from approval-queue to auto-publish.</b> Keyword timeliness scores 54 because three of four terms are past their peak; replacing 「平價好用」 with 「屏障修復」 (+189% search-share, 90D) lifts the component to ~74 and the composite to 81, clearing the 80 auto-publish bar. <b>Make the swap and re-score before sending to the approval queue — it saves an entire human review cycle.</b></div>
+  <div class="ai-insight-item alert"><span class="ib ib-r">Honesty</span><b>Do not use this score to rank drafts within three points of each other.</b> With r=0.52 and MAE 0.9pp, the model's separation power is real at the thirds level (≥80 → median 4.4% delivered ER; &lt;65 → 2.1%) and absent at the margin. V4 outscoring V2 by one point carries no information. <b>Configure the UI to display a score band (High / Mid / Low) alongside the number so nobody over-reads a one-point gap.</b></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">Guard</span><b>The fatigue guard is doing real work — it blocked the fastest-to-produce draft.</b> 促銷轉化型 has run 5 times in 12 posts with ER decaying 2.90% → 1.80%, a 38% drop that tracks the typical decay curve for this angle. Without the guard, V6 ships because it is the easiest to make. <b>Keep the threshold at 4/12 and review monthly; loosening it is how page-level ER erodes quietly.</b></div>
+  <div class="ai-ask"><input type="text" placeholder="Ask about this score — e.g. 「keyword 分數點樣計？」"><button class="btn btn--primary btn--sm">Ask</button></div>
+</section>
+
+</div>
+<!-- ══════════ TAB 6 · CALENDAR ══════════ -->
+<div class="tab-panel" id="tab-calendar">
+
+<div class="sec-head">
+  <div class="dm-title-section">Calendar — the queue, its scores, and the slot each post is going into</div>
+  <span class="dm-subtitle">Scheduling is where the brief, the score and the online-follower data meet. Every cell carries a status and a pre-flight score, because a scheduled post with a score of 58 is a problem you want to see a week early.</span>
+</div>
+
+<div class="dm-controls-row" style="padding-top:0">
+  <span class="dm-ctl-label">View</span>
+  <div class="pill-row" style="margin-bottom:0"><button class="pill is-active">Month</button><button class="pill">Week</button></div>
+  <span class="dm-ctl-label">Colour by</span>
+  <div class="pill-row" style="margin-bottom:0"><button class="pill is-active">Status</button><button class="pill">Predicted score</button></div>
+  <span class="spacer"></span>
+  <span class="dm-meta-label">August 2026 · GirlStyle 女生日常 · IG + FB</span>
+</div>
+
+<div class="dm-kpi-row">
+  <div class="dm-kpi-card"><div class="kpi__label">Scheduled this month</div><div class="kpi__metric">24</div><div class="kpi__sub">target 28</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Published</div><div class="kpi__metric">11</div><div class="kpi__sub up">on pace</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Needs approval</div><div class="kpi__metric">5</div><div class="kpi__sub down">2 over 48h old</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Median queue score</div><div class="kpi__metric">76</div><div class="kpi__sub up">ship bar 70</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Below ship bar</div><div class="kpi__metric">3</div><div class="kpi__sub down">blocked from scheduling</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Slot compliance</div><div class="kpi__metric">67%</div><div class="kpi__sub down">16 of 24 in recommended slots</div></div>
+</div>
+
+<section class="dm-card">
+  <div class="dm-title-card">August 2026<span class="dmode dmode-live">LIVE</span></div>
+  <span class="dm-subtitle">Colour = status. Number = pre-flight score. Grey cells are unscheduled days.</span>
+  <div class="cal-grid">
+    <div class="hd">Mon</div><div class="hd">Tue</div><div class="hd">Wed</div><div class="hd">Thu</div><div class="hd">Fri</div><div class="hd">Sat</div><div class="hd">Sun</div>
+    <div class="cal-cell cal-pub"><div class="d">3 · 21:00</div><div class="m">教育 · 82</div></div>
+    <div class="cal-cell"><div class="d">4</div><div class="m">—</div></div>
+    <div class="cal-cell cal-pub"><div class="d">5 · 20:30</div><div class="m">UGC · 74</div></div>
+    <div class="cal-cell cal-pub"><div class="d">6 · 21:00</div><div class="m">信任 · 79</div></div>
+    <div class="cal-cell"><div class="d">7</div><div class="m">—</div></div>
+    <div class="cal-cell cal-pub"><div class="d">8 · 11:00</div><div class="m">情感 · 71</div></div>
+    <div class="cal-cell cal-pub"><div class="d">9 · 21:30</div><div class="m">教育 · 85</div></div>
+    <div class="cal-cell cal-pub"><div class="d">10 · 21:00</div><div class="m">促銷 · 63</div></div>
+    <div class="cal-cell cal-pub"><div class="d">11 · 20:30</div><div class="m">教育 · 80</div></div>
+    <div class="cal-cell"><div class="d">12</div><div class="m">—</div></div>
+    <div class="cal-cell cal-pub"><div class="d">13 · 21:00</div><div class="m">UGC · 76</div></div>
+    <div class="cal-cell cal-pub"><div class="d">14 · 21:00</div><div class="m">信任 · 78</div></div>
+    <div class="cal-cell cal-pub"><div class="d">15 · 12:00</div><div class="m">社區 · 69</div></div>
+    <div class="cal-cell cal-pub"><div class="d">16 · 21:30</div><div class="m">教育 · 83</div></div>
+    <div class="cal-cell cal-sch"><div class="d">17 · 21:00</div><div class="m">信任 · 77</div></div>
+    <div class="cal-cell cal-app"><div class="d">18 · 20:30</div><div class="m">促銷 · 58 ⚠</div></div>
+    <div class="cal-cell cal-sch"><div class="d">19 · 21:00</div><div class="m">教育 · 78</div></div>
+    <div class="cal-cell cal-app"><div class="d">20 · 21:00</div><div class="m">情感 · 72</div></div>
+    <div class="cal-cell cal-sch"><div class="d">21 · 20:30</div><div class="m">UGC · 75</div></div>
+    <div class="cal-cell cal-dft"><div class="d">22 · 11:30</div><div class="m">Draft · —</div></div>
+    <div class="cal-cell cal-sch"><div class="d">23 · 21:30</div><div class="m">教育 · 81</div></div>
+    <div class="cal-cell cal-app"><div class="d">24 · 21:00</div><div class="m">促銷 · 61 ⚠</div></div>
+    <div class="cal-cell cal-sch"><div class="d">25 · 20:30</div><div class="m">信任 · 74</div></div>
+    <div class="cal-cell cal-dft"><div class="d">26 · —</div><div class="m">Draft · —</div></div>
+    <div class="cal-cell cal-sch"><div class="d">27 · 21:00</div><div class="m">教育 · 79</div></div>
+    <div class="cal-cell cal-app"><div class="d">28 · 21:00</div><div class="m">社區 · 66</div></div>
+    <div class="cal-cell cal-sch"><div class="d">29 · 12:00</div><div class="m">UGC · 73</div></div>
+    <div class="cal-cell cal-dft"><div class="d">30 · —</div><div class="m">Draft · —</div></div>
+  </div>
+  <div class="cal-legend">
+    <span><span class="sw" style="background:#BBF7D0"></span>Published</span>
+    <span><span class="sw" style="background:#BFDBFE"></span>Scheduled</span>
+    <span><span class="sw" style="background:#FDE68A"></span>Needs approval</span>
+    <span><span class="sw" style="background:#DDD6FE"></span>Draft</span>
+    <span>⚠ = below ship bar 70</span>
+  </div>
+</section>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">Slot recommendation <span class="tg-new">NEW</span><span class="dmode dmode-agg">AGG</span></div>
+    <span class="dm-subtitle">Derived from hourly online-follower data for this page, expressed as predicted lift versus the page's median-slot performance.</span>
+    <div class="dm-table-scroll"><table class="dm-modern-table dm-modern-table--compact">
+      <thead><tr><th>Slot</th><th>Online followers</th><th>Posts in slot (90D)</th><th>Median ER in slot</th><th>Predicted lift vs page median</th><th>Queue usage</th></tr></thead>
+      <tbody>
+        <tr class="row-g"><td>週三 21:00</td><td class="num">18.4%</td><td class="num">7</td><td class="num">3.02%</td><td><span class="tg tg-g">+25%</span></td><td class="num">3 of 24</td></tr>
+        <tr><td>週六 21:30</td><td class="num">17.9%</td><td class="num">6</td><td class="num">2.96%</td><td><span class="tg tg-g">+23%</span></td><td class="num">3 of 24</td></tr>
+        <tr><td>週二 20:30</td><td class="num">16.1%</td><td class="num">9</td><td class="num">2.81%</td><td><span class="tg tg-g">+17%</span></td><td class="num">4 of 24</td></tr>
+        <tr><td>週日 12:00</td><td class="num">14.2%</td><td class="num">5</td><td class="num">2.60%</td><td><span class="tg tg-g">+8%</span></td><td class="num">2 of 24</td></tr>
+        <tr><td>週五 18:00</td><td class="num">11.8%</td><td class="num">11</td><td class="num">2.34%</td><td><span class="tg tg-n">−3%</span></td><td class="num">4 of 24</td></tr>
+        <tr><td>平日 09:00</td><td class="num">6.4%</td><td class="num">14</td><td class="num">1.88%</td><td><span class="tg tg-r">−22%</span></td><td class="num">5 of 24</td></tr>
+      </tbody>
+    </table></div>
+    <div class="foot-note">You publish most often at 09:00 — the worst slot on the page, and 5 posts in the current queue still sit there. Moving those five into the top-three slots is worth an estimated <b>+0.4pp of monthly page ER</b> and costs nothing but a scheduler change.</div>
+  </section>
+
+  <section class="dm-card">
+    <div class="dm-title-card">Angle rotation planner <span class="tg-new">NEW</span><span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">Planned angle sequence over 4 weeks. Warnings fire where an angle repeats inside its cooldown window.</span>
+    <div class="rot-grid">
+      <div></div><div class="hd">M</div><div class="hd">T</div><div class="hd">W</div><div class="hd">T</div><div class="hd">F</div><div class="hd">S</div><div class="hd">S</div>
+      <div class="wk">W31</div><div class="rot-chip rc-edu">教育</div><div class="rot-chip">—</div><div class="rot-chip rc-ugc">UGC</div><div class="rot-chip rc-trust">信任</div><div class="rot-chip">—</div><div class="rot-chip rc-emo">情感</div><div class="rot-chip rc-edu">教育</div>
+      <div class="wk">W32</div><div class="rot-chip rc-promo">促銷⚠</div><div class="rot-chip rc-edu">教育</div><div class="rot-chip">—</div><div class="rot-chip rc-ugc">UGC</div><div class="rot-chip rc-trust">信任</div><div class="rot-chip rc-comm">社區</div><div class="rot-chip rc-edu">教育</div>
+      <div class="wk">W33</div><div class="rot-chip rc-trust">信任</div><div class="rot-chip rc-promo">促銷⚠</div><div class="rot-chip rc-edu">教育</div><div class="rot-chip rc-emo">情感</div><div class="rot-chip rc-ugc">UGC</div><div class="rot-chip rc-draft">Draft</div><div class="rot-chip rc-edu">教育</div>
+      <div class="wk">W34</div><div class="rot-chip rc-promo">促銷⚠</div><div class="rot-chip rc-trust">信任</div><div class="rot-chip rc-draft">Draft</div><div class="rot-chip rc-edu">教育</div><div class="rot-chip rc-comm">社區</div><div class="rot-chip rc-ugc">UGC</div><div class="rot-chip rc-draft">Draft</div>
+    </div>
+    <div class="callout callout--r" style="margin-bottom:10px">
+      <div class="callout__title">3 fatigue warnings in the plan</div>
+      <div class="callout__body">促銷轉化型 appears on 10 Aug, 18 Aug and 24 Aug — three times in 15 days, against a 21-day cooldown for this angle on this page. Its ER has already decayed 2.90% → 1.80% across the current run.</div>
+      <div class="callout__meta"><span>Cooldown: <b>21 days</b></span><span>Observed gap: <b>6–8 days</b></span><span>Suggested swap: <b>社區互動型 (unused 63 days)</b></span></div>
+    </div>
+    <div class="callout callout--a" style="margin-bottom:0">
+      <div class="callout__title">教育價值型 is at 8 of 24 — near the concentration ceiling</div>
+      <div class="callout__body">It is the page's best angle, which is exactly why it is at risk of being over-run. The planner caps any single angle at 35% of the queue; education is at 33%.</div>
+    </div>
+  </section>
+</div>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">Planned vs published volume by week<span class="dmode dmode-live">LIVE</span></div>
+    <span class="dm-subtitle">Where the queue slips — and it slips in the same place every month.</span>
+    <div class="dm-chart-area" data-chart="caVol"></div>
+  </section>
+  <section class="dm-card">
+    <div class="dm-title-card">Predicted score distribution of the queue<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">24 scheduled posts bucketed by pre-flight score against the 70 ship bar.</span>
+    <div class="dm-chart-area" data-chart="caDist"></div>
+  </section>
+  <section class="dm-card">
+    <div class="dm-title-card">Angle mix — queue vs recommended<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">Recommended mix is derived from measured ER per angle, capped at 35% concentration.</span>
+    <div class="dm-chart-area" data-chart="caMix"></div>
+  </section>
+</div>
+
+<section class="dm-card">
+  <div class="dm-title-card">Approval queue<span class="dmode dmode-mock">MOCK</span></div>
+  <span class="dm-subtitle">Five posts awaiting human sign-off. Two are past the 48-hour SLA.</span>
+  <div class="dm-table-scroll"><table class="dm-modern-table">
+    <thead><tr><th>Post</th><th>Author / Agent</th><th>Angle</th><th>Slot</th><th>Pre-flight score</th><th>Status</th><th>Approver</th></tr></thead>
+    <tbody>
+      <tr><td>V2 · 一個月試 9 支保濕</td><td><span class="tg tg-p">Agent</span> Creation Studio</td><td>教育價值型</td><td>19 Aug 21:00</td><td class="num"><b style="color:var(--g)">78</b></td><td><span class="tg tg-b">Awaiting approval · 4h</span></td><td>Karen Chan</td></tr>
+      <tr><td>秋冬底妝服貼度實測</td><td>Cherry Lau · Editor</td><td>信任建立型</td><td>25 Aug 20:30</td><td class="num"><b>74</b></td><td><span class="tg tg-b">Awaiting approval · 11h</span></td><td>Karen Chan</td></tr>
+      <tr><td>限時優惠 · 買一送一</td><td><span class="tg tg-p">Agent</span> Creation Studio</td><td>促銷轉化型</td><td>18 Aug 20:30</td><td class="num"><b style="color:var(--r)">58</b></td><td><span class="tg tg-r">Blocked · fatigue guard · 61h</span></td><td>Karen Chan</td></tr>
+      <tr><td>讀者投稿 · 我嘅換季護膚櫃</td><td>Community team</td><td>社區互動型</td><td>28 Aug 21:00</td><td class="num"><b style="color:var(--a)">66</b></td><td><span class="tg tg-a">Needs edit · below bar · 52h</span></td><td>Michelle Ho</td></tr>
+      <tr><td>秋日香氛禮物指南</td><td><span class="tg tg-p">Agent</span> Creation Studio</td><td>情感故事型</td><td>20 Aug 21:00</td><td class="num"><b>72</b></td><td><span class="tg tg-b">Awaiting approval · 7h</span></td><td>Cherry Lau</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<div class="callout callout--a">
+  <div class="callout__title">Publishing is not live yet — stated plainly</div>
+  <div class="callout__body">IG/FB publishing from MediaLens is <b>pending Meta permissions</b>. Everything in this tab up to and including approval works today; the final write to Meta does not. A minimal post-publish MVP exists specifically to support that permissions application — a working publish path is what Meta requires to review the request. Until approval lands, "Schedule" writes to the MediaLens queue and hands the operator a copy-ready payload; it does not post.</div>
+  <div class="callout__meta"><span>Blocked capability: <b>IG/FB publish + schedule</b></span><span>Working today: <b>brief → generate → score → approve → queue</b></span><span>Dependency: <b>Meta App Review</b></span><span>Do not: <b>demo this as shipped</b></span></div>
+</div>
+
+<section class="ai-card">
+  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Calendar</div></div>
+  <div class="ai-card__sub">Grounded on 24 queued posts · online-follower hourly data · angle fatigue curves · Confidence: Medium</div>
+  <div class="ai-insight-item good"><span class="ib ib-g">Slot</span><b>Five queued posts are scheduled into your worst hour.</b> The 09:00 weekday slot carries 6.4% online followers and a median ER of 1.88%, 22% below page median, yet it holds 5 of 24 queued posts because it is the default in the scheduler. Moving them to 20:30–21:30 is worth roughly +0.4pp of monthly page ER. <b>Change the scheduler default from 09:00 to 21:00 and re-slot the five affected posts today.</b></div>
+  <div class="ai-insight-item alert"><span class="ib ib-r">Fatigue</span><b>The promo angle is scheduled three times in 15 days against a 21-day cooldown.</b> 10, 18 and 24 August all carry 促銷轉化型, whose ER has decayed 2.90% → 1.80% across the current run, and two of those three posts already score below the ship bar. <b>Replace the 18 and 24 August slots with 社區互動型, which has been unused for 63 days and has no decay penalty.</b></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">Process</span><b>Approval, not production, is the bottleneck.</b> Two of five queued posts are past the 48-hour SLA and both sit with the same approver; the studio produced 24 briefs this month against a 28-post target, so generation is not what is short. <b>Add a second approver for scores ≥80 or auto-approve that band under the Autopilot L3 guardrails — that clears roughly 60% of the queue without a human touch.</b></div>
+  <div class="ai-ask"><input type="text" placeholder="Ask about the queue — e.g. 「下星期邊幾篇要先出？」"><button class="btn btn--primary btn--sm">Ask</button></div>
+</section>
+
+</div>
+<!-- ══════════ TAB 7 · AUTOPILOT ══════════ -->
+<div class="tab-panel" id="tab-autopilot">
+
+<div class="sec-head">
+  <div class="dm-title-section">Autopilot</div>
+  <span class="dm-subtitle">Autonomy as an explicit setting, not an implicit behaviour.</span>
+</div>
+
+<div class="dm-kpi-row">
+  <div class="dm-kpi-card"><div class="kpi__label">Current autonomy level</div><div class="kpi__metric">L3</div><div class="kpi__sub">propose-and-confirm</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Pending proposals</div><div class="kpi__metric">4</div><div class="kpi__sub down">oldest 6h</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Approval rate (8w)</div><div class="kpi__metric">71%</div><div class="kpi__sub up">+9pp vs first 4w</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Actions executed</div><div class="kpi__metric">148</div><div class="kpi__sub">all reversible</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Est. time saved</div><div class="kpi__metric">31h</div><div class="kpi__sub up">8 weeks</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Kill switch</div><div class="kpi__metric">Armed</div><div class="kpi__sub">1-click halt all</div></div>
+</div>
+
+<div class="sec-head">
+  <div class="dm-title-section">Autonomy level selector <span class="tg-new">NEW</span></div>
+  <span class="dm-subtitle">Five levels, each with an explicit ceiling. The point of printing "will never" is that a level is a contract, not a mood.</span>
+</div>
+<div class="lvl-grid">
+  <div class="lvl-card"><div class="lvl-card__t">L0 · Answer</div><div class="lvl-card__s">Shipped</div><div class="lvl-card__b"><b>Does:</b> answers questions about your data when asked. Nothing happens unless you type.<br><b>Will never:</b> initiate, alert, or change anything.</div></div>
+  <div class="lvl-card"><div class="lvl-card__t">L1 · Notice</div><div class="lvl-card__s">Q4 2026</div><div class="lvl-card__b"><b>Does:</b> watches benchmarks and fatigue curves, alerts you unprompted when something moves.<br><b>Will never:</b> tell you what to do about it, or act.</div></div>
+  <div class="lvl-card"><div class="lvl-card__t">L2 · Recommend</div><div class="lvl-card__s">Q4 2026</div><div class="lvl-card__b"><b>Does:</b> alerts <i>and</i> names a specific action with its evidence and predicted effect.<br><b>Will never:</b> prepare or execute the change. Do not skip this level.</div></div>
+  <div class="lvl-card hl"><div class="lvl-card__t">L3 · Propose-and-confirm <span class="tg tg-b">Current</span></div><div class="lvl-card__s">Partly live — pause/resume today</div><div class="lvl-card__b"><b>Does:</b> prepares the exact change — payload, target, rollback — and holds it. One click executes.<br><b>Will never:</b> execute without that click.</div></div>
+  <div class="lvl-card"><div class="lvl-card__t">L4 · Autopilot with veto</div><div class="lvl-card__s">2027 · opt-in · ad ops only</div><div class="lvl-card__b"><b>Does:</b> executes inside your guardrails, reports after, every action reversible for 24h.<br><b>Will never:</b> exceed a guardrail, touch creative publishing, or act without an audit entry.</div></div>
+</div>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">Guardrails <span class="tg-new">NEW</span><span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">The limits that define what any level above L2 is allowed to do. These are configuration, not prompt text.</span>
+    <div class="dm-table-scroll"><table class="dm-modern-table">
+      <thead><tr><th>Guardrail</th><th>Value</th><th>Applies at</th><th>On breach</th></tr></thead>
+      <tbody>
+        <tr><td>Max posts published per day</td><td class="num"><b>2</b></td><td>L3 · L4</td><td>Queue overflow to next slot</td></tr>
+        <tr><td>Min pre-flight score to auto-publish</td><td class="num"><b>80</b></td><td>L4</td><td>Route to human approval</td></tr>
+        <tr><td>Min pre-flight score to schedule at all</td><td class="num"><b>70</b></td><td>L3 · L4</td><td>Hard block, returned to Post Studio</td></tr>
+        <tr><td>Blocked topics / keywords</td><td><b>醫療聲稱 · 減肥療程 · 政治 · 賭博 · 借貸</b></td><td>All levels</td><td>Hard block, logged, human notified</td></tr>
+        <tr><td>Human approval required for</td><td><b>Crisis-adjacent · Regulated (醫美/保健聲稱) · Competitor mentions</b></td><td>All levels</td><td>Forced to approval queue regardless of score</td></tr>
+        <tr><td>Max daily budget change per ad set</td><td><b>HK$500 or 20%, whichever is lower</b></td><td>L3 · L4</td><td>Proposal capped at limit, difference flagged</td></tr>
+        <tr><td>Max total daily budget shift per account</td><td class="num"><b>HK$1,500</b></td><td>L4</td><td>Remaining shifts deferred to next day</td></tr>
+        <tr><td>Angle fatigue refuse-to-ship</td><td><b>4 uses in last 12 posts</b></td><td>L3 · L4</td><td>Hard block, alternative angle proposed</td></tr>
+        <tr><td>Action reversibility window</td><td class="num"><b>24 hours</b></td><td>L4</td><td>Auto-rollback available in audit trail</td></tr>
+        <tr><td>Kill switch</td><td><span class="tg tg-g">Armed</span> · halts all pending and scheduled agent actions</td><td>All levels</td><td>Immediate, no confirmation dialog</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+  <section class="dm-card">
+    <div class="dm-title-card">Actions proposed vs approved vs rejected<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">Eight weeks of agent proposals. Rising approval rate is the trust signal that justifies moving to L4.</span>
+    <div class="dm-chart-area" style="height:330px" data-chart="auFlow"></div>
+  </section>
+</div>
+
+<div class="sec-head">
+  <div class="dm-title-section">Action queue <span class="tg-new">NEW</span></div>
+  <span class="dm-subtitle">Four proposals awaiting confirmation. Each carries its evidence, its predicted effect and its rollback.</span>
+</div>
+
+<div class="prop-card">
+  <div class="prop-card__main">
+    <div class="prop-card__t">Publish「一個月試 9 支保濕」 at 19 Aug 21:00</div>
+    <div class="prop-card__e">Evidence: pre-flight 78 (above ship bar 70); 週三 21:00 slot carries 18.4% online followers and +25% predicted lift; 教育價值型 last used 11 days ago, fatigue clear at 2/12.</div>
+    <div class="prop-card__tags"><span class="tg tg-b">Publish</span><span class="tg tg-a">Blocked on Meta permissions</span><span class="tg tg-n">Reversible: delete within 24h</span></div>
+    <div class="prop-card__foot"><button class="btn btn--primary btn--sm">Approve</button><button class="btn btn--secondary btn--sm">Modify</button><button class="btn btn--secondary btn--sm">Reject</button><span class="prop-card__by">Proposed 6h ago · Creation Studio agent</span></div>
+  </div>
+  <div class="prop-card__fx"><div class="l">PREDICTED EFFECT</div><div class="v1">ER 4.1%</div><div class="v2">486k reach</div></div>
+</div>
+
+<div class="prop-card">
+  <div class="prop-card__main">
+    <div class="prop-card__t">Pause ad set「換季保濕_TOFU_廣泛_9:16」</div>
+    <div class="prop-card__e">Evidence: lifetime day 19; CTR decayed 0.81% → 0.44% (−46%), matching the typical fatigue curve for Problem-Agitate creative; frequency 4.2 against account comfort band 2.8; CPM up 31% over 7 days.</div>
+    <div class="prop-card__tags"><span class="tg tg-a">Pause</span><span class="tg tg-g">Write path live today</span><span class="tg tg-n">Reversible: resume, 1 click</span></div>
+    <div class="prop-card__foot"><button class="btn btn--primary btn--sm">Approve</button><button class="btn btn--secondary btn--sm">Modify</button><button class="btn btn--secondary btn--sm">Reject</button><span class="prop-card__by">Proposed 3h ago · Ad Manager agent</span></div>
+  </div>
+  <div class="prop-card__fx"><div class="l">PREDICTED EFFECT</div><div class="v1">−HK$310/day waste</div><div class="v2">CPA −18%</div></div>
+</div>
+
+<div class="prop-card">
+  <div class="prop-card__main">
+    <div class="prop-card__t">Shift HK$300/day from ad set A「秋冬底妝_MOFU」 to ad set B「換季保濕_TOFU_15s」</div>
+    <div class="prop-card__e">Evidence: B's cost per result is HK$18.40 vs A's HK$31.20 over 7 days at comparable spend; B is at 62% of its saturation point, A at 94%. Shift is HK$300 — inside the HK$500 / 20% guardrail.</div>
+    <div class="prop-card__tags"><span class="tg tg-b">Budget shift</span><span class="tg tg-g">Within guardrail</span><span class="tg tg-n">Reversible: restore split, 24h</span></div>
+    <div class="prop-card__foot"><button class="btn btn--primary btn--sm">Approve</button><button class="btn btn--secondary btn--sm">Modify</button><button class="btn btn--secondary btn--sm">Reject</button><span class="prop-card__by">Proposed 3h ago · Ad Manager agent</span></div>
+  </div>
+  <div class="prop-card__fx"><div class="l">PREDICTED EFFECT</div><div class="v1">+41 results/wk</div><div class="v2">blended CPA −11%</div></div>
+</div>
+
+<div class="prop-card">
+  <div class="prop-card__main">
+    <div class="prop-card__t">Refresh creative on「敏感肌_BOFU_carousel」 — day 19 of fatigue curve</div>
+    <div class="prop-card__e">Evidence: CTR 1.62% → 1.09% since day 8; the account's Before &amp; After category typically holds CTR to day 26, so this decay is early and creative-specific. Visual Studio has 5 unused Before/After assets from this week's brief, top predicted thumb-stop 88.</div>
+    <div class="prop-card__tags"><span class="tg tg-p">Creative refresh</span><span class="tg tg-b">Assets ready</span><span class="tg tg-n">Reversible: revert to prior creative</span></div>
+    <div class="prop-card__foot"><button class="btn btn--primary btn--sm">Approve</button><button class="btn btn--secondary btn--sm">Modify</button><button class="btn btn--secondary btn--sm">Reject</button><span class="prop-card__by">Proposed 1h ago · Creation Studio agent</span></div>
+  </div>
+  <div class="prop-card__fx"><div class="l">PREDICTED EFFECT</div><div class="v1">CTR +0.4pp</div><div class="v2">extends run ~12 days</div></div>
+</div>
+
+<div class="callout callout--b">
+  <div class="callout__title">The agent only ever proposes</div>
+  <div class="callout__body">Architecturally the agent has no write credential. It reads, reasons and emits a proposal object containing the exact payload, the target entity, the predicted effect and the rollback. <b>The front end calls the write endpoint after human confirmation — the agent never writes to Meta directly.</b> This is what makes L3 safe and what makes L4 auditable later: the same proposal object is the audit record whether a human or a guardrail approved it.</div>
+</div>
+
+<section class="dm-card">
+  <div class="dm-title-card">Boost recommendation — Organic → Paid transfer<span class="dmode dmode-agg">AGG</span></div>
+  <span class="dm-subtitle">High-performing organic posts matched to a proposed boost budget, with predicted paid performance from the ad account's own benchmarks.</span>
+  <div class="dm-table-scroll"><table class="dm-modern-table">
+    <thead><tr><th>Organic post</th><th>Organic ER</th><th>Percentile</th><th>Saves</th><th>Proposed budget</th><th>Predicted CTR</th><th>Predicted CPM</th><th>Predicted CPA</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr class="row-g"><td>敏感肌急救 carousel（7月）</td><td class="num">6.42%</td><td class="num">P97</td><td class="num">4,180</td><td>HK$450/day × 7d</td><td><span class="tg tg-g">1.96%</span></td><td class="num">HK$38</td><td class="num">HK$16.20</td><td><button class="btn btn--primary btn--sm">Boost</button></td></tr>
+      <tr><td>9 支保濕實測（16 Aug）</td><td class="num">5.18%</td><td class="num">P92</td><td class="num">3,020</td><td>HK$350/day × 7d</td><td><span class="tg tg-g">1.81%</span></td><td class="num">HK$41</td><td class="num">HK$18.90</td><td><button class="btn btn--primary btn--sm">Boost</button></td></tr>
+      <tr><td>秋冬底妝服貼實測（11 Aug）</td><td class="num">4.44%</td><td class="num">P84</td><td class="num">2,110</td><td>HK$250/day × 5d</td><td><span class="tg tg-g">1.62%</span></td><td class="num">HK$44</td><td class="num">HK$22.40</td><td><button class="btn btn--secondary btn--sm">Queue</button></td></tr>
+      <tr><td>換季爆乾 Reel（9 Aug）</td><td class="num">4.02%</td><td class="num">P78</td><td class="num">1,640</td><td>HK$200/day × 5d</td><td><span class="tg tg-a">1.38%</span></td><td class="num">HK$47</td><td class="num">HK$27.10</td><td><button class="btn btn--secondary btn--sm">Queue</button></td></tr>
+      <tr><td>限時優惠 · 買一送一（10 Aug）</td><td class="num">1.84%</td><td class="num">P22</td><td class="num">310</td><td>—</td><td><span class="tg tg-r">n/a</span></td><td>—</td><td>—</td><td><span class="tg tg-n">Below transfer bar</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="foot-note">Transfer bar is organic P75. The relationship holds on this account: organic saves-per-reach correlates with paid CTR at r=0.61 across 34 previously boosted posts — stronger than the pre-flight model's own calibration, because it is measuring an already-published outcome rather than predicting one.</div>
+</section>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">Approval rate by action type<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">Which proposals humans trust. Budget shifts are trusted least, and that is the correct instinct at L3.</span>
+    <div class="dm-chart-area" data-chart="auRate"></div>
+  </section>
+  <section class="dm-card">
+    <div class="dm-title-card">Estimated time saved per week<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">Minutes of analyst time displaced, by action category, over 8 weeks.</span>
+    <div class="dm-chart-area" data-chart="auTime"></div>
+  </section>
+</div>
+
+<section class="dm-card">
+  <div class="dm-title-card">Audit trail <span class="tg-new">NEW</span><span class="dmode dmode-mock">MOCK</span></div>
+  <span class="dm-subtitle">Every action, by whom, on what evidence, with what outcome, and whether it can still be undone.</span>
+  <div class="dm-table-scroll"><table class="dm-modern-table">
+    <thead><tr><th>Timestamp (HKT)</th><th>Actor</th><th>Action</th><th>Target</th><th>Evidence</th><th>Outcome</th><th>Reversible</th></tr></thead>
+    <tbody>
+      <tr><td>17 Aug 14:12</td><td><span class="tg tg-p">Agent</span></td><td>Proposed creative refresh</td><td>敏感肌_BOFU_carousel</td><td>CTR 1.62%→1.09%, day 19</td><td><span class="tg tg-b">Pending</span></td><td><span class="tg tg-g">Yes</span></td></tr>
+      <tr><td>17 Aug 11:40</td><td><span class="tg tg-p">Agent</span></td><td>Proposed budget shift HK$300</td><td>秋冬底妝_MOFU → 換季保濕_TOFU_15s</td><td>CPR HK$31.20 vs HK$18.40</td><td><span class="tg tg-b">Pending</span></td><td><span class="tg tg-g">Yes</span></td></tr>
+      <tr><td>16 Aug 22:05</td><td><span class="tg tg-g">Human</span> Karen Chan</td><td>Approved publish</td><td>9 支保濕實測</td><td>Pre-flight 80, slot +23%</td><td>ER 5.18% <span class="tg tg-g">beat prediction</span></td><td><span class="tg tg-n">Expired</span></td></tr>
+      <tr><td>16 Aug 09:31</td><td><span class="tg tg-p">Agent</span></td><td>Proposed pause</td><td>換季保濕_TOFU_廣泛_1:1</td><td>Frequency 4.6, CPM +38%</td><td><span class="tg tg-g">Approved → paused</span></td><td><span class="tg tg-g">Yes · 6h left</span></td></tr>
+      <tr><td>15 Aug 18:22</td><td><span class="tg tg-g">Human</span> Cherry Lau</td><td>Rejected proposal</td><td>促銷轉化型 post, 18 Aug</td><td>Fatigue guard 5/12</td><td><span class="tg tg-r">Rejected — routed to paid</span></td><td>—</td></tr>
+      <tr><td>15 Aug 10:04</td><td><span class="tg tg-p">Agent</span></td><td>Blocked scheduling</td><td>醫美聲稱 draft</td><td>Guardrail: regulated topic</td><td><span class="tg tg-a">Forced to human review</span></td><td>—</td></tr>
+      <tr><td>14 Aug 21:00</td><td><span class="tg tg-g">Human</span> Karen Chan</td><td>Approved budget shift HK$200</td><td>敏感肌_BOFU → 換季保濕_TOFU</td><td>Saturation 91% vs 58%</td><td>CPA −14% <span class="tg tg-g">as predicted</span></td><td><span class="tg tg-n">Expired</span></td></tr>
+      <tr><td>13 Aug 16:47</td><td><span class="tg tg-p">Agent</span></td><td>Proposed slot change</td><td>4 posts at 09:00</td><td>Slot ER −22% vs median</td><td><span class="tg tg-r">Rejected — editorial preference</span></td><td>—</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="ai-card">
+  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Autopilot</div></div>
+  <div class="ai-card__sub">Grounded on 8 weeks of proposals · guardrail configuration · Ad Manager write log · Confidence: Medium</div>
+  <div class="ai-insight-item"><span class="ib ib-b">Trust</span><b>Pause proposals are approved 94% of the time — that band is ready for L4.</b> Across 8 weeks, 47 of 50 pause proposals were approved unchanged, and the three rejections were all the same ad set during a client campaign freeze. Budget shifts, by contrast, run at 52%. <b>Promote pause-only to L4 with the HK$0 budget impact guardrail, and leave budget shifts at L3 until approval rate clears 80%.</b></div>
+  <div class="ai-insight-item alert"><span class="ib ib-r">Risk</span><b>The most valuable action is also the one humans keep rejecting.</b> Slot-change proposals are rejected 61% of the time on editorial preference, yet the 09:00 slot they target is measurably the page's worst (ER −22%). Either the evidence is not landing or the constraint is real and undocumented. <b>Add a "why rejected" field to the reject flow — without it the agent cannot learn the constraint and will keep proposing into a wall.</b></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">Blocker</span><b>Half of the queue cannot execute regardless of approval.</b> Publish and schedule actions are gated on Meta permissions; pause, resume and budget writes are live. That means the visible approval rate flatters the system — two of today's four proposals would sit pending even if approved. <b>Label publish-class proposals as "approve to queue, not to post" in the UI until Meta App Review clears, so operators do not believe something shipped.</b></div>
+  <div class="ai-ask"><input type="text" placeholder="Ask about autopilot — e.g. 「呢個星期改做 L2 得唔得？」"><button class="btn btn--primary btn--sm">Ask</button></div>
+</section>
+
+</div>
+
+</div></main>
+<div class="proto-badge">PRODUCT PROTOTYPE v1.0</div>
+<script>
+/* ── Tabs ── */
+document.querySelectorAll('.dm-page-menu .menu-item').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.dm-page-menu .menu-item').forEach(function(b){b.classList.remove('is-active')});
+    btn.classList.add('is-active');
+    document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active')});
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+    window.scrollTo({top:0});
+  });
+});
+/* ── Period dropdown ── */
+(function(){
+  var t=document.getElementById('periodTrigger'),m=document.getElementById('periodMenu');
+  t.addEventListener('click',function(e){e.stopPropagation();m.classList.toggle('open')});
+  document.addEventListener('click',function(){m.classList.remove('open')});
+  m.querySelectorAll('.dm-period-menu__item').forEach(function(it){
+    it.addEventListener('click',function(){
+      m.querySelectorAll('.dm-period-menu__item').forEach(function(x){x.classList.remove('is-active')});
+      it.classList.add('is-active');
+      var spans=it.querySelectorAll('span');
+      if(spans.length>1){t.children[1].textContent=spans[0].textContent;t.children[2].textContent='· '+spans[1].textContent;}
+    });
+  });
+})();
+/* ── Pills toggle (visual only) ── */
+document.querySelectorAll('.pill-row').forEach(function(row){
+  row.querySelectorAll('.pill').forEach(function(p){
+    p.addEventListener('click',function(){
+      row.querySelectorAll('.pill').forEach(function(x){x.classList.remove('is-active')});
+      p.classList.add('is-active');
+    });
+  });
+});
+
+/* ══ Minimal inline-SVG chart renderer (file:// self-contained, no chart lib) ══ */
+var NS='http://www.w3.org/2000/svg';
+function E(n,a,txt){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;return e}
+function TT(el,s){el.appendChild(E('title',{},s))}
+var GRID='#E4E7ED',AXT='#707070',FA="'Lato',sans-serif",FM="'Roboto',sans-serif";
+var W=640,H=300,M={t:16,r:52,b:40,l:48};
+function pw(){return W-M.l-M.r} function ph(){return H-M.t-M.b}
+function chart(id,cfg){
+  var host=document.querySelector('[data-chart="'+id+'"]');if(!host)return;
+  if(cfg.legend){var lg=document.createElement('div');lg.className='legend-row';
+    cfg.legend.forEach(function(l){var li=document.createElement('span');li.className='li';
+      var sw=document.createElement('span');sw.className=l.round?'dotc':'linec';sw.style.background=l.color;
+      if(l.dash){sw.style.background='none';sw.style.borderTop='2px dashed '+l.color;sw.style.height='0';sw.style.width='14px';sw.style.borderRadius='0'}
+      li.appendChild(sw);li.appendChild(document.createTextNode(l.label));lg.appendChild(li)});
+    host.parentNode.insertBefore(lg,host)}
+  var svg=E('svg',{viewBox:'0 0 '+W+' '+H,preserveAspectRatio:'xMidYMid meet'});host.appendChild(svg);
+  var yMin=cfg.yMin||0,yMax=cfg.yMax,y2Max=cfg.y2Max||0;
+  function Y(v){if(cfg.log){var lo=Math.log10(cfg.logMin||1),hi=Math.log10(yMax);return M.t+ph()*(1-(Math.log10(Math.max(v,cfg.logMin||1))-lo)/(hi-lo))}
+    return M.t+ph()*(1-(v-yMin)/(yMax-yMin))}
+  function Y2(v){return M.t+ph()*(1-v/y2Max)}
+  var n=cfg.labels?cfg.labels.length:0,bw=n?pw()/n:0;
+  function X(i){return M.l+(i+0.5)*bw}
+  function XV(v){return M.l+pw()*((v-cfg.xMin)/(cfg.xMax-cfg.xMin))}
+  /* gridlines + y ticks */
+  var ticks=cfg.yTicks||5;
+  for(var i=0;i<=ticks;i++){var tv=yMin+(yMax-yMin)*i/ticks,ty=cfg.log?null:Y(tv);
+    if(cfg.log)continue;
+    svg.appendChild(E('line',{x1:M.l,x2:W-M.r,y1:ty,y2:ty,stroke:GRID,'stroke-dasharray':'3,3','stroke-width':1}));
+    svg.appendChild(E('text',{x:M.l-6,y:ty+3,'text-anchor':'end','font-size':9,'font-family':FM,fill:AXT},cfg.yFmt?cfg.yFmt(tv):(+tv.toFixed(1))));}
+  if(cfg.log){[100,30,10,3,1].forEach(function(tv){if(tv>yMax)return;var ty=Y(tv);
+    svg.appendChild(E('line',{x1:M.l,x2:W-M.r,y1:ty,y2:ty,stroke:GRID,'stroke-dasharray':'3,3','stroke-width':1}));
+    svg.appendChild(E('text',{x:M.l-6,y:ty+3,'text-anchor':'end','font-size':9,'font-family':FM,fill:AXT},tv+'%'))})}
+  if(y2Max){for(var j=0;j<=4;j++){var t2=y2Max*j/4;
+    svg.appendChild(E('text',{x:W-M.r+8,y:Y2(t2)+3,'font-size':9,'font-family':FM,fill:AXT},cfg.y2Fmt?cfg.y2Fmt(t2):t2))}}
+  /* x labels */
+  (cfg.labels||[]).forEach(function(lb,i){
+    var t=E('text',{x:X(i),y:H-M.b+14,'text-anchor':'middle','font-size':9,'font-family':FA,fill:AXT},lb);
+    if(cfg.tiltX){t.setAttribute('transform','rotate(-24 '+X(i)+' '+(H-M.b+14)+')');t.setAttribute('text-anchor','end')}
+    svg.appendChild(t)});
+  if(cfg.xTitle)svg.appendChild(E('text',{x:M.l+pw()/2,y:H-4,'text-anchor':'middle','font-size':9.5,'font-family':FA,fill:AXT},cfg.xTitle));
+  if(cfg.yTitle)svg.appendChild(E('text',{x:11,y:M.t+ph()/2,'text-anchor':'middle','font-size':9.5,'font-family':FA,fill:AXT,transform:'rotate(-90 11 '+(M.t+ph()/2)+')'},cfg.yTitle));
+  if(cfg.y2Title)svg.appendChild(E('text',{x:W-8,y:M.t+ph()/2,'text-anchor':'middle','font-size':9.5,'font-family':FA,fill:AXT,transform:'rotate(90 '+(W-8)+' '+(M.t+ph()/2)+')'},cfg.y2Title));
+  /* layers */
+  var barGroups=(cfg.layers||[]).filter(function(l){return l.type==='bar'&&!l.stack});
+  (cfg.layers||[]).forEach(function(l){
+    if(l.type==='bar'&&!l.stack){
+      var gi=barGroups.indexOf(l),gn=barGroups.length,w=Math.min(bw*0.62/gn,34);
+      l.data.forEach(function(v,i){if(v==null)return;
+        var x=X(i)-(gn*w)/2+gi*w,y=(l.axis==='y2'?Y2(v):Y(v)),base=(l.axis==='y2'?Y2(0):Y(0));
+        var r=E('rect',{x:x,y:y,width:w-2,height:Math.max(base-y,0),rx:2,fill:(l.colors?l.colors[i]:l.color),opacity:l.opacity!=null?(Array.isArray(l.opacity)?l.opacity[i]:l.opacity):1});
+        TT(r,(cfg.labels?cfg.labels[i]+': ':'')+v+(l.tt?' — '+(Array.isArray(l.tt)?l.tt[i]:l.tt):''));svg.appendChild(r)});
+    }
+    if(l.type==='stackbar'){
+      var w2=Math.min(bw*0.55,34),acc=[];
+      l.series.forEach(function(s){s.data.forEach(function(v,i){acc[i]=acc[i]||0;
+        var y0=Y(acc[i]),y1=Y(acc[i]+v);
+        var r=E('rect',{x:X(i)-w2/2,y:y1,width:w2,height:y0-y1,fill:s.color});
+        TT(r,cfg.labels[i]+' · '+s.label+': '+v);svg.appendChild(r);acc[i]+=v})});
+    }
+    if(l.type==='stackarea'){
+      var accA=cfg.labels.map(function(){return 0});
+      l.series.forEach(function(s){
+        var pts0=accA.slice(),pts1=accA.map(function(a,i){return a+s.data[i]});
+        var d='M'+X(0)+' '+Y(pts1[0]);pts1.forEach(function(v,i){if(i)d+=' L'+X(i)+' '+Y(v)});
+        for(var i=pts0.length-1;i>=0;i--)d+=' L'+X(i)+' '+Y(pts0[i]);d+=' Z';
+        svg.appendChild(E('path',{d:d,fill:s.color,opacity:0.55}));
+        var dl='M'+X(0)+' '+Y(pts1[0]);pts1.forEach(function(v,i){if(i)dl+=' L'+X(i)+' '+Y(v)});
+        svg.appendChild(E('path',{d:dl,fill:'none',stroke:s.color,'stroke-width':1.5}));
+        accA=pts1});
+    }
+    if(l.type==='line'){
+      var d='',started=false;
+      l.data.forEach(function(v,i){if(v==null){return}var px=X(i),py=(l.axis==='y2'?Y2(v):Y(v));
+        d+=(started?' L':'M')+px+' '+py;started=true});
+      if(l.fill){var dd=d;var lastIdx=l.data.length-1;while(l.data[lastIdx]==null)lastIdx--;
+        dd+=' L'+X(lastIdx)+' '+Y(yMin)+' L'+X(0)+' '+Y(yMin)+' Z';
+        svg.appendChild(E('path',{d:dd,fill:l.color,opacity:0.10}))}
+      var p=E('path',{d:d,fill:'none',stroke:l.color,'stroke-width':2});
+      if(l.dash)p.setAttribute('stroke-dasharray','5,4');svg.appendChild(p);
+      if(l.points!==false)l.data.forEach(function(v,i){if(v==null)return;
+        var c=E('circle',{cx:X(i),cy:(l.axis==='y2'?Y2(v):Y(v)),r:3,fill:'#FFF',stroke:l.color,'stroke-width':1.8});
+        TT(c,(cfg.labels?cfg.labels[i]+': ':'')+v);svg.appendChild(c)});
+    }
+    if(l.type==='hline'){var hy=(l.axis==='y2'?Y2(l.y):Y(l.y));
+      svg.appendChild(E('line',{x1:M.l,x2:W-M.r,y1:hy,y2:hy,stroke:l.color,'stroke-width':1.6,'stroke-dasharray':'6,4'}));
+      if(l.label)svg.appendChild(E('text',{x:W-M.r-4,y:hy-5,'text-anchor':'end','font-size':9,'font-family':FA,fill:l.color},l.label));}
+    if(l.type==='vline'){var vx=XV(l.x);
+      svg.appendChild(E('line',{x1:vx,x2:vx,y1:M.t,y2:H-M.b,stroke:l.color,'stroke-width':1.4,'stroke-dasharray':'5,4'}));
+      if(l.label)svg.appendChild(E('text',{x:vx+4,y:M.t+10,'font-size':9,'font-family':FA,fill:l.color},l.label));}
+    if(l.type==='fitline'){
+      svg.appendChild(E('line',{x1:XV(l.x1),y1:Y(l.y1),x2:XV(l.x2),y2:Y(l.y2),stroke:l.color,'stroke-width':1.8,'stroke-dasharray':'6,4'}));
+      if(l.label)svg.appendChild(E('text',{x:XV(l.x2)-4,y:Y(l.y2)-8,'text-anchor':'end','font-size':9,'font-family':FA,fill:l.color},l.label));}
+    if(l.type==='scatter'){
+      l.points.forEach(function(pt){var px=(cfg.xMin!=null?XV(pt.x):X(pt.x)),py=Y(pt.y);
+        var m;if(l.shape==='tri'){m=E('path',{d:'M'+px+' '+(py-5)+' L'+(px+5)+' '+(py+4)+' L'+(px-5)+' '+(py+4)+' Z',fill:l.color})}
+        else{m=E('circle',{cx:px,cy:py,r:l.r||3.5,fill:l.color,opacity:l.opacity||0.75})}
+        TT(m,(pt.t||('('+pt.x+', '+pt.y+')')));svg.appendChild(m)});
+    }
+    if(l.type==='xnums'){ /* numeric x ticks for scatter charts */
+      l.ticks.forEach(function(tv){var px=XV(tv);
+        svg.appendChild(E('text',{x:px,y:H-M.b+14,'text-anchor':'middle','font-size':9,'font-family':FM,fill:AXT},tv))});
+    }
+  });
+  /* plot frame baseline */
+  svg.appendChild(E('line',{x1:M.l,x2:W-M.r,y1:H-M.b,y2:H-M.b,stroke:'#CBD5E1','stroke-width':1}));
+}
+function donut(id,cfg){
+  var host=document.querySelector('[data-chart="'+id+'"]');if(!host)return;
+  var svg=E('svg',{viewBox:'0 0 '+W+' '+H});host.appendChild(svg);
+  var cx=200,cy=150,R=95,r=58,total=cfg.data.reduce(function(a,b){return a+b.v},0),a0=-Math.PI/2;
+  cfg.data.forEach(function(s){
+    var a1=a0+s.v/total*Math.PI*2,large=(a1-a0)>Math.PI?1:0;
+    var d='M'+(cx+R*Math.cos(a0))+' '+(cy+R*Math.sin(a0))+' A'+R+' '+R+' 0 '+large+' 1 '+(cx+R*Math.cos(a1))+' '+(cy+R*Math.sin(a1))+
+      ' L'+(cx+r*Math.cos(a1))+' '+(cy+r*Math.sin(a1))+' A'+r+' '+r+' 0 '+large+' 0 '+(cx+r*Math.cos(a0))+' '+(cy+r*Math.sin(a0))+' Z';
+    var p=E('path',{d:d,fill:s.c,stroke:'#FFF','stroke-width':2});TT(p,s.l+': '+s.v+(s.tt?' — '+s.tt:''));svg.appendChild(p);
+    a0=a1});
+  cfg.data.forEach(function(s,i){
+    var ly=70+i*34;
+    svg.appendChild(E('circle',{cx:390,cy:ly-4,r:5,fill:s.c}));
+    svg.appendChild(E('text',{x:404,y:ly,'font-size':11.5,'font-family':FA,fill:'#334155'},s.l+' ('+s.v+')'));
+    if(s.tt)svg.appendChild(E('text',{x:404,y:ly+13,'font-size':9.5,'font-family':FA,fill:'#94A3B8'},s.tt));});
+}
+function radar(id,cfg){
+  var host=document.querySelector('[data-chart="'+id+'"]');if(!host)return;
+  var svg=E('svg',{viewBox:'0 0 '+W+' '+H});host.appendChild(svg);
+  var cx=W/2,cy=H/2+6,R=100,n=cfg.axes.length;
+  function pt(i,v){var a=-Math.PI/2+i*2*Math.PI/n,rr=R*v/cfg.max;return[cx+rr*Math.cos(a),cy+rr*Math.sin(a)]}
+  [0.25,0.5,0.75,1].forEach(function(f){
+    var d='';for(var i=0;i<n;i++){var p=pt(i,cfg.max*f);d+=(i?' L':'M')+p[0]+' '+p[1]}d+=' Z';
+    svg.appendChild(E('path',{d:d,fill:'none',stroke:GRID,'stroke-width':1}))});
+  for(var i=0;i<n;i++){var p=pt(i,cfg.max);
+    svg.appendChild(E('line',{x1:cx,y1:cy,x2:p[0],y2:p[1],stroke:GRID,'stroke-width':1}));
+    var lp=pt(i,cfg.max*1.22);
+    svg.appendChild(E('text',{x:lp[0],y:lp[1]+3,'text-anchor':'middle','font-size':10,'font-family':FA,fill:'#475569'},cfg.axes[i]))}
+  cfg.series.forEach(function(s){
+    var d='';for(var i=0;i<n;i++){var p=pt(i,s.data[i]);d+=(i?' L':'M')+p[0]+' '+p[1]}d+=' Z';
+    var path=E('path',{d:d,fill:s.c,'fill-opacity':0.12,stroke:s.c,'stroke-width':2});
+    if(s.dash)path.setAttribute('stroke-dasharray','5,4');svg.appendChild(path);
+    for(var i=0;i<n;i++){var p=pt(i,s.data[i]);var c=E('circle',{cx:p[0],cy:p[1],r:2.6,fill:s.c});TT(c,cfg.axes[i]+' · '+s.l+': '+s.data[i]+'%');svg.appendChild(c)}});
+}
+function hbar(id,cfg){
+  var host=document.querySelector('[data-chart="'+id+'"]');if(!host)return;
+  if(cfg.legend){var lg=document.createElement('div');lg.className='legend-row';
+    cfg.legend.forEach(function(l){var li=document.createElement('span');li.className='li';
+      var sw=document.createElement('span');sw.className='dotc';sw.style.background=l.color;li.appendChild(sw);
+      li.appendChild(document.createTextNode(l.label));lg.appendChild(li)});
+    host.parentNode.insertBefore(lg,host)}
+  var HH=cfg.h||300;
+  var svg=E('svg',{viewBox:'0 0 '+W+' '+HH});host.appendChild(svg);
+  var ml=150,mr=40,mt=10,mb=26,n=cfg.labels.length,rowH=(HH-mt-mb)/n;
+  function XX(v){return ml+(W-ml-mr)*(v/cfg.xMax)}
+  for(var i=0;i<=4;i++){var tv=cfg.xMax*i/4,tx=XX(tv);
+    svg.appendChild(E('line',{x1:tx,x2:tx,y1:mt,y2:HH-mb,stroke:GRID,'stroke-dasharray':'3,3','stroke-width':1}));
+    svg.appendChild(E('text',{x:tx,y:HH-mb+13,'text-anchor':'middle','font-size':9,'font-family':FM,fill:AXT},cfg.xFmt?cfg.xFmt(tv):tv))}
+  var gn=cfg.series.length,bh=Math.min(rowH*0.6/gn,14);
+  cfg.labels.forEach(function(lb,i){
+    svg.appendChild(E('text',{x:ml-8,y:mt+rowH*i+rowH/2+3,'text-anchor':'end','font-size':10,'font-family':FA,fill:'#475569'},lb));
+    cfg.series.forEach(function(s,si){var v=s.data[i];if(v==null)return;
+      var y=mt+rowH*i+rowH/2-(gn*bh)/2+si*bh;
+      var r=E('rect',{x:ml,y:y,width:XX(v)-ml,height:bh-1.5,rx:2,fill:(s.colors?s.colors[i]:s.color)});
+      TT(r,lb+' · '+(s.label||'')+': '+v+(s.tt?' — '+s.tt[i]:''));svg.appendChild(r)})});
+  if(cfg.xTitle)svg.appendChild(E('text',{x:ml+(W-ml-mr)/2,y:HH-2,'text-anchor':'middle','font-size':9.5,'font-family':FA,fill:AXT},cfg.xTitle));
+}
+
+/* ══ Chart configs (all data verbatim from Ryan's proto) ══ */
+var BLUE='#3B82F6',GREEN='#10B981',GREY='#CBD5E1',RED='#EF4444',AMBER='#F59E0B',PURPLE='#8B5CF6',TEAL='#14B8A6',PINK='#EC4899',DGREEN='#059669';
+
+chart('brAngle',{labels:['教育價值型','信任建立型','情感故事型','娛樂潮流型','社區互動型','品牌資產型','促銷轉化型'],yMax:5,yTitle:'Avg ER %',tiltX:true,
+  legend:[{label:'Avg ER % (90D)',color:BLUE,round:true},{label:'Page median ER 2.41%',color:GREEN,dash:true}],
+  layers:[{type:'bar',data:[4.12,3.80,3.55,3.21,2.94,2.36,1.98],colors:[BLUE,GREY,GREY,GREY,GREY,GREY,RED],tt:['posts: 23','posts: 14','posts: 12','posts: 9','posts: 7','posts: 11','posts: 24']},
+          {type:'hline',y:2.41,color:GREEN,label:'Page median ER 2.41%'}]});
+
+chart('brSlot',{labels:['06','08','10','12','14','16','18','19','20','21','22','23','00','02'],yMax:20,y2Max:4,xTitle:'Hour (HKT)',yTitle:'Online followers %',y2Title:'Median ER %',yFmt:function(v){return v+'%'},y2Fmt:function(v){return v+'%'},
+  legend:[{label:'Online followers %',color:BLUE,round:true},{label:'Median ER % in slot',color:GREEN}],
+  layers:[{type:'bar',data:[2.1,4.8,6.4,9.2,7.8,8.4,11.8,14.6,16.1,18.4,17.2,12.4,7.1,3.2],color:BLUE,opacity:[0.35,0.35,0.35,0.35,0.35,0.35,0.35,0.35,0.35,1,0.35,0.35,0.35,0.35]},
+          {type:'line',axis:'y2',data:[1.42,1.61,1.78,2.60,2.11,2.24,2.34,2.72,2.81,3.02,2.96,2.48,1.94,1.55],color:GREEN}]});
+
+chart('poER',{labels:['V1','V2','V3','V4','V5','V6'],yMax:6,yTitle:'Predicted ER %',
+  legend:[{label:'Predicted ER % (point)',color:BLUE,round:true},{label:'Page P50 2.41%',color:'#94A3B8',dash:true},{label:'Page P75 4.02%',color:PURPLE,dash:true}],
+  layers:[{type:'bar',data:[4.15,4.65,3.85,4.40,3.45,2.00],colors:[BLUE,GREEN,BLUE,BLUE,AMBER,RED],tt:['80% CI: 3.7–4.6%','80% CI: 4.1–5.2%','80% CI: 3.4–4.3%','80% CI: 3.9–4.9%','80% CI: 2.9–4.0%','80% CI: 1.6–2.4%']},
+          {type:'hline',y:2.41,color:'#94A3B8',label:'Page P50 2.41%'},
+          {type:'hline',y:4.02,color:PURPLE,label:'Page P75 4.02%'}]});
+
+donut('poHook',{data:[
+  {l:'Problem Introduction',v:2,c:BLUE,tt:'measured 3s retention: 24.1%'},
+  {l:'Stat / Number Reveal',v:2,c:GREEN,tt:'measured 3s retention: 22.8%'},
+  {l:'Talking-head Direct',v:1,c:PURPLE,tt:'measured 3s retention: 18.6%'},
+  {l:'Product Close-up',v:1,c:PINK,tt:'measured 3s retention: 15.2%'}]});
+
+hbar('viCat',{labels:['Before & After','Infographic','Customer Review','UGC & Lifestyle','Face-Only','Product-Only','CTA Image','Promo Offer','Text-Only'],xMax:6,h:320,xTitle:'ER %',xFmt:function(v){return v+'%'},
+  legend:[{label:'Page measured avg ER % (90D)',color:GREY},{label:'Predicted ER % of generated assets',color:BLUE}],
+  series:[{label:'Page measured avg ER % (90D)',color:GREY,data:[5.24,4.86,4.11,3.72,3.05,2.28,2.02,1.84,1.41]},
+          {label:'Predicted ER % of generated assets',color:BLUE,data:[4.52,4.60,null,null,null,null,null,null,null]}]});
+
+chart('viThumb',{labels:['40–49','50–59','60–69','70–79','80–89','90–100'],yMax:26,xTitle:'Thumb-stop score band',yTitle:'Assets',
+  legend:[{label:'Published assets, last 90D (count)',color:GREY,round:true},{label:'Generated set (count)',color:BLUE,round:true},{label:'Page median thumb-stop 66',color:RED,round:true}],
+  layers:[{type:'bar',data:[9,17,24,21,11,3],color:GREY},
+          {type:'bar',data:[0,0,2,3,3,0],color:BLUE},
+          {type:'scatter',points:[{x:2,y:24.8,t:'Page median thumb-stop 66'}],color:RED,r:4.5,opacity:1}]});
+
+chart('vdRet',{labels:['Impression','3s','25%','50%','75%','Complete'],yMax:100,log:true,logMin:1,yTitle:'% of impressions retained (log)',
+  legend:[{label:'Problem Introduction',color:BLUE},{label:'Stat / Number Reveal',color:GREEN},{label:'Slow Establishing Shot',color:RED,dash:true}],
+  layers:[{type:'line',data:[100,24.1,18.4,13.6,9.8,7.1],color:BLUE},
+          {type:'line',data:[100,22.8,18.9,14.8,11.2,8.6],color:GREEN},
+          {type:'line',data:[100,9.8,6.1,3.9,2.4,1.6],color:RED,dash:true}]});
+
+chart('vdLen',{labels:['0–6s','6–15s','15–30s','30–45s','45–60s','60s+'],yMax:70,y2Max:20,yTitle:'ThruPlay rate %',y2Title:'Videos produced',yFmt:function(v){return v+'%'},
+  legend:[{label:'Measured ThruPlay rate %',color:GREEN},{label:'Videos produced (count, 90D)',color:GREY,round:true},{label:'This brief: master + cutdowns',color:BLUE,round:true}],
+  layers:[{type:'bar',axis:'y2',data:[2,5,9,17,12,4],color:GREY},
+          {type:'line',data:[61.4,38.2,24.6,14.8,11.9,8.4],color:GREEN},
+          {type:'scatter',points:[{x:0,y:63.5,t:'Cutdown C 6s · 63.5%'},{x:1,y:41.2,t:'Cutdown A 15s · 41.2%'},{x:4,y:12.4,t:'Master 0:47 · 12.4%'}],color:BLUE,shape:'tri'}]});
+
+chart('vdBeat',{labels:['0:00 Hook','0:03 Agitate','0:09 Evidence','0:21 Proof','0:31 How-to','0:41 CTA'],yMax:26,yTitle:'% retained',
+  layers:[{type:'bar',data:[24.1,22.2,19.8,17.6,14.3,12.4],colors:[BLUE,BLUE,GREEN,GREEN,AMBER,PURPLE],tt:['beat drop-off: —','beat drop-off: −8%','beat drop-off: −11%','beat drop-off: −11%','beat drop-off: −19%','beat drop-off: −13%']}]});
+
+chart('scFatigue',{labels:['Use 1','Use 2','Use 3','Use 4','Use 5','Use 6'],yMax:4.5,yMin:1,xTitle:'Nth use within a 12-post window',yTitle:'ER %',
+  legend:[{label:'促銷轉化型 (blocked)',color:RED},{label:'情感故事型 (watch)',color:AMBER},{label:'教育價值型 (clear)',color:GREEN}],
+  layers:[{type:'line',data:[2.90,2.62,2.31,2.05,1.80,1.62],color:RED,fill:true},
+          {type:'line',data:[3.55,3.38,3.02,null,null,null],color:AMBER},
+          {type:'line',data:[4.12,4.10,4.06,null,null,null],color:GREEN}]});
+
+chart('scCal',{xMin:38,xMax:100,yMax:7.4,yTicks:4,xTitle:'Pre-flight score at publish time',yTitle:'Delivered ER %',
+  legend:[{label:'Published posts (n=60)',color:BLUE,round:true},{label:'Fit: ER = 0.082·score − 2.06 (r=0.52)',color:RED,dash:true}],
+  layers:[
+    {type:'xnums',ticks:[40,50,60,70,80,90,100]},
+    {type:'scatter',color:BLUE,points:[[42,1.4],[46,1.9],[48,1.2],[51,2.4],[53,1.7],[55,2.0],[57,2.9],[58,1.6],[59,2.3],[61,2.6],[62,1.9],[63,3.1],[64,2.2],[65,2.8],[66,3.4],[67,2.1],[68,3.0],[69,2.5],[70,3.6],[70,2.4],[71,3.2],[72,2.7],[72,4.1],[73,3.4],[74,2.9],[74,3.9],[75,3.1],[76,4.4],[76,2.6],[77,3.8],[77,4.6],[78,3.3],[78,4.2],[79,3.6],[79,5.0],[80,4.1],[80,3.0],[81,4.8],[81,3.7],[82,4.4],[82,5.3],[83,3.9],[83,4.9],[84,5.6],[84,4.2],[85,4.7],[85,3.5],[86,5.4],[86,4.4],[87,5.1],[87,6.0],[88,4.6],[88,5.7],[89,5.2],[90,6.3],[90,4.5],[91,5.9],[92,6.6],[93,5.4],[95,6.9]].map(function(p){return{x:p[0],y:p[1],t:'score '+p[0]+' → ER '+p[1]+'%'}})},
+    {type:'fitline',x1:42,y1:1.38,x2:95,y2:5.73,color:RED,label:'Fit: ER = 0.082·score − 2.06 (r=0.52)'},
+    {type:'vline',x:70,color:'#94A3B8',label:'Ship bar (70)'}]});
+
+chart('caVol',{labels:['W28','W29','W30','W31','W32','W33','W34'],yMax:8,yTitle:'Posts',
+  legend:[{label:'Planned',color:GREY,round:true},{label:'Published',color:BLUE,round:true}],
+  layers:[{type:'bar',data:[7,7,7,6,7,7,7],color:GREY},{type:'bar',data:[6,7,5,6,5,3,0],color:BLUE}]});
+
+chart('caDist',{labels:['55–59','60–64','65–69','70–74','75–79','80–84','85+'],yMax:8,xTitle:'Pre-flight score band',yTitle:'Posts in queue',
+  layers:[{type:'bar',data:[1,2,2,6,7,5,1],colors:[RED,RED,AMBER,BLUE,BLUE,GREEN,GREEN],tt:['below ship bar 70','below ship bar 70','below ship bar 70','clears ship bar','clears ship bar','clears ship bar','clears ship bar']}]});
+
+radar('caMix',{axes:['教育價值型','信任建立型','情感故事型','社區互動型','娛樂潮流型','促銷轉化型'],max:40,
+  series:[{l:'Current queue %',c:BLUE,data:[33,21,17,4,4,21]},{l:'Recommended mix %',c:GREEN,dash:true,data:[35,22,15,14,8,6]}]});
+
+chart('auFlow',{labels:['W27','W28','W29','W30','W31','W32','W33','W34'],yMax:40,y2Max:100,yTitle:'Proposals',y2Title:'Approval rate %',y2Fmt:function(v){return v+'%'},
+  legend:[{label:'Approved',color:GREEN,round:true},{label:'Rejected',color:RED,round:true},{label:'Expired / no action',color:GREY,round:true},{label:'Approval rate %',color:PURPLE}],
+  layers:[{type:'stackbar',series:[{label:'Approved',color:GREEN,data:[9,12,14,16,19,22,26,30]},{label:'Rejected',color:RED,data:[8,9,8,7,7,6,6,5]},{label:'Expired / no action',color:GREY,data:[4,3,4,3,2,3,2,2]}]},
+          {type:'line',axis:'y2',data:[43,50,54,62,68,71,76,81],color:PURPLE}]});
+
+hbar('auRate',{labels:['Pause ad set','Creative refresh','Resume ad set','Publish post','Slot change','Budget shift'],xMax:100,h:300,xTitle:'Approval rate %',xFmt:function(v){return v+'%'},
+  series:[{label:'Approval rate %',data:[94,82,78,73,39,52],colors:[GREEN,GREEN,BLUE,BLUE,RED,AMBER],tt:['n = 50 proposals','n = 28 proposals','n = 23 proposals','n = 31 proposals','n = 18 proposals','n = 25 proposals']}]});
+
+chart('auTime',{labels:['W27','W28','W29','W30','W31','W32','W33','W34'],yMax:400,yTitle:'Minutes saved per week',
+  legend:[{label:'Ad ops monitoring (min)',color:BLUE,round:true},{label:'Brief & draft prep (min)',color:PURPLE,round:true},{label:'Scheduling & QA (min)',color:GREEN,round:true}],
+  layers:[{type:'stackarea',series:[{label:'Ad ops monitoring (min)',color:BLUE,data:[62,78,95,104,126,141,158,172]},{label:'Brief & draft prep (min)',color:PURPLE,data:[40,55,68,84,96,112,124,138]},{label:'Scheduling & QA (min)',color:GREEN,data:[18,22,26,31,35,40,46,52]}]}]});
+</script>
+</body>
+</html>
