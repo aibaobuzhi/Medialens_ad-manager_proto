@@ -124,6 +124,10 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
 .rank-item-top{display:flex;align-items:flex-start;gap:8px;justify-content:space-between;min-width:0;}
 .rank-num{font-size:12px;font-weight:700;color:var(--ac-accent-rank,#FFA500);width:16px;flex-shrink:0;line-height:1.35;}
 .rank-name{font-size:13px;font-weight:500;color:#1e293b;flex:1 1 auto;min-width:0;line-height:1.35;word-wrap:anywhere;}
+/* Winner star — sits right after the row name, tinted with the colour of the page that
+   performs best in that row. Colour is the whole signal, so it needs no legend beyond
+   the page pill row already under every card. */
+.rank-star{font-size:11.5px;line-height:1;margin-left:6px;vertical-align:1px;cursor:help;}
 .rank-val{font-size:.8rem;color:var(--ac-text);font-weight:600;line-height:1.4;min-width:110px;text-align:right;flex-shrink:0;}
 .stack-track{background:#f1f5f9;border-radius:2px;height:4px;margin-top:5px;overflow:hidden;width:100%;}
 .stack-fill{border-radius:2px;height:100%;display:flex;transition:width .45s ease;}
@@ -199,7 +203,17 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
 .ct-trend.up{color:#1E8E3E;}
 .ct-trend.down{color:#C0392B;}
 .ct-trend.flat{color:var(--ac-secondary);}
-.bf-page-select{background:var(--ac-pill-active-bg);border:1px solid var(--ac-border);border-radius:8px;color:var(--ac-text);cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:600;padding:7px 12px;}
+/* Compare-page control — deliberately larger than the other chrome: it changes which
+   page the whole table is benchmarked against, so it has to read as a control. */
+.bf-cmp-wrap{display:flex;align-items:center;gap:10px;background:var(--ac-brand-tint);border:1px solid #BFE3FB;border-radius:12px;padding:8px 12px;}
+.bf-cmp-label{font-size:12.5px;font-weight:700;color:var(--ac-brand);white-space:nowrap;}
+.bf-page-select{background:#fff;border:1px solid #A9D9F7;border-radius:9px;color:var(--ac-title);cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;padding:9px 34px 9px 14px;min-width:170px;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2323A9F6' stroke-width='3'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+  box-shadow:0 1px 3px rgba(0,0,0,.07);transition:border-color .15s,box-shadow .15s;}
+.bf-page-select:hover{border-color:var(--ac-brand);box-shadow:0 2px 6px rgba(35,169,246,.2);}
+.bf-page-select:focus{outline:none;border-color:var(--ac-brand);box-shadow:0 0 0 3px rgba(35,169,246,.18);}
 .bf-fmt-group{display:flex;align-items:center;gap:2px;flex-wrap:wrap;background:var(--ac-pill-track);border-radius:var(--ac-r);padding:3px;margin-bottom:14px;width:fit-content;}
 .bf-fmt-btn{background:transparent;border:none;border-radius:8px;color:var(--ac-muted);cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:500;padding:7px 14px;white-space:nowrap;}
 .bf-fmt-btn.active{background:var(--ac-pill-active-bg);box-shadow:0 1px 3px rgba(0,0,0,.08);color:var(--ac-brand);font-weight:600;}
@@ -242,6 +256,12 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
 .top-cat-name{font-weight:500;}
 .top-page-dot{width:8px;height:8px;border-radius:3px;flex-shrink:0;}
 .top-empty{color:var(--ac-secondary);font-weight:500;}
+
+/* Category rows are clickable and expand into one sub-row per page. */
+.top-main-row{cursor:pointer;}
+.top-chevron{color:var(--ac-secondary);flex-shrink:0;transition:transform .15s;}
+.top-chevron.open{transform:rotate(-180deg);}
+.top-sub-row td{background:#FCFDFE;}
 
 .top-pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--ac-divider);}
 .top-pagination-info{font-size:11.5px;color:var(--ac-secondary);}
@@ -733,6 +753,19 @@ function rankCardHTML(title, sub, rows, showAll, metric){
   const grandTotal = withTotal.reduce((s,r)=>s+r.total,0);
   const max = sorted[0] ? sorted[0].total : 1;
   const items = sorted.map((r,i)=>{
+    // Star = the page that performs best in this row. "Best" is per-post for count
+    // metrics and the rate itself for ratio metrics — i.e. quality, not volume, since
+    // volume is already readable from the segment widths. Pages under the sample-size
+    // floor are skipped so a 1-post fluke can't win a row.
+    let starPi = -1, starVal = -1;
+    r.pages.forEach((p,idx)=>{
+      if((p.posts||0) < BF_MIN_N) return;
+      const v = pageMetricVal(p, metric, true);
+      if(v > starVal){ starVal = v; starPi = idx; }
+    });
+    const star = starPi>=0
+      ? `<span class="rank-star" style="color:${PAGES[starPi].color}" title="Best in this row: ${esc(PAGES[starPi].name)} · ${metricLabel(metric, true)} ${fmtMetric(starVal, metric, true)} (n ≥ ${BF_MIN_N})">★</span>`
+      : '';
     const pct = (isCount && grandTotal) ? Math.round(r.total/grandTotal*100) : null;
     const fillW = max ? (r.total/max*100) : 0;
     const segSum = r.vals.reduce((t,v)=>t+v,0);
@@ -745,7 +778,7 @@ function rankCardHTML(title, sub, rows, showAll, metric){
     return `<div class="rank-item">
       <div class="rank-item-top">
         <span class="rank-num">${i+1}</span>
-        <span class="rank-name">${esc(r.name)}</span>
+        <span class="rank-name">${esc(r.name)}${star}</span>
         <span class="rank-val">${fmtMetric(r.total, metric)}${pct!=null?` (${pct}%)`:''}</span>
       </div>
       <div class="stack-track"><div class="stack-fill" style="width:${fillW}%;">${segs}</div></div>
@@ -938,8 +971,8 @@ function renderHeatmap(){
   el.innerHTML = `<div class="card">
     <div class="card-hd">
       <div class="card-title bf-title">Category Battlefield — ${esc(lens.label)}</div>
-      <div class="metric-select-wrap">
-        <span class="metric-select-label">Compare page:</span>
+      <div class="bf-cmp-wrap">
+        <span class="bf-cmp-label">Compare page</span>
         <select class="bf-page-select" onchange="setBfPage(this.value)">${pageOptions}</select>
       </div>
     </div>
@@ -966,16 +999,11 @@ function renderCombos(){
 }
 
 // ---------- 5. Top categories table ----------
-// Columns = Category + one column per METRIC (all metrics shown at once, so this table is
-// independent of the Metric selector — that selector only drives cards 1 and 3).
-// Each row is a category with the combined totals of every selected page; click a category
-// to expand one sub-row per page, tinted with that page's colour.
-// Columns = Posts + whatever metrics the current scenario actually offers. That is why
-// the two Competitor scenarios show three data columns and My Page shows the full set:
-// the missing columns are metrics competitor data does not carry, not a display choice.
 // Columns = Posts + every metric the scenario offers, each shown in its base (non-Avg)
 // form. The table is a full data read-out, so it is deliberately independent of the
 // Metric selector and its Avg toggle.
+// Each row is a category with the combined totals of every selected page; click a
+// category to expand one sub-row per page, tinted with that page's colour.
 function topMetrics(){
   return [{key:'posts', label:'Posts'},
           ...sc().metrics.map(k=>({key:k, label:METRIC_CATALOG[k].label}))];
@@ -1003,7 +1031,6 @@ function topChevron(open){
   return `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="top-chevron${open?' open':''}"><polyline points="6 9 12 15 18 9"/></svg>`;
 }
 
-// all five metrics for one page's stats object (or for a combined total)
 // Values for every column of one row, from a list of page stat objects (one page, or
 // all of them pooled). Rates re-derive from pooled numerator/denominator via
 // pooledMetricVal, so a category row is never an average of averages.
@@ -1019,7 +1046,6 @@ function renderTopTable(){
   // The scenario may have just dropped the column we were sorting by (e.g. switching
   // from FB My Page to a Competitor scenario loses ER / CTR) — fall back to Engagement.
   if(!cols.some(m=>m.key===topSortKey)) topSortKey = 'eng';
-  const posts0 = {key:'posts', label:'Posts'};
   const sortLabel = (cols.find(m=>m.key===topSortKey)||cols[1]).label;
 
   document.getElementById('top-sub').textContent =
