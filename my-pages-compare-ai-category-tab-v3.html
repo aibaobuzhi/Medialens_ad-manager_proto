@@ -257,6 +257,12 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
 .top-page-dot{width:8px;height:8px;border-radius:3px;flex-shrink:0;}
 .top-empty{color:var(--ac-secondary);font-weight:500;}
 
+/* Card header row: title block on the left, Export CSV on the right. */
+.top-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.csv-btn{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;background:#fff;border:1px solid var(--ac-border);border-radius:9px;color:var(--ac-text);cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:600;padding:7px 13px;transition:border-color .15s,color .15s,box-shadow .15s;}
+.csv-btn:hover{border-color:var(--ac-brand);color:var(--ac-brand);box-shadow:0 1px 4px rgba(35,169,246,.18);}
+.csv-btn svg{flex-shrink:0;}
+
 /* Category rows are clickable and expand into one sub-row per page. */
 .top-main-row{cursor:pointer;}
 .top-chevron{color:var(--ac-secondary);flex-shrink:0;transition:transform .15s;}
@@ -361,8 +367,16 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
       <div class="section">
         <div class="card" style="padding:0;overflow:hidden;">
           <div style="padding:20px 20px 0;">
-            <div class="card-title">Top categories</div>
-            <div class="card-sub" id="top-sub"></div>
+            <div class="top-hd">
+              <div>
+                <div class="card-title">Top categories</div>
+                <div class="card-sub" id="top-sub"></div>
+              </div>
+              <button class="csv-btn" onclick="exportTopCategoriesCsv()" title="Download every category × page row with the columns currently shown">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export CSV
+              </button>
+            </div>
           </div>
           <div class="top-wrap">
             <table class="top-table">
@@ -603,6 +617,10 @@ function fmt(n){
 // `Page ER` and `Page ER (bp)` are the SAME underlying value on two display scales
 // (bp = percent × 100), which is why they are separate option ids.
 const METRIC_CATALOG = {
+  // `posts` is never offered in the Metric bar (no scenario lists it) — it exists here
+  // so the Top categories table and its CSV export can resolve their Posts column
+  // through the same pooling helpers as every other column.
+  posts:     {label:'Posts',           kind:'count', field:'posts',        supportsAvg:false},
   eng:       {label:'Engagement',      kind:'count', field:'eng',          supportsAvg:true,  defaultAvg:true},
   likes:     {label:'Likes',           kind:'count', field:'likes',        supportsAvg:true,  defaultAvg:true},
   comments:  {label:'Comments',        kind:'count', field:'comments',     supportsAvg:true,  defaultAvg:true},
@@ -1005,8 +1023,7 @@ function renderCombos(){
 // Each row is a category with the combined totals of every selected page; click a
 // category to expand one sub-row per page, tinted with that page's colour.
 function topMetrics(){
-  return [{key:'posts', label:'Posts'},
-          ...sc().metrics.map(k=>({key:k, label:METRIC_CATALOG[k].label}))];
+  return ['posts', ...sc().metrics].map(k=>({key:k, label:METRIC_CATALOG[k].label}));
 }
 const TOP_PAGE_SIZE = 10;
 let topPage = 1;
@@ -1107,6 +1124,68 @@ function renderTopTable(){
 function goToTopPage(p){
   topPage = p;
   renderTopTable();
+}
+
+// ---------- Export CSV (Top categories) ----------
+// One row per category × page, so a category with five pages exports five rows. The
+// first two columns are fixed (category / Page Name); everything after them is exactly
+// the metric columns the table is currently showing, so the export follows the scenario
+// automatically. The whole category list is exported, not just the visible page.
+//
+// Values keep the ="1,234" wrapper the existing MediaLens exports use — that is what
+// makes Excel show the thousands separators instead of re-parsing the number. Because
+// the wrapper contains a comma, the field ALSO has to be quoted the RFC-4180 way (whole
+// field in quotes, inner quotes doubled), otherwise a parser splits it at that comma:
+//   unquoted field  ->  ="35,364"       ->  naive split breaks it into two fields
+//   quoted field    ->  "=""35,364"""   ->  one field everywhere, Excel still shows 35,364
+function csvField(raw){
+  return '"' + String(raw).replace(/"/g, '""') + '"';
+}
+// Text that should survive verbatim in Excel (page names, formatted numbers).
+function csvCell(v){
+  return csvField('="' + String(v) + '"');
+}
+function csvNumber(v, key){
+  const o = METRIC_CATALOG[key];
+  if(o && o.kind==='rate') return csvCell(v.toFixed(2) + (o.unit||''));
+  return csvCell(Math.round(v).toLocaleString('en-US'));
+}
+
+function buildTopCategoriesCsv(){
+  const cols = topMetrics();
+  // Same order the table is showing, but every category rather than the current page.
+  const rows = LENSES[currentLens].categories.map(c=>
+    ({name:c.name, pages:c.pages, ...topMetricValues(c.pages)}));
+  const dir = topSortDir==='desc' ? -1 : 1;
+  const sorted = [...rows].sort((a,b)=>(a[topSortKey]-b[topSortKey])*dir);
+
+  const header = ['category','Page Name', ...cols.map(m=>m.label)].map(csvField);
+  const lines = [header.join(',')];
+  sorted.forEach(r=>{
+    PAGES.forEach((p,pi)=>{
+      const v = topMetricValues([r.pages[pi]]);
+      lines.push([
+        csvField(r.name),             // plain text (no ="…" wrapper), as in the existing exports
+        csvCell(p.name),
+        ...cols.map(m=>csvNumber(v[m.key], m.key))
+      ].join(','));
+    });
+  });
+  return lines.join('\r\n');
+}
+
+function exportTopCategoriesCsv(){
+  const csv = buildTopCategoriesCsv();
+  // BOM so Excel opens the Chinese page names as UTF-8 rather than mojibake.
+  const blob = new Blob(['\uFEFF' + csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Top Categories - ${LENSES[currentLens].label} - ${sc().label}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 function setLens(lens, el){
