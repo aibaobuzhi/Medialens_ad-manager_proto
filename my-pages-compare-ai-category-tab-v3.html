@@ -528,9 +528,14 @@ function fmt(n){
 //                        Avg Video Views / CTR / Non-Fans Reach          (7)
 //   IG  METRIC_OPTIONS = Avg Engagement / Engagement / ER by reaches /
 //                        ER by Followers / Avg Video Views               (5)
-// Competitor scenarios are limited to Engagement + Average, because ER / CTR /
-// Reach come from a page's private Insights and are not available for pages the
-// org does not own.
+// Competitor scenarios keep every metric whose inputs are publicly observable and
+// already fetched on the competitor side (engagement, posts, video views, follower
+// count). What they lose is only the metrics that need a page's private Insights:
+//   ER (by reaches) / CTR / Non-Fans Reach  → need reach, clicks, impressions.
+// A follower-based ratio IS available, because follower counts are public and the
+// competitor pages already load them (FB fanCount/followersCount, IG followers_count).
+// FB expresses it as Page ER (bp), IG as ER by Followers — each platform keeps the
+// name its shipped single-page AI Category tab already uses.
 //
 // `type` decides how several pages are pooled into one headline figure:
 //   count → straight sum        (Posts, Engagement, Non-Fans Reach)
@@ -588,7 +593,7 @@ const SCENARIOS = {
     section:'competitors',
     title:'Competitors · Compare',
     accountTabLabel:'Page',
-    metrics:['aeng','eng'],
+    metrics:['aeng','eng','pageer','avv'],
     defaultMetric:'eng',
     // No Reels: myPageMediaTypes is never mixed in on the competitor side.
     formats:['Photo','Video','Album','Link','Share','Status'],
@@ -602,7 +607,7 @@ const SCENARIOS = {
     section:'competitors',
     title:'Competitors · Compare',
     accountTabLabel:'Account',
-    metrics:['aeng','eng'],
+    metrics:['aeng','eng','erf','avv'],
     defaultMetric:'eng',
     formats:null,
     hasBattlefield:false,
@@ -708,14 +713,19 @@ function renderScatter(){
   const lens = LENSES[currentLens];
   const svg = document.getElementById('scatter-svg');
   const W=900,H=360,padL=50,padR=20,padT=16,padB=36;
-  const hasER = sc().metrics.indexOf('er') !== -1;
+  // Bubble size is always a real engagement-rate metric — just not always the same one.
+  // Own pages can use ER (engagements ÷ reach); competitor pages have no reach, so they
+  // fall back to the follower-based ratio their platform already ships (FB Page ER,
+  // IG ER by Followers). Only if a scenario had no rate metric at all would this be null.
+  const rateKey = ['er','erf','pageer'].find(k=>sc().metrics.indexOf(k)!==-1) || null;
+  const rateLabel = rateKey ? METRIC_META[rateKey].label : null;
   let maxPosts=0, maxAvgEng=0, maxER=0, maxSize=0;
   lens.categories.forEach(c=>c.pages.forEach(p=>{
     if(p.posts>maxPosts)maxPosts=p.posts;
     const avg = p.eng/p.posts;
     if(avg>maxAvgEng)maxAvgEng=avg;
     if(p.er>maxER)maxER=p.er;
-    const sv = hasER ? p.er : avg;
+    const sv = rateKey ? pageMetricVal(p, rateKey) : avg;
     if(sv>maxSize)maxSize=sv;
   }));
 
@@ -734,19 +744,19 @@ function renderScatter(){
   lens.categories.forEach(c=>{
     c.pages.forEach((p,idx)=>{
       const avg = p.eng/p.posts;
-      // Competitor scenarios have no ER (no reach data), so the bubble falls back to
-      // sizing on avg engagement there instead of silently showing a rate we can't get.
-      const sizeVal = hasER ? p.er : avg;
-      const erText = hasER ? `  ER: ${p.er}%` : '';
+      const sizeVal = rateKey ? pageMetricVal(p, rateKey) : avg;
+      const erText = rateKey ? `  ${rateLabel}: ${fmtMetric(pageMetricVal(p, rateKey), rateKey)}` : '';
       dots += `<circle cx="${x(p.posts)}" cy="${y(avg)}" r="${r(sizeVal)}" fill="${PAGES[idx].color}" opacity="0.5" stroke="${PAGES[idx].color}" stroke-width="1.2"><title>${esc(c.name)} · ${esc(PAGES[idx].name)}\nPosts: ${p.posts}  Avg Eng/Post: ${fmt(Math.round(avg))}${erText}</title></circle>`;
     });
   });
 
   svg.innerHTML = axes + dots;
-  document.getElementById('scatter-sub').textContent = `Each dot is one ${lens.label.toLowerCase()} for one page · x = posts, y = avg engagement per post, size = ${hasER?'engagement rate':'avg engagement'}`;
-  document.getElementById('scatter-note').textContent = hasER
-    ? 'Bubble size = engagement rate for that category'
-    : 'Bubble size = avg engagement per post (engagement rate needs reach data, which is not available for competitor pages)';
+  document.getElementById('scatter-sub').textContent = `Each dot is one ${lens.label.toLowerCase()} for one page · x = posts, y = avg engagement per post, size = ${rateLabel?rateLabel.toLowerCase():'avg engagement'}`;
+  document.getElementById('scatter-note').textContent = rateKey==='er'
+    ? 'Bubble size = ER (engagements ÷ reach) for that category'
+    : rateKey
+      ? `Bubble size = ${rateLabel} for that category — competitor pages have no reach data, so the rate uses the public follower count as its base`
+      : 'Bubble size = avg engagement per post';
   document.getElementById('pill-scatter').innerHTML = pageLegendHTML();
 }
 
