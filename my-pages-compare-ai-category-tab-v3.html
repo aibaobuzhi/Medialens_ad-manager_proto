@@ -344,10 +344,10 @@ body{font-family:'Lato','Noto Sans HK',sans-serif;background:var(--ac-bg);color:
       <!-- 1. Category Bars — "{Lens} vs {Metric}" -->
       <div class="section" id="section-bars"></div>
 
-      <!-- 2. Avg Engagements vs Posts — scatter (identical in both modes) -->
+      <!-- 2. {Metric} vs Posts — scatter; the y axis follows the Metric selector -->
       <div class="section">
         <div class="card scatter-wrap">
-          <div class="card-hd"><div class="card-title">Avg Engagements vs Posts</div></div>
+          <div class="card-hd"><div class="card-title" id="scatter-title">Avg Engagement vs Posts</div></div>
           <div class="card-sub" id="scatter-sub">Each dot is one category for one page · x = posts, y = avg engagements per post</div>
           <svg id="scatter-svg" width="100%" height="360" viewBox="0 0 900 360"></svg>
           <div class="scatter-note" id="scatter-note">Bubble size = engagement rate for that category</div>
@@ -510,7 +510,9 @@ function buildCombos(namesA, namesB, seed, n){
     const pages = PAGES.map((p,idx)=>makePageStats(rnd, 2+rnd()*14, PAGE_FOLLOWERS[idx]));
     out.push({name:`${a} × ${b}`, pages});
   }
-  return out.sort((x,y)=>sumMetric(y,'eng')-sumMetric(x,'eng')).slice(0,8);
+  // Return every candidate — the card picks its own top rows for whichever metric is
+  // selected, so the shortlist can't be frozen to one metric here.
+  return out;
 }
 
 // Split a whole number across weighted buckets so the parts sum back to the total exactly.
@@ -575,23 +577,23 @@ const LENSES = {
     label: 'Content category',
     categories: CONTENT_CATEGORIES,
     combos: [
-      {title:'Content category × Ad category', sub:'Top pairings ranked by combined engagements of all pages', data: buildCombos(CONTENT_CATS, AD_CATS, 21, 40)},
-      {title:'Content category × Image category', sub:'Top pairings ranked by combined engagements of all pages', data: buildCombos(CONTENT_CATS, IMAGE_CATS, 22, 40)},
+      {title:'Content category × Ad category', data: buildCombos(CONTENT_CATS, AD_CATS, 21, 40)},
+      {title:'Content category × Image category', data: buildCombos(CONTENT_CATS, IMAGE_CATS, 22, 40)},
     ]
   },
   ad: {
     label: 'Ad category',
     categories: buildCategoryData(AD_CATS, 31, false),
     combos: [
-      {title:'Ad category × Image category', sub:'Top pairings ranked by combined engagements of all pages', data: buildCombos(AD_CATS, IMAGE_CATS, 32, 40)},
+      {title:'Ad category × Image category', data: buildCombos(AD_CATS, IMAGE_CATS, 32, 40)},
     ]
   },
   image: {
     label: 'Image category',
     categories: buildCategoryData(IMAGE_CATS, 41, false),
     combos: [
-      {title:'Image category × Content category', sub:'Top pairings ranked by combined engagements of all pages', data: buildCombos(IMAGE_CATS, CONTENT_CATS, 42, 40)},
-      {title:'Image category × Ad category', sub:'Top pairings ranked by combined engagements of all pages', data: buildCombos(IMAGE_CATS, AD_CATS, 43, 40)},
+      {title:'Image category × Content category', data: buildCombos(IMAGE_CATS, CONTENT_CATS, 42, 40)},
+      {title:'Image category × Ad category', data: buildCombos(IMAGE_CATS, AD_CATS, 43, 40)},
     ]
   }
 };
@@ -826,7 +828,7 @@ function renderBars(){
   );
 }
 
-// ---------- 2. Avg Engagements vs Posts (same in both modes) ----------
+// ---------- 2. {Metric} vs Posts (y axis follows the Metric selector) ----------
 function renderScatter(){
   const lens = LENSES[currentLens];
   const svg = document.getElementById('scatter-svg');
@@ -837,23 +839,24 @@ function renderScatter(){
   // IG ER by Followers). Only if a scenario had no rate metric at all would this be null.
   const rateKey = ['er','erReach','erf','pageerPct','pageer'].find(k=>sc().metrics.indexOf(k)!==-1) || null;
   const rateLabel = rateKey ? METRIC_CATALOG[rateKey].label : null;
-  let maxPosts=0, maxAvgEng=0, maxER=0, maxSize=0;
+  const yLabel = metricLabel(selectedMetric);
+  let maxPosts=0, maxY=0, maxER=0, maxSize=0;
   lens.categories.forEach(c=>c.pages.forEach(p=>{
     if(p.posts>maxPosts)maxPosts=p.posts;
-    const avg = p.eng/p.posts;
-    if(avg>maxAvgEng)maxAvgEng=avg;
+    const yv = pageMetricVal(p, selectedMetric);
+    if(yv>maxY)maxY=yv;
     if(p.er>maxER)maxER=p.er;
-    const sv = rateKey ? pageMetricVal(p, rateKey) : avg;
+    const sv = rateKey ? pageMetricVal(p, rateKey) : yv;
     if(sv>maxSize)maxSize=sv;
   }));
 
   function x(v){return padL + (v/maxPosts)*(W-padL-padR);}
-  function y(v){return H-padB - (v/(maxAvgEng*1.15))*(H-padT-padB);}
+  function y(v){return H-padB - (maxY ? (v/(maxY*1.15)) : 0)*(H-padT-padB);}
   function r(v){return 5 + (maxSize ? (v/maxSize) : 0)*16;}
 
   const axes = `<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H-padB}" stroke="#E4E9ED"/>
               <line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="#E4E9ED"/>
-              <text x="${padL-8}" y="${padT+4}" font-size="10" fill="#828282" text-anchor="end">${fmt(Math.round(maxAvgEng))}</text>
+              <text x="${padL-8}" y="${padT+4}" font-size="10" fill="#828282" text-anchor="end">${fmtMetric(maxY, selectedMetric)}</text>
               <text x="${padL-8}" y="${H-padB}" font-size="10" fill="#828282" text-anchor="end">0</text>
               <text x="${padL}" y="${H-14}" font-size="10" fill="#828282">0</text>
               <text x="${W-padR}" y="${H-14}" font-size="10" fill="#828282" text-anchor="end">${maxPosts} posts</text>`;
@@ -861,15 +864,17 @@ function renderScatter(){
   let dots = '';
   lens.categories.forEach(c=>{
     c.pages.forEach((p,idx)=>{
-      const avg = p.eng/p.posts;
-      const sizeVal = rateKey ? pageMetricVal(p, rateKey) : avg;
-      const erText = rateKey ? `  ${rateLabel}: ${fmtMetric(pageMetricVal(p, rateKey), rateKey)}` : '';
-      dots += `<circle cx="${x(p.posts)}" cy="${y(avg)}" r="${r(sizeVal)}" fill="${PAGES[idx].color}" opacity="0.5" stroke="${PAGES[idx].color}" stroke-width="1.2"><title>${esc(c.name)} · ${esc(PAGES[idx].name)}\nPosts: ${p.posts}  Avg Eng/Post: ${fmt(Math.round(avg))}${erText}</title></circle>`;
+      const yv = pageMetricVal(p, selectedMetric);
+      const sizeVal = rateKey ? pageMetricVal(p, rateKey) : yv;
+      // Don't repeat the same figure twice when the selected metric IS the bubble rate.
+      const erText = (rateKey && rateKey!==selectedMetric) ? `  ${rateLabel}: ${fmtMetric(pageMetricVal(p, rateKey), rateKey)}` : '';
+      dots += `<circle cx="${x(p.posts)}" cy="${y(yv)}" r="${r(sizeVal)}" fill="${PAGES[idx].color}" opacity="0.5" stroke="${PAGES[idx].color}" stroke-width="1.2"><title>${esc(c.name)} · ${esc(PAGES[idx].name)}\nPosts: ${p.posts}  ${yLabel}: ${fmtMetric(yv, selectedMetric)}${erText}</title></circle>`;
     });
   });
 
   svg.innerHTML = axes + dots;
-  document.getElementById('scatter-sub').textContent = `Each dot is one ${lens.label.toLowerCase()} for one page · x = posts, y = avg engagement per post, size = ${rateLabel?rateLabel.toLowerCase():'avg engagement'}`;
+  document.getElementById('scatter-title').textContent = `${yLabel} vs Posts`;
+  document.getElementById('scatter-sub').textContent = `Each dot is one ${lens.label.toLowerCase()} for one ${sc().section==='mypage'?'page':'competitor'} · x = posts, y = ${yLabel.toLowerCase()}, size = ${rateLabel?rateLabel.toLowerCase():yLabel.toLowerCase()}`;
   document.getElementById('scatter-note').textContent = (rateKey==='er'||rateKey==='erReach')
     ? 'Bubble size = ER (engagements ÷ reach) for that category'
     : rateKey
@@ -1011,8 +1016,15 @@ function renderHeatmap(){
 // ---------- 4. Combinations — always vs Engagements (same in both modes) ----------
 function renderCombos(){
   const lens = LENSES[currentLens];
+  const mLabel = metricLabel(selectedMetric);
+  const verb = isSummable(selectedMetric) ? 'combined' : 'pooled';
   document.getElementById('combo-cards').innerHTML = lens.combos.map(c=>
-    rankCardHTML(`${c.title} vs Engagements`, c.sub, c.data, true, 'eng')
+    // showAll = false, so the card ranks every candidate pairing by the selected metric
+    // and keeps the top 8 — the shortlist follows the metric instead of being fixed.
+    rankCardHTML(
+      `${c.title} vs ${mLabel}`,
+      `Top pairings ranked by ${verb} ${mLabel.toLowerCase()} of all ${PAGES.length} ${subjectNoun()}`,
+      c.data, false, selectedMetric)
   ).join('');
 }
 
@@ -1240,6 +1252,7 @@ function renderMetricDrivenCards(){
   renderBars();
   renderHeatmap();
   renderScatter();
+  renderCombos();
 }
 
 // Lens change re-seeds the toggle from the metric's own default (rather than carrying
