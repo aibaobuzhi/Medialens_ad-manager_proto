@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BF · Creation &amp; Autopilot Studio · MediaLens</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lato:wght@400;500;600;700&family=Roboto:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════════════════════════
+   MediaLens Ad Manager design system (dm-*) — tokens from
+   assets/css/snippets/dashboard-tokens.scss + app.scss + real components
+   Content: 100% from Ryan's MediaLens_2.0_B_Creation_Autopilot_Studio proto
+   ══════════════════════════════════════════════════════════════════ */
+:root{
+  --brand-blue:#23A9F6; --brand-blue-hover:#1E90E0; --brand-light-blue:#73DFFF;
+  --brand-blue-tint:#EEF6FF; --highlight-navy:#001983;
+  --title:#0A1F2C; --text-primary:#102532; --text-regular:#707070; --text-secondary:#828282;
+  --surface-ai:#F6F8FD; --border:#D9E3E6; --divider:#E8EEF0;
+  --danger:#FF3F41; --danger-light:#FFECEC; --success:#52C41A; --success-light:#E6FBEB;
+  --warning:#FFC960; --warning-light:#FFF8EB;
+  --dm-primary:#23A9F6; --dm-primary-hover:#1E90E0; --dm-primary-light:#E8F4FE;
+  --dm-accent:#409EFF;
+  --dm-text-primary:#4A4A4A; --dm-text-secondary:#939EAB; --dm-text-heading:#1E293B;
+  --dm-slate-900:#0F172A; --dm-slate-700:#334155; --dm-slate-600:#475569; --dm-slate-500:#64748B;
+  --dm-slate-400:#94A3B8; --dm-slate-200:#E2E8F0; --dm-slate-100:#F1F5F9; --dm-slate-50:#F8FAFC;
+  --dm-bg-page:#F5F7FA; --dm-bg-card:#FFFFFF;
+  --dm-border:rgba(203,213,225,.6); --dm-border-light:rgba(226,232,240,.5);
+  --dm-positive:#67C23A; --dm-negative:#F56C6C; --dm-warning:#E6A23C; --dm-neutral:#909399;
+  --delta-up:#059669; --delta-down:#DC2626;
+  --chart-1:#3B82F6; --chart-2:#6366F1; --chart-3:#06B6D4; --chart-4:#14B8A6;
+  --chart-5:#8B5CF6; --chart-6:#0EA5E9; --chart-7:#A78BFA; --chart-8:#2DD4BF;
+  --chart-grid:#E4E7ED; --chart-tooltip-bg:#303133;
+  --g:#059669; --gl:#F0FDF4; --a:#B45309; --al:#FFFBEB; --r:#DC2626; --rl:#FEF2F2;
+  --b:#2563EB; --bl:#EFF6FF; --p:#7C3AED; --pl:#F5F3FF; --n:#475569; --nl:#F1F5F9;
+  --font-heading:'Poppins',sans-serif; --font-body:'Lato',sans-serif; --font-metric:'Roboto',sans-serif;
+  --header-h:70px; --sidebar-w:270px; --content-max:1300px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-body);background:var(--dm-bg-page);color:var(--dm-text-primary);font-size:13px;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+
+/* ── App shell ───────────────────────────────────────────── */
+.ml-header{position:fixed;top:0;left:0;right:0;z-index:102;height:var(--header-h);background:#FFF;display:flex;align-items:center;font-family:var(--font-heading);border-bottom:1px solid var(--divider)}
+.ml-header__logo{padding:0 30px;display:flex;align-items:center;gap:8px}
+.ml-header__logo .mark{width:26px;height:26px}
+.ml-header__logo .word{font-size:18px;font-weight:600;color:var(--title)}
+.ml-header__logo .v2{font-size:9px;font-weight:700;color:#FFF;background:var(--brand-blue);border-radius:8px;padding:2px 6px;margin-left:2px}
+.ml-header__ctx{display:flex;align-items:center;gap:10px;margin-left:18px}
+.ml-page-badge{display:inline-flex;align-items:center;gap:6px;background:var(--brand-blue-tint);color:var(--highlight-navy);border-radius:8px;padding:5px 12px;font-family:var(--font-body);font-size:12px;font-weight:600}
+.ml-voice-status{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-body);font-size:12px;color:var(--dm-slate-500)}
+.ml-voice-status::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--dm-positive);box-shadow:0 0 0 2px rgba(103,194,58,.2)}
+.ml-header__right{margin-left:auto;display:flex;align-items:center;gap:10px;padding-right:24px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font-heading);font-size:13px;font-weight:500;line-height:20px;padding:7px 14px;border-radius:8px;border:1px solid transparent;cursor:pointer;transition:background .15s,border-color .15s;white-space:nowrap;background:none}
+.btn--primary{background:var(--brand-blue);color:#FFF;border-color:var(--brand-blue);font-weight:600}
+.btn--primary:hover{background:#1B9BEA;border-color:#1B9BEA}
+.btn--secondary{background:#FFF;color:var(--text-regular);border-color:var(--border)}
+.btn--secondary:hover{background:#F7F7F7}
+.btn--sm{font-size:12px;padding:5px 12px;border-radius:6px}
+
+.ml-sidebar{position:fixed;top:var(--header-h);bottom:0;left:0;z-index:101;width:var(--sidebar-w);background:#FFF;box-shadow:0 0 5px rgba(0,25,131,.10);padding:20px 0 30px;overflow-y:auto;font-family:var(--font-heading)}
+.ml-sidebar__section{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--dm-slate-400);padding:16px 24px 6px}
+.ml-sidebar__item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;color:#5F5F5F;font-size:13.5px;border-left:4px solid transparent;transition:color .15s}
+.ml-sidebar__item:hover{color:var(--brand-blue)}
+.ml-sidebar__item.is-active{border-left-color:var(--brand-blue);color:var(--dm-accent);background:var(--brand-blue-tint)}
+.ml-sidebar__item .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ml-sidebar__item.is-sub{padding-left:38px;font-size:13px}
+.ml-sidebar__new{font-size:8px;font-weight:700;color:#FFF;background:var(--chart-5);border-radius:6px;padding:2px 5px;margin-left:6px;letter-spacing:.5px}
+
+.ml-main{padding-top:calc(var(--header-h) + 20px);margin-left:var(--sidebar-w);min-height:100vh;background:var(--dm-bg-page)}
+.ml-content{max-width:var(--content-max);margin:0 auto;padding:0 24px 80px}
+
+/* ── Titles / labels ─────────────────────────────────────── */
+.dm-title-page{font:600 22px/1.3 var(--font-heading);color:var(--dm-text-heading);margin:6px 0 4px}
+.dm-page-sub{font:400 12.5px/1.55 var(--font-body);color:var(--dm-text-secondary);margin:0 0 18px;max-width:920px}
+.dm-title-section{font:600 16px/1.4 var(--font-heading);color:var(--dm-text-heading);margin:0 0 4px}
+.dm-title-card{font:500 14px/1.4 var(--font-heading);color:var(--dm-text-heading);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dm-subtitle{display:block;font:400 12px/1.6 var(--font-body);color:var(--dm-text-secondary);margin:4px 0 14px;max-width:980px}
+.sec-head{margin:26px 0 12px}
+.sec-head .dm-subtitle{margin-bottom:0}
+
+/* ── Tabs (Ad Manager pill sub-nav) ──────────────────────── */
+.dm-page-menu{position:sticky;top:var(--header-h);z-index:90;background:var(--dm-bg-page);margin:0 -24px;padding:8px 24px 10px;border-bottom:1px solid var(--dm-border-light)}
+.dm-page-menu .menu-list{display:flex;gap:4px;flex-wrap:nowrap;overflow-x:auto}
+.dm-page-menu .menu-item{font-family:var(--font-body);font-size:13px;font-weight:500;color:#64748B;padding:7px 14px;border-radius:20px;transition:all .15s;white-space:nowrap;cursor:pointer;border:none;background:none}
+.dm-page-menu .menu-item:hover{color:#1E293B;background:#F1F5F9}
+.dm-page-menu .menu-item.is-active{color:#FFF;background:var(--dm-primary);font-weight:600}
+
+/* ── Control bar: date picker + filters ───────────────────── */
+.dm-controls-row{display:flex;align-items:center;gap:10px;padding:14px 0;flex-wrap:wrap}
+.dm-controls-row .spacer{flex:1}
+.dm-meta-label{font:400 12px var(--font-body);color:var(--dm-slate-400);white-space:nowrap}
+.dm-ctl-label{font:500 11px var(--font-body);color:var(--dm-slate-600);text-transform:uppercase;letter-spacing:.4px;margin-right:-2px}
+.dm-period-group{position:relative}
+.dm-period-trigger{display:inline-flex;align-items:center;gap:6px;background:#FFF;color:var(--dm-slate-700);font:500 13px/1 var(--font-body);padding:0 14px;height:34px;border-radius:8px;border:1px solid var(--dm-slate-200);box-shadow:0 1px 3px rgba(0,0,0,.04);cursor:pointer;transition:all .15s;white-space:nowrap}
+.dm-period-trigger:hover{border-color:#CBD5E1;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.dm-period-trigger__date{color:#94A3B8;font-weight:400}
+.dm-period-trigger .ic{font-size:13px;color:#94A3B8;line-height:1}
+.dm-period-menu{position:absolute;top:40px;left:0;z-index:95;background:#FFF;border:1px solid var(--dm-slate-200);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.08);padding:4px;min-width:250px;display:none}
+.dm-period-menu.open{display:block}
+.dm-period-menu__item{display:flex;justify-content:space-between;align-items:center;gap:12px;font-family:var(--font-body);font-size:13px;color:var(--dm-slate-600);padding:8px 14px;border-radius:6px;line-height:1.5;cursor:pointer}
+.dm-period-menu__item:hover{background:var(--dm-slate-50);color:#1E293B}
+.dm-period-menu__item.is-active{color:var(--dm-slate-900);font-weight:600;background:var(--dm-slate-100)}
+.dm-period-menu__date{color:#94A3B8;font-weight:400;font-size:12px}
+.dm-period-menu__divider{height:1px;background:var(--dm-slate-100);margin:4px 0}
+.dm-select{height:34px;font:500 13px/32px var(--font-body);color:var(--dm-slate-700);background:#FFF;border:1px solid var(--dm-slate-200);border-radius:8px;padding:0 28px 0 12px;box-shadow:0 1px 3px rgba(0,0,0,.04);transition:all .15s;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%2394A3B8' stroke-width='1.5' stroke-linecap='round'/></svg>");background-repeat:no-repeat;background-position:right 10px center}
+.dm-select:hover,.dm-select:focus{border-color:#CBD5E1;box-shadow:0 2px 6px rgba(0,0,0,.06);outline:none}
+
+/* ── Cards & layout ──────────────────────────────────────── */
+.dm-card{background:var(--dm-bg-card);border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 1px 2px rgba(0,0,0,.03);transition:box-shadow .2s ease;margin-bottom:20px}
+.dm-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04)}
+.dm-card--hl{border:1.5px solid var(--dm-primary)}
+.dm-row{display:flex;gap:20px;align-items:stretch}
+.dm-row>*{flex:1;min-width:0}
+.dm-row .dm-card{margin-bottom:20px}
+.dm-chart-area{width:100%;height:280px;position:relative}
+.dm-chart-area.short{height:170px}
+.dm-chart-area svg{display:block;width:100%;height:100%}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ── KPI cards ───────────────────────────────────────────── */
+.dm-kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:1200px){.dm-kpi-row{grid-template-columns:repeat(3,1fr)}}
+.dm-kpi-card{background:var(--dm-bg-card);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 1px 2px rgba(0,0,0,.03);padding:16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.kpi__label{font:500 11px/1.4 var(--font-body);color:var(--dm-slate-600);text-transform:uppercase;letter-spacing:.3px}
+.kpi__metric{font:600 26px/1.15 var(--font-metric);color:var(--dm-slate-900);letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.kpi__sub{font:400 11px/1.35 var(--font-body);color:var(--dm-text-secondary)}
+.kpi__sub.up{color:var(--delta-up)}
+.kpi__sub.down{color:var(--delta-down)}
+.kpi-range{margin-top:4px}
+.kpi-range__rail{position:relative;height:5px;border-radius:3px;background:var(--dm-slate-100)}
+.kpi-range__fill{position:absolute;top:0;bottom:0;border-radius:3px;background:var(--brand-blue);opacity:.75}
+.kpi-range__marker{position:absolute;top:-2px;width:2px;height:9px;background:var(--delta-up);border-radius:1px}
+.kpi-range__axis{display:flex;justify-content:space-between;font:400 9px var(--font-metric);color:var(--dm-slate-400);margin-top:3px}
+
+/* ── Tables ──────────────────────────────────────────────── */
+.dm-table-scroll{overflow-x:auto}
+.dm-modern-table{width:100%;border-collapse:collapse}
+.dm-modern-table th{font-family:var(--font-body);font-size:12px;font-weight:400;color:var(--dm-slate-600);text-align:left;border-bottom:1px solid rgba(226,232,240,.6);padding:8px 12px;white-space:nowrap}
+.dm-modern-table td{font-family:var(--font-body);font-size:12.5px;color:var(--dm-slate-700);border-bottom:1px solid rgba(241,245,249,.7);padding:11px 12px;font-variant-numeric:tabular-nums;vertical-align:top;line-height:1.5}
+.dm-modern-table tbody tr{transition:background-color .15s ease}
+.dm-modern-table tbody tr:hover td{background:rgba(248,250,252,.5)}
+.dm-modern-table td:first-child{font-weight:500;color:var(--dm-slate-900)}
+.dm-modern-table tr.row-g td{background:var(--gl)}
+.dm-modern-table tr.row-a td{background:var(--al)}
+.dm-modern-table tr.row-r td{background:var(--rl)}
+.dm-modern-table td .num{font-family:var(--font-metric)}
+.dm-cell-sub{display:block;color:#94A3B8;font-size:10px;line-height:1.4;margin-top:2px;font-weight:400}
+.dm-modern-table--compact th{padding:7px 7px;white-space:normal;font-size:11px;line-height:1.35}
+.dm-modern-table--compact td{padding:9px 7px;font-size:11.5px}
+.dm-modern-table--compact .tg{font-size:9.5px;padding:3px 6px}
+
+/* ── Tags / chips / badges ───────────────────────────────── */
+.tg{display:inline-block;font:600 10.5px/1 var(--font-body);padding:4px 8px;border-radius:20px;white-space:nowrap}
+.tg-g{background:var(--gl);color:var(--g)}.tg-a{background:var(--al);color:var(--a)}
+.tg-r{background:var(--rl);color:var(--r)}.tg-b{background:var(--bl);color:var(--b)}
+.tg-p{background:var(--pl);color:var(--p)}.tg-n{background:var(--nl);color:var(--n)}
+.mf{display:inline-flex;align-items:center;gap:4px;background:#E5F1FC;color:var(--highlight-navy);border-radius:8px;padding:3px 8px;font:600 10px/1.3 var(--font-body);white-space:nowrap}
+.mf::before{content:'◈';font-size:9px}
+.dmode{display:inline-flex;align-items:center;font:700 9px/1 var(--font-metric);letter-spacing:.6px;padding:3px 7px;border-radius:4px;margin-left:auto}
+.dmode-live{background:var(--gl);color:var(--g)}
+.dmode-agg{background:var(--bl);color:var(--b)}
+.dmode-mock{background:var(--al);color:var(--a)}
+.tg-new{display:inline-block;font:700 8.5px/1 var(--font-metric);letter-spacing:.5px;color:#FFF;background:var(--chart-5);border-radius:6px;padding:3px 6px}
+.dm-status-dot{display:inline-flex;align-items:center;gap:6px;font:500 12px var(--font-body)}
+.dm-status-dot::before{content:'';width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dm-status-dot--active::before{background:var(--dm-positive);box-shadow:0 0 0 2px rgba(103,194,58,.2)}
+.dm-status-dot--active{color:#2D6A1E}
+
+/* ── Score bars (voice / hook / composite) ───────────────── */
+.sbar{margin-bottom:12px}
+.sbar__top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:5px}
+.sbar__name{font:500 12px/1.4 var(--font-body);color:var(--dm-slate-700)}
+.sbar__val{font:600 13px var(--font-metric);color:var(--dm-slate-900)}
+.sbar__rail{height:6px;border-radius:3px;background:var(--dm-slate-100);overflow:hidden}
+.sbar__fill{height:100%;border-radius:3px}
+.f-g{background:#34D399}.f-a{background:#FBBF24}.f-r{background:#F87171}.f-b{background:#60A5FA}.f-p{background:#A78BFA}.f-pk{background:#F472B6}
+.sbar__tag{margin-left:6px}
+
+/* ── Callouts ────────────────────────────────────────────── */
+.callout{background:#FFF;border-radius:12px;padding:16px 18px;margin-bottom:20px;border:1px solid var(--dm-border-light);border-left:4px solid var(--b);box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.callout--r{border-left-color:var(--r);background:#FFFBFB}
+.callout--a{border-left-color:var(--dm-warning);background:#FFFDF7}
+.callout--b{border-left-color:var(--b)}
+.callout__title{font:600 13px/1.4 var(--font-heading);color:var(--dm-text-heading);margin-bottom:6px}
+.callout__body{font:400 12.5px/1.7 var(--font-body);color:var(--dm-slate-600)}
+.callout__meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font:400 11.5px var(--font-body);color:var(--dm-slate-500)}
+.callout__meta b{color:var(--dm-slate-900)}
+
+/* ── Spine / level / category / reference / asset grids ──── */
+.spine-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.spine-cell{border:1px solid var(--dm-border-light);border-radius:10px;padding:12px;background:var(--dm-slate-50)}
+.spine-cell.hl{border-color:var(--brand-blue);background:var(--brand-blue-tint)}
+.spine-cell__t{font:600 12px var(--font-heading);color:var(--dm-text-heading);display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px}
+.spine-cell__b{font:400 11px/1.6 var(--font-body);color:var(--dm-slate-600)}
+.lvl-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.lvl-card{background:#FFF;border:1px solid var(--dm-border-light);border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.lvl-card.hl{border:1.5px solid var(--brand-blue)}
+.lvl-card__t{font:600 12.5px var(--font-heading);color:var(--dm-text-heading);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.lvl-card__s{font:500 10px var(--font-body);color:var(--dm-slate-400);margin:4px 0 8px}
+.lvl-card__b{font:400 11px/1.65 var(--font-body);color:var(--dm-slate-600)}
+.lvl-card__b b{color:var(--dm-slate-800,#1E293B)}
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.cat-tile{display:flex;align-items:center;gap:10px;border:1px solid var(--dm-border-light);border-radius:10px;padding:12px;background:#FFF}
+.cat-tile .em{font-size:20px}
+.cat-tile__n{font:600 12px var(--font-body);color:var(--dm-slate-800,#1E293B)}
+.cat-tile__s{font:400 11px var(--font-metric);color:var(--dm-slate-500)}
+.cat-tile__s b{color:var(--dm-slate-900);font-weight:600}
+.ref-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.asset-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.thumb{position:relative;border-radius:8px;background:linear-gradient(135deg,#E8F4FE,#F1F5F9);min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:12px;text-align:center}
+.thumb .l1{font:600 11.5px/1.4 var(--font-body);color:var(--dm-slate-600)}
+.thumb .l2{font:400 10px/1.4 var(--font-body);color:var(--dm-slate-400)}
+.corner-tl{position:absolute;top:8px;left:8px}
+.corner-tr{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;background:var(--highlight-navy);color:#FFF;font:600 10px/20px var(--font-metric);text-align:center}
+.ref-card,.asset-card{background:#FFF;border:1px solid var(--dm-border-light);border-radius:12px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:8px}
+.ref-card__n{font:600 12px/1.5 var(--font-body);color:var(--dm-slate-800,#1E293B)}
+.stat4{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.stat4 .s{font:400 10.5px/1.5 var(--font-body);color:var(--dm-slate-500)}
+.stat4 .s b{display:block;font:600 13px var(--font-metric);color:var(--dm-slate-900)}
+.ref-card__f{font:400 10.5px/1.5 var(--font-body);color:var(--dm-slate-400);border-top:1px solid var(--dm-slate-100);padding-top:7px}
+
+/* ── Variant post cards ──────────────────────────────────── */
+.var-card{background:#FFF;border:1px solid var(--dm-border-light);border-radius:12px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04);margin-bottom:12px;display:flex;gap:18px}
+.var-card.pick{border:1.5px solid var(--brand-blue)}
+.var-card.bad{border:1.5px solid #FECACA;background:#FFFBFB}
+.var-card__main{flex:1;min-width:0}
+.var-card__t{font:600 13.5px/1.5 var(--font-heading);color:var(--dm-text-heading);margin-bottom:7px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.var-card__body{font:400 12.5px/1.75 var(--font-body);color:var(--dm-slate-600);margin-bottom:10px}
+.var-card__tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.var-card__meta{display:flex;gap:16px;flex-wrap:wrap;font:400 11px var(--font-body);color:var(--dm-slate-500)}
+.var-card__meta b{color:var(--dm-slate-900);font-family:var(--font-metric)}
+.var-card__score{flex-shrink:0;width:86px;text-align:center;align-self:flex-start;border-left:1px solid var(--dm-slate-100);padding-left:18px}
+.var-card__score .n{font:600 34px/1.1 var(--font-metric);letter-spacing:-1px}
+.var-card__score .n.g{color:var(--g)}.var-card__score .n.a{color:var(--a)}.var-card__score .n.r{color:var(--r)}
+.var-card__score .l{font:600 8.5px/1.4 var(--font-metric);letter-spacing:1px;color:var(--dm-slate-400)}
+
+/* ── Pills row (filters as chips) ────────────────────────── */
+.pill-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.pill{font:500 12px/1 var(--font-body);color:#64748B;background:#FFF;border:1px solid var(--dm-slate-200);border-radius:20px;padding:7px 14px;cursor:pointer;transition:all .15s}
+.pill:hover{color:#1E293B;background:#F1F5F9}
+.pill.is-active{color:#FFF;background:var(--dm-primary);border-color:var(--dm-primary);font-weight:600}
+
+/* ── Storyboard beats ────────────────────────────────────── */
+.beats{position:relative;padding-left:18px}
+.beats::before{content:'';position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--dm-slate-100);border-radius:1px}
+.beat{position:relative;padding:0 0 16px 12px}
+.beat::before{content:'';position:absolute;left:-17px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--brand-blue);border:2px solid #FFF;box-shadow:0 0 0 1.5px var(--brand-blue)}
+.beat__t{font:600 12px var(--font-heading);color:var(--dm-text-heading);margin-bottom:4px}
+.beat__l{font:400 11.5px/1.6 var(--font-body);color:var(--dm-slate-600)}
+.beat__l b{color:var(--dm-slate-800,#1E293B);font-weight:600}
+
+/* ── Score ring ──────────────────────────────────────────── */
+.ring-wrap{display:flex;gap:18px;align-items:center;margin-bottom:16px}
+.ring{width:110px;height:110px;flex-shrink:0}
+.ring .num{font:600 30px var(--font-metric);fill:var(--dm-slate-900)}
+.ring-side .h{font:600 14px var(--font-heading);color:var(--g);margin-bottom:4px}
+.ring-side .b{font:400 12px/1.65 var(--font-body);color:var(--dm-slate-600)}
+
+/* ── Calendar month grid ─────────────────────────────────── */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-grid .hd{font:600 10.5px var(--font-body);color:var(--dm-slate-400);text-transform:uppercase;letter-spacing:.5px;text-align:center;padding:4px 0}
+.cal-cell{border-radius:8px;padding:8px;min-height:56px;border:1px solid var(--dm-border-light);background:var(--dm-slate-50)}
+.cal-cell .d{font:600 11px var(--font-metric);color:var(--dm-slate-700)}
+.cal-cell .m{font:400 10px/1.4 var(--font-body);color:var(--dm-slate-500);margin-top:2px}
+.cal-pub{background:var(--gl);border-color:#BBF7D0}.cal-pub .d{color:var(--g)}
+.cal-sch{background:var(--bl);border-color:#BFDBFE}.cal-sch .d{color:var(--b)}
+.cal-app{background:var(--al);border-color:#FDE68A}.cal-app .d{color:var(--a)}
+.cal-dft{background:var(--pl);border-color:#DDD6FE}.cal-dft .d{color:var(--p)}
+.cal-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font:400 11px var(--font-body);color:var(--dm-slate-500)}
+.cal-legend .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+/* ── Rotation planner ────────────────────────────────────── */
+.rot-grid{display:grid;grid-template-columns:44px repeat(7,1fr);gap:5px;margin-bottom:14px}
+.rot-grid .hd{font:600 10px var(--font-body);color:var(--dm-slate-400);text-align:center;padding:3px 0}
+.rot-grid .wk{font:600 10.5px var(--font-metric);color:var(--dm-slate-500);display:flex;align-items:center}
+.rot-chip{font:500 10.5px/1.3 var(--font-body);text-align:center;border-radius:6px;padding:6px 2px;background:var(--dm-slate-50);color:var(--dm-slate-400)}
+.rc-edu{background:var(--bl);color:var(--b)}.rc-trust{background:var(--gl);color:var(--g)}
+.rc-emo{background:var(--pl);color:var(--p)}.rc-ugc{background:#ECFEFF;color:#0E7490}
+.rc-comm{background:#FDF2F8;color:#BE185D}.rc-promo{background:var(--rl);color:var(--r)}
+.rc-draft{background:var(--dm-slate-100);color:var(--dm-slate-500)}
+
+/* ── Proposal cards / action queue ───────────────────────── */
+.prop-card{background:#FFF;border:1px solid var(--dm-border-light);border-radius:12px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04);margin-bottom:12px;display:flex;gap:18px}
+.prop-card__main{flex:1;min-width:0}
+.prop-card__t{font:600 13.5px/1.5 var(--font-heading);color:var(--dm-text-heading);margin-bottom:6px}
+.prop-card__e{font:400 12px/1.7 var(--font-body);color:var(--dm-slate-600);margin-bottom:10px}
+.prop-card__tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.prop-card__foot{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.prop-card__by{margin-left:auto;font:400 11px var(--font-body);color:var(--dm-slate-400)}
+.prop-card__fx{flex-shrink:0;width:150px;border-left:1px solid var(--dm-slate-100);padding-left:18px;align-self:center}
+.prop-card__fx .l{font:600 8.5px/1.4 var(--font-metric);letter-spacing:1px;color:var(--dm-slate-400);margin-bottom:4px}
+.prop-card__fx .v1{font:600 17px var(--font-metric);color:var(--g)}
+.prop-card__fx .v2{font:400 12px var(--font-metric);color:var(--dm-slate-600);margin-top:2px}
+
+/* ── AI insights panel (Ad Manager ai-card surface) ──────── */
+.ai-card{background:var(--surface-ai);border:1px solid #DBE6FF;border-radius:12px;padding:20px;margin-bottom:26px}
+.ai-card__head{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.ai-icon{width:32px;height:32px;border-radius:8px;color:#FFF;font-size:15px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--brand-blue),var(--brand-light-blue));flex-shrink:0}
+.ai-card__title{font:600 14px var(--font-heading);color:var(--dm-text-heading)}
+.ai-card__sub{font:400 11.5px/1.5 var(--font-body);color:var(--dm-slate-500);margin:2px 0 14px}
+.ai-insight-item{background:#FFF;border-radius:8px;padding:12px 14px;border-left:3px solid var(--brand-blue);font:400 12.5px/1.75 var(--font-body);color:var(--dm-slate-600);margin-bottom:10px}
+.ai-insight-item b{color:var(--dm-slate-900)}
+.ai-insight-item.warn{border-left-color:var(--dm-warning)}
+.ai-insight-item.alert{border-left-color:var(--danger)}
+.ai-insight-item.good{border-left-color:var(--dm-positive)}
+.ai-insight-item.new{border-left-color:var(--chart-5)}
+.ib{display:inline-block;font:700 9px/1 var(--font-metric);letter-spacing:.8px;text-transform:uppercase;padding:4px 7px;border-radius:4px;margin-right:8px;vertical-align:1px}
+.ib-b{background:var(--bl);color:var(--b)}.ib-a{background:var(--al);color:var(--a)}
+.ib-r{background:var(--rl);color:var(--r)}.ib-p{background:var(--pl);color:var(--p)}
+.ib-g{background:var(--gl);color:var(--g)}
+.ai-ask{display:flex;gap:8px;margin-top:4px}
+.ai-ask input{flex:1;height:36px;border:1px solid var(--dm-slate-200);border-radius:8px;padding:0 14px;font:400 12.5px var(--font-body);color:var(--dm-slate-700);background:#FFF}
+.ai-ask input::placeholder{color:var(--dm-slate-400)}
+.ai-ask input:focus{outline:none;border-color:var(--brand-blue)}
+
+/* ── Brief block / misc ──────────────────────────────────── */
+.brief-block{border:1px solid var(--dm-slate-200);border-radius:10px;background:var(--dm-slate-50);padding:16px;font:400 12.5px/1.9 var(--font-body);color:var(--dm-slate-700);margin-bottom:14px}
+.brief-block b{color:var(--dm-slate-900)}
+.action-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:4px 0 22px}
+.action-row .who{margin-left:auto;font:400 11.5px var(--font-body);color:var(--dm-slate-400)}
+.mini-info{border:1px solid var(--dm-border-light);border-radius:10px;padding:12px;background:var(--dm-slate-50);margin-bottom:10px}
+.mini-info__t{font:600 12px var(--font-body);color:var(--dm-slate-800,#1E293B);margin-bottom:4px}
+.mini-info__b{font:400 11.5px/1.65 var(--font-body);color:var(--dm-slate-600)}
+.mini-info__b code{font:500 10.5px var(--font-metric);background:var(--dm-slate-100);border-radius:4px;padding:1px 5px;color:var(--p)}
+.split2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.ctl-inline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;font:400 12px var(--font-body);color:var(--dm-slate-500)}
+.foot-note{font:400 11.5px/1.7 var(--font-body);color:var(--dm-slate-500);border-top:1px solid var(--dm-slate-100);padding-top:10px;margin-top:12px}
+.foot-note b{color:var(--dm-slate-900)}
+.proto-badge{position:fixed;right:18px;bottom:16px;z-index:200;background:var(--chart-5);color:#FFF;font:700 10px/1 var(--font-metric);letter-spacing:.8px;padding:8px 12px;border-radius:20px;box-shadow:0 4px 16px rgba(124,58,237,.35)}
+.legend-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;font:400 11px var(--font-body);color:var(--text-regular)}
+.legend-row .li{display:inline-flex;align-items:center;gap:6px}
+.legend-row .dotc{width:10px;height:10px;border-radius:50%}
+.legend-row .linec{width:14px;height:3px;border-radius:2px}
+@media(max-width:1100px){.spine-grid,.lvl-grid{grid-template-columns:repeat(2,1fr)}.ref-grid,.asset-grid{grid-template-columns:repeat(2,1fr)}.dm-row{flex-direction:column}.split2{grid-template-columns:1fr}}
+/* ── BF-specific additions ── */
+.seg{display:inline-block;font:700 9.5px/1 var(--font-metric);letter-spacing:.4px;padding:3px 7px;border-radius:4px;margin-right:6px;vertical-align:1px}
+.seg-s1{background:var(--bl);color:var(--b)}.seg-s2{background:var(--gl);color:var(--g)}
+.seg-s3,.seg-s4,.seg-s5{background:var(--pl);color:var(--p)}.seg-s6{background:var(--al);color:var(--a)}
+.seg-s7{background:#ECFEFF;color:#0E7490}.seg-s8{background:var(--nl);color:var(--n)}
+.article-block{border:1px solid var(--dm-slate-200);border-radius:10px;background:var(--dm-slate-50);padding:16px;font:400 12.5px/1.9 var(--font-body);color:var(--dm-slate-700);max-height:520px;overflow-y:auto}
+.article-block .seg-line{margin-bottom:12px}
+.article-block b{color:var(--dm-slate-900)}
+.chk{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--dm-slate-100);font:400 12.5px var(--font-body);color:var(--dm-slate-700)}
+.chk:last-child{border-bottom:none}
+.chk .ok{width:18px;height:18px;border-radius:50%;background:var(--gl);color:var(--g);font:700 11px/18px var(--font-metric);text-align:center;flex-shrink:0}
+.chk .meta{margin-left:auto;display:flex;gap:6px;align-items:center}
+.lockrow{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--dm-border-light);border-radius:8px;background:var(--dm-slate-50);font:500 12px var(--font-body);color:var(--dm-slate-600);margin-bottom:8px}
+.lockrow b{color:var(--dm-slate-900);font-family:var(--font-metric);font-weight:500}
+.lockrow .lk{margin-left:auto;font-size:12px}
+</style>
+</head>
+<body>
+<header class="ml-header">
+  <div class="ml-header__logo">
+    <svg class="mark" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="11" stroke="#23A9F6" stroke-width="3"/><path d="M13 2a11 11 0 0 1 11 11" stroke="#001983" stroke-width="3" stroke-linecap="round"/></svg>
+    <span class="word">MediaLens</span><span class="v2">2.0</span>
+  </div>
+  <div class="ml-header__ctx">
+    <span class="ml-page-badge">BusinessFocus · FB + IG</span>
+    <span class="ml-voice-status">bf_agent · 3 skills loaded</span>
+  </div>
+  <div class="ml-header__right">
+    <button class="btn btn--secondary">Asset Library</button>
+    <button class="btn btn--primary">Run topic discovery</button>
+  </div>
+</header>
+
+<aside class="ml-sidebar">
+  <div class="ml-sidebar__section">Intelligence</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#2d7ff9"></span>My Pages</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#ec4899"></span>Competitor Analysis</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#f59e0b"></span>Buzz (Market Insights)</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#10b981"></span>Leader Board</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#7c5cfc"></span>Social Listening</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#06b6a0"></span>Social Pulses</div>
+  <div class="ml-sidebar__section">Ads</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#2d7ff9"></span>Ad Manager</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#f97316"></span>Ad Intelligence</div>
+  <div class="ml-sidebar__section">Creation</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#23A9F6"></span>Content Publish</div>
+  <div class="ml-sidebar__item is-sub is-active">Creation &amp; Autopilot Studio<span class="ml-sidebar__new">BF</span></div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#8B5CF6"></span>AI Assets</div>
+  <div class="ml-sidebar__section">Tools</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#94A3B8"></span>Report Scheduler</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#94A3B8"></span>Tag Management</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#94A3B8"></span>AI Chat</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#94A3B8"></span>AI Agent</div>
+</aside>
+
+<main class="ml-main"><div class="ml-content">
+
+<div class="dm-title-page">Creation &amp; Autopilot Studio — BF</div>
+<div class="dm-page-sub">The BusinessFocus autopilot use case: a daily topic pool assembled by two discovery tracks, editor-confirmed, then generated, assembled, scored and queued — the same Studio flow, with topics as the new front door.</div>
+
+<nav class="dm-page-menu"><div class="menu-list">
+  <button class="menu-item is-active" data-tab="topic">Topic Studio</button>
+  <button class="menu-item" data-tab="brief">Brief Studio</button>
+  <button class="menu-item" data-tab="post">Post Studio</button>
+  <button class="menu-item" data-tab="visual">Visual Studio</button>
+  <button class="menu-item" data-tab="score">Pre-flight Score</button>
+  <button class="menu-item" data-tab="calendar">Calendar</button>
+  <button class="menu-item" data-tab="autopilot">Autopilot</button>
+</div></nav>
+
+<div class="dm-controls-row">
+  <span class="dm-ctl-label">Grounding window</span>
+  <div class="dm-period-group">
+    <button class="dm-period-trigger" id="periodTrigger">
+      <span class="ic">📅</span>
+      <span>Last 90 Days</span>
+      <span class="dm-period-trigger__date">· May 26 – Aug 23</span>
+      <span class="ic">▾</span>
+    </button>
+    <div class="dm-period-menu" id="periodMenu">
+      <div class="dm-period-menu__item"><span>Last 7 Days</span><span class="dm-period-menu__date">Aug 17 – Aug 23</span></div>
+      <div class="dm-period-menu__item"><span>Last 28 Days</span><span class="dm-period-menu__date">Jul 27 – Aug 23</span></div>
+      <div class="dm-period-menu__item is-active"><span>Last 90 Days</span><span class="dm-period-menu__date">May 26 – Aug 23</span></div>
+      <div class="dm-period-menu__item"><span>Last 12 Months</span><span class="dm-period-menu__date">Aug 24 – Aug 23</span></div>
+      <div class="dm-period-menu__divider"></div>
+      <div class="dm-period-menu__item"><span>📅 Custom Range</span></div>
+    </div>
+  </div>
+  <span class="dm-ctl-label">Model</span>
+  <select class="dm-select"><option>Pre-flight v1</option><option>v0 (legacy)</option></select>
+  <span class="spacer"></span>
+  <span class="dm-meta-label">Aug 2026 · FB 136 + IG 50 posts · run #34 · 10:00 HKT daily</span>
+</div>
+<!-- ══════════ TAB 1 · TOPIC STUDIO ══════════ -->
+<div class="tab-panel active" id="tab-topic">
+
+<div class="sec-head">
+  <div class="dm-title-section">Topic Studio — the day starts with a pool, not a prompt</div>
+  <span class="dm-subtitle">Every morning at 10:00 HKT two discovery tracks build a 20-topic pool: the MediaLens track (Google Trends HK → finance filter → source whitelist) and the ChatGPT-by-skill track (the editor's old topic prompt, now versioned inside bf-topic-selection v1). Every candidate carries its sources, its score breakdown and the track that found it. The editor confirms; nothing generates without a tick.</span>
+</div>
+
+<div class="dm-kpi-row">
+  <div class="dm-kpi-card"><div class="kpi__label">Today's pool</div><div class="kpi__metric">20</div><div class="kpi__sub">run #34 · 10:00:12 HKT</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Trends 轨命中</div><div class="kpi__metric">11</div><div class="kpi__sub">google_trends · HK · 24h</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">LLM (skill) 轨命中</div><div class="kpi__metric">6</div><div class="kpi__sub up">已重搜验证 · 2 条被拒</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">双轨命中</div><div class="kpi__metric">3</div><div class="kpi__sub up">两轨同时发现</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Selected</div><div class="kpi__metric">3/3</div><div class="kpi__sub">daily_count 3 · 待生成</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Degraded</div><div class="kpi__metric">0</div><div class="kpi__sub up">未触发降级链</div></div>
+</div>
+
+<section class="dm-card">
+  <div class="dm-title-card">Discovery configuration<span class="dmode dmode-live">LIVE</span></div>
+  <span class="dm-subtitle">v1 ships these four fields locked (read-only). The mode pills show the current value of BFSchedule.discovery_mode — trends first, with the ChatGPT track topping up the pool and acting as the last fallback.</span>
+  <div class="dm-controls-row" style="padding:0 0 12px">
+    <span class="dm-ctl-label">Discovery mode</span>
+    <div class="pill-row" style="margin-bottom:0"><button class="pill is-active">trends_first</button><button class="pill">cross_check</button><button class="pill">llm_only</button></div>
+    <span class="dm-meta-label">trends 不足时 LLM 轨补差额；cross_check 每周一次做双轨对照</span>
+  </div>
+  <div class="split2">
+    <div>
+      <div class="lockrow">选题 skill <b>bf-topic-selection @v1</b><span class="lk">🔒</span></div>
+      <div class="lockrow">Writing skill <b>bf-content-package @v1</b><span class="lk">🔒</span></div>
+      <div class="lockrow">Image cover style <b>BF media template2</b><span class="lk">🔒</span></div>
+      <div class="lockrow">Run time <b>每日 10:00 · Asia/Hong_Kong</b> · daily_count <b>3</b> · pool_size <b>20</b><span class="lk">🔒</span></div>
+    </div>
+    <div class="mini-info" style="margin-bottom:0"><div class="mini-info__t">topic_prompt（ChatGPT 轨，已固化进 skill · 只读）</div><div class="mini-info__b">「截止到目前，給出 20 個全球熱點的行業財經選題。輸出標題和 brief，附每條選題的資訊來源。」——editor 原来每天手贴的 prompt，现在由 skill 按排程自动执行；<b>模型给的 URL 一律不采信</b>，重搜到 ≥2 独立来源才进池。</div></div>
+  </div>
+</section>
+
+<section class="dm-card dm-card--table">
+  <div class="dm-card__header" style="padding:20px 20px 0">
+    <div>
+      <div class="dm-title-card">Today's topic pool — 24 Aug 2026 <span class="tg-new">NEW</span><span class="dmode dmode-mock">MOCK</span></div>
+      <span class="dm-subtitle">Top 8 of 20 shown. Score is the 100-point rubric (即時性25 · 影響22 · 數據18 · HK關聯18 · 討論度12 · 敘事5, minus penalties). Every row can expand its full source list with outlet and tier.</span>
+    </div>
+  </div>
+  <div class="dm-table-scroll"><table class="dm-modern-table dm-modern-table--compact">
+    <thead><tr><th></th><th>#</th><th>Topic</th><th>Category</th><th>Score</th><th>Found by</th><th>Sources</th><th>State</th></tr></thead>
+    <tbody>
+      <tr class="row-g"><td>☑</td><td class="num">1</td><td>英偉達財報前夕美股 AI 板塊震盪 港股科技股連鎖反應點睇？</td><td>Business &amp; Finance</td><td class="num"><b>87</b></td><td><span class="tg tg-b">Trends ↑#3 +180%</span> <span class="tg tg-p">LLM (skill)</span></td><td class="num">4 · Bloomberg / 信報 / Yahoo Fin HK / HK01</td><td><span class="tg tg-g">Selected</span></td></tr>
+      <tr class="row-g"><td>☑</td><td class="num">2</td><td>人民幣中間價創逾一年新高 出口商結匯潮對聯繫匯率有咩壓力</td><td>Business &amp; Finance</td><td class="num"><b>84</b></td><td><span class="tg tg-b">Trends #11</span></td><td class="num">3 · 華爾街見聞 / 金十 / SCMP</td><td><span class="tg tg-g">Selected</span></td></tr>
+      <tr class="row-g"><td>☑</td><td class="num">3</td><td>香港加密幣投資平台懷疑詐騙案 警方拘 12 人涉款 2.3 億</td><td>News &amp; Current Affairs</td><td class="num"><b>81</b></td><td><span class="tg tg-p">LLM (skill) · 已重搜驗證 ✓</span></td><td class="num">3 · HK01 / SCMP / Now財經</td><td><span class="tg tg-g">Selected</span></td></tr>
+      <tr><td>☐</td><td class="num">4</td><td>馬斯克 xAI 據報洽談新一輪融資 估值挑戰 2,000 億美元</td><td>Technology &amp; Innovation</td><td class="num">78</td><td><span class="tg tg-b">Trends #7</span> <span class="tg tg-p">LLM (skill)</span></td><td class="num">2 · TechCrunch / Bloomberg</td><td><span class="tg tg-n">Pool</span></td></tr>
+      <tr><td>☐</td><td class="num">5</td><td>ESG 基金第三季資金外流創紀錄 亞太區點解逆勢淨流入</td><td>Business &amp; Finance</td><td class="num">74</td><td><span class="tg tg-p">LLM (skill) · 已重搜驗證 ✓</span></td><td class="num">2 · Bloomberg / 信報</td><td><span class="tg tg-n">Pool</span></td></tr>
+      <tr><td>☐</td><td class="num">6</td><td>全港最低工資檢討報告出爐 商界勞工界分歧再現</td><td>Society &amp; Culture</td><td class="num">71</td><td><span class="tg tg-a">Outlet scan</span></td><td class="num">3 · HK01 / SCMP / Now財經</td><td><span class="tg tg-n">Pool</span></td></tr>
+      <tr><td>☐</td><td class="num">7</td><td>43歲家庭主婦月供 8 千滾出 300 萬 退休部署三步曲</td><td>Lifestyle &amp; Personal Dev</td><td class="num">66</td><td><span class="tg tg-p">LLM (skill) · 已重搜驗證 ✓</span></td><td class="num">2 · EDigest / 信報</td><td><span class="tg tg-n">Pool</span></td></tr>
+      <tr class="row-r"><td>—</td><td class="num">8</td><td>女保險代理呃錢案餘波 業界監管收緊傳聞</td><td>News &amp; Current Affairs</td><td class="num">58</td><td><span class="tg tg-b">Trends #28</span></td><td class="num">1 · HK01</td><td><span class="tg tg-r">Dropped · 單一來源 −15</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="foot-note" style="padding:0 20px 16px">12 more in pool（rank 9–20）。剔除規則：純波動 / 噪音 / 重複 / 無實質 / 影響有限 / HK 關聯弱；同 category 最多 2 條。扣分：單一來源 −15 · 寫不出成因 −10 · 同批重疊 −20。</div>
+  <div class="action-row" style="padding:0 20px 20px;margin-bottom:0">
+    <button class="btn btn--primary">確認生成（3/3）→</button>
+    <button class="btn btn--secondary">換一批（重跑 STAGE 1）</button>
+    <span class="who">D1：勾選確認後才進生成 · 獨立於 auto_publish</span>
+  </div>
+</section>
+
+<div class="callout callout--b">
+  <div class="callout__title">「ChatGPT 按 skill 給選題」的三條硬規則 — 印在 UI 上</div>
+  <div class="callout__body">① prompt 不再由 editor 每天手貼——它是 <b>bf-topic-selection v1</b> 的一部分，按排程自動執行、有版本、有留檔；② <b>LLM 給的 URL 一律不採信</b>——必須重新搜到 ≥2 個獨立真實報道才進池，驗證失敗的候選進 run.llm_unverified[]（本次 2 條，可展開查看）；③ trends 軌故障時 LLM 軌是降級鏈的最後一級（48h → buzz keywords → 12 來源頭條 → llm_only）。</div>
+  <div class="callout__meta"><span>今日 LLM 轨贡献: <b>6 進池 · 2 被拒</b></span><span>雙軌命中: <b>3</b></span><span>降級: <b>0 級</b></span></div>
+</div>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">Found-by distribution — today's pool<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">Where the 20 candidates came from. The two tracks overlap on the three biggest stories — that overlap is the health signal cross_check exists to measure.</span>
+    <div class="dm-chart-area" data-chart="tpFound"></div>
+  </section>
+  <section class="dm-card">
+    <div class="dm-title-card">Pool category mix vs page corpus<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">BusinessFocus already publishes 72% Business &amp; Finance. The pool respects the「同 category 最多 2 條」selection rule so the day's slate is not five takes on the same market story.</span>
+    <div class="dm-chart-area" data-chart="tpCat"></div>
+  </section>
+</div>
+
+<section class="ai-card">
+  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Topic Studio</div></div>
+  <div class="ai-card__sub">Grounded on run #34 · 20-topic pool · dual-track discovery · Confidence: Medium</div>
+  <div class="ai-insight-item"><span class="ib ib-b">Overlap</span><b>兩軌同時命中的三條，正是今日分數最高的三條。</b> 英偉達財報、人民幣中間價、xAI 融資同時被 trends 軌（名次 #3/#11/#7）與 LLM 軌發現——雙軌重疊率 15% 是健康信號：trends 保證即時性，LLM 軌保證財經敘事完整性。<b>維持 trends_first，LLM 軌作補差與敘事校驗。</b></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">Coverage</span><b>今日 50 條 HK trends 只有 14 條財經相關（28%）。</b> 低於 30% 的日子本月已出現 9 次；若一週滾動低於 20%，降級鏈會把 hours 擴到 48h 並把 outlet scan 升為常規軌。<b>O8 實測仍在進行——月底前不要改 hours 默認值。</b></div>
+  <div class="ai-insight-item alert"><span class="ib ib-r">Guard</span><b>LLM 軌今日被拒的 2 條都是「來源驗證失敗」。</b> 一條引用了不存在的 SCMP 報道，一條只搜到內容農場轉載。這正是「URL 不採信」規則存在的原因——被拒候選記入 run.llm_unverified[]，可追溯、可复盘。<b>不要為湊池數放寬 ≥2 獨立來源的門檻。</b></div>
+  <div class="ai-ask"><input type="text" placeholder="Ask about the pool — e.g. 「點解第 8 條被 dropped？」"><button class="btn btn--primary btn--sm">Ask</button></div>
+</section>
+
+</div>
+<!-- ══════════ TAB 2 · BRIEF STUDIO (BF) ══════════ -->
+<div class="tab-panel" id="tab-brief">
+
+<div class="sec-head">
+  <div class="dm-title-section">Brief Studio — the brief assembles itself from the confirmed topic</div>
+  <span class="dm-subtitle">Once a topic is confirmed, the brief is derived, not drafted: keywords inherit the topic's trend signal, the angle follows BF's editorial register, the slot comes from this page's own online-follower hours. The editor can edit every line — but never starts from blank.</span>
+</div>
+
+<div class="dm-kpi-row">
+  <div class="dm-kpi-card"><div class="kpi__label">Grounding corpus</div><div class="kpi__metric">186</div><div class="kpi__sub">FB 136 + IG 50 · window</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">FB Post ER</div><div class="kpi__metric">0.56%</div><div class="kpi__sub up">+66.24% vs prior</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">IG Post ER</div><div class="kpi__metric">0.21%</div><div class="kpi__sub up">+50.07% vs prior</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Avg eng / post（竞品组）</div><div class="kpi__metric">300.3</div><div class="kpi__sub up">全組第一 · EDigest 123.9</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Comments / Post</div><div class="kpi__metric">54</div><div class="kpi__sub up">FB · +139.78%</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">IG Saves</div><div class="kpi__metric">6,253</div><div class="kpi__sub up">+63.22% · 強指標</div></div>
+</div>
+
+<section class="dm-card">
+  <div class="dm-title-card">Auto-assembled brief — topic #1「英偉達財報前夕美股 AI 板塊震盪」<span class="dmode dmode-mock">MOCK</span></div>
+  <span class="dm-subtitle">Every element traced to its evidence — the topic's signal, this page's own distributions, and the BF writing skill's fixed rules.</span>
+  <div class="dm-table-scroll"><table class="dm-modern-table">
+    <thead><tr><th>Brief element</th><th>Decision</th><th>Evidence</th><th>Source</th></tr></thead>
+    <tbody>
+      <tr><td>Topic</td><td>英偉達財報前夕美股 AI 板塊震盪 港股科技股連鎖反應</td><td>Score 87 · Trends ↑#3 +180% · 雙軌命中 · 4 來源</td><td><span class="mf">Topic Studio · run #34</span></td></tr>
+      <tr><td>Angle</td><td>拆局分析型 — 數據前置、成因與港股傳導鏈</td><td>BF 主品類 Business &amp; Finance 佔本頁 72%（FB）/ 80%（IG）；拆局是 BF 語態</td><td><span class="mf">My Pages · category 分布</span></td></tr>
+      <tr><td>結構</td><td>8 區段（s1 標題 → s2 導言 → s3–s5 三大段 → s6 結語 → s7 hashtags → s8 品牌塊）</td><td>bf-content-package 固定契約；錨點供組裝切段</td><td><span class="mf">Writing skill v1</span></td></tr>
+      <tr><td>Keywords</td><td>美股 · AI · 英偉達 · 港股科技股</td><td>繼承選題 signal.trend_queries；「美股」「AI」同時是本頁 90D 熱詞</td><td><span class="mf">Topic signal + 頁面熱詞</span></td></tr>
+      <tr><td>Format</td><td>FB image post（s1..s7 + 封面）+ IG carousel（s1..s8 + 5 圖）</td><td>固定組裝配方；FB 帖型現狀 Status 47.8% / Link 30.9%，image post 是 BF 高互動形態</td><td><span class="mf">bf-post-assembly</span></td></tr>
+      <tr><td>Posting slot</td><td>今日 19:00 HKT</td><td>IG top posts 實測集中 18:11 / 19:01 / 20:51；19:00 slot 在線粉絲峰值</td><td><span class="mf">My Pages · online followers</span></td></tr>
+      <tr><td>Predicted eng</td><td>FB 412 / IG 1.4K likes（80% CI）</td><td>Pre-flight model v1（BF 校準 n=38，區間偏寬）</td><td><span class="mf">Pre-flight model v1</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">BF writing rules — applied as constraints<span class="dmode dmode-live">LIVE</span></div>
+    <span class="dm-subtitle">The rules the generator must obey, verbatim from bf-content-package v1. These are not style suggestions — ratio and fact rules fail the delivery when violated.</span>
+    <div class="chk"><span class="ok">✓</span>繁體中文財經分析報道 · 港式書面語（唔會/點解 只入引語）</div>
+    <div class="chk"><span class="ok">✓</span>標題固定尾綴 【 @businessfocus.io 】【#BF社會熱話】</div>
+    <div class="chk"><span class="ok">✓</span>股票代碼規則：美股：GM · 日股：7203 · A股：600104 · 德股：MBG</div>
+    <div class="chk"><span class="ok">✓</span>數字必須先核實才上圖 — 不可腦補</div>
+    <div class="chk"><span class="ok">✓</span>比例硬性：4:5 ×5 + 1000×525 ×1 — 不符即重生成</div>
+    <div class="chk"><span class="ok">✓</span>固定文末聲明與品牌文字（s8）</div>
+  </section>
+  <section class="dm-card">
+    <div class="dm-title-card">Posting slot — BusinessFocus hours<span class="dmode dmode-agg">AGG</span></div>
+    <span class="dm-subtitle">Hourly online-follower share for BusinessFocus IG + FB, with the recommended evening slot marked. Finance pages get a second commuter shoulder at 08:30.</span>
+    <div class="dm-chart-area" data-chart="bfSlot"></div>
+  </section>
+</div>
+
+<div class="action-row">
+  <button class="btn btn--primary">Generate delivery →</button>
+  <button class="btn btn--secondary">Edit brief</button>
+  <button class="btn btn--secondary">Back to pool</button>
+  <span class="who">bf_agent · bf-content-package v1 · 一次產出全套 7 產物</span>
+</div>
+
+<section class="ai-card">
+  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Brief Studio</div></div>
+  <div class="ai-card__sub">Grounded on FB 136 + IG 50 posts · topic signal · BF writing skill · Confidence: Medium</div>
+  <div class="ai-insight-item"><span class="ib ib-b">Signal</span><b>選題自帶 keyword 時效性——這是 BF brief 天生比通用 brief 強的地方。</b>「英偉達」在 HK trends 排 #3 且 +180%，brief 的 keyword 分量不需要另外驗證時效。<b>keyword timeliness 分量直接吃 topic signal，省一次 Buzz 查詢。</b></div>
+  <div class="ai-insight-item good"><span class="ib ib-g">Benchmark</span><b>BusinessFocus 平均每帖互動 300.3，是競品組第一——高出第二名 EDigest 2.4 倍。</b> 這個領先來自量少質精（week 窗口 114 帖 vs 香港01 的 358 帖）。<b>brief 的目標不是追發帖量，是守住單帖互動的領先。</b></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">Watch</span><b>IG saves +63.22% 是本月最強的正向信號。</b> 財經資訊圖的收藏行為（袋住慢慢睇）與 IG 演算法的非粉觸達強相關。<b>brief 的 CTA 從「讚好」改成「收藏」，資訊圖 03–06 的最後一格帶收藏提示。</b></div>
+  <div class="ai-ask"><input type="text" placeholder="Ask about this brief — e.g. 「點解揀 19:00 唔係開市前？」"><button class="btn btn--primary btn--sm">Ask</button></div>
+</section>
+
+</div>
+<!-- ══════════ TAB 3 · POST STUDIO (BF) ══════════ -->
+<div class="tab-panel" id="tab-post">
+
+<div class="sec-head">
+  <div class="dm-title-section">Post Studio — one topic, one delivery folder, two ready posts</div>
+  <span class="dm-subtitle">The article is the single source of truth. Both captions are cut from it by anchor — engineering, not a second generation pass: reproducible, zero hallucination, and every failure has an address. Example below is the real golden sample（delivery-20260625-momenta）.</span>
+</div>
+
+<div class="dm-kpi-row">
+  <div class="dm-kpi-card"><div class="kpi__label">Delivery</div><div class="kpi__metric">7/7</div><div class="kpi__sub up">全部產物通過校驗</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Posts assembled</div><div class="kpi__metric">2</div><div class="kpi__sub">FB image + IG carousel</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">FB caption</div><div class="kpi__metric">1,709</div><div class="kpi__sub">字 · s1..s7</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">IG caption</div><div class="kpi__metric">1,923</div><div class="kpi__sub up">字 · s1..s8 · ≤2,200 ✓</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Best pre-flight</div><div class="kpi__metric">76</div><div class="kpi__sub up">FB post · ship bar 70</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Link post</div><div class="kpi__metric">預留</div><div class="kpi__sub">等 article URL 回填</div></div>
+</div>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">Delivery folder — 20260625_Momenta擬港籌10億美元<span class="dmode dmode-live">LIVE</span></div>
+    <span class="dm-subtitle">7 products, fixed names, fixed order. Ratio validation is a gate: a failed image regenerates, it never ships.</span>
+    <div class="chk"><span class="ok">✓</span><b>01_文章全文.md</b><span class="meta"><span class="tg tg-b">8 區段 s1..s8</span><span class="tg tg-g">錨點完整</span></span></div>
+    <div class="chk"><span class="ok">✓</span><b>02_直版封面_4x5.png</b><span class="meta"><span class="tg tg-n">4:5</span><span class="tg tg-g">verified</span></span></div>
+    <div class="chk"><span class="ok">✓</span><b>03_資訊圖1_事件拆解_4x5.png</b><span class="meta"><span class="tg tg-n">4:5</span><span class="tg tg-g">verified</span></span></div>
+    <div class="chk"><span class="ok">✓</span><b>04_資訊圖2_痛點分析_4x5.png</b><span class="meta"><span class="tg tg-n">4:5</span><span class="tg tg-g">verified</span></span></div>
+    <div class="chk"><span class="ok">✓</span><b>05_資訊圖3_解法重點_4x5.png</b><span class="meta"><span class="tg tg-n">4:5</span><span class="tg tg-g">verified</span></span></div>
+    <div class="chk"><span class="ok">✓</span><b>06_資訊圖4_CTA_4x5.png</b><span class="meta"><span class="tg tg-n">4:5</span><span class="tg tg-g">verified</span></span></div>
+    <div class="chk"><span class="ok">✓</span><b>07_橫版封面_1000x525.png</b><span class="meta"><span class="tg tg-n">1000×525</span><span class="tg tg-a">網站 hero 用</span></span></div>
+    <div class="foot-note">狀態機：generating → review（7 asset + 2 post 齊備）→ partial_published / published；比例不符 / 圖缺 / 區段缺 → 該項重生成，組裝缺件 → 整條 post 不建立、交付標 failed。</div>
+  </section>
+  <section class="dm-card">
+    <div class="dm-title-card">01_文章全文 — 8 區段（golden sample 真實內容）<span class="dmode dmode-live">LIVE</span></div>
+    <span class="dm-subtitle">Anchors are the hard contract the assembler cuts by. Section colours match the recipe chips on the post cards.</span>
+    <div class="article-block">
+      <div class="seg-line"><span class="seg seg-s1">s1 標題</span><b>Momenta擬港籌10億美元！中國自動駕駛AI新股光環背後 三年蝕逾92億問盈利何時到？【 @businessfocus.io 】【#BF社會熱話】</b></div>
+      <div class="seg-line"><span class="seg seg-s2">s2 導言</span>中國自動駕駛獨角獸 Momenta 擬在香港 IPO，集資額或約 10 億美元（約78億港元），估值約 90 億美元。通用汽車（美股：GM）、豐田汽車（日股：7203）、上汽集團（A股：600104）、Mercedes-Benz（德股：MBG）在股東或合作方名單中……</div>
+      <div class="seg-line"><span class="seg seg-s3">s3 段一</span><b>車企背書夠豪華 但港股要看的不是名單</b> — 2025 年收入增至人民幣 24.13 億元，毛利率 71.6%；量產車方案安裝量超過 68 萬套，城市 NOA 超過 65 萬套……</div>
+      <div class="seg-line"><span class="seg seg-s4">s4 段二</span><b>收入增長快 虧損曲線仍是最大陰影</b> — 收入 7.43 億 → 24.13 億（三年 CAGR &gt;80%）；虧損 25.70 / 32.06 / 34.58 億，三年合計逾 92 億；非 IFRS 經調整虧損收窄至 3.03 億……</div>
+      <div class="seg-line"><span class="seg seg-s5">s5 段三</span><b>Robotaxi 是想像空間 也是估值風險</b> — 與 Uber（美股：UBER）2026 年慕尼黑測試 L4；Mercedes-Benz 及 Lumo 阿布扎比；Grab（美股：GRAB）東南亞……</div>
+      <div class="seg-line"><span class="seg seg-s6">s6 結語</span>2026 年上半年香港 IPO 融資額達 216 億美元，按年升 51%（LSEG）。下一隻 AI 新股能否成為長線贏家，不在於故事有幾震撼，而在於它何時證明自動駕駛不只是會開車，還真的會賺錢。</div>
+      <div class="seg-line"><span class="seg seg-s7">s7 標籤</span>#BusinessFocus #BF #Insight #Momenta #香港IPO #自動駕駛 #Robotaxi #AI新股</div>
+      <div class="seg-line"><span class="seg seg-s8">s8 品牌塊</span>Text by BusinessFocus Editorial · 免責聲明（固定文末聲明）· 📣 請即 follow @businessfocus.io 發掘更多商業智慧 投資靈感 及 創業故事！</div>
+    </div>
+  </section>
+</div>
+
+<div class="var-card pick">
+  <div class="var-card__main">
+    <div class="var-card__t">Facebook image post <span class="tg tg-b">caption = s1..s7</span> <span class="tg tg-n">1,709 字</span> <span class="tg tg-g">媒體：02 封面單圖</span></div>
+    <div class="var-card__body">Momenta擬港籌10億美元！中國自動駕駛AI新股光環背後 三年蝕逾92億問盈利何時到？【 @businessfocus.io 】【#BF社會熱話】 ⸺ 中國自動駕駛獨角獸 Momenta 擬在香港 IPO，集資額或約 10 億美元…（s2–s6 全文）… #BusinessFocus #BF #Insight #Momenta #香港IPO #自動駕駛 #Robotaxi #AI新股</div>
+    <div class="var-card__tags"><span class="seg seg-s1">s1</span><span class="seg seg-s2">s2</span><span class="seg seg-s3">s3</span><span class="seg seg-s4">s4</span><span class="seg seg-s5">s5</span><span class="seg seg-s6">s6</span><span class="seg seg-s7">s7</span></div>
+    <div class="var-card__meta"><span>平台 <b>Facebook</b></span><span>postType <b>image</b></span><span>mediaItems <b>[02]</b></span><span>createdVia <b>bf_agent</b></span><span>全文版 · 不加導流兩行</span></div>
+  </div>
+  <div class="var-card__score"><div class="n g">76</div><div class="l">PRE-FLIGHT</div></div>
+</div>
+
+<div class="var-card">
+  <div class="var-card__main">
+    <div class="var-card__t">Instagram carousel post <span class="tg tg-p">caption = s1..s8</span> <span class="tg tg-n">1,923 字 · ≤2,200 ✓</span> <span class="tg tg-g">媒體：02→06 五圖依序</span></div>
+    <div class="var-card__body">同一篇文章按錨點切出，再加 s8 固定文末聲明與品牌文字。五張圖依序：02 直版封面 → 03 事件拆解 → 04 痛點分析 → 05 解法重點 → 06 CTA。超過 2,200 字時先截 s8 免責段並回報——不靜默截斷。</div>
+    <div class="var-card__tags"><span class="seg seg-s1">s1</span><span class="seg seg-s2">s2</span><span class="seg seg-s3">s3</span><span class="seg seg-s4">s4</span><span class="seg seg-s5">s5</span><span class="seg seg-s6">s6</span><span class="seg seg-s7">s7</span><span class="seg seg-s8">s8</span></div>
+    <div class="var-card__meta"><span>平台 <b>Instagram</b></span><span>postType <b>carousel</b></span><span>mediaItems <b>[02,03,04,05,06]</b></span><span>createdVia <b>bf_agent</b></span></div>
+  </div>
+  <div class="var-card__score"><div class="n a">73</div><div class="l">PRE-FLIGHT</div></div>
+</div>
+
+<div class="var-card" style="opacity:.72">
+  <div class="var-card__main">
+    <div class="var-card__t">Facebook Link post <span class="tg tg-n">caption = short_link</span> <span class="tg tg-a">預留 · blocked_on_article_url</span></div>
+    <div class="var-card__body">s1 + s2 摘要截取 + 「全文詳見➡️ &lt;article URL&gt;」 + 🔔 訂閱行。網站文章發布成功後由平台回填 URL 解鎖——URL 不可由模型編造，摘要不另外生成（D2 已定）。</div>
+    <div class="var-card__meta"><span>平台 <b>Facebook</b></span><span>postType <b>link</b></span><span>state <b>blocked_on_article_url</b></span></div>
+  </div>
+  <div class="var-card__score"><div class="n" style="color:var(--dm-slate-400)">—</div><div class="l">AWAITING URL</div></div>
+</div>
+
+<div class="callout callout--b">
+  <div class="callout__title">組裝用 engineering，不用 AI — 已定決策，不重新討論</div>
+  <div class="callout__body">caption 是從 01_文章全文.md 按 <b>&lt;!-- sN --&gt;</b> 錨點切出來的，不經過第二次生成：<b>可重現、零幻覺、零額外 token、失敗可定位</b>。驗證失敗（缺區段 / 圖不齊 / 比例錯）→ 整條 post 不建立，交付標 failed 並回報是哪一項。</div>
+</div>
+
+<div class="action-row">
+  <button class="btn btn--primary">Send both to approval →</button>
+  <button class="btn btn--secondary">Regenerate 該項</button>
+  <button class="btn btn--secondary">Open in Content Publish</button>
+  <span class="who">同一條記錄同時出現在 Studio 與 Content Publish · BF agent Draft</span>
+</div>
+
+<section class="ai-card">
+  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Post Studio</div></div>
+  <div class="ai-card__sub">Grounded on golden sample 契約 · 組裝驗證日誌 · BF 語料 · Confidence: Medium</div>
+  <div class="ai-insight-item"><span class="ib ib-b">Contract</span><b>錨點契約是整條流水線最便宜的保險。</b> 8 個 sN 錨點讓組裝零猜測；歷史驗證失敗全部可定位到具體區段或圖。<b>writing skill 升版時錨點 schema 不許動——它是 bf-post-assembly 的輸入契約。</b></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">Length</span><b>IG caption 1,923 字距離 2,200 上限只有 277 字餘量。</b> 免責聲明段（s8）約 180 字——文章任何一段加長都可能觸發截斷回報。<b>把 s3–s5 的段長上限寫進 writing skill 的生成約束，而不是事後截。</b></div>
+  <div class="ai-insight-item good"><span class="ib ib-g">Reuse</span><b>FB 與 IG 用同一篇文章切段，內容一致性 100%，且單帖成本只算一次生成。</b> editor 過去手動拼貼最常出的錯（兩平台數字不一致）在結構上不可能再發生。<b>保持全文版 caption——導流兩行只屬於 Link post。</b></div>
+  <div class="ai-ask"><input type="text" placeholder="Ask about assembly — e.g. 「IG 超字數會點處理？」"><button class="btn btn--primary btn--sm">Ask</button></div>
+</section>
+
+</div>
+<!-- ══════════ TAB 4 · VISUAL STUDIO (BF) ══════════ -->
+<div class="tab-panel" id="tab-visual">
+
+<div class="sec-head">
+  <div class="dm-title-section">Visual Studio — template-locked, ratio-gated, facts verified</div>
+  <span class="dm-subtitle">BF visuals are not a style exploration. The cover and infographics follow BF media template2, ratios are a hard gate (4:5 ×5, 1000×525 ×1), and every number on an image must be verified before it is drawn.</span>
+</div>
+
+<section class="dm-card">
+  <div class="dm-title-card">Visual category mix — what BusinessFocus actually publishes<span class="dmode dmode-agg">AGG</span></div>
+  <span class="dm-subtitle">This page's real visual-category distribution (IG, window). Text-Only Graphic at 64% is not a weakness here — the finance infographic IS the product format. Per-page grounding is the whole point: the same category is GirlStyle's worst and BusinessFocus's workhorse.</span>
+  <div class="dm-chart-area" style="height:260px" data-chart="bfViCat"></div>
+</section>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">Generated assets — 02 to 07<span class="dmode dmode-live">LIVE</span></div>
+    <span class="dm-subtitle">Six images per delivery, fixed roles, fixed names, ratio verified. 07 橫版 is the website hero only — no social placement consumes it（O3）.</span>
+    <div class="asset-grid" style="grid-template-columns:repeat(2,1fr)">
+      <div class="asset-card"><div class="thumb"><span class="corner-tl tg tg-b">4:5</span><span class="corner-tr">02</span><span class="l1">直版封面</span><span class="l2">深藍底 · 大字標題 · 模板2 對照</span></div><div class="ref-card__n">02_直版封面_4x5</div><div class="stat4"><span class="s">Kind<b>cover</b></span><span class="s">校驗<b>✓ 4:5</b></span></div></div>
+      <div class="asset-card"><div class="thumb"><span class="corner-tl tg tg-b">4:5</span><span class="corner-tr">03</span><span class="l1">資訊圖1 · 事件拆解</span><span class="l2">IPO 集資/估值/股東名單</span></div><div class="ref-card__n">03_資訊圖1_事件拆解_4x5</div><div class="stat4"><span class="s">Kind<b>info</b></span><span class="s">校驗<b>✓ 4:5</b></span></div></div>
+      <div class="asset-card"><div class="thumb"><span class="corner-tl tg tg-b">4:5</span><span class="corner-tr">04</span><span class="l1">資訊圖2 · 痛點分析</span><span class="l2">三年虧損逾 92 億曲線</span></div><div class="ref-card__n">04_資訊圖2_痛點分析_4x5</div><div class="stat4"><span class="s">Kind<b>info</b></span><span class="s">校驗<b>✓ 4:5</b></span></div></div>
+      <div class="asset-card"><div class="thumb"><span class="corner-tl tg tg-b">4:5</span><span class="corner-tr">05</span><span class="l1">資訊圖3 · 解法重點</span><span class="l2">盈利路線與商業模式</span></div><div class="ref-card__n">05_資訊圖3_解法重點_4x5</div><div class="stat4"><span class="s">Kind<b>info</b></span><span class="s">校驗<b>✓ 4:5</b></span></div></div>
+      <div class="asset-card"><div class="thumb"><span class="corner-tl tg tg-b">4:5</span><span class="corner-tr">06</span><span class="l1">資訊圖4 · CTA</span><span class="l2">收藏提示 + follow 引導</span></div><div class="ref-card__n">06_資訊圖4_CTA_4x5</div><div class="stat4"><span class="s">Kind<b>info</b></span><span class="s">校驗<b>✓ 4:5</b></span></div></div>
+      <div class="asset-card"><div class="thumb"><span class="corner-tl tg tg-a">1000×525</span><span class="corner-tr">07</span><span class="l1">橫版封面</span><span class="l2">網站文章 hero（不上社媒）</span></div><div class="ref-card__n">07_橫版封面_1000x525</div><div class="stat4"><span class="s">Kind<b>banner</b></span><span class="s">校驗<b>✓ 1000×525</b></span></div></div>
+    </div>
+  </section>
+  <section class="dm-card">
+    <div class="dm-title-card">Template reference — the three-image contract<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">Every generated image is checked against its template reference. ⚠ Templates currently live in Google Drive — they must move into MediaLens `bf-templates/` before the agent can run the comparison unattended（O4）.</span>
+    <div class="mini-info"><div class="mini-info__t">封面模板 · (Chant)BF media template2.jpg</div><div class="mini-info__b">深藍底 · 左字右圖 · 黃色數字強調 · 粗體無襯線標題。封面 02 逐項對照 layout / palette / type treatment。</div></div>
+    <div class="mini-info"><div class="mini-info__t">資訊圖模板 · (Chant)BF media template2 (1).jpg</div><div class="mini-info__b">三欄結構 + 圖示 + 數字前置。03–06 沿用；每張圖上的數字必須先在來源核實。</div></div>
+    <div class="mini-info"><div class="mini-info__t">橫版模板 · AI投資懶人包.jpg + image.png</div><div class="mini-info__b">1000×525（不再用 21:9 — O5 以 Notion 版 skill 為準）。僅網站 hero 消費。</div></div>
+    <div class="mini-info"><div class="mini-info__t">生成管線</div><div class="mini-info__b">走既有 <code>aiAsset</code> 管線（mode + referenceImageUrls）；4:5 在 ratioBucket 枚舉內；<b>1000×525 需走 custom + outputRatio 精確校驗</b>（B8）。</div></div>
+  </section>
+</div>
+
+<div class="callout callout--a">
+  <div class="callout__title">兩條硬規則 — 圖的可信度就是 BF 的可信度</div>
+  <div class="callout__body">① <b>比例不符即重生成</b>——4:5 與 1000×525 是校驗門檻不是建議，不符的圖不會進交付；② <b>圖內數字必須先核實才上圖</b>——資訊圖上的每個數字都要能對回來源（HKEXnews / 招股書 / LSEG…），不可腦補。這兩條在 writing skill 裡是失敗條件，不是風格偏好。</div>
+</div>
+
+<section class="ai-card">
+  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Visual Studio</div></div>
+  <div class="ai-card__sub">Grounded on IG 視覺類目分布 · 模板契約 · aiAsset 管線 · Confidence: Medium</div>
+  <div class="ai-insight-item"><span class="ib ib-b">Category</span><b>Text-Only Graphic 佔 BF 產出 64%，而它是 GirlStyle 的最差類目——同一類目，兩頁命運相反。</b> 這正是 per-page grounding 的證據：類目沒有絕對好壞，只有「對這個頁面」的實測表現。<b>BF 的優化方向不是換類目，是把 Infographic（16%）的佔比往收藏強的方向加。</b></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">Blocker</span><b>模板圖還在 Google Drive——這是 B-S1 的第一塊絆腳石。</b> 對照步驟無法自動執行，等於每張圖都要人工核模板。<b>先搬 bf-templates/ 再接生成編排（B7），順序不能反。</b></div>
+  <div class="ai-insight-item good"><span class="ib ib-g">Trust</span><b>「數字先核實」規則讓資訊圖可以直接引用——這是財經頁的護城河。</b> Momenta 樣本裡 92 億虧損、71.6% 毛利率、216 億美元 IPO 融資額全部可對回招股書與 LSEG。<b>把「每張圖的數字來源」存進 BFAsset 元數據，審批時一鍵對照。</b></div>
+  <div class="ai-ask"><input type="text" placeholder="Ask about assets — e.g. 「07 橫版可唔可以跳過？」"><button class="btn btn--primary btn--sm">Ask</button></div>
+</section>
+
+</div>
+<!-- ══════════ TAB 5 · PRE-FLIGHT SCORE (BF) ══════════ -->
+<div class="tab-panel" id="tab-score">
+
+<div class="sec-head">
+  <div class="dm-title-section">Pre-flight Score — the same gate, BF's own yardstick</div>
+  <span class="dm-subtitle">「其他流程不變」的核心：BF post 與人工 post 用同一把尺。分量與 gate 邏輯完全復用主線；分母換成 BusinessFocus 自己的分布（FB Post ER 0.56% / IG 0.21%），FB 與 IG 分開打分。</span>
+</div>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">Composite score — FB image post「Momenta 擬港籌 10 億美元」<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">Weighted components against this page's own distribution. Ship bar 70, auto-publish bar 80 — same bars as the main Studio.</span>
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 110 110">
+        <circle cx="55" cy="55" r="46" fill="none" stroke="#F1F5F9" stroke-width="10"/>
+        <circle cx="55" cy="55" r="46" fill="none" stroke="#34D399" stroke-width="10" stroke-linecap="round" stroke-dasharray="219.7 289" transform="rotate(-90 55 55)"/>
+        <text class="num" x="55" y="66" text-anchor="middle">76</text>
+      </svg>
+      <div class="ring-side">
+        <div class="h">Cleared for approval</div>
+        <div class="b">高於 70 ship bar、低於 80 auto-publish bar——進審批隊列而非直接排期。拖分的是 format & length（IG 餘量僅 277 字）與 hook 強度（標題數字前置已是最優解，但缺問句）。</div>
+      </div>
+    </div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Category fit（B&amp;F 主品類）· weight 20%</span><span class="sbar__val">88</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:88%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Hook / 標題強度（數字前置「10億」「92億」）· weight 20%</span><span class="sbar__val">82</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:82%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Keyword timeliness（香港IPO · trends rising）· weight 15%</span><span class="sbar__val">79</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:79%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Voice match（BF 財經書面語 + 尾綴 + 代碼格式）· weight 15%</span><span class="sbar__val">91</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:91%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Format &amp; length fit · weight 15%</span><span class="sbar__val">68</span></div><div class="sbar__rail"><div class="sbar__fill f-a" style="width:68%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">近重復（7 天同題材 similar 檢索）· weight 10%</span><span class="sbar__val">90</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:90%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Fatigue（選題池已控同 category ≤2）· weight 5%</span><span class="sbar__val">85</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:85%"></div></div></div>
+    <div class="foot-note">IG carousel 同稿另打：<b>73</b>（format & length 更緊：1,923/2,200 字）。BF 語境的 fatigue 語義變化：Business &amp; Finance 佔本頁 72–80% 是常態而非風險——guard 看「同題材 7 天近重復」而非 category 集中度；集中度由選題池「同 category ≤2 條」在上游控制。</div>
+  </section>
+
+  <section class="dm-card">
+    <div class="dm-title-card">Predicted outcome — FB post<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">Point predictions with 80% CI. BF calibration is young（n=38 published BF-flow posts）— intervals are wide and the UI says so.</span>
+    <div style="margin-bottom:18px">
+      <div class="kpi__label" style="margin-bottom:4px">Predicted engagements</div>
+      <div style="font:600 20px var(--font-metric);color:var(--dm-slate-900)">412 <span style="font:400 12px var(--font-body);color:var(--dm-slate-500)">(80% CI 260 – 640)</span></div>
+      <div class="kpi-range"><div class="kpi-range__rail"><div class="kpi-range__fill" style="left:26%;width:38%"></div><div class="kpi-range__marker" style="left:30%"></div></div><div class="kpi-range__axis"><span>0</span><span>page avg 300.3 / post</span><span>1,000</span></div></div>
+    </div>
+    <div style="margin-bottom:18px">
+      <div class="kpi__label" style="margin-bottom:4px">Predicted reach</div>
+      <div style="font:600 20px var(--font-metric);color:var(--dm-slate-900)">82k <span style="font:400 12px var(--font-body);color:var(--dm-slate-500)">(80% CI 54k – 121k)</span></div>
+      <div class="kpi-range"><div class="kpi-range__rail"><div class="kpi-range__fill" style="left:27%;width:34%;background:var(--chart-5)"></div><div class="kpi-range__marker" style="left:23%"></div></div><div class="kpi-range__axis"><span>0</span><span>window 日均 reach 31k</span><span>200k</span></div></div>
+    </div>
+    <div style="margin-bottom:18px">
+      <div class="kpi__label" style="margin-bottom:4px">Predicted comments</div>
+      <div style="font:600 20px var(--font-metric);color:var(--dm-slate-900)">61 <span style="font:400 12px var(--font-body);color:var(--dm-slate-500)">(80% CI 34 – 104)</span></div>
+      <div class="kpi-range"><div class="kpi-range__rail"><div class="kpi-range__fill" style="left:24%;width:36%;background:var(--chart-4)"></div><div class="kpi-range__marker" style="left:38%"></div></div><div class="kpi-range__axis"><span>0</span><span>page median 54 / post</span><span>150</span></div></div>
+    </div>
+    <div style="margin-bottom:18px">
+      <div class="kpi__label" style="margin-bottom:4px">Predicted IG saves（carousel）</div>
+      <div style="font:600 20px var(--font-metric);color:var(--dm-slate-900)">210 <span style="font:400 12px var(--font-body);color:var(--dm-slate-500)">(80% CI 120 – 360)</span></div>
+      <div class="kpi-range"><div class="kpi-range__rail"><div class="kpi-range__fill" style="left:22%;width:40%;background:#F472B6"></div><div class="kpi-range__marker" style="left:25%"></div></div><div class="kpi-range__axis"><span>0</span><span>window saves/post 125</span><span>500</span></div></div>
+    </div>
+    <div class="foot-note">Saves 是 BF 資訊圖內容的承重指標（window +63.22%）——財經圖收藏行為與非粉觸達強相關。四個預測全部進 <b>studioOutcomeLog（useCase='bf'）</b>，T+72h 回填實發。</div>
+  </section>
+</div>
+
+<section class="dm-card">
+  <div class="dm-title-card">Score-to-outcome calibration — BF flow<span class="dmode dmode-mock">MOCK</span></div>
+  <span class="dm-subtitle">BF posts calibrate separately from the main page corpus（FB 與 IG 再分開）。38 posts in, the honest read is: gate works, ranking doesn't yet.</span>
+  <div class="dm-chart-area" style="height:280px" data-chart="bfCal"></div>
+  <div class="foot-note"><b>Pearson r = 0.44 across 38 BF-flow posts（Jul–Aug 2026）；MAE 0.9pp。</b> <span style="color:var(--r);font-weight:600">Honest read:</span> 比主線（60 帖 r=0.52）更早期。≥75 的帖實發互動中位 420，&lt;65 的帖 190——gate 有效；三分以內的排序無意義。BF 節奏每月約 90 條 post，校準量增長比主線快——<b>預計 10 月中達到 150 帖降級解除線。</b></div>
+</section>
+
+<section class="ai-card">
+  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Pre-flight Score</div></div>
+  <div class="ai-card__sub">Grounded on 38 BF calibration posts · BF 頁分布 · Confidence: Medium</div>
+  <div class="ai-insight-item"><span class="ib ib-b">Yardstick</span><b>BF 的 keyword 分量天生強——選題就是從 trends 來的。</b> 主線 brief 要另查 Buzz 驗證時效；BF post 的題目本身帶 trend 名次與升幅。<b>keyword timeliness 直接讀 topic signal，這個分量在 BF 流永遠不會是拖分項。</b></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">Length</span><b>Format &amp; length 是 BF 兩條 post 的共同拖分項（68）。</b> 全文版 caption 是產品決策（一致性、SEO、資訊完整），不是要改掉的毛病——但它結構性壓低這個分量。<b>給 BF 流單獨設 format 分量的 BF 基準（以全文版分布為分母），而不是沿用主線的短文案分布。</b></div>
+  <div class="ai-insight-item alert"><span class="ib ib-r">Honesty</span><b>n=38 的校準只夠支撐 gate，不夠支撐排序。</b> 76 vs 73 的差異在噪聲帶內——兩條 post 都該進審批，而不是只發高分那條。<b>UI 顯示分數帶（High/Mid/Low）；10 月中 150 帖前不開 auto_publish 的分數門檻。</b></div>
+  <div class="ai-ask"><input type="text" placeholder="Ask about scoring — e.g. 「BF 嘅 fatigue 點解唔睇 category 集中度？」"><button class="btn btn--primary btn--sm">Ask</button></div>
+</section>
+
+</div>
+<!-- ══════════ TAB 6 · CALENDAR (BF) ══════════ -->
+<div class="tab-panel" id="tab-calendar">
+
+<div class="sec-head">
+  <div class="dm-title-section">Calendar — the daily run meets the human queue</div>
+  <span class="dm-subtitle">Every day the run adds up to 6 posts（3 topics × FB + IG）to a queue that also carries the editors' own posts. Slots come from BusinessFocus's measured hours; approval is on by default（auto_publish = false）.</span>
+</div>
+
+<div class="dm-kpi-row">
+  <div class="dm-kpi-card"><div class="kpi__label">Queued this week</div><div class="kpi__metric">32</div><div class="kpi__sub">BF flow 24 + 人工 8</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Published</div><div class="kpi__metric">18</div><div class="kpi__sub up">on pace</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Needs approval</div><div class="kpi__metric">6</div><div class="kpi__sub down">最舊 9h · SLA 48h</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Median queue score</div><div class="kpi__metric">74</div><div class="kpi__sub up">ship bar 70</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">IG posts / day</div><div class="kpi__metric">5</div><div class="kpi__sub">現狀 · 含人工帖</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Slot compliance</div><div class="kpi__metric">78%</div><div class="kpi__sub up">25 of 32 in 推薦時段</div></div>
+</div>
+
+<section class="dm-card">
+  <div class="dm-title-card">August 2026 — BF flow + manual, one queue<span class="dmode dmode-live">LIVE</span></div>
+  <span class="dm-subtitle">Colour = status（同主線）。Cell = 當日 post 數 · 佇列中位分。BF flow posts 標 ⚙。</span>
+  <div class="cal-grid">
+    <div class="hd">Mon</div><div class="hd">Tue</div><div class="hd">Wed</div><div class="hd">Thu</div><div class="hd">Fri</div><div class="hd">Sat</div><div class="hd">Sun</div>
+    <div class="cal-cell cal-pub"><div class="d">3 · 6 posts</div><div class="m">⚙4 + 2 · 75</div></div>
+    <div class="cal-cell cal-pub"><div class="d">4 · 5 posts</div><div class="m">⚙4 + 1 · 72</div></div>
+    <div class="cal-cell cal-pub"><div class="d">5 · 6 posts</div><div class="m">⚙4 + 2 · 77</div></div>
+    <div class="cal-cell cal-pub"><div class="d">6 · 5 posts</div><div class="m">⚙4 + 1 · 74</div></div>
+    <div class="cal-cell cal-pub"><div class="d">7 · 6 posts</div><div class="m">⚙4 + 2 · 76</div></div>
+    <div class="cal-cell cal-pub"><div class="d">8 · 3 posts</div><div class="m">⚙2 + 1 · 71</div></div>
+    <div class="cal-cell cal-pub"><div class="d">9 · 3 posts</div><div class="m">⚙2 + 1 · 73</div></div>
+    <div class="cal-cell cal-pub"><div class="d">10 · 6 posts</div><div class="m">⚙4 + 2 · 78</div></div>
+    <div class="cal-cell cal-pub"><div class="d">11 · 5 posts</div><div class="m">⚙4 + 1 · 74</div></div>
+    <div class="cal-cell cal-pub"><div class="d">12 · 6 posts</div><div class="m">⚙4 + 2 · 75</div></div>
+    <div class="cal-cell cal-pub"><div class="d">13 · 5 posts</div><div class="m">⚙4 + 1 · 72</div></div>
+    <div class="cal-cell cal-pub"><div class="d">14 · 6 posts</div><div class="m">⚙4 + 2 · 77</div></div>
+    <div class="cal-cell cal-pub"><div class="d">15 · 3 posts</div><div class="m">⚙2 + 1 · 70</div></div>
+    <div class="cal-cell cal-pub"><div class="d">16 · 3 posts</div><div class="m">⚙2 + 1 · 74</div></div>
+    <div class="cal-cell cal-pub"><div class="d">17 · 6 posts</div><div class="m">⚙4 + 2 · 76</div></div>
+    <div class="cal-cell cal-pub"><div class="d">18 · 5 posts</div><div class="m">⚙4 + 1 · 73</div></div>
+    <div class="cal-cell cal-pub"><div class="d">19 · 6 posts</div><div class="m">⚙4 + 2 · 75</div></div>
+    <div class="cal-cell cal-pub"><div class="d">20 · 6 posts</div><div class="m">⚙4 + 2 · 78</div></div>
+    <div class="cal-cell cal-pub"><div class="d">21 · 5 posts</div><div class="m">⚙4 + 1 · 74</div></div>
+    <div class="cal-cell cal-pub"><div class="d">22 · 3 posts</div><div class="m">⚙2 + 1 · 72</div></div>
+    <div class="cal-cell cal-pub"><div class="d">23 · 3 posts</div><div class="m">⚙2 + 1 · 71</div></div>
+    <div class="cal-cell cal-app"><div class="d">24 · 6 posts</div><div class="m">⚙6 待審 · 74</div></div>
+    <div class="cal-cell cal-sch"><div class="d">25 · 5 sched</div><div class="m">⚙4 + 1 · 75</div></div>
+    <div class="cal-cell cal-sch"><div class="d">26 · 6 sched</div><div class="m">⚙4 + 2 · 76</div></div>
+    <div class="cal-cell cal-dft"><div class="d">27 · pool</div><div class="m">明日 run 待建</div></div>
+    <div class="cal-cell cal-dft"><div class="d">28 · pool</div><div class="m">—</div></div>
+    <div class="cal-cell cal-dft"><div class="d">29 · —</div><div class="m">weekend 減量</div></div>
+    <div class="cal-cell cal-dft"><div class="d">30 · —</div><div class="m">weekend 減量</div></div>
+  </div>
+  <div class="cal-legend">
+    <span><span class="sw" style="background:#BBF7D0"></span>Published</span>
+    <span><span class="sw" style="background:#BFDBFE"></span>Scheduled</span>
+    <span><span class="sw" style="background:#FDE68A"></span>Needs approval</span>
+    <span><span class="sw" style="background:#DDD6FE"></span>Pool / Draft</span>
+    <span>⚙ = BF flow（createdVia bf_agent）· weekend 降 daily_count（BFRun.is_weekend）</span>
+  </div>
+</section>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">Slot recommendation — BusinessFocus hours<span class="dmode dmode-agg">AGG</span></div>
+    <span class="dm-subtitle">From this page's own online-follower hours and measured slot ER. Evening dominates; the pre-market commuter band is the finance-page bonus slot.</span>
+    <div class="dm-table-scroll"><table class="dm-modern-table dm-modern-table--compact">
+      <thead><tr><th>Slot</th><th>Online followers</th><th>Posts in slot (90D)</th><th>Median eng / post</th><th>Lift vs page median</th><th>Queue usage</th></tr></thead>
+      <tbody>
+        <tr class="row-g"><td>平日 19:00</td><td class="num">18.9%</td><td class="num">22</td><td class="num">386</td><td><span class="tg tg-g">+48%</span></td><td class="num">8 of 32</td></tr>
+        <tr><td>平日 18:00</td><td class="num">17.2%</td><td class="num">19</td><td class="num">347</td><td><span class="tg tg-g">+33%</span></td><td class="num">7 of 32</td></tr>
+        <tr><td>平日 20:30</td><td class="num">16.4%</td><td class="num">14</td><td class="num">322</td><td><span class="tg tg-g">+24%</span></td><td class="num">5 of 32</td></tr>
+        <tr><td>平日 14:30</td><td class="num">12.8%</td><td class="num">11</td><td class="num">296</td><td><span class="tg tg-g">+14%</span></td><td class="num">4 of 32</td></tr>
+        <tr><td>平日 08:30（開市前）</td><td class="num">11.2%</td><td class="num">16</td><td class="num">273</td><td><span class="tg tg-n">+5%</span></td><td class="num">6 of 32</td></tr>
+        <tr><td>深夜 01:00–03:00</td><td class="num">4.3%</td><td class="num">7</td><td class="num">148</td><td><span class="tg tg-r">−43%</span></td><td class="num">2 of 32</td></tr>
+      </tbody>
+    </table></div>
+    <div class="foot-note">佐證：IG 實測 top posts 時間 19:01 / 18:11 / 20:51 / 14:44——全部落在推薦時段。深夜檔偶有爆帖（03 Aug 02:10 · 1.9K likes）但中位表現 −43%，不做常規檔。</div>
+  </section>
+
+  <section class="dm-card">
+    <div class="dm-title-card">Approval queue — today's run<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">auto_publish = false（預設）：run #34 的 6 條 post 全部停在這裡等一次點擊。approve 即進 scheduler。</span>
+    <div class="dm-table-scroll"><table class="dm-modern-table dm-modern-table--compact">
+      <thead><tr><th>Post</th><th>Platform</th><th>Topic</th><th>Slot</th><th>Score</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>⚙ 英偉達財報前夕…（FB image）</td><td>FB</td><td>#1</td><td>今日 19:00</td><td class="num"><b style="color:var(--g)">76</b></td><td><span class="tg tg-b">Awaiting · 2h</span></td></tr>
+        <tr><td>⚙ 英偉達財報前夕…（IG carousel）</td><td>IG</td><td>#1</td><td>今日 19:05</td><td class="num"><b>73</b></td><td><span class="tg tg-b">Awaiting · 2h</span></td></tr>
+        <tr><td>⚙ 人民幣中間價新高…（FB image）</td><td>FB</td><td>#2</td><td>今日 18:00</td><td class="num"><b>74</b></td><td><span class="tg tg-b">Awaiting · 2h</span></td></tr>
+        <tr><td>⚙ 人民幣中間價新高…（IG carousel）</td><td>IG</td><td>#2</td><td>今日 18:05</td><td class="num"><b>71</b></td><td><span class="tg tg-b">Awaiting · 2h</span></td></tr>
+        <tr><td>⚙ 加密幣平台詐騙案…（FB image）</td><td>FB</td><td>#3</td><td>明日 08:30</td><td class="num"><b>75</b></td><td><span class="tg tg-b">Awaiting · 2h</span></td></tr>
+        <tr><td>⚙ 加密幣平台詐騙案…（IG carousel）</td><td>IG</td><td>#3</td><td>明日 08:35</td><td class="num"><b style="color:var(--a)">69</b></td><td><span class="tg tg-a">Needs edit · below bar</span></td></tr>
+      </tbody>
+    </table></div>
+    <div class="foot-note">審批動作全部寫入 studioAuditLog；auto_publish=true 時直接發布並在交付標 <b>unreviewed</b>——審計可見，不是靜默。</div>
+  </section>
+</div>
+
+<div class="callout callout--a">
+  <div class="callout__title">Publishing is not live yet — 同主線，如實聲明</div>
+  <div class="callout__body">IG/FB 發布等 Meta App Review。今天「approve」= 寫入 MediaLens 佇列 + copy-ready payload；到 Meta 權限落地當天，這條審批鏈自動變成 auto_publish 的入口。<b>Do not demo this as shipped。</b></div>
+</div>
+
+<section class="ai-card">
+  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Calendar</div></div>
+  <div class="ai-card__sub">Grounded on 32 queued posts · BF online-follower hours · run cadence · Confidence: Medium</div>
+  <div class="ai-insight-item"><span class="ib ib-b">Cadence</span><b>BF flow 每日 6 條 + 人工 2 條，IG 已達現狀 5 帖/日的節奏上限。</b> 再加量會稀釋單帖互動（BF 的競品優勢正是量少質精 300.3/帖）。<b>daily_count 保持 3；要加量先看單帖互動有沒有掉。</b></div>
+  <div class="ai-insight-item good"><span class="ib ib-g">Slot</span><b>78% 的隊列已落在推薦時段——比主線 GirlStyle 的 67% 健康。</b> 因為 BF 的排期是 run 自動分配的，不經過「編輯順手選 09:00」這一步。<b>自動排程本身就是 slot 合規率的保證，保持 scheduler 只從 top-4 slot 分配。</b></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">Weekend</span><b>週末財經 trends 供給薄（BFRun.is_weekend），daily_count 自動降到 2。</b> 8 月四個週末的池均值只有 12 條合格候選。<b>週末檔改推 Lifestyle/理財故事類（如「43歲家庭主婦」）——這類題材週末互動反而 +20%。</b></div>
+  <div class="ai-ask"><input type="text" placeholder="Ask about the queue — e.g. 「點解第 6 條 below bar？」"><button class="btn btn--primary btn--sm">Ask</button></div>
+</section>
+
+</div>
+<!-- ══════════ TAB 7 · AUTOPILOT (BF) ══════════ -->
+<div class="tab-panel" id="tab-autopilot">
+
+<div class="sec-head">
+  <div class="dm-title-section">Autopilot — the schedule is the contract</div>
+  <span class="dm-subtitle">BFSchedule 是這個 use case 的自治設定：什麼時候跑、跑多少、哪些字段鎖死、要不要人審。兩道人工閘（選題確認 D1 + 發布審批）讓 BF v1 停在 L3——agent 只提案，前端確認後才寫。</span>
+</div>
+
+<div class="dm-kpi-row">
+  <div class="dm-kpi-card"><div class="kpi__label">Autonomy level</div><div class="kpi__metric">L3</div><div class="kpi__sub">選題確認 + 發布審批 雙閘</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Runs（8 週）</div><div class="kpi__metric">34</div><div class="kpi__sub up">33 done · 1 degraded</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Topics generated</div><div class="kpi__metric">96</div><div class="kpi__sub">680 pool → 96 selected</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Posts published</div><div class="kpi__metric">178</div><div class="kpi__sub up">FB 89 + IG 89</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Editor time saved</div><div class="kpi__metric">2.1h</div><div class="kpi__sub up">/日 · 選題+拼貼+搬運</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Kill switch</div><div class="kpi__metric">Armed</div><div class="kpi__sub">停排程 + 清待審提案</div></div>
+</div>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">BFSchedule — the standing configuration<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">v1 ships the four capability fields locked（🔒 read-only cards, not disabled inputs）. Changing them is a version bump, not a setting.</span>
+    <div class="lockrow">Run time <b>每日 10:00 · Asia/Hong_Kong</b><span class="lk">enabled ✅</span></div>
+    <div class="lockrow">daily_count <b>3</b> · pool_size <b>20</b> · weekend 自動降量<span class="lk"></span></div>
+    <div class="lockrow">auto_publish <b>OFF</b>（=true 時直發並標 unreviewed）<span class="lk"></span></div>
+    <div class="lockrow">topic_skill <b>bf-topic-selection @v1</b><span class="lk">🔒</span></div>
+    <div class="lockrow">discovery_mode <b>trends_first</b><span class="lk">🔒</span></div>
+    <div class="lockrow">writing_skill <b>bf-content-package @v1</b><span class="lk">🔒</span></div>
+    <div class="lockrow">cover_style <b>BF media template2</b><span class="lk">🔒</span></div>
+    <div class="foot-note">隔離原則（結構性，不靠 prompt 自律）：<b>bf_agent 是獨立 root agent</b>，不掛 medialens_agent.sub_agents——既不轉出也不被轉入；google_search 以 AgentTool 掛載而非 transfer，隔離不破。</div>
+  </section>
+  <section class="dm-card">
+    <div class="dm-title-card">Run history — last 8 weeks<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">Pool built → editor confirmed → generated → published, per week. The one degraded run fell back to 48h trends + outlet scan and still delivered.</span>
+    <div class="dm-chart-area" style="height:300px" data-chart="bfRuns"></div>
+  </section>
+</div>
+
+<div class="sec-head">
+  <div class="dm-title-section">Action queue — today</div>
+  <span class="dm-subtitle">BF 提案與主線共用同一個持久化隊列（autopilotProposal）。每條帶證據、預測效果與回滾。</span>
+</div>
+
+<div class="prop-card">
+  <div class="prop-card__main">
+    <div class="prop-card__t">Publish FB post「英偉達財報前夕美股 AI 板塊震盪」 at 今日 19:00</div>
+    <div class="prop-card__e">Evidence: pre-flight 76（ship bar 70 ✓）；19:00 slot 在線粉絲 18.9% · lift +48%；topic score 87 · 雙軌命中 · 4 來源；7 產物比例校驗全過。</div>
+    <div class="prop-card__tags"><span class="tg tg-b">Publish</span><span class="tg tg-a">Blocked on Meta permissions</span><span class="tg tg-n">Reversible: delete within 24h</span></div>
+    <div class="prop-card__foot"><button class="btn btn--primary btn--sm">Approve</button><button class="btn btn--secondary btn--sm">Modify</button><button class="btn btn--secondary btn--sm">Reject</button><span class="prop-card__by">Proposed 2h ago · bf_agent</span></div>
+  </div>
+  <div class="prop-card__fx"><div class="l">PREDICTED EFFECT</div><div class="v1">eng 412</div><div class="v2">reach 82k</div></div>
+</div>
+
+<div class="prop-card">
+  <div class="prop-card__main">
+    <div class="prop-card__t">Rerun topic #6 depth research —「最低工資檢討」缺 Tier-3 原始資料</div>
+    <div class="prop-card__e">Evidence: 深化階段只找到媒體轉述，未落到統計處/勞福局原始文件（STAGE 3 要求 ≥3 獨立來源 + Tier3）；不補齊則該題今日不生成。</div>
+    <div class="prop-card__tags"><span class="tg tg-p">Rerun research</span><span class="tg tg-g">Zero spend</span><span class="tg tg-n">Reversible: drop topic</span></div>
+    <div class="prop-card__foot"><button class="btn btn--primary btn--sm">Approve</button><button class="btn btn--secondary btn--sm">Modify</button><button class="btn btn--secondary btn--sm">Reject</button><span class="prop-card__by">Proposed 1h ago · bf_agent</span></div>
+  </div>
+  <div class="prop-card__fx"><div class="l">PREDICTED EFFECT</div><div class="v1">+1 題入池</div><div class="v2">來源達標</div></div>
+</div>
+
+<div class="prop-card">
+  <div class="prop-card__main">
+    <div class="prop-card__t">Boost 上週高分帖「Momenta 擬港籌 10 億美元」（organic P92）</div>
+    <div class="prop-card__e">Evidence: 實發互動 486（頁均 300.3 的 1.6 倍）· IG saves 289；organic P75 transfer bar 已過；預測 paid CTR 由自有帳號 benchmark 映射。執行 = 發 L3 boost 提案，不直接建廣告。</div>
+    <div class="prop-card__tags"><span class="tg tg-b">Boost</span><span class="tg tg-g">Within guardrail</span><span class="tg tg-n">Reversible: pause, 1 click</span></div>
+    <div class="prop-card__foot"><button class="btn btn--primary btn--sm">Approve</button><button class="btn btn--secondary btn--sm">Modify</button><button class="btn btn--secondary btn--sm">Reject</button><span class="prop-card__by">Proposed 4h ago · bf_agent</span></div>
+  </div>
+  <div class="prop-card__fx"><div class="l">PREDICTED EFFECT</div><div class="v1">CTR 1.3%</div><div class="v2">HK$250/day × 5d</div></div>
+</div>
+
+<div class="callout callout--b">
+  <div class="callout__title">The agent only ever proposes — 同主線架構原則</div>
+  <div class="callout__body">bf_agent 沒有寫憑證：它讀、推理、發出帶 payload/目標/預測效果/回滾的提案對象；<b>前端確認後由前端調寫端點</b>。選題確認（D1）與發布審批是兩道獨立的人工閘——auto_publish 只影響第二道。</div>
+</div>
+
+<section class="ai-card">
+  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Autopilot</div></div>
+  <div class="ai-card__sub">Grounded on 34 runs · 178 published posts · BFSchedule config · Confidence: Medium</div>
+  <div class="ai-insight-item"><span class="ib ib-b">Throughput</span><b>8 週 680 條候選 → 96 條生成 → 178 條 post，editor 每天省約 2.1 小時。</b> 省的不是寫作時間（editor 本來就不寫全文），是選題檢索、素材拼貼、跨平台搬運。<b>時間節省口徑寫進 config（每動作 × 分鐘系數），別用拍腦袋數。</b></div>
+  <div class="ai-insight-item good"><span class="ib ib-g">Trust</span><b>選題確認率 71%（editor 平均每天勾 2.1/3 條系統首推）。</b> 被換掉的多數是 category 重複或當日已有同題人工帖——這正是選題池「同 category ≤2」之外的人類語境判斷。<b>把「換題原因」做成必填下拉（dropped_reason），讓 skill 學會這層語境。</b></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">Next</span><b>auto_publish 的開啟條件應該綁校準里程碑，不綁日期。</b> 建議：BF 校準 ≥150 帖且 r ≥ 0.4、連續 4 週審批通過率 ≥85%、Meta 權限落地——三者齊備才開，且先只開 score ≥80 的 band。<b>預計 10 月中達成，屆時這頁的 L3 自動變成半個 L4。</b></div>
+  <div class="ai-ask"><input type="text" placeholder="Ask about autopilot — e.g. 「幾時可以開 auto_publish？」"><button class="btn btn--primary btn--sm">Ask</button></div>
+</section>
+
+</div>
+
+</div></main>
+<div class="proto-badge">PRODUCT PROTOTYPE v1.0 · BF</div>
+<script>
+/* ── Tabs ── */
+document.querySelectorAll('.dm-page-menu .menu-item').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.dm-page-menu .menu-item').forEach(function(b){b.classList.remove('is-active')});
+    btn.classList.add('is-active');
+    document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active')});
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+    window.scrollTo({top:0});
+  });
+});
+/* ── Period dropdown ── */
+(function(){
+  var t=document.getElementById('periodTrigger'),m=document.getElementById('periodMenu');
+  t.addEventListener('click',function(e){e.stopPropagation();m.classList.toggle('open')});
+  document.addEventListener('click',function(){m.classList.remove('open')});
+  m.querySelectorAll('.dm-period-menu__item').forEach(function(it){
+    it.addEventListener('click',function(){
+      m.querySelectorAll('.dm-period-menu__item').forEach(function(x){x.classList.remove('is-active')});
+      it.classList.add('is-active');
+      var spans=it.querySelectorAll('span');
+      if(spans.length>1){t.children[1].textContent=spans[0].textContent;t.children[2].textContent='· '+spans[1].textContent;}
+    });
+  });
+})();
+/* ── Pills toggle (visual only) ── */
+document.querySelectorAll('.pill-row').forEach(function(row){
+  row.querySelectorAll('.pill').forEach(function(p){
+    p.addEventListener('click',function(){
+      row.querySelectorAll('.pill').forEach(function(x){x.classList.remove('is-active')});
+      p.classList.add('is-active');
+    });
+  });
+});
+
+/* ══ Minimal inline-SVG chart renderer (file:// self-contained, no chart lib) ══ */
+var NS='http://www.w3.org/2000/svg';
+function E(n,a,txt){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;return e}
+function TT(el,s){el.appendChild(E('title',{},s))}
+var GRID='#E4E7ED',AXT='#707070',FA="'Lato',sans-serif",FM="'Roboto',sans-serif";
+var W=640,H=300,M={t:16,r:52,b:40,l:48};
+function pw(){return W-M.l-M.r} function ph(){return H-M.t-M.b}
+function chart(id,cfg){
+  var host=document.querySelector('[data-chart="'+id+'"]');if(!host)return;
+  if(cfg.legend){var lg=document.createElement('div');lg.className='legend-row';
+    cfg.legend.forEach(function(l){var li=document.createElement('span');li.className='li';
+      var sw=document.createElement('span');sw.className=l.round?'dotc':'linec';sw.style.background=l.color;
+      if(l.dash){sw.style.background='none';sw.style.borderTop='2px dashed '+l.color;sw.style.height='0';sw.style.width='14px';sw.style.borderRadius='0'}
+      li.appendChild(sw);li.appendChild(document.createTextNode(l.label));lg.appendChild(li)});
+    host.parentNode.insertBefore(lg,host)}
+  var svg=E('svg',{viewBox:'0 0 '+W+' '+H,preserveAspectRatio:'xMidYMid meet'});host.appendChild(svg);
+  var yMin=cfg.yMin||0,yMax=cfg.yMax,y2Max=cfg.y2Max||0;
+  function Y(v){if(cfg.log){var lo=Math.log10(cfg.logMin||1),hi=Math.log10(yMax);return M.t+ph()*(1-(Math.log10(Math.max(v,cfg.logMin||1))-lo)/(hi-lo))}
+    return M.t+ph()*(1-(v-yMin)/(yMax-yMin))}
+  function Y2(v){return M.t+ph()*(1-v/y2Max)}
+  var n=cfg.labels?cfg.labels.length:0,bw=n?pw()/n:0;
+  function X(i){return M.l+(i+0.5)*bw}
+  function XV(v){return M.l+pw()*((v-cfg.xMin)/(cfg.xMax-cfg.xMin))}
+  /* gridlines + y ticks */
+  var ticks=cfg.yTicks||5;
+  for(var i=0;i<=ticks;i++){var tv=yMin+(yMax-yMin)*i/ticks,ty=cfg.log?null:Y(tv);
+    if(cfg.log)continue;
+    svg.appendChild(E('line',{x1:M.l,x2:W-M.r,y1:ty,y2:ty,stroke:GRID,'stroke-dasharray':'3,3','stroke-width':1}));
+    svg.appendChild(E('text',{x:M.l-6,y:ty+3,'text-anchor':'end','font-size':9,'font-family':FM,fill:AXT},cfg.yFmt?cfg.yFmt(tv):(+tv.toFixed(1))));}
+  if(cfg.log){[100,30,10,3,1].forEach(function(tv){if(tv>yMax)return;var ty=Y(tv);
+    svg.appendChild(E('line',{x1:M.l,x2:W-M.r,y1:ty,y2:ty,stroke:GRID,'stroke-dasharray':'3,3','stroke-width':1}));
+    svg.appendChild(E('text',{x:M.l-6,y:ty+3,'text-anchor':'end','font-size':9,'font-family':FM,fill:AXT},tv+'%'))})}
+  if(y2Max){for(var j=0;j<=4;j++){var t2=y2Max*j/4;
+    svg.appendChild(E('text',{x:W-M.r+8,y:Y2(t2)+3,'font-size':9,'font-family':FM,fill:AXT},cfg.y2Fmt?cfg.y2Fmt(t2):t2))}}
+  /* x labels */
+  (cfg.labels||[]).forEach(function(lb,i){
+    var t=E('text',{x:X(i),y:H-M.b+14,'text-anchor':'middle','font-size':9,'font-family':FA,fill:AXT},lb);
+    if(cfg.tiltX){t.setAttribute('transform','rotate(-24 '+X(i)+' '+(H-M.b+14)+')');t.setAttribute('text-anchor','end')}
+    svg.appendChild(t)});
+  if(cfg.xTitle)svg.appendChild(E('text',{x:M.l+pw()/2,y:H-4,'text-anchor':'middle','font-size':9.5,'font-family':FA,fill:AXT},cfg.xTitle));
+  if(cfg.yTitle)svg.appendChild(E('text',{x:11,y:M.t+ph()/2,'text-anchor':'middle','font-size':9.5,'font-family':FA,fill:AXT,transform:'rotate(-90 11 '+(M.t+ph()/2)+')'},cfg.yTitle));
+  if(cfg.y2Title)svg.appendChild(E('text',{x:W-8,y:M.t+ph()/2,'text-anchor':'middle','font-size':9.5,'font-family':FA,fill:AXT,transform:'rotate(90 '+(W-8)+' '+(M.t+ph()/2)+')'},cfg.y2Title));
+  /* layers */
+  var barGroups=(cfg.layers||[]).filter(function(l){return l.type==='bar'&&!l.stack});
+  (cfg.layers||[]).forEach(function(l){
+    if(l.type==='bar'&&!l.stack){
+      var gi=barGroups.indexOf(l),gn=barGroups.length,w=Math.min(bw*0.62/gn,34);
+      l.data.forEach(function(v,i){if(v==null)return;
+        var x=X(i)-(gn*w)/2+gi*w,y=(l.axis==='y2'?Y2(v):Y(v)),base=(l.axis==='y2'?Y2(0):Y(0));
+        var r=E('rect',{x:x,y:y,width:w-2,height:Math.max(base-y,0),rx:2,fill:(l.colors?l.colors[i]:l.color),opacity:l.opacity!=null?(Array.isArray(l.opacity)?l.opacity[i]:l.opacity):1});
+        TT(r,(cfg.labels?cfg.labels[i]+': ':'')+v+(l.tt?' — '+(Array.isArray(l.tt)?l.tt[i]:l.tt):''));svg.appendChild(r)});
+    }
+    if(l.type==='stackbar'){
+      var w2=Math.min(bw*0.55,34),acc=[];
+      l.series.forEach(function(s){s.data.forEach(function(v,i){acc[i]=acc[i]||0;
+        var y0=Y(acc[i]),y1=Y(acc[i]+v);
+        var r=E('rect',{x:X(i)-w2/2,y:y1,width:w2,height:y0-y1,fill:s.color});
+        TT(r,cfg.labels[i]+' · '+s.label+': '+v);svg.appendChild(r);acc[i]+=v})});
+    }
+    if(l.type==='stackarea'){
+      var accA=cfg.labels.map(function(){return 0});
+      l.series.forEach(function(s){
+        var pts0=accA.slice(),pts1=accA.map(function(a,i){return a+s.data[i]});
+        var d='M'+X(0)+' '+Y(pts1[0]);pts1.forEach(function(v,i){if(i)d+=' L'+X(i)+' '+Y(v)});
+        for(var i=pts0.length-1;i>=0;i--)d+=' L'+X(i)+' '+Y(pts0[i]);d+=' Z';
+        svg.appendChild(E('path',{d:d,fill:s.color,opacity:0.55}));
+        var dl='M'+X(0)+' '+Y(pts1[0]);pts1.forEach(function(v,i){if(i)dl+=' L'+X(i)+' '+Y(v)});
+        svg.appendChild(E('path',{d:dl,fill:'none',stroke:s.color,'stroke-width':1.5}));
+        accA=pts1});
+    }
+    if(l.type==='line'){
+      var d='',started=false;
+      l.data.forEach(function(v,i){if(v==null){return}var px=X(i),py=(l.axis==='y2'?Y2(v):Y(v));
+        d+=(started?' L':'M')+px+' '+py;started=true});
+      if(l.fill){var dd=d;var lastIdx=l.data.length-1;while(l.data[lastIdx]==null)lastIdx--;
+        dd+=' L'+X(lastIdx)+' '+Y(yMin)+' L'+X(0)+' '+Y(yMin)+' Z';
+        svg.appendChild(E('path',{d:dd,fill:l.color,opacity:0.10}))}
+      var p=E('path',{d:d,fill:'none',stroke:l.color,'stroke-width':2});
+      if(l.dash)p.setAttribute('stroke-dasharray','5,4');svg.appendChild(p);
+      if(l.points!==false)l.data.forEach(function(v,i){if(v==null)return;
+        var c=E('circle',{cx:X(i),cy:(l.axis==='y2'?Y2(v):Y(v)),r:3,fill:'#FFF',stroke:l.color,'stroke-width':1.8});
+        TT(c,(cfg.labels?cfg.labels[i]+': ':'')+v);svg.appendChild(c)});
+    }
+    if(l.type==='hline'){var hy=(l.axis==='y2'?Y2(l.y):Y(l.y));
+      svg.appendChild(E('line',{x1:M.l,x2:W-M.r,y1:hy,y2:hy,stroke:l.color,'stroke-width':1.6,'stroke-dasharray':'6,4'}));
+      if(l.label)svg.appendChild(E('text',{x:W-M.r-4,y:hy-5,'text-anchor':'end','font-size':9,'font-family':FA,fill:l.color},l.label));}
+    if(l.type==='vline'){var vx=XV(l.x);
+      svg.appendChild(E('line',{x1:vx,x2:vx,y1:M.t,y2:H-M.b,stroke:l.color,'stroke-width':1.4,'stroke-dasharray':'5,4'}));
+      if(l.label)svg.appendChild(E('text',{x:vx+4,y:M.t+10,'font-size':9,'font-family':FA,fill:l.color},l.label));}
+    if(l.type==='fitline'){
+      svg.appendChild(E('line',{x1:XV(l.x1),y1:Y(l.y1),x2:XV(l.x2),y2:Y(l.y2),stroke:l.color,'stroke-width':1.8,'stroke-dasharray':'6,4'}));
+      if(l.label)svg.appendChild(E('text',{x:XV(l.x2)-4,y:Y(l.y2)-8,'text-anchor':'end','font-size':9,'font-family':FA,fill:l.color},l.label));}
+    if(l.type==='scatter'){
+      l.points.forEach(function(pt){var px=(cfg.xMin!=null?XV(pt.x):X(pt.x)),py=Y(pt.y);
+        var m;if(l.shape==='tri'){m=E('path',{d:'M'+px+' '+(py-5)+' L'+(px+5)+' '+(py+4)+' L'+(px-5)+' '+(py+4)+' Z',fill:l.color})}
+        else{m=E('circle',{cx:px,cy:py,r:l.r||3.5,fill:l.color,opacity:l.opacity||0.75})}
+        TT(m,(pt.t||('('+pt.x+', '+pt.y+')')));svg.appendChild(m)});
+    }
+    if(l.type==='xnums'){ /* numeric x ticks for scatter charts */
+      l.ticks.forEach(function(tv){var px=XV(tv);
+        svg.appendChild(E('text',{x:px,y:H-M.b+14,'text-anchor':'middle','font-size':9,'font-family':FM,fill:AXT},tv))});
+    }
+  });
+  /* plot frame baseline */
+  svg.appendChild(E('line',{x1:M.l,x2:W-M.r,y1:H-M.b,y2:H-M.b,stroke:'#CBD5E1','stroke-width':1}));
+}
+function donut(id,cfg){
+  var host=document.querySelector('[data-chart="'+id+'"]');if(!host)return;
+  var svg=E('svg',{viewBox:'0 0 '+W+' '+H});host.appendChild(svg);
+  var cx=200,cy=150,R=95,r=58,total=cfg.data.reduce(function(a,b){return a+b.v},0),a0=-Math.PI/2;
+  cfg.data.forEach(function(s){
+    var a1=a0+s.v/total*Math.PI*2,large=(a1-a0)>Math.PI?1:0;
+    var d='M'+(cx+R*Math.cos(a0))+' '+(cy+R*Math.sin(a0))+' A'+R+' '+R+' 0 '+large+' 1 '+(cx+R*Math.cos(a1))+' '+(cy+R*Math.sin(a1))+
+      ' L'+(cx+r*Math.cos(a1))+' '+(cy+r*Math.sin(a1))+' A'+r+' '+r+' 0 '+large+' 0 '+(cx+r*Math.cos(a0))+' '+(cy+r*Math.sin(a0))+' Z';
+    var p=E('path',{d:d,fill:s.c,stroke:'#FFF','stroke-width':2});TT(p,s.l+': '+s.v+(s.tt?' — '+s.tt:''));svg.appendChild(p);
+    a0=a1});
+  cfg.data.forEach(function(s,i){
+    var ly=70+i*34;
+    svg.appendChild(E('circle',{cx:390,cy:ly-4,r:5,fill:s.c}));
+    svg.appendChild(E('text',{x:404,y:ly,'font-size':11.5,'font-family':FA,fill:'#334155'},s.l+' ('+s.v+')'));
+    if(s.tt)svg.appendChild(E('text',{x:404,y:ly+13,'font-size':9.5,'font-family':FA,fill:'#94A3B8'},s.tt));});
+}
+function radar(id,cfg){
+  var host=document.querySelector('[data-chart="'+id+'"]');if(!host)return;
+  var svg=E('svg',{viewBox:'0 0 '+W+' '+H});host.appendChild(svg);
+  var cx=W/2,cy=H/2+6,R=100,n=cfg.axes.length;
+  function pt(i,v){var a=-Math.PI/2+i*2*Math.PI/n,rr=R*v/cfg.max;return[cx+rr*Math.cos(a),cy+rr*Math.sin(a)]}
+  [0.25,0.5,0.75,1].forEach(function(f){
+    var d='';for(var i=0;i<n;i++){var p=pt(i,cfg.max*f);d+=(i?' L':'M')+p[0]+' '+p[1]}d+=' Z';
+    svg.appendChild(E('path',{d:d,fill:'none',stroke:GRID,'stroke-width':1}))});
+  for(var i=0;i<n;i++){var p=pt(i,cfg.max);
+    svg.appendChild(E('line',{x1:cx,y1:cy,x2:p[0],y2:p[1],stroke:GRID,'stroke-width':1}));
+    var lp=pt(i,cfg.max*1.22);
+    svg.appendChild(E('text',{x:lp[0],y:lp[1]+3,'text-anchor':'middle','font-size':10,'font-family':FA,fill:'#475569'},cfg.axes[i]))}
+  cfg.series.forEach(function(s){
+    var d='';for(var i=0;i<n;i++){var p=pt(i,s.data[i]);d+=(i?' L':'M')+p[0]+' '+p[1]}d+=' Z';
+    var path=E('path',{d:d,fill:s.c,'fill-opacity':0.12,stroke:s.c,'stroke-width':2});
+    if(s.dash)path.setAttribute('stroke-dasharray','5,4');svg.appendChild(path);
+    for(var i=0;i<n;i++){var p=pt(i,s.data[i]);var c=E('circle',{cx:p[0],cy:p[1],r:2.6,fill:s.c});TT(c,cfg.axes[i]+' · '+s.l+': '+s.data[i]+'%');svg.appendChild(c)}});
+}
+function hbar(id,cfg){
+  var host=document.querySelector('[data-chart="'+id+'"]');if(!host)return;
+  if(cfg.legend){var lg=document.createElement('div');lg.className='legend-row';
+    cfg.legend.forEach(function(l){var li=document.createElement('span');li.className='li';
+      var sw=document.createElement('span');sw.className='dotc';sw.style.background=l.color;li.appendChild(sw);
+      li.appendChild(document.createTextNode(l.label));lg.appendChild(li)});
+    host.parentNode.insertBefore(lg,host)}
+  var HH=cfg.h||300;
+  var svg=E('svg',{viewBox:'0 0 '+W+' '+HH});host.appendChild(svg);
+  var ml=150,mr=40,mt=10,mb=26,n=cfg.labels.length,rowH=(HH-mt-mb)/n;
+  function XX(v){return ml+(W-ml-mr)*(v/cfg.xMax)}
+  for(var i=0;i<=4;i++){var tv=cfg.xMax*i/4,tx=XX(tv);
+    svg.appendChild(E('line',{x1:tx,x2:tx,y1:mt,y2:HH-mb,stroke:GRID,'stroke-dasharray':'3,3','stroke-width':1}));
+    svg.appendChild(E('text',{x:tx,y:HH-mb+13,'text-anchor':'middle','font-size':9,'font-family':FM,fill:AXT},cfg.xFmt?cfg.xFmt(tv):tv))}
+  var gn=cfg.series.length,bh=Math.min(rowH*0.6/gn,14);
+  cfg.labels.forEach(function(lb,i){
+    svg.appendChild(E('text',{x:ml-8,y:mt+rowH*i+rowH/2+3,'text-anchor':'end','font-size':10,'font-family':FA,fill:'#475569'},lb));
+    cfg.series.forEach(function(s,si){var v=s.data[i];if(v==null)return;
+      var y=mt+rowH*i+rowH/2-(gn*bh)/2+si*bh;
+      var r=E('rect',{x:ml,y:y,width:XX(v)-ml,height:bh-1.5,rx:2,fill:(s.colors?s.colors[i]:s.color)});
+      TT(r,lb+' · '+(s.label||'')+': '+v+(s.tt?' — '+s.tt[i]:''));svg.appendChild(r)})});
+  if(cfg.xTitle)svg.appendChild(E('text',{x:ml+(W-ml-mr)/2,y:HH-2,'text-anchor':'middle','font-size':9.5,'font-family':FA,fill:AXT},cfg.xTitle));
+}
+
+/* ══ BF Chart configs ══ */
+var BLUE='#3B82F6',GREEN='#10B981',GREY='#CBD5E1',RED='#EF4444',AMBER='#F59E0B',PURPLE='#8B5CF6',TEAL='#14B8A6',PINK='#EC4899';
+
+donut('tpFound',{data:[
+  {l:'Trends 轨独有',v:8,c:BLUE,tt:'google_trends HK/24h'},
+  {l:'LLM (skill) 轨独有',v:6,c:PURPLE,tt:'topic_prompt · 已重搜验证（另有 2 条被拒）'},
+  {l:'双轨命中',v:3,c:GREEN,tt:'trends + LLM 同时发现'},
+  {l:'Outlet scan',v:2,c:AMBER,tt:'12 来源头条扫描'},
+  {l:'Buzz keywords',v:1,c:TEAL,tt:'降级链备用轨'}]});
+
+chart('tpCat',{labels:['Business & Finance','News & Current Affairs','Tech & Innovation','Society & Culture','Lifestyle & P.D.'],yMax:80,yTitle:'%',tiltX:true,yFmt:function(v){return v+'%'},
+  legend:[{label:'今日池占比 %',color:BLUE,round:true},{label:'页面语料占比 %（FB 90D）',color:GREY,round:true}],
+  layers:[{type:'bar',data:[45,20,15,10,10],color:BLUE,tt:['9 条','4 条','3 条','2 条','2 条']},
+          {type:'bar',data:[72.0,17.5,16.8,22.4,4.9],color:GREY,tt:['103 posts','25 posts','24 posts','32 posts','7 posts']}]});
+
+chart('bfSlot',{labels:['06','08','09','10','12','14','16','18','19','20','21','22','00','02'],yMax:22,y2Max:450,xTitle:'Hour (HKT)',yTitle:'Online followers %',y2Title:'Median eng / post',yFmt:function(v){return v+'%'},
+  legend:[{label:'Online followers %',color:BLUE,round:true},{label:'Median eng / post in slot',color:GREEN}],
+  layers:[{type:'bar',data:[3.1,9.8,11.2,8.4,10.6,12.8,11.4,17.2,18.9,16.4,14.8,9.6,5.2,4.3],color:BLUE,opacity:[0.35,0.35,0.35,0.35,0.35,0.35,0.35,0.35,1,0.35,0.35,0.35,0.35,0.35]},
+          {type:'line',axis:'y2',data:[152,231,273,246,265,296,278,347,386,322,301,232,171,148],color:GREEN}]});
+
+hbar('bfViCat',{labels:['Text-Only Graphic','Infographic & Data Viz','Face-Only Image','Headline Headshot','其他'],xMax:70,h:260,xTitle:'% of published assets (IG, window)',xFmt:function(v){return v+'%'},
+  series:[{label:'share',data:[64,16,4,2,14],colors:[BLUE,GREEN,PURPLE,AMBER,GREY],tt:['32 posts · avg eng 298','8 posts · avg eng 412 — 收藏最强','2 posts · avg eng 264','1 post · avg eng 275','未分类/其他']}]});
+
+chart('bfCal',{xMin:40,xMax:100,yMax:800,yTicks:4,xTitle:'Pre-flight score at publish time',yTitle:'Delivered engagements / post',
+  legend:[{label:'BF-flow posts (n=38)',color:BLUE,round:true},{label:'Fit (r=0.44)',color:RED,dash:true}],
+  layers:[
+    {type:'xnums',ticks:[40,50,60,70,80,90,100]},
+    {type:'scatter',color:BLUE,points:[[48,130],[52,210],[55,150],[57,260],[59,190],[61,240],[62,175],[63,310],[64,220],[65,285],[66,190],[67,340],[68,255],[69,300],[70,270],[71,380],[71,240],[72,330],[73,290],[73,415],[74,350],[75,310],[75,460],[76,380],[77,340],[78,430],[78,486],[79,395],[80,450],[81,370],[82,520],[83,440],[84,560],[85,470],[86,610],[87,530],[89,640],[91,700]].map(function(p){return{x:p[0],y:p[1],t:'score '+p[0]+' → eng '+p[1]}})},
+    {type:'fitline',x1:48,y1:150,x2:91,y2:610,color:RED,label:'Fit (r=0.44 · n=38)'},
+    {type:'vline',x:70,color:'#94A3B8',label:'Ship bar (70)'}]});
+
+chart('bfRuns',{labels:['W27','W28','W29','W30','W31','W32','W33','W34'],yMax:32,y2Max:100,yTitle:'Posts / week',y2Title:'選題確認率 %',y2Fmt:function(v){return v+'%'},
+  legend:[{label:'Published',color:GREEN,round:true},{label:'Rejected / edited',color:AMBER,round:true},{label:'Failed validation',color:RED,round:true},{label:'選題確認率 %',color:PURPLE}],
+  layers:[{type:'stackbar',series:[{label:'Published',color:GREEN,data:[16,18,20,22,22,24,26,24]},{label:'Rejected / edited',color:AMBER,data:[6,5,4,4,3,3,2,3]},{label:'Failed validation',color:RED,data:[2,1,1,0,1,0,0,1]}]},
+          {type:'line',axis:'y2',data:[58,62,64,67,70,71,74,71],color:PURPLE}]});
+</script>
+</body>
+</html>
