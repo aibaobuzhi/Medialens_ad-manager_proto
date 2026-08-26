@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BF · Creation Studio · MediaLens</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lato:wght@400;500;600;700&family=Roboto:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════════════════════════
+   MediaLens Ad Manager design system (dm-*) — tokens from
+   assets/css/snippets/dashboard-tokens.scss + app.scss + real components
+   Content: 100% from Ryan's MediaLens_2.0_B_Creation_Autopilot_Studio proto
+   ══════════════════════════════════════════════════════════════════ */
+:root{
+  --brand-blue:#23A9F6; --brand-blue-hover:#1E90E0; --brand-light-blue:#73DFFF;
+  --brand-blue-tint:#EEF6FF; --highlight-navy:#001983;
+  --title:#0A1F2C; --text-primary:#102532; --text-regular:#707070; --text-secondary:#828282;
+  --surface-ai:#F6F8FD; --border:#D9E3E6; --divider:#E8EEF0;
+  --danger:#FF3F41; --danger-light:#FFECEC; --success:#52C41A; --success-light:#E6FBEB;
+  --warning:#FFC960; --warning-light:#FFF8EB;
+  --dm-primary:#23A9F6; --dm-primary-hover:#1E90E0; --dm-primary-light:#E8F4FE;
+  --dm-accent:#409EFF;
+  --dm-text-primary:#4A4A4A; --dm-text-secondary:#939EAB; --dm-text-heading:#1E293B;
+  --dm-slate-900:#0F172A; --dm-slate-700:#334155; --dm-slate-600:#475569; --dm-slate-500:#64748B;
+  --dm-slate-400:#94A3B8; --dm-slate-200:#E2E8F0; --dm-slate-100:#F1F5F9; --dm-slate-50:#F8FAFC;
+  --dm-bg-page:#F5F7FA; --dm-bg-card:#FFFFFF;
+  --dm-border:rgba(203,213,225,.6); --dm-border-light:rgba(226,232,240,.5);
+  --dm-positive:#67C23A; --dm-negative:#F56C6C; --dm-warning:#E6A23C; --dm-neutral:#909399;
+  --delta-up:#059669; --delta-down:#DC2626;
+  --chart-1:#3B82F6; --chart-2:#6366F1; --chart-3:#06B6D4; --chart-4:#14B8A6;
+  --chart-5:#8B5CF6; --chart-6:#0EA5E9; --chart-7:#A78BFA; --chart-8:#2DD4BF;
+  --chart-grid:#E4E7ED; --chart-tooltip-bg:#303133;
+  --g:#059669; --gl:#F0FDF4; --a:#B45309; --al:#FFFBEB; --r:#DC2626; --rl:#FEF2F2;
+  --b:#2563EB; --bl:#EFF6FF; --p:#7C3AED; --pl:#F5F3FF; --n:#475569; --nl:#F1F5F9;
+  --font-heading:'Poppins',sans-serif; --font-body:'Lato',sans-serif; --font-metric:'Roboto',sans-serif;
+  --header-h:70px; --sidebar-w:270px; --content-max:1300px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-body);background:var(--dm-bg-page);color:var(--dm-text-primary);font-size:13px;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+
+/* ── App shell ───────────────────────────────────────────── */
+.ml-header{position:fixed;top:0;left:0;right:0;z-index:102;height:var(--header-h);background:#FFF;display:flex;align-items:center;font-family:var(--font-heading);border-bottom:1px solid var(--divider)}
+.ml-header__logo{padding:0 30px;display:flex;align-items:center;gap:8px}
+.ml-header__logo .mark{width:26px;height:26px}
+.ml-header__logo .word{font-size:18px;font-weight:600;color:var(--title)}
+.ml-header__logo .v2{font-size:9px;font-weight:700;color:#FFF;background:var(--brand-blue);border-radius:8px;padding:2px 6px;margin-left:2px}
+.ml-header__ctx{display:flex;align-items:center;gap:10px;margin-left:18px}
+.ml-page-badge{display:inline-flex;align-items:center;gap:6px;background:var(--brand-blue-tint);color:var(--highlight-navy);border-radius:8px;padding:5px 12px;font-family:var(--font-body);font-size:12px;font-weight:600}
+.ml-voice-status{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-body);font-size:12px;color:var(--dm-slate-500)}
+.ml-voice-status::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--dm-positive);box-shadow:0 0 0 2px rgba(103,194,58,.2)}
+.ml-header__right{margin-left:auto;display:flex;align-items:center;gap:10px;padding-right:24px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font-heading);font-size:13px;font-weight:500;line-height:20px;padding:7px 14px;border-radius:8px;border:1px solid transparent;cursor:pointer;transition:background .15s,border-color .15s;white-space:nowrap;background:none}
+.btn--primary{background:var(--brand-blue);color:#FFF;border-color:var(--brand-blue);font-weight:600}
+.btn--primary:hover{background:#1B9BEA;border-color:#1B9BEA}
+.btn--secondary{background:#FFF;color:var(--text-regular);border-color:var(--border)}
+.btn--secondary:hover{background:#F7F7F7}
+.btn--sm{font-size:12px;padding:5px 12px;border-radius:6px}
+
+.ml-sidebar{position:fixed;top:var(--header-h);bottom:0;left:0;z-index:101;width:var(--sidebar-w);background:#FFF;box-shadow:0 0 5px rgba(0,25,131,.10);padding:20px 0 30px;overflow-y:auto;font-family:var(--font-heading)}
+.ml-sidebar__section{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--dm-slate-400);padding:16px 24px 6px}
+.ml-sidebar__item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;color:#5F5F5F;font-size:13.5px;border-left:4px solid transparent;transition:color .15s}
+.ml-sidebar__item:hover{color:var(--brand-blue)}
+.ml-sidebar__item.is-active{border-left-color:var(--brand-blue);color:var(--dm-accent);background:var(--brand-blue-tint)}
+.ml-sidebar__item .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ml-sidebar__item.is-sub{padding-left:38px;font-size:13px}
+.ml-sidebar__new{font-size:8px;font-weight:700;color:#FFF;background:var(--chart-5);border-radius:6px;padding:2px 5px;margin-left:6px;letter-spacing:.5px}
+
+.ml-main{padding-top:calc(var(--header-h) + 20px);margin-left:var(--sidebar-w);min-height:100vh;background:var(--dm-bg-page)}
+.ml-content{max-width:var(--content-max);margin:0 auto;padding:0 24px 80px}
+
+/* ── Titles / labels ─────────────────────────────────────── */
+.dm-title-page{font:600 22px/1.3 var(--font-heading);color:var(--dm-text-heading);margin:6px 0 4px}
+.dm-page-sub{font:400 12.5px/1.55 var(--font-body);color:var(--dm-text-secondary);margin:0 0 18px;max-width:920px}
+.dm-title-section{font:600 16px/1.4 var(--font-heading);color:var(--dm-text-heading);margin:0 0 4px}
+.dm-title-card{font:500 14px/1.4 var(--font-heading);color:var(--dm-text-heading);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dm-subtitle{display:block;font:400 12px/1.6 var(--font-body);color:var(--dm-text-secondary);margin:4px 0 14px;max-width:980px}
+.sec-head{margin:26px 0 12px}
+.sec-head .dm-subtitle{margin-bottom:0}
+
+/* ── Tabs (Ad Manager pill sub-nav) ──────────────────────── */
+.dm-page-menu{position:sticky;top:var(--header-h);z-index:90;background:var(--dm-bg-page);margin:0 -24px;padding:8px 24px 10px;border-bottom:1px solid var(--dm-border-light)}
+.dm-page-menu .menu-list{display:flex;gap:4px;flex-wrap:nowrap;overflow-x:auto}
+.dm-page-menu .menu-item{font-family:var(--font-body);font-size:13px;font-weight:500;color:#64748B;padding:7px 14px;border-radius:20px;transition:all .15s;white-space:nowrap;cursor:pointer;border:none;background:none}
+.dm-page-menu .menu-item:hover{color:#1E293B;background:#F1F5F9}
+.dm-page-menu .menu-item.is-active{color:#FFF;background:var(--dm-primary);font-weight:600}
+
+/* ── Control bar: date picker + filters ───────────────────── */
+.dm-controls-row{display:flex;align-items:center;gap:10px;padding:14px 0;flex-wrap:wrap}
+.dm-controls-row .spacer{flex:1}
+.dm-meta-label{font:400 12px var(--font-body);color:var(--dm-slate-400);white-space:nowrap}
+.dm-ctl-label{font:500 11px var(--font-body);color:var(--dm-slate-600);text-transform:uppercase;letter-spacing:.4px;margin-right:-2px}
+.dm-period-group{position:relative}
+.dm-period-trigger{display:inline-flex;align-items:center;gap:6px;background:#FFF;color:var(--dm-slate-700);font:500 13px/1 var(--font-body);padding:0 14px;height:34px;border-radius:8px;border:1px solid var(--dm-slate-200);box-shadow:0 1px 3px rgba(0,0,0,.04);cursor:pointer;transition:all .15s;white-space:nowrap}
+.dm-period-trigger:hover{border-color:#CBD5E1;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.dm-period-trigger__date{color:#94A3B8;font-weight:400}
+.dm-period-trigger .ic{font-size:13px;color:#94A3B8;line-height:1}
+.dm-period-menu{position:absolute;top:40px;left:0;z-index:95;background:#FFF;border:1px solid var(--dm-slate-200);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.08);padding:4px;min-width:250px;display:none}
+.dm-period-menu.open{display:block}
+.dm-period-menu__item{display:flex;justify-content:space-between;align-items:center;gap:12px;font-family:var(--font-body);font-size:13px;color:var(--dm-slate-600);padding:8px 14px;border-radius:6px;line-height:1.5;cursor:pointer}
+.dm-period-menu__item:hover{background:var(--dm-slate-50);color:#1E293B}
+.dm-period-menu__item.is-active{color:var(--dm-slate-900);font-weight:600;background:var(--dm-slate-100)}
+.dm-period-menu__date{color:#94A3B8;font-weight:400;font-size:12px}
+.dm-period-menu__divider{height:1px;background:var(--dm-slate-100);margin:4px 0}
+.dm-select{height:34px;font:500 13px/32px var(--font-body);color:var(--dm-slate-700);background:#FFF;border:1px solid var(--dm-slate-200);border-radius:8px;padding:0 28px 0 12px;box-shadow:0 1px 3px rgba(0,0,0,.04);transition:all .15s;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%2394A3B8' stroke-width='1.5' stroke-linecap='round'/></svg>");background-repeat:no-repeat;background-position:right 10px center}
+.dm-select:hover,.dm-select:focus{border-color:#CBD5E1;box-shadow:0 2px 6px rgba(0,0,0,.06);outline:none}
+
+/* ── Cards & layout ──────────────────────────────────────── */
+.dm-card{background:var(--dm-bg-card);border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 1px 2px rgba(0,0,0,.03);transition:box-shadow .2s ease;margin-bottom:20px}
+.dm-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04)}
+.dm-card--hl{border:1.5px solid var(--dm-primary)}
+.dm-row{display:flex;gap:20px;align-items:stretch}
+.dm-row>*{flex:1;min-width:0}
+.dm-row .dm-card{margin-bottom:20px}
+.dm-chart-area{width:100%;height:280px;position:relative}
+.dm-chart-area.short{height:170px}
+.dm-chart-area svg{display:block;width:100%;height:100%}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ── KPI cards ───────────────────────────────────────────── */
+.dm-kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:1200px){.dm-kpi-row{grid-template-columns:repeat(3,1fr)}}
+.dm-kpi-card{background:var(--dm-bg-card);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 1px 2px rgba(0,0,0,.03);padding:16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.kpi__label{font:500 11px/1.4 var(--font-body);color:var(--dm-slate-600);text-transform:uppercase;letter-spacing:.3px}
+.kpi__metric{font:600 26px/1.15 var(--font-metric);color:var(--dm-slate-900);letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.kpi__sub{font:400 11px/1.35 var(--font-body);color:var(--dm-text-secondary)}
+.kpi__sub.up{color:var(--delta-up)}
+.kpi__sub.down{color:var(--delta-down)}
+.kpi-range{margin-top:4px}
+.kpi-range__rail{position:relative;height:5px;border-radius:3px;background:var(--dm-slate-100)}
+.kpi-range__fill{position:absolute;top:0;bottom:0;border-radius:3px;background:var(--brand-blue);opacity:.75}
+.kpi-range__marker{position:absolute;top:-2px;width:2px;height:9px;background:var(--delta-up);border-radius:1px}
+.kpi-range__axis{display:flex;justify-content:space-between;font:400 9px var(--font-metric);color:var(--dm-slate-400);margin-top:3px}
+
+/* ── Tables ──────────────────────────────────────────────── */
+.dm-table-scroll{overflow-x:auto}
+.dm-modern-table{width:100%;border-collapse:collapse}
+.dm-modern-table th{font-family:var(--font-body);font-size:12px;font-weight:400;color:var(--dm-slate-600);text-align:left;border-bottom:1px solid rgba(226,232,240,.6);padding:8px 12px;white-space:nowrap}
+.dm-modern-table td{font-family:var(--font-body);font-size:12.5px;color:var(--dm-slate-700);border-bottom:1px solid rgba(241,245,249,.7);padding:11px 12px;font-variant-numeric:tabular-nums;vertical-align:top;line-height:1.5}
+.dm-modern-table tbody tr{transition:background-color .15s ease}
+.dm-modern-table tbody tr:hover td{background:rgba(248,250,252,.5)}
+.dm-modern-table td:first-child{font-weight:500;color:var(--dm-slate-900)}
+.dm-modern-table tr.row-g td{background:var(--gl)}
+.dm-modern-table tr.row-a td{background:var(--al)}
+.dm-modern-table tr.row-r td{background:var(--rl)}
+.dm-modern-table td .num{font-family:var(--font-metric)}
+.dm-cell-sub{display:block;color:#94A3B8;font-size:10px;line-height:1.4;margin-top:2px;font-weight:400}
+.dm-modern-table--compact th{padding:7px 7px;white-space:normal;font-size:11px;line-height:1.35}
+.dm-modern-table--compact td{padding:9px 7px;font-size:11.5px}
+.dm-modern-table--compact .tg{font-size:9.5px;padding:3px 6px}
+
+/* ── Tags / chips / badges ───────────────────────────────── */
+.tg{display:inline-block;font:600 10.5px/1 var(--font-body);padding:4px 8px;border-radius:20px;white-space:nowrap}
+.tg-g{background:var(--gl);color:var(--g)}.tg-a{background:var(--al);color:var(--a)}
+.tg-r{background:var(--rl);color:var(--r)}.tg-b{background:var(--bl);color:var(--b)}
+.tg-p{background:var(--pl);color:var(--p)}.tg-n{background:var(--nl);color:var(--n)}
+.mf{display:inline-flex;align-items:center;gap:4px;background:#E5F1FC;color:var(--highlight-navy);border-radius:8px;padding:3px 8px;font:600 10px/1.3 var(--font-body);white-space:nowrap}
+.mf::before{content:'◈';font-size:9px}
+.dmode{display:inline-flex;align-items:center;font:700 9px/1 var(--font-metric);letter-spacing:.6px;padding:3px 7px;border-radius:4px;margin-left:auto}
+.dmode-live{background:var(--gl);color:var(--g)}
+.dmode-agg{background:var(--bl);color:var(--b)}
+.dmode-mock{background:var(--al);color:var(--a)}
+.tg-new{display:inline-block;font:700 8.5px/1 var(--font-metric);letter-spacing:.5px;color:#FFF;background:var(--chart-5);border-radius:6px;padding:3px 6px}
+.dm-status-dot{display:inline-flex;align-items:center;gap:6px;font:500 12px var(--font-body)}
+.dm-status-dot::before{content:'';width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dm-status-dot--active::before{background:var(--dm-positive);box-shadow:0 0 0 2px rgba(103,194,58,.2)}
+.dm-status-dot--active{color:#2D6A1E}
+
+/* ── Score bars (voice / hook / composite) ───────────────── */
+.sbar{margin-bottom:12px}
+.sbar__top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:5px}
+.sbar__name{font:500 12px/1.4 var(--font-body);color:var(--dm-slate-700)}
+.sbar__val{font:600 13px var(--font-metric);color:var(--dm-slate-900)}
+.sbar__rail{height:6px;border-radius:3px;background:var(--dm-slate-100);overflow:hidden}
+.sbar__fill{height:100%;border-radius:3px}
+.f-g{background:#34D399}.f-a{background:#FBBF24}.f-r{background:#F87171}.f-b{background:#60A5FA}.f-p{background:#A78BFA}.f-pk{background:#F472B6}
+.sbar__tag{margin-left:6px}
+
+/* ── Callouts ────────────────────────────────────────────── */
+.callout{background:#FFF;border-radius:12px;padding:16px 18px;margin-bottom:20px;border:1px solid var(--dm-border-light);border-left:4px solid var(--b);box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.callout--r{border-left-color:var(--r);background:#FFFBFB}
+.callout--a{border-left-color:var(--dm-warning);background:#FFFDF7}
+.callout--b{border-left-color:var(--b)}
+.callout__title{font:600 13px/1.4 var(--font-heading);color:var(--dm-text-heading);margin-bottom:6px}
+.callout__body{font:400 12.5px/1.7 var(--font-body);color:var(--dm-slate-600)}
+.callout__meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font:400 11.5px var(--font-body);color:var(--dm-slate-500)}
+.callout__meta b{color:var(--dm-slate-900)}
+
+/* ── Spine / level / category / reference / asset grids ──── */
+.spine-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.spine-cell{border:1px solid var(--dm-border-light);border-radius:10px;padding:12px;background:var(--dm-slate-50)}
+.spine-cell.hl{border-color:var(--brand-blue);background:var(--brand-blue-tint)}
+.spine-cell__t{font:600 12px var(--font-heading);color:var(--dm-text-heading);display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px}
+.spine-cell__b{font:400 11px/1.6 var(--font-body);color:var(--dm-slate-600)}
+.lvl-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.lvl-card{background:#FFF;border:1px solid var(--dm-border-light);border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.lvl-card.hl{border:1.5px solid var(--brand-blue)}
+.lvl-card__t{font:600 12.5px var(--font-heading);color:var(--dm-text-heading);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.lvl-card__s{font:500 10px var(--font-body);color:var(--dm-slate-400);margin:4px 0 8px}
+.lvl-card__b{font:400 11px/1.65 var(--font-body);color:var(--dm-slate-600)}
+.lvl-card__b b{color:var(--dm-slate-800,#1E293B)}
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.cat-tile{display:flex;align-items:center;gap:10px;border:1px solid var(--dm-border-light);border-radius:10px;padding:12px;background:#FFF}
+.cat-tile .em{font-size:20px}
+.cat-tile__n{font:600 12px var(--font-body);color:var(--dm-slate-800,#1E293B)}
+.cat-tile__s{font:400 11px var(--font-metric);color:var(--dm-slate-500)}
+.cat-tile__s b{color:var(--dm-slate-900);font-weight:600}
+.ref-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.asset-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.thumb{position:relative;border-radius:8px;background:linear-gradient(135deg,#E8F4FE,#F1F5F9);min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:12px;text-align:center}
+.thumb .l1{font:600 11.5px/1.4 var(--font-body);color:var(--dm-slate-600)}
+.thumb .l2{font:400 10px/1.4 var(--font-body);color:var(--dm-slate-400)}
+.corner-tl{position:absolute;top:8px;left:8px}
+.corner-tr{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;background:var(--highlight-navy);color:#FFF;font:600 10px/20px var(--font-metric);text-align:center}
+.ref-card,.asset-card{background:#FFF;border:1px solid var(--dm-border-light);border-radius:12px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:8px}
+.ref-card__n{font:600 12px/1.5 var(--font-body);color:var(--dm-slate-800,#1E293B)}
+.stat4{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.stat4 .s{font:400 10.5px/1.5 var(--font-body);color:var(--dm-slate-500)}
+.stat4 .s b{display:block;font:600 13px var(--font-metric);color:var(--dm-slate-900)}
+.ref-card__f{font:400 10.5px/1.5 var(--font-body);color:var(--dm-slate-400);border-top:1px solid var(--dm-slate-100);padding-top:7px}
+
+/* ── Variant post cards ──────────────────────────────────── */
+.var-card{background:#FFF;border:1px solid var(--dm-border-light);border-radius:12px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04);margin-bottom:12px;display:flex;gap:18px}
+.var-card.pick{border:1.5px solid var(--brand-blue)}
+.var-card.bad{border:1.5px solid #FECACA;background:#FFFBFB}
+.var-card__main{flex:1;min-width:0}
+.var-card__t{font:600 13.5px/1.5 var(--font-heading);color:var(--dm-text-heading);margin-bottom:7px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.var-card__body{font:400 12.5px/1.75 var(--font-body);color:var(--dm-slate-600);margin-bottom:10px}
+.var-card__tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.var-card__meta{display:flex;gap:16px;flex-wrap:wrap;font:400 11px var(--font-body);color:var(--dm-slate-500)}
+.var-card__meta b{color:var(--dm-slate-900);font-family:var(--font-metric)}
+.var-card__score{flex-shrink:0;width:86px;text-align:center;align-self:flex-start;border-left:1px solid var(--dm-slate-100);padding-left:18px}
+.var-card__score .n{font:600 34px/1.1 var(--font-metric);letter-spacing:-1px}
+.var-card__score .n.g{color:var(--g)}.var-card__score .n.a{color:var(--a)}.var-card__score .n.r{color:var(--r)}
+.var-card__score .l{font:600 8.5px/1.4 var(--font-metric);letter-spacing:1px;color:var(--dm-slate-400)}
+
+/* ── Pills row (filters as chips) ────────────────────────── */
+.pill-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.pill{font:500 12px/1 var(--font-body);color:#64748B;background:#FFF;border:1px solid var(--dm-slate-200);border-radius:20px;padding:7px 14px;cursor:pointer;transition:all .15s}
+.pill:hover{color:#1E293B;background:#F1F5F9}
+.pill.is-active{color:#FFF;background:var(--dm-primary);border-color:var(--dm-primary);font-weight:600}
+
+/* ── Storyboard beats ────────────────────────────────────── */
+.beats{position:relative;padding-left:18px}
+.beats::before{content:'';position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--dm-slate-100);border-radius:1px}
+.beat{position:relative;padding:0 0 16px 12px}
+.beat::before{content:'';position:absolute;left:-17px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--brand-blue);border:2px solid #FFF;box-shadow:0 0 0 1.5px var(--brand-blue)}
+.beat__t{font:600 12px var(--font-heading);color:var(--dm-text-heading);margin-bottom:4px}
+.beat__l{font:400 11.5px/1.6 var(--font-body);color:var(--dm-slate-600)}
+.beat__l b{color:var(--dm-slate-800,#1E293B);font-weight:600}
+
+/* ── Score ring ──────────────────────────────────────────── */
+.ring-wrap{display:flex;gap:18px;align-items:center;margin-bottom:16px}
+.ring{width:110px;height:110px;flex-shrink:0}
+.ring .num{font:600 30px var(--font-metric);fill:var(--dm-slate-900)}
+.ring-side .h{font:600 14px var(--font-heading);color:var(--g);margin-bottom:4px}
+.ring-side .b{font:400 12px/1.65 var(--font-body);color:var(--dm-slate-600)}
+
+/* ── Calendar month grid ─────────────────────────────────── */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-grid .hd{font:600 10.5px var(--font-body);color:var(--dm-slate-400);text-transform:uppercase;letter-spacing:.5px;text-align:center;padding:4px 0}
+.cal-cell{border-radius:8px;padding:8px;min-height:56px;border:1px solid var(--dm-border-light);background:var(--dm-slate-50)}
+.cal-cell .d{font:600 11px var(--font-metric);color:var(--dm-slate-700)}
+.cal-cell .m{font:400 10px/1.4 var(--font-body);color:var(--dm-slate-500);margin-top:2px}
+.cal-pub{background:var(--gl);border-color:#BBF7D0}.cal-pub .d{color:var(--g)}
+.cal-sch{background:var(--bl);border-color:#BFDBFE}.cal-sch .d{color:var(--b)}
+.cal-app{background:var(--al);border-color:#FDE68A}.cal-app .d{color:var(--a)}
+.cal-dft{background:var(--pl);border-color:#DDD6FE}.cal-dft .d{color:var(--p)}
+.cal-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font:400 11px var(--font-body);color:var(--dm-slate-500)}
+.cal-legend .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+/* ── Rotation planner ────────────────────────────────────── */
+.rot-grid{display:grid;grid-template-columns:44px repeat(7,1fr);gap:5px;margin-bottom:14px}
+.rot-grid .hd{font:600 10px var(--font-body);color:var(--dm-slate-400);text-align:center;padding:3px 0}
+.rot-grid .wk{font:600 10.5px var(--font-metric);color:var(--dm-slate-500);display:flex;align-items:center}
+.rot-chip{font:500 10.5px/1.3 var(--font-body);text-align:center;border-radius:6px;padding:6px 2px;background:var(--dm-slate-50);color:var(--dm-slate-400)}
+.rc-edu{background:var(--bl);color:var(--b)}.rc-trust{background:var(--gl);color:var(--g)}
+.rc-emo{background:var(--pl);color:var(--p)}.rc-ugc{background:#ECFEFF;color:#0E7490}
+.rc-comm{background:#FDF2F8;color:#BE185D}.rc-promo{background:var(--rl);color:var(--r)}
+.rc-draft{background:var(--dm-slate-100);color:var(--dm-slate-500)}
+
+/* ── Proposal cards / action queue ───────────────────────── */
+.prop-card{background:#FFF;border:1px solid var(--dm-border-light);border-radius:12px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04);margin-bottom:12px;display:flex;gap:18px}
+.prop-card__main{flex:1;min-width:0}
+.prop-card__t{font:600 13.5px/1.5 var(--font-heading);color:var(--dm-text-heading);margin-bottom:6px}
+.prop-card__e{font:400 12px/1.7 var(--font-body);color:var(--dm-slate-600);margin-bottom:10px}
+.prop-card__tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.prop-card__foot{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.prop-card__by{margin-left:auto;font:400 11px var(--font-body);color:var(--dm-slate-400)}
+.prop-card__fx{flex-shrink:0;width:150px;border-left:1px solid var(--dm-slate-100);padding-left:18px;align-self:center}
+.prop-card__fx .l{font:600 8.5px/1.4 var(--font-metric);letter-spacing:1px;color:var(--dm-slate-400);margin-bottom:4px}
+.prop-card__fx .v1{font:600 17px var(--font-metric);color:var(--g)}
+.prop-card__fx .v2{font:400 12px var(--font-metric);color:var(--dm-slate-600);margin-top:2px}
+
+/* ── AI insights panel (Ad Manager ai-card surface) ──────── */
+.ai-card{background:var(--surface-ai);border:1px solid #DBE6FF;border-radius:12px;padding:20px;margin-bottom:26px}
+.ai-card__head{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.ai-icon{width:32px;height:32px;border-radius:8px;color:#FFF;font-size:15px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--brand-blue),var(--brand-light-blue));flex-shrink:0}
+.ai-card__title{font:600 14px var(--font-heading);color:var(--dm-text-heading)}
+.ai-card__sub{font:400 11.5px/1.5 var(--font-body);color:var(--dm-slate-500);margin:2px 0 14px}
+.ai-insight-item{background:#FFF;border-radius:8px;padding:12px 14px;border-left:3px solid var(--brand-blue);font:400 12.5px/1.75 var(--font-body);color:var(--dm-slate-600);margin-bottom:10px}
+.ai-insight-item b{color:var(--dm-slate-900)}
+.ai-insight-item.warn{border-left-color:var(--dm-warning)}
+.ai-insight-item.alert{border-left-color:var(--danger)}
+.ai-insight-item.good{border-left-color:var(--dm-positive)}
+.ai-insight-item.new{border-left-color:var(--chart-5)}
+.ib{display:inline-block;font:700 9px/1 var(--font-metric);letter-spacing:.8px;text-transform:uppercase;padding:4px 7px;border-radius:4px;margin-right:8px;vertical-align:1px}
+.ib-b{background:var(--bl);color:var(--b)}.ib-a{background:var(--al);color:var(--a)}
+.ib-r{background:var(--rl);color:var(--r)}.ib-p{background:var(--pl);color:var(--p)}
+.ib-g{background:var(--gl);color:var(--g)}
+.ai-ask{display:flex;gap:8px;margin-top:4px}
+.ai-ask input{flex:1;height:36px;border:1px solid var(--dm-slate-200);border-radius:8px;padding:0 14px;font:400 12.5px var(--font-body);color:var(--dm-slate-700);background:#FFF}
+.ai-ask input::placeholder{color:var(--dm-slate-400)}
+.ai-ask input:focus{outline:none;border-color:var(--brand-blue)}
+
+/* ── Brief block / misc ──────────────────────────────────── */
+.brief-block{border:1px solid var(--dm-slate-200);border-radius:10px;background:var(--dm-slate-50);padding:16px;font:400 12.5px/1.9 var(--font-body);color:var(--dm-slate-700);margin-bottom:14px}
+.brief-block b{color:var(--dm-slate-900)}
+.action-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:4px 0 22px}
+.action-row .who{margin-left:auto;font:400 11.5px var(--font-body);color:var(--dm-slate-400)}
+.mini-info{border:1px solid var(--dm-border-light);border-radius:10px;padding:12px;background:var(--dm-slate-50);margin-bottom:10px}
+.mini-info__t{font:600 12px var(--font-body);color:var(--dm-slate-800,#1E293B);margin-bottom:4px}
+.mini-info__b{font:400 11.5px/1.65 var(--font-body);color:var(--dm-slate-600)}
+.mini-info__b code{font:500 10.5px var(--font-metric);background:var(--dm-slate-100);border-radius:4px;padding:1px 5px;color:var(--p)}
+.split2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.ctl-inline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;font:400 12px var(--font-body);color:var(--dm-slate-500)}
+.foot-note{font:400 11.5px/1.7 var(--font-body);color:var(--dm-slate-500);border-top:1px solid var(--dm-slate-100);padding-top:10px;margin-top:12px}
+.foot-note b{color:var(--dm-slate-900)}
+.proto-badge{position:fixed;right:18px;bottom:16px;z-index:200;background:var(--chart-5);color:#FFF;font:700 10px/1 var(--font-metric);letter-spacing:.8px;padding:8px 12px;border-radius:20px;box-shadow:0 4px 16px rgba(124,58,237,.35)}
+.legend-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;font:400 11px var(--font-body);color:var(--text-regular)}
+.legend-row .li{display:inline-flex;align-items:center;gap:6px}
+.legend-row .dotc{width:10px;height:10px;border-radius:50%}
+.legend-row .linec{width:14px;height:3px;border-radius:2px}
+@media(max-width:1100px){.spine-grid,.lvl-grid{grid-template-columns:repeat(2,1fr)}.ref-grid,.asset-grid{grid-template-columns:repeat(2,1fr)}.dm-row{flex-direction:column}.split2{grid-template-columns:1fr}}
+/* ── BF-specific additions ── */
+.seg{display:inline-block;font:700 9.5px/1 var(--font-metric);letter-spacing:.4px;padding:3px 7px;border-radius:4px;margin-right:6px;vertical-align:1px}
+.seg-s1{background:var(--bl);color:var(--b)}.seg-s2{background:var(--gl);color:var(--g)}
+.seg-s3,.seg-s4,.seg-s5{background:var(--pl);color:var(--p)}.seg-s6{background:var(--al);color:var(--a)}
+.seg-s7{background:#ECFEFF;color:#0E7490}.seg-s8{background:var(--nl);color:var(--n)}
+.article-block{border:1px solid var(--dm-slate-200);border-radius:10px;background:var(--dm-slate-50);padding:16px;font:400 12.5px/1.9 var(--font-body);color:var(--dm-slate-700);max-height:520px;overflow-y:auto}
+.article-block .seg-line{margin-bottom:12px}
+.article-block b{color:var(--dm-slate-900)}
+.chk{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--dm-slate-100);font:400 12.5px var(--font-body);color:var(--dm-slate-700)}
+.chk:last-child{border-bottom:none}
+.chk .ok{width:18px;height:18px;border-radius:50%;background:var(--gl);color:var(--g);font:700 11px/18px var(--font-metric);text-align:center;flex-shrink:0}
+.chk .meta{margin-left:auto;display:flex;gap:6px;align-items:center}
+.lockrow{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--dm-border-light);border-radius:8px;background:var(--dm-slate-50);font:500 12px var(--font-body);color:var(--dm-slate-600);margin-bottom:8px}
+.lockrow b{color:var(--dm-slate-900);font-family:var(--font-metric);font-weight:500}
+.lockrow .lk{margin-left:auto;font-size:12px}
+/* ── master-detail 详情面板 / 录入 / 阶段条 ── */
+.md-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:20px;align-items:start}
+@media(max-width:1180px){.md-wrap{grid-template-columns:1fr}}
+.md-list .dm-modern-table tbody tr{cursor:pointer}
+.md-list .dm-modern-table tbody tr.is-sel td{background:var(--brand-blue-tint) !important;box-shadow:inset 3px 0 0 var(--brand-blue)}
+.md-sec{border-top:1px solid var(--dm-slate-100);padding:14px 0 0;margin-top:14px}
+.md-sec:first-of-type{border-top:none;padding-top:0;margin-top:8px}
+.md-sec__t{display:flex;align-items:center;gap:8px;font:600 12px var(--font-heading);color:var(--dm-slate-700);margin-bottom:9px}
+.md-sec__t .n{width:17px;height:17px;border-radius:50%;background:var(--dm-slate-100);color:var(--dm-slate-600);font:700 9.5px/17px var(--font-metric);text-align:center;flex-shrink:0}
+.ev-row{display:flex;gap:8px;padding:7px 0;border-bottom:1px dashed var(--dm-slate-100);font:400 11.5px/1.6 var(--font-body);color:var(--dm-slate-600)}
+.ev-row:last-child{border-bottom:none}
+.ev-row .lbl{flex-shrink:0;width:86px;font-weight:600;color:var(--dm-slate-700)}
+.ev-row .val{flex:1;min-width:0}
+.ev-row .val b{color:var(--dm-slate-900);font-family:var(--font-metric)}
+.src-link{color:var(--brand-blue);text-decoration:underline;font-size:10.5px}
+.tier{display:inline-block;font:700 8.5px/1 var(--font-metric);padding:2px 5px;border-radius:3px;margin-left:5px}
+.tier-1{background:var(--nl);color:var(--n)}.tier-2{background:var(--bl);color:var(--b)}.tier-3{background:var(--gl);color:var(--g)}
+.miss{background:var(--al);border-radius:6px;padding:8px 10px;font:400 11px/1.6 var(--font-body);color:var(--a);margin-top:8px}
+.art-box{border:1px solid var(--dm-slate-200);border-radius:8px;background:var(--dm-slate-50);padding:13px;font:400 12px/1.85 var(--font-body);color:var(--dm-slate-700);max-height:320px;overflow-y:auto}
+.art-box .seg-line{margin-bottom:11px}
+.art-box b{color:var(--dm-slate-900)}
+.origin{display:inline-block;font:700 8.5px/1 var(--font-metric);padding:3px 6px;border-radius:4px;white-space:nowrap}
+.origin-pool{background:var(--nl);color:var(--n)}
+.origin-mt{background:var(--pl);color:var(--p)}
+.origin-ma{background:#ECFEFF;color:#0E7490}
+.entry-card{border:1.5px dashed var(--dm-slate-200);border-radius:10px;padding:14px;background:var(--dm-slate-50)}
+.entry-card.hl{border-color:var(--brand-blue);background:var(--brand-blue-tint)}
+.entry-card__t{font:600 12.5px var(--font-heading);color:var(--dm-text-heading);display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.entry-card__b{font:400 11.5px/1.65 var(--font-body);color:var(--dm-slate-600)}
+.fld{margin-top:9px}
+.fld label{display:block;font:600 10px var(--font-body);color:var(--dm-slate-600);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+.fld input,.fld textarea{width:100%;border:1px solid var(--dm-slate-200);border-radius:6px;padding:7px 10px;font:400 12px/1.6 var(--font-body);color:var(--dm-slate-700);background:#FFF;font-family:var(--font-body)}
+.fld textarea{min-height:62px;resize:vertical}
+.fld input::placeholder,.fld textarea::placeholder{color:var(--dm-slate-400)}
+.gate{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:8px;background:var(--gl);border-left:3px solid var(--g);font:400 11.5px/1.6 var(--font-body);color:var(--dm-slate-700);margin-bottom:10px}
+.gate.warn{background:var(--al);border-left-color:var(--dm-warning)}
+.gate b{color:var(--dm-slate-900)}
+.stagebar{display:flex;gap:0;margin:0 0 16px}
+.stg{flex:1;text-align:center;font:600 10.5px/1.3 var(--font-body);color:var(--dm-slate-400);padding:8px 4px;border-bottom:3px solid var(--dm-slate-100)}
+.stg.done{color:var(--g);border-bottom-color:#86EFAC}
+.stg.now{color:var(--brand-blue);border-bottom-color:var(--brand-blue)}
+.stg .sub{display:block;font-weight:400;font-size:9.5px;color:var(--dm-slate-400);margin-top:2px}
+.explain{max-width:720px;margin:16px auto;text-align:center;padding:30px 24px}
+.explain__ico{font-size:32px;margin-bottom:12px}
+.explain__t{font:600 17px var(--font-heading);color:var(--dm-text-heading);margin-bottom:10px}
+.explain__b{font:400 12.5px/1.9 var(--font-body);color:var(--dm-slate-600);text-align:left;max-width:620px;margin:0 auto 16px}
+.explain__nav{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.recipe-bar{display:flex;gap:3px;margin:10px 0 6px}
+.recipe-bar .rseg{flex:1;text-align:center;font:700 9px/1 var(--font-metric);padding:7px 2px;border-radius:4px}
+
+.rmbanner{display:flex;align-items:flex-start;gap:10px;background:#FFF8E6;border:1px solid #F2D98C;border-radius:12px;padding:12px 16px;margin-bottom:16px}
+.rmbanner .rmb-tag{flex:0 0 auto;background:#B8860B;color:#fff;border-radius:6px;padding:2px 8px;font:700 10px var(--font-body);letter-spacing:.04em;margin-top:1px}
+.rmbanner .rmb-t{font:600 12.5px var(--font-body);color:#6B4E00;line-height:1.55}
+.rmbanner .rmb-t b{color:#4A3600}
+
+.artfold{border:1px solid var(--dm-slate-200);border-radius:10px;background:var(--dm-slate-50);overflow:hidden}
+.artfold>summary{cursor:pointer;list-style:none;padding:11px 14px;display:flex;align-items:center;gap:9px;font:600 12px var(--font-body);color:var(--dm-slate-700)}
+.artfold>summary::-webkit-details-marker{display:none}
+.artfold>summary::before{content:'▸';color:var(--dm-slate-400);font-size:11px}
+.artfold[open]>summary::before{content:'▾'}
+.artfold .ro{margin-left:auto;background:var(--dm-slate-200);color:var(--dm-slate-600);border-radius:5px;padding:2px 7px;font:700 9.5px var(--font-body)}
+.artfold .bd{padding:0 14px 14px;font:400 12px/1.75 var(--font-body);color:var(--dm-slate-700);border-top:1px solid var(--dm-slate-200);padding-top:12px}
+.gatecmp{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.gatecmp .g1{border:1px solid var(--dm-slate-200);border-radius:10px;padding:12px 14px;background:#fff}
+.gatecmp .g1.here{border-color:var(--dm-primary);background:#F2F9FF}
+.gatecmp .gn{font:700 9.5px var(--font-body);letter-spacing:.05em;color:var(--dm-slate-400);margin-bottom:5px}
+.gatecmp .gq{font:600 12.5px var(--font-body);color:var(--dm-slate-800);line-height:1.5;margin-bottom:7px}
+.gatecmp .gb{font:600 11px var(--font-body);color:var(--dm-primary);background:#fff;border:1px solid var(--dm-primary);border-radius:6px;padding:3px 9px;display:inline-block}
+.gatecmp .g1:not(.here) .gb{color:var(--dm-slate-500);border-color:var(--dm-slate-300)}
+.regen{display:inline-flex;align-items:center;gap:4px;margin-left:auto;font:600 10px var(--font-body);color:var(--dm-primary);border:1px solid var(--dm-slate-300);border-radius:6px;padding:2px 7px;background:#fff;cursor:pointer}
+.capedit{border:1px dashed var(--dm-slate-300);border-radius:7px;padding:7px 10px;margin-top:8px;font:400 11px/1.6 var(--font-body);color:var(--dm-slate-600);background:var(--dm-slate-50)}
+.capedit b{color:var(--dm-slate-800)}
+
+/* ── v2 additions ── */
+.zone{margin-bottom:8px;display:flex;align-items:center;gap:9px}
+.zone__t{font:600 13px var(--font-heading);color:var(--dm-slate-800)}
+.zone__n{background:var(--dm-slate-100);color:var(--dm-slate-600);border-radius:20px;padding:1px 9px;font:700 10.5px var(--font-body)}
+.zone__sp{flex:1}
+.prog{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:2px 9px;font:600 10.5px var(--font-body);white-space:nowrap}
+.prog i{width:6px;height:6px;border-radius:50%;flex:0 0 auto}
+.prog--cand{background:var(--dm-slate-100);color:var(--dm-slate-600)}.prog--cand i{background:#94A3B8}
+.prog--gen{background:#EFF6FF;color:#1D4ED8}.prog--gen i{background:#3B82F6;animation:pls 1.4s infinite}
+.prog--wait{background:#FFF7ED;color:#B45309}.prog--wait i{background:#F59E0B}
+.prog--ready{background:#ECFDF5;color:#047857}.prog--ready i{background:#10B981}
+.prog--pub{background:#F5F3FF;color:#6D28D9}.prog--pub i{background:#8B5CF6}
+.prog--stale{background:#FEF2F2;color:#B91C1C}.prog--stale i{background:#EF4444}
+@keyframes pls{0%,100%{opacity:1}50%{opacity:.3}}
+.vfy{display:inline-flex;align-items:center;gap:4px;font:600 10.5px var(--font-body);border-radius:5px;padding:1px 7px}
+.vfy--no{background:var(--dm-slate-100);color:var(--dm-slate-500)}
+.vfy--ok{background:#ECFDF5;color:#047857}
+.vfy--bad{background:#FEF2F2;color:#B91C1C}
+.det{border:1px solid var(--dm-border-light);border-radius:12px;background:#FFF;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow:hidden;margin-bottom:16px}
+.det__hd{padding:15px 20px;border-bottom:1px solid var(--dm-border-light);display:flex;align-items:flex-start;gap:12px}
+.det__ti{font:600 15px var(--font-heading);color:var(--dm-slate-800);line-height:1.45;flex:1}
+.det__sc{text-align:center;flex:0 0 auto}
+.det__sc .n{font:700 26px var(--font-metric);color:var(--dm-primary);font-variant-numeric:tabular-nums;line-height:1}
+.det__sc .l{font:600 8.5px var(--font-body);color:var(--dm-slate-400);letter-spacing:.06em;margin-top:2px}
+.seg{border-top:1px solid var(--dm-border-light)}
+.seg__hd{padding:11px 20px;display:flex;align-items:center;gap:9px;cursor:pointer;font:600 12px var(--font-body);color:var(--dm-slate-700)}
+.seg__n{width:18px;height:18px;border-radius:50%;background:var(--dm-primary);color:#fff;font:700 10px var(--font-body);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.seg__bd{padding:0 20px 18px}
+.srcrow{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--dm-slate-200);font:400 11.5px var(--font-body);color:var(--dm-slate-600)}
+.srcrow:last-child{border-bottom:none}
+.srcrow .t3{background:#FFF7ED;color:#B45309;border-radius:4px;padding:1px 6px;font:700 9px var(--font-body)}
+.srcrow .t12{background:var(--dm-slate-100);color:var(--dm-slate-500);border-radius:4px;padding:1px 6px;font:700 9px var(--font-body)}
+.art{border:1px solid var(--dm-slate-200);border-radius:9px;background:#FCFCFD;padding:13px 15px;font:400 12px/1.8 var(--font-body);color:var(--dm-slate-700);max-height:210px;overflow-y:auto}
+.art .sl{display:inline-block;border-radius:4px;padding:0 5px;font:700 9.5px var(--font-body);margin-right:6px;vertical-align:2px}
+.grid6{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.acell{border:1px solid var(--dm-border-light);border-radius:10px;overflow:hidden;background:#FFF}
+.acell__ph{height:96px;display:flex;align-items:center;justify-content:center;position:relative;font:600 10px var(--font-body);color:var(--dm-slate-400);background:linear-gradient(135deg,#F1F5F9,#E2E8F0)}
+.acell__ph.gen{background:linear-gradient(135deg,#EFF6FF,#DBEAFE);color:#1D4ED8}
+.acell__ph.fail{background:linear-gradient(135deg,#FEF2F2,#FEE2E2);color:#B91C1C}
+.acell__sq{position:absolute;top:6px;left:6px;background:rgba(15,23,42,.72);color:#fff;border-radius:4px;padding:1px 6px;font:700 9px var(--font-body)}
+.acell__rt{position:absolute;top:6px;right:6px;background:rgba(255,255,255,.9);color:var(--dm-slate-600);border-radius:4px;padding:1px 6px;font:700 9px var(--font-body)}
+.acell__bd{padding:9px 10px}
+.acell__nm{font:600 10.5px var(--font-body);color:var(--dm-slate-700);margin-bottom:5px;line-height:1.4}
+.acell__ck{font:400 9.5px/1.55 var(--font-body);color:var(--dm-slate-500)}
+.acell__ck b{color:var(--dm-slate-700)}
+.regenbox{display:flex;gap:5px;margin-top:8px}
+.regenbox input{flex:1;min-width:0;border:1px solid var(--dm-slate-300);border-radius:6px;padding:4px 7px;font:400 10px var(--font-body);color:var(--dm-slate-700)}
+.regenbox input::placeholder{color:var(--dm-slate-400)}
+.regenbox button{flex:0 0 auto;border:1px solid var(--dm-primary);background:#fff;color:var(--dm-primary);border-radius:6px;padding:4px 8px;font:600 10px var(--font-body);cursor:pointer}
+.ckbar{display:flex;align-items:center;gap:8px;background:#FFF7ED;border:1px solid #F2D98C;border-radius:9px;padding:9px 13px;margin-top:12px;font:600 11.5px var(--font-body);color:#7C4A03}
+.ckbar .cnt{background:#B45309;color:#fff;border-radius:5px;padding:1px 7px;font:700 10px var(--font-body)}
+.gates{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+.gt{border:1px solid var(--dm-slate-200);border-radius:10px;padding:11px 13px;background:#fff}
+.gt.on{border-color:var(--dm-primary);background:#F2F9FF}
+.gt.free{border-style:dashed;background:var(--dm-slate-50)}
+.gt__k{font:700 9px var(--font-body);letter-spacing:.05em;color:var(--dm-slate-400);margin-bottom:4px}
+.gt__q{font:600 12px var(--font-body);color:var(--dm-slate-800);line-height:1.5;margin-bottom:6px}
+.gt__b{font:600 10.5px var(--font-body);color:var(--dm-primary);border:1px solid var(--dm-primary);border-radius:6px;padding:2px 8px;display:inline-block;background:#fff}
+.gt.free .gt__b{color:var(--dm-slate-500);border-color:var(--dm-slate-300);border-style:dashed}
+.subpill{display:flex;gap:6px;margin-bottom:14px}
+.subpill button{border:1px solid var(--dm-slate-300);background:#fff;color:var(--dm-slate-600);border-radius:20px;padding:5px 14px;font:600 12px var(--font-body);cursor:pointer}
+.subpill button.on{background:var(--dm-primary);border-color:var(--dm-primary);color:#fff}
+.tprow{border:1px solid var(--dm-border-light);border-radius:11px;background:#fff;margin-bottom:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.tprow__hd{padding:13px 17px;display:flex;align-items:center;gap:11px;cursor:pointer}
+.tprow__t{font:600 13.5px var(--font-heading);color:var(--dm-slate-800);flex:1;line-height:1.4}
+.tprow__bd{border-top:1px solid var(--dm-border-light);padding:15px 17px;background:#FCFCFD;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pv{border:1px solid var(--dm-slate-200);border-radius:10px;background:#fff;overflow:hidden}
+.pv__hd{padding:9px 12px;border-bottom:1px solid var(--dm-slate-200);display:flex;align-items:center;gap:7px;font:600 11.5px var(--font-body);color:var(--dm-slate-700)}
+.pv__md{height:82px;background:linear-gradient(135deg,#F1F5F9,#E2E8F0);display:flex;align-items:center;justify-content:center;gap:4px;font:600 9.5px var(--font-body);color:var(--dm-slate-400)}
+.pv__md .th{width:34px;height:60px;background:#fff;border:1px solid var(--dm-slate-300);border-radius:3px;display:flex;align-items:center;justify-content:center;font:700 8.5px var(--font-body);color:var(--dm-slate-500)}
+.pv__cp{padding:10px 12px;font:400 10.5px/1.65 var(--font-body);color:var(--dm-slate-600);max-height:70px;overflow:hidden}
+.pv__ft{padding:9px 12px;border-top:1px solid var(--dm-slate-200);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ovr{background:#F5F3FF;color:#6D28D9;border-radius:5px;padding:1px 7px;font:700 9.5px var(--font-body)}
+.arch{border:1px solid var(--dm-slate-200);border-radius:12px;background:#FCFCFD;padding:0;overflow:hidden}
+.arch>summary{cursor:pointer;list-style:none;padding:13px 18px;font:600 13px var(--font-heading);color:var(--dm-slate-800);display:flex;align-items:center;gap:9px}
+.arch>summary::-webkit-details-marker{display:none}
+.arch>summary::before{content:'▸';color:var(--dm-slate-400);font-size:11px}
+.arch[open]>summary::before{content:'▾'}
+.arch__bd{padding:0 18px 18px}
+.painmap{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.pain{border:1px solid var(--dm-border-light);border-radius:11px;background:#fff;padding:13px 15px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.pain__h{font:700 11px var(--font-body);color:#B91C1C;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.pain__h .x{background:#FEF2F2;border-radius:5px;padding:1px 6px;font-size:9.5px}
+.pain__r{font:400 11px/1.6 var(--font-body);color:var(--dm-slate-500);margin-bottom:8px}
+.pain__f{font:600 11.5px/1.6 var(--font-body);color:#047857;padding-top:8px;border-top:1px dashed var(--dm-slate-200)}
+.pain__f b{color:#065F46}
+.pain__e{font:400 9.5px/1.5 var(--font-body);color:var(--dm-slate-400);margin-top:6px;font-family:var(--font-metric)}
+</style>
+<aside class="ml-sidebar">
+  <div class="ml-sidebar__section">Intelligence</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#2d7ff9"></span>My Pages</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#ec4899"></span>Competitor Analysis</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#f59e0b"></span>Buzz (Market Insights)</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#10b981"></span>Leader Board</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#7c5cfc"></span>Social Listening</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#06b6a0"></span>Social Pulses</div>
+  <div class="ml-sidebar__section">Ads</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#2d7ff9"></span>Ad Manager</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#f97316"></span>Ad Intelligence</div>
+  <div class="ml-sidebar__section">Creation</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#23A9F6"></span>Content Publish</div>
+  <div class="ml-sidebar__item is-sub is-active">Creation &amp; Autopilot Studio<span class="ml-sidebar__new">BF</span></div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#8B5CF6"></span>AI Assets</div>
+  <div class="ml-sidebar__section">Tools</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#94A3B8"></span>Report Scheduler</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#94A3B8"></span>Tag Management</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#94A3B8"></span>AI Chat</div>
+  <div class="ml-sidebar__item"><span class="dot" style="background:#94A3B8"></span>AI Agent</div>
+</aside>
+
+<main class="ml-main"><div class="ml-content">
+
+<div class="dm-title-page">Creation Studio — BusinessFocus</div>
+<div class="dm-page-sub">一条生產線，三道闘門：<b>每日自動找題</b> → <b>G1 採用</b> → 生成文稿 → <b>G2 確認文稿</b> → <b>6 張圖並行生成</b> → 自動拼裝 2 條 post → <b>G3 確認並發布</b>。<br>Stage 按對象命名（S1 候選 / S2 文稿 / S3 交付版本 / S4 post），品牌差異全落 <code>brand_profile</code> / <code>topic_policy</code> / <code>delivery_spec</code> 三個對象——所以主線不用再建一套。</div>
+
+
+<nav class="dm-page-menu"><div class="menu-list">
+  <button class="menu-item is-active" data-tab="work">選題工作臺</button>
+  <button class="menu-item" data-tab="lib">發佈庫</button>
+  <span style="align-self:center;margin-left:10px;font:600 10px var(--font-body);color:var(--dm-slate-400);white-space:nowrap">v2 — 四個 Stage，兩個 Tab（stage 是詳情面裏的進度，不是導航層級）</span>
+</div></nav>
+
+<div class="dm-controls-row">
+  <span class="dm-ctl-label">GROUNDING WINDOW</span>
+  <div class="dm-datepick"><span class="ic">🗓</span>Last 90 Days<span class="sep">·</span><span class="rng">May 26 – Aug 24</span><span class="cv">▾</span></div>
+  <span class="dm-ctl-label" style="margin-left:8px">MODEL</span>
+  <div class="dm-select-lite">bf_agent v2<span class="cv">▾</span></div>
+  <span class="spacer"></span>
+  <span class="dm-meta-label">Aug 2026 · FB 136 &amp; IG 50 posts · run #34 · 10:00 HKT daily</span>
+</div>
+
+<div class="tab-panel active" id="tab-work">
+
+<div class="painmap">
+  <div class="pain">
+    <div class="pain__h"><span class="x">痛點</span>生圖慢</div>
+    <div class="pain__r">根因：skill 在會話裏<b>串行</b>跑 6 次生成，第 6 張要等前 5 張。</div>
+    <div class="pain__f">過 G2 後 <b>6 張一次全部發出去</b>，異步 worker 並行處理，先完成的先顯示。</div>
+    <div class="pain__e">enqueue.py：does NOT generate, poll, or wait</div>
+  </div>
+  <div class="pain">
+    <div class="pain__h"><span class="x">痛點</span>生圖不穩定</div>
+    <div class="pain__r">根因：沒有模板錨定；校驗比的是「請求的比例」；錯一張要重跑全套。</div>
+    <div class="pain__f">模板圖作參照（<b>clone_creative</b>）· 校驗比 <b>outputRatio</b>（實際產出）· <b>逐張重生</b>，一次只花一次生成。</div>
+    <div class="pain__e">outputRatio: may differ from requested after model rounding</div>
+  </div>
+  <div class="pain">
+    <div class="pain__h"><span class="x">痛點</span>手動拼接</div>
+    <div class="pain__r">根因：人在 Drive / Notion 之間搬素材、對區段、貼 caption。</div>
+    <div class="pain__f">切段是純 Python，然後<b>複用現成腳本</b> assemble_post_draft 調兩次。拼裝不是要建，是要接。</div>
+    <div class="pain__e">--caption / --media-asset-ids / --platform / --created-via</div>
+  </div>
+</div>
+
+<div class="gates">
+  <div class="gt on"><div class="gt__k">G1 · 本頁詳情面</div><div class="gt__q">這條題值不值得寫一篇文章？</div><span class="gt__b">採用</span></div>
+  <div class="gt on"><div class="gt__k">G2 · 本頁詳情面</div><div class="gt__q">這篇文章值不值得花 6 次出圖？（成本 1:6）</div><span class="gt__b">確認文稿並生成圖片</span></div>
+  <div class="gt free"><div class="gt__k">S3 → S4 · 無閘門</div><div class="gt__q">拼裝是純 Python、零 token —— 在免費操作前設閘門是純摩擦。</div><span class="gt__b">自動拼裝</span></div>
+</div>
+
+<div class="dm-kpi-row">
+  <div class="dm-kpi-card"><div class="kpi__label">今日候選</div><div class="kpi__metric">20</div><div class="kpi__sub">run #34 · 10:00:12 HKT · LLM 單軌</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">已驗證</div><div class="kpi__metric">6</div><div class="kpi__sub up">≥2 個獨立真實報道</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">驗證失敗</div><div class="kpi__metric">2</div><div class="kpi__sub down">來源查不到 / 單一來源</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">進行中</div><div class="kpi__metric">3</div><div class="kpi__sub">已過 G1 · 未發布</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">文稿待確認</div><div class="kpi__metric">1</div><div class="kpi__sub">等 G2</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">今日已換批</div><div class="kpi__metric">1</div><div class="kpi__sub">舊批次已摺疊留檔</div></div>
+</div>
+
+<div class="callout callout--a">
+  <div class="callout__title">「已驗證 6 / 20」不是 bug —— 這是懶驗證</div>
+  <div class="callout__body">建池時<b>不驗證</b>，只算初評分；<b>打開哪條才驗證哪條</b>。因為換一批不設上限，如果每批都全驗，一天 3 次換批就是 <b>150+ 次搜索調用</b>，而且大部分驗的是編輯根本沒滾到的候選；懶驗證降到約 40 次。<br>不變量守住了：<b>只有驗證過的候選能被採用</b>——未驗證時按鈕顯示「驗證並採用」，驗證失敗則攔住並說明原因。<br>⚠ 兩個誠實標註：列表上的分數是<b>初評</b>（驗證後可能掉，單一來源 −15）；「驗證失敗」是<b>部分統計</b>，只統計已經驗過的那些。</div>
+  <div class="callout__meta"><span>本批已驗: <b>8 / 20</b></span><span>通過: <b>6</b></span><span>失敗: <b>2</b></span><span>省下: <b>約 110 次搜索</b></span></div>
+</div>
+
+<section class="dm-card">
+  <div class="dm-title-card">排程與規則（v2 只讀）<span class="dmode dmode-live">LIVE</span></div>
+  <span class="dm-subtitle">不做獨立 Autopilot 配置頁——排程與能力版本在這裏只讀展示。<b>每日自動找題的排程保留</b>；不做的是<b>定時發布</b>，這兩件事別混。</span>
+  <div class="dm-controls-row" style="padding:0 0 12px">
+    <span class="dm-ctl-label">選題模式</span>
+    <div class="pill-row" style="margin-bottom:0"><button class="pill is-active">llm_only 🔒</button><button class="pill" style="opacity:.45">trends_first（路線圖）</button></div>
+    <span class="spacer"></span>
+    <button class="btn btn--secondary btn--sm">+ 手動錄入（P1）</button>
+  </div>
+  <div class="lockrow">run_time <b>10:00 · Asia/Hong_Kong</b> · daily_count <b>3</b> · pool_size <b>20</b><span class="lk">🔒</span></div>
+  <div class="lockrow">topic_skill <b>bf-topic-selection@v1</b> · writing_skill <b>bf-content-package@v1</b><span class="lk">🔒</span></div>
+  <div class="lockrow">delivery_spec <b>bf/default</b> — 6 圖 4:5 + 1 橫版 1.91:1 · required_sections 8<span class="lk">🔒</span></div>
+</section>
+
+<div class="zone" style="margin-top:22px">
+  <div class="zone__t">進行中</div><div class="zone__n">3</div>
+  <div class="zone__sp"></div>
+  <span class="dm-meta-label">已過 G1，<b>不受「換一批」影響</b></span>
+</div>
+<section class="dm-card" style="margin-bottom:20px">
+  <table class="dm-modern-table dm-modern-table--compact">
+    <thead><tr><th>選題</th><th>進度</th><th>採用人</th><th style="text-align:right">score</th></tr></thead>
+    <tbody>
+      <tr><td><div class="dm-cell-main">英偉達財報前夕美股 AI 板塊震盪</div><div class="dm-cell-sub">4 來源（含 1 個原始資料）· 文稿已生成</div></td>
+          <td><span class="prog prog--wait"><i></i>文稿待確認</span></td><td>Kelvin</td><td style="text-align:right"><b>87</b></td></tr>
+      <tr><td><div class="dm-cell-main">人民幣中間價連續第三日走強</div><div class="dm-cell-sub">3 來源 · 出圖中</div></td>
+          <td><span class="prog prog--gen"><i></i>出圖中 4/6</span></td><td>Kelvin</td><td style="text-align:right"><b>81</b></td></tr>
+      <tr><td><div class="dm-cell-main">xAI 新一輪融資估值傳達 2000 億美元</div><div class="dm-cell-sub">4 來源 · 2 條 post 已拼裝</div></td>
+          <td><span class="prog prog--ready"><i></i>待發布</span></td><td>Amy</td><td style="text-align:right"><b>79</b></td></tr>
+    </tbody>
+  </table>
+  <div class="foot-note">進度全部<b>派生</b>——由下游產物是否存在推出，不是誰去點了一個狀態。48h 未推進標 <code>stale</code>：<b>只標記，不刪不自動放行</b>。</div>
+</section>
+
+<div class="zone">
+  <div class="zone__t">今日候選</div><div class="zone__n">20</div>
+  <div class="zone__sp"></div>
+  <button class="btn btn--secondary btn--sm">↻ 換一批（今日已換 1 次）</button>
+</div>
+<section class="dm-card">
+  <span class="dm-subtitle">點任一列在下方看來源、證據與文稿。<b>沒有「否決」按鈕</b>——不用的題什麼都不用做。<br>為什麼不做否決：該藏沒藏 = 你多花 5 秒認出「看過了」；不該藏藏了 = <b>漏掉一條真新聞，而且不會被發現</b>。單軌之下覆蓋面本來就是風險項，不該再疊一個靜默隱藏候選的機制。撞題防護在發布前的 Readiness Check（7 天近重複）——放那兒是「你要發重複的了」，放這兒是「我幫你藏了」。</span>
+  <table class="dm-modern-table dm-modern-table--compact">
+    <thead><tr><th>選題</th><th>驗證</th><th>來源</th><th>origin</th><th style="text-align:right">初評</th></tr></thead>
+    <tbody>
+      <tr style="background:#F2F9FF"><td><div class="dm-cell-main">Momenta 擬港籌 10 億美元 · 自動駕駛 AI 新股</div><div class="dm-cell-sub">LLM 軌 · 已重搜驗證 ✓</div></td>
+          <td><span class="vfy vfy--ok">✓ 已驗證</span></td><td>4（含 tier3）</td><td>pool</td><td style="text-align:right"><b>87</b></td></tr>
+      <tr><td><div class="dm-cell-main">港樓按息連續兩月回落 · 供樓負擔比率</div><div class="dm-cell-sub">LLM 軌 · 已重搜驗證 ✓</div></td>
+          <td><span class="vfy vfy--ok">✓ 已驗證</span></td><td>3</td><td>pool</td><td style="text-align:right"><b>76</b></td></tr>
+      <tr><td><div class="dm-cell-main">最低工資檢討 · 商會與勞方分歧</div><div class="dm-cell-sub">未打開，尚未觸發驗證</div></td>
+          <td><span class="vfy vfy--no">未驗證</span></td><td>—</td><td>pool</td><td style="text-align:right">72</td></tr>
+      <tr><td><div class="dm-cell-main">加密幣投資平台監管諮詢期結束</div><div class="dm-cell-sub">模型給的兩條連結均查不到</div></td>
+          <td><span class="vfy vfy--bad">✕ 驗證失敗</span></td><td>0</td><td>pool</td><td style="text-align:right">68</td></tr>
+      <tr><td><div class="dm-cell-main">本地餐飲業結業數創三年新高</div><div class="dm-cell-sub">只搜到內容農場轉載，未達 ≥2 獨立來源</div></td>
+          <td><span class="vfy vfy--bad">✕ 驗證失敗</span></td><td>1</td><td>pool</td><td style="text-align:right">64</td></tr>
+      <tr><td><div class="dm-cell-main">中概股回港二次上市窗口</div><div class="dm-cell-sub">未打開，尚未觸發驗證</div></td>
+          <td><span class="vfy vfy--no">未驗證</span></td><td>—</td><td>pool</td><td style="text-align:right">61</td></tr>
+      <tr style="opacity:.75"><td><div class="dm-cell-main">聯儲局點陣圖與港息走向</div><div class="dm-cell-sub">Amy 在對話中建的題 · 待驗證</div></td>
+          <td><span class="vfy vfy--no">待驗證</span></td><td>—</td><td><span class="tg tg-p">chat · Amy</span></td><td style="text-align:right">—</td></tr>
+    </tbody>
+  </table>
+  <div class="foot-note">還有 13 條 · <span style="color:var(--dm-primary);font-weight:600">已換掉的批次（20）· 09:41 由 Kelvin 操作 ▸</span><br>換一批<b>只替換沒有下游產物的候選</b>——上面「進行中」那 3 條不受影響（不寫這條規則會出 bug：正在出圖的題被換掉）。不設次數上限，<b>但每次都記檔</b>：唯一的約束沒有了，至少要能事後看見發生了什麼。</div>
+</section>
+
+<div class="zone" style="margin-top:22px"><div class="zone__t">詳情面 · S1 → S3</div><div class="zone__sp"></div><span class="dm-meta-label">master-detail：G1 與 G2 都在同一個對象上，所以必須同屏</span></div>
+
+<div class="det">
+  <div class="det__hd">
+    <div class="det__ti">Momenta 擬港籌 10 億美元！中國自動駕駛 AI 新股光環背後 三年蝕逾 92 億問盈利何時到？
+      <div style="margin-top:6px"><span class="vfy vfy--ok">✓ 已驗證 · 4 來源</span> <span class="prog prog--wait"><i></i>文稿待確認</span> <span class="dm-meta-label">origin pool · found_by llm_prompt · 採用人 Kelvin</span></div>
+    </div>
+    <div class="det__sc"><div class="n">87</div><div class="l">SCORE</div></div>
+  </div>
+
+  <div class="seg"><div class="seg__hd"><span class="seg__n">1</span>選題與來源</div><div class="seg__bd">
+    <div class="ev-row"><span class="lbl">為何入選</span><span class="val">財報日在即、有實數可核、港股有直接傳導、討論度高。</span></div>
+    <div class="ev-row"><span class="lbl">score 拆解</span><span class="val">即時性 23/25 · 影響 20/22 · 數據 17/18 · HK關聯 16/18 · 討論度 9/12 · 敘事 2/5</span></div>
+    <div style="margin-top:10px">
+      <div class="srcrow"><span class="t3">tier3</span>HKEXnews — 遞表文件（原始資料）<span style="margin-left:auto;color:var(--dm-slate-400)">08-24 09:12</span></div>
+      <div class="srcrow"><span class="t12">tier1</span>SCMP — Momenta files for Hong Kong listing<span style="margin-left:auto;color:var(--dm-slate-400)">08-24 07:40</span></div>
+      <div class="srcrow"><span class="t12">tier1</span>信報 hkej.com — 自動駕駛新股招股在即<span style="margin-left:auto;color:var(--dm-slate-400)">08-24 08:05</span></div>
+      <div class="srcrow"><span class="t12">tier2</span>華爾街見聞 — 三年累虧細節<span style="margin-left:auto;color:var(--dm-slate-400)">08-24 08:33</span></div>
+    </div>
+    <div class="foot-note">模型初給的 2 條連結均不可用，<b>重搜後找到這 4 條真實報道</b>才進池。單軌之下這道驗證是唯一的質量防線——規則不許有 fallback 分支，湊不夠 20 條就進池少於 20 條。</div>
+  </div></div>
+
+  <div class="seg"><div class="seg__hd"><span class="seg__n">2</span>證據（research pack）</div><div class="seg__bd">
+    <div class="ev-row"><span class="lbl">angle</span><span class="val">光環 vs 盈利——AI 新股的估值敘事與實際虧損之間的落差。</span></div>
+    <div class="ev-row"><span class="lbl">data points</span><span class="val">集資額約 10 億美元（HKEXnews）· 三年累虧 92.3 億人民幣（招股書）· 研發佔收入比 61%（招股書）</span></div>
+    <div class="ev-row"><span class="lbl">counter view</span><span class="val">Robotaxi 商業化時點若提前，虧損收窄速度可能快於市場預期。</span></div>
+    <div class="ev-row"><span class="lbl">missing</span><span class="val">基石投資者名單未公開；定價區間未定。</span></div>
+  </div></div>
+
+  <div class="seg"><div class="seg__hd"><span class="seg__n">3</span>文稿（8 區段 · 可編輯）</div><div class="seg__bd">
+    <div class="art">
+      <span class="sl seg-s1">s1</span>Momenta擬港籌10億美元！中國自動駕駛AI新股光環背後 三年蝕逾92億問盈利何時到？【 @businessfocus.io 】【#BF社會熱話】<br><br>
+      <span class="sl seg-s2">s2</span>中國自動駕駛獨角獸 Momenta 已向港交所遞表，市場預期集資額約 10 億美元…<br><br>
+      <span class="sl seg-s3">s3</span><b>事件拆解</b>——遞表文件顯示…（兩個自然段）<br><br>
+      <span class="sl seg-s4">s4</span><b>痛點分析</b>——三年累虧 92.3 億人民幣…（兩個自然段）<br><br>
+      <span class="sl seg-s5">s5</span><b>解法重點</b>——Robotaxi 商業化路徑…（兩個自然段）<br><br>
+      <span class="sl seg-s6">s6</span>無小標題結尾段…<br><br>
+      <span class="sl seg-s7">s7</span>導流前綴行 · <span class="sl seg-s8">s8</span>固定文末聲明與品牌文字（逐字，只有 IG 版帶）
+    </div>
+    <div class="action-row" style="padding-top:12px">
+      <button class="btn btn--primary">確認文稿並生成圖片 →</button>
+      <button class="btn btn--secondary">重寫某一段</button>
+      <span class="who"><b>G2 · 成本閘門</b>：確認後才會呼叫 6 次 image gen。文稿的可編輯入口只有這裏一處——caption 是從它切出來的，兩處可改必然漂移。</span>
+    </div>
+  </div></div>
+
+  <div class="seg"><div class="seg__hd"><span class="seg__n">4</span>交付版本（S3）· 6 張圖並行生成</div><div class="seg__bd">
+    <div class="grid6">
+      <div class="acell"><div class="acell__ph"><span class="acell__sq">02</span><span class="acell__rt">4:5 ✓</span>直版封面</div><div class="acell__bd"><div class="acell__nm">02_直版封面_4x5.png</div><div class="acell__ck">代碼層 <b>4/4 通過</b><br>圖內數字 <b>需你確認</b></div><div class="regenbox"><input placeholder="再亮一點…"><button>↻</button></div></div></div>
+      <div class="acell"><div class="acell__ph"><span class="acell__sq">03</span><span class="acell__rt">4:5 ✓</span>事件拆解</div><div class="acell__bd"><div class="acell__nm">03_資訊圖1_事件拆解.png</div><div class="acell__ck">代碼層 <b>4/4 通過</b><br>圖內數字 <b>已核對一致</b></div><div class="regenbox"><input placeholder="改一行指令…"><button>↻</button></div></div></div>
+      <div class="acell"><div class="acell__ph fail"><span class="acell__sq">04</span><span class="acell__rt">比例不符</span>重生中 (2)</div><div class="acell__bd"><div class="acell__nm">04_資訊圖2_痛點分析.png</div><div class="acell__ck" style="color:#B91C1C">outputRatio <b>1.02:1</b> ≠ 4:5<br>自動重生第 2 次</div><div class="regenbox"><input placeholder="數字用 Q2 的…"><button>↻</button></div></div></div>
+      <div class="acell"><div class="acell__ph gen"><span class="acell__sq">05</span><span class="acell__rt">generating</span>生成中…</div><div class="acell__bd"><div class="acell__nm">05_資訊圖3_解法重點.png</div><div class="acell__ck">已排隊 · 異步 worker 處理中</div><div class="regenbox"><input placeholder="（生成中）" disabled><button>↻</button></div></div></div>
+      <div class="acell"><div class="acell__ph gen"><span class="acell__sq">06</span><span class="acell__rt">queued</span>已排隊</div><div class="acell__bd"><div class="acell__nm">06_資訊圖4_CTA.png</div><div class="acell__ck">已排隊 · 不阻塞前面幾張</div><div class="regenbox"><input placeholder="（排隊中）" disabled><button>↻</button></div></div></div>
+      <div class="acell"><div class="acell__ph"><span class="acell__sq">07</span><span class="acell__rt">1.91:1 ✓</span>橫版 · 網站 hero</div><div class="acell__bd"><div class="acell__nm">07_橫版封面_1000x525.png</div><div class="acell__ck">代碼層 <b>3/4</b><br><b>像素 1024×536</b>（近似）</div><div class="regenbox"><input placeholder="改一行指令…"><button>↻</button></div></div></div>
+    </div>
+
+    <div class="ckbar"><span class="cnt">4 / 6</span>已自動核對比例、尺寸、齊全、命名 <b>4 項</b> · 圖內數字 <b>2 項需你確認</b>
+      <span style="margin-left:auto;font-weight:400;font-size:10.5px">檢查 agent 的作用是<b>縮小你要看的範圍，不是替你看</b>——所以這裏沒有綠勾</span></div>
+
+    <div class="foot-note"><b>並行</b>：過 G2 後 6 張一次全部 enqueue，異步 worker 並行處理，先完成的先顯示——不阻塞在最後一張。<b>逐張重生</b>：只重生這一張（一次 image gen，不是六次），複用同 <code>generationRequestId</code>、同 seq 遞增 version 保留歷史。<b>校驗比 outputRatio</b>（實際產出）不比請求值——比請求值等於沒校驗。<br>⚠ 07 橫版：<code>1.91:1</code> 在枚舉內沒問題，但 enqueue 只能請求<b>比例</b>不能請求<b>精確像素</b>，1000×525 需要生成後 resize/crop（待拍板 B27：接受近似，還是加這一步）。</div>
+  </div></div>
+</div>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">來源驗證結果（本批已驗 8 條）<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">單軌之下這張圖就是質量儀表盤。要盯的是<b>失敗率</b>——長期高於 30% 代表模型在編造來源，那才是啟動「補第二條軌」討論的信號。</span>
+    <div class="dm-chart-area" data-chart="srcVerify"></div>
+  </section>
+  <section class="dm-card">
+    <div class="dm-title-card">池內 category 分佈 vs 頁面語料<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">BusinessFocus 本身已有 72% Business &amp; Finance。選題池遵守「同 category 最多 2 條」，避免一天五條都在講同一個大盤故事。</span>
+    <div class="dm-chart-area" data-chart="poolCat"></div>
+  </section>
+</div>
+
+<section class="ai-card">
+  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — 選題工作臺</div></div>
+  <div class="ai-card__sub">Grounded on run #34 · 20-topic pool · LLM-only discovery · Confidence: Medium</div>
+  <div class="ai-insight-item"><span class="ib ib-b">驗證</span><b>已驗 8 條，2 條被拒（25%）。</b>被拒的都是模型給的連結查不到或只有內容農場轉載。<b>這道驗證不能為了湊夠 20 條而放寬——單軌之下它是唯一擋住「編造報道」的東西。</b></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">並行收益</span><b>6 張串行約需 4–6 分鐘，並行後牆上時間 ≈ 最慢那一張。</b>04 這次比例不符自動重生了 2 次——串行時它會把後面 2 張一起拖住，並行時只有它自己在等。</div>
+  <div class="ai-insight-item alert"><span class="ib ib-r">前置未完成</span><b>模板圖還沒搬進 MediaLens <code>bf-templates/</code>。</b>沒有參照圖，<code>clone_creative</code> 錨不住模板、檢查 agent 也沒有對照物——<b>「生圖不穩定」這個痛點解不掉的一半原因在這裏</b>，而它從 v1 挂到現在。</div>
+  <div class="ai-card__ask"><input placeholder="Ask about the pool — e.g.「第 4 條為什麼驗證失敗？」"><button class="btn btn--primary btn--sm">Ask</button></div>
+</section>
+
+<details class="arch" style="margin-top:20px">
+  <summary>架構：為什麼主線（Ryan）不用再建一套</summary>
+  <div class="arch__bd">
+    <span class="dm-subtitle">四個 stage 用<b>通用對象</b>命名，BF 就退化成一份配置。品牌差異全部落三個對象，不 fork skill。</span>
+    <table class="dm-modern-table dm-modern-table--compact">
+      <thead><tr><th>Stage</th><th>通用對象</th><th>BF 配置</th><th>主線配置（將來）</th></tr></thead>
+      <tbody>
+        <tr><td><b>S1 候選</b></td><td><code>Candidate</code></td><td>選題 20/天 · LLM 單軌 + 來源驗證 + 評分</td><td>brief / idea 池</td></tr>
+        <tr><td><b>S2 文稿</b></td><td><code>Draft</code></td><td>8 區段文章（錨點 s1..s8）</td><td>copy variants（N 條）</td></tr>
+        <tr><td><b>S3 交付版本</b></td><td><code>Delivery</code> + <code>Asset[]</code></td><td>01 文章 + 02–07 六圖，固定模板與比例</td><td>N creative，比例自由</td></tr>
+        <tr><td><b>S4 post</b></td><td><code>publishPost[]</code></td><td>FB image + IG carousel</td><td><b>完全一樣</b></td></tr>
+      </tbody>
+    </table>
+    <div class="foot-note"><code>brand_profile</code>（調性/品牌色/字體）· <code>topic_policy</code>（選題規則）· <code>delivery_spec</code>（S2 產出什麼結構 / S3 產幾件什麼比例 / S4 拼裝配方）。<br><b>S4 兩邊完全一樣</b>——所以它最該做扎實，也最不該寫 BF 專用邏輯。三對象簽名分層<b>現在改是零行為變化</b>；等第二個品牌進來再改，就要 fork 一份 skill。</div>
+  </div>
+</details>
+
+</div>
+
+<div class="tab-panel" id="tab-lib">
+
+<div class="sec-head">
+  <div class="dm-title-section">發佈庫 — S4 · 拼裝好的成品在這裏 review、編輯、發布</div>
+  <span class="dm-subtitle">默認按<b>選題</b>分組——編輯的心智單位是「一個故事出兩條 post」。<b>by post</b> 是橫切視圖，用來做批量與回答「今天還有什麼沒發」。</span>
+</div>
+
+<div class="dm-kpi-row">
+  <div class="dm-kpi-card"><div class="kpi__label">待發布</div><div class="kpi__metric">2</div><div class="kpi__sub">1 個選題 · FB + IG</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">今日已發</div><div class="kpi__metric">4</div><div class="kpi__sub up">2 個選題</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Readiness</div><div class="kpi__metric">0 fail</div><div class="kpi__sub up">1 warn（IG 字數餘量）</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">已手改</div><div class="kpi__metric">1</div><div class="kpi__sub">override · 不會被自動重切覆蓋</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">FB caption</div><div class="kpi__metric">1,709</div><div class="kpi__sub">字 · s1..s7</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">IG caption</div><div class="kpi__metric">1,923</div><div class="kpi__sub up">字 · s1..s8 · ≤2,200 ✓</div></div>
+</div>
+
+<div class="subpill">
+  <button class="on">by 選題（默認）</button>
+  <button>by post</button>
+</div>
+
+<div class="tprow">
+  <div class="tprow__hd">
+    <span class="prog prog--ready"><i></i>待發布</span>
+    <div class="tprow__t">xAI 新一輪融資估值傳達 2000 億美元</div>
+    <span class="dm-meta-label">2 條 post · 7/7 產物 · score 79</span>
+    <span style="color:var(--dm-slate-400);font-size:12px">▾</span>
+  </div>
+  <div class="tprow__bd">
+    <div class="pv">
+      <div class="pv__hd">Facebook · image feed <span class="tg tg-b">s1..s7</span><span style="margin-left:auto" class="tg tg-n">1,709 字</span></div>
+      <div class="pv__md"><div class="th">02</div></div>
+      <div class="pv__cp">xAI 新一輪融資估值傳達 2000 億美元！馬斯克的 AI 帝國憑什麼撐起這個數字？【 @businessfocus.io 】【#BF社會熱話】 ⸺ 據多家外媒報道，xAI 正進行新一輪融資…</div>
+      <div class="pv__ft"><button class="btn btn--primary btn--sm">確認並發布</button><button class="btn btn--secondary btn--sm">編輯</button><span class="dm-meta-label" style="margin-left:auto">mediaItems [02]</span></div>
+    </div>
+    <div class="pv">
+      <div class="pv__hd">Instagram · carousel <span class="tg tg-p">s1..s8</span><span style="margin-left:auto" class="tg tg-n">1,923 字</span></div>
+      <div class="pv__md"><div class="th">02</div><div class="th">03</div><div class="th">04</div><div class="th">05</div><div class="th">06</div></div>
+      <div class="pv__cp">同一篇文章按錨點切出，再加 s8 固定文末聲明與品牌文字。五張圖依序：02 直版封面 → 03 事件拆解 → 04 痛點分析 → 05 解法重點 → 06 CTA。</div>
+      <div class="pv__ft"><button class="btn btn--primary btn--sm">確認並發布</button><button class="btn btn--secondary btn--sm">編輯</button><span class="dm-meta-label" style="margin-left:auto">mediaItems [02–06] 有序</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="tprow">
+  <div class="tprow__hd">
+    <span class="prog prog--pub"><i></i>已發布</span>
+    <div class="tprow__t">人民幣中間價連續第三日走強</div>
+    <span class="ovr">caption 已手改</span>
+    <span class="dm-meta-label">2 條 post · 今日 11:24 / 11:26</span>
+    <span style="color:var(--dm-slate-400);font-size:12px">▸</span>
+  </div>
+</div>
+
+<div class="tprow">
+  <div class="tprow__hd">
+    <span class="prog prog--pub"><i></i>已發布</span>
+    <div class="tprow__t">港樓按息連續兩月回落 · 供樓負擔比率</div>
+    <span class="dm-meta-label">2 條 post · 今日 09:12 / 09:15</span>
+    <span style="color:var(--dm-slate-400);font-size:12px">▸</span>
+  </div>
+</div>
+
+<div class="callout callout--b">
+  <div class="callout__title">post 是交付版本的<b>投影</b>，不是快照 —— 這條規則決定了誰的修改會被吃掉</div>
+  <div class="callout__body">交付版本變了（比如你重生了第 4 張圖）就<b>重新拼裝</b>——<b>除了</b>帶 override 標記的部分。<br>caption 是從文章切出來的，所以「文章變了就自動重切 caption」看起來非常順手，<b>但它會靜默蓋掉編輯剛手改完的東西，而他不會馬上發現</b>。所以：手改過就置 <code>overrides.caption</code>，此後只提示「文章已更新，是否用新版重切？（會覆蓋你的修改）」，<b>默認不覆蓋</b>。換過/排過 media 同理走 <code>overrides.media</code>。<br>反過來做成一次性快照，你就得處理「v1 拼的 post 配 v2 的圖」這種髒狀態。</div>
+  <div class="callout__meta"><span>字段: <b>BFPost.overrides{caption,media}</b></span><span>默認: <b>不覆蓋</b></span><span>本頁 override: <b>1 條</b></span></div>
+</div>
+
+<section class="dm-card">
+  <div class="dm-title-card">編輯：直接複用現有彈窗，BF 不新建編輯器<span class="dmode dmode-live">LIVE</span></div>
+  <span class="dm-subtitle">「編輯」按鈕挂的是 Content Publish 已在跑的那兩個彈窗。打開即置對應的 override 標記。</span>
+  <table class="dm-modern-table dm-modern-table--compact">
+    <thead><tr><th>平台</th><th>組件</th><th>已有能力</th></tr></thead>
+    <tbody>
+      <tr><td>Facebook</td><td><code>publish/EditPostModal.vue</code><div class="dm-cell-sub">1,735 行</div></td>
+          <td>caption 編輯 · <b>MediaStrip</b>（增/刪/拖拽排序，index = 閱讀順序）· Assets 選取 · 本地上傳（逐個按選取順序）· 服務端逐字校驗提示</td></tr>
+      <tr><td>Instagram</td><td><code>publish/IgEditPostModal.vue</code><div class="dm-cell-sub">1,794 行</div></td>
+          <td>同上 + <b>caption 字數 / hashtag / mention 計數與上限</b>（igCaptionRules）· carousel readiness 提示（比例不一致 / carousel 只剩一張）</td></tr>
+    </tbody>
+  </table>
+  <div class="foot-note">⚠ <b>hashtag 口徑纠正</b>：之前建議「不設硬上限只警告」是<b>錯的</b>——<code>IgEditPostModal</code> 已有 <code>captionCounts.hashtags / captionLimits.hashtags</code>，且 <code>canSave</code> 被 caption gate 卡住，<b>現有 app 已經是硬閘門</b>。BF 跟現有規則一致，不另立一套。此待拍板項關閉。</div>
+</section>
+
+<section class="dm-card">
+  <div class="dm-title-card">拼裝：不是要建，是要接<span class="dmode dmode-live">LIVE</span></div>
+  <span class="dm-subtitle">「手動拼接」這個痛點的答案——現成腳本已經支持我們需要的全部參數。BF 唯一要新寫的是 s1..s8 錨點切段。</span>
+  <div class="chk"><span class="ok">✓</span><b>full-post-gen/scripts/assemble_post_draft.py</b><span class="meta"><span class="tg tg-g">已具備</span></span></div>
+  <div style="font:400 11.5px/1.9 var(--font-body);color:var(--dm-slate-600);padding:8px 0 0 4px">
+    <code>--caption</code> 全文 · <code>--media-asset-ids</code>（複數 = carousel）· <code>--platform</code> · <code>--page-id</code> / <code>--ig-user-id</code> · <code>--created-via</code> · <code>--aspect-ratio</code>
+  </div>
+  <div class="foot-note">BF 調它<b>兩次</b>：FB（<code>--platform facebook --media-asset-ids 02</code>）/ IG（<code>--platform instagram --media-asset-ids 02..06</code>），都帶 <code>--created-via bf_agent</code>。<br>⚠ <b>前置</b>：<code>bf_agent</code> 要先加進 <code>createdVia</code> 枚舉，而這<b>不是 1 行改動</b>——<code>constants/agentSources.js</code> 是權威源，另有兩份逐字鏡像（前端 <code>utils/agentSource.js</code> + ADK full-post-gen common），<b>parity 測試會挂</b>。ADD-ONLY，只能追加不能改名。<br>拼裝<b>禁止用 LLM 重寫</b>：可重現、零幻覺、失敗可定位。缺區段 / 圖不齊 / 比例錯 → 整條 post 不建立，交付標 failed 並回報是哪一項。</div>
+</section>
+
+<div class="action-row">
+  <button class="btn btn--primary">確認並發布（2 條）</button>
+  <button class="btn btn--secondary">只發 FB</button>
+  <span class="who"><b>G3</b> · 走 Content Publish <b>已在用的同一條發布鏈路、同一條 publishPost 記錄</b>——不重建發布後端、不新增 Meta 依賴。權限 = <b>Page role</b>（admin / manager / editor 可發；analyst &amp; sales 不可 —— ⚠ 這條軸不是 Pause Ad 的 ad-account role 軸）。Readiness 有 fail 時按鈕禁用並列出原因；warn 可發但要顯式確認一次。<b>v2 不排期、不定時發</b>。</span>
+</div>
+
+<section class="ai-card">
+  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — 發佈庫</div></div>
+  <div class="ai-card__sub">Grounded on golden sample 契約 · 拼裝驗證日誌 · Readiness 規則 · Confidence: Medium</div>
+  <div class="ai-insight-item"><span class="ib ib-b">契約</span><b>錨點契約是整條流水線最便宜的保險。</b>8 個 sN 錨點讓拼裝零猜測，歷史驗證失敗全部可定位到具體區段或圖。<b>writing skill 升版時錨點 schema 不許動——它是 assemble 的輸入契約。</b></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">長度</span><b>IG caption 1,923 字距離 2,200 上限只有 277 字餘量</b>，而 s8 免責段約 180 字。文章任何一段加長都可能觸發截斷回報。<b>把段長上限寫進 writing skill 的生成約束，而不是事後截。</b></div>
+  <div class="ai-insight-item alert"><span class="ib ib-r">覆蓋</span><b>最容易吃掉編輯工作的地方就在這一頁。</b>「文章變了就重切 caption」是最順手的實現，也是最會出事的實現——它靜默、不可見、發現得晚。<b>override 默認不覆蓋這條規則，比任何校驗都重要。</b></div>
+  <div class="ai-card__ask"><input placeholder="Ask about assembly — e.g.「IG 超字數會怎麼處理？」"><button class="btn btn--primary btn--sm">Ask</button></div>
+</section>
+
+</div>
+
+</div></main>
+<div class="proto-badge">PRODUCT PROTOTYPE v2.0 · BF</div>
+
+<script>
+/* ── tabs ── */
+document.querySelectorAll('.dm-page-menu .menu-item').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.dm-page-menu .menu-item').forEach(function(b){b.classList.remove('is-active')});
+    btn.classList.add('is-active');
+    document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active')});
+    var el=document.getElementById('tab-'+btn.dataset.tab); if(el)el.classList.add('active');
+    window.scrollTo(0,0);
+  });
+});
+/* ── by 選題 / by post 子視圖 ── */
+document.querySelectorAll('.subpill button').forEach(function(b){
+  b.addEventListener('click',function(){
+    b.parentNode.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});
+    b.classList.add('on');
+  });
+});
+/* ── 選題條目展開 ── */
+document.querySelectorAll('.tprow__hd').forEach(function(h){
+  h.addEventListener('click',function(){
+    var bd=h.parentNode.querySelector('.tprow__bd');
+    var cv=h.querySelector('span:last-child');
+    if(bd){ var open=bd.style.display!=='none'&&bd.offsetParent!==null;
+      bd.style.display=open?'none':'grid'; if(cv)cv.textContent=open?'\u25B8':'\u25BE'; }
+  });
+});
+/* ── 詳情段落摺疊 ── */
+document.querySelectorAll('.seg__hd').forEach(function(h){
+  h.addEventListener('click',function(){
+    var bd=h.parentNode.querySelector('.seg__bd');
+    if(bd) bd.style.display = (bd.style.display==='none') ? 'block' : 'none';
+  });
+});
+</script>
+
+<script>
+var NS='http://www.w3.org/2000/svg';
+function E(n,a,txt){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;return e}
+function TT(el,s){el.appendChild(E('title',{},s))}
+var GRID='#E4E7ED',AXT='#707070',FA="'Lato',sans-serif",FM="'Roboto',sans-serif";
+var W=640,H=300,M={t:16,r:52,b:40,l:48};
+function pw(){return W-M.l-M.r} function ph(){return H-M.t-M.b}
+function chart(id,cfg){
+  var host=document.querySelector('[data-chart="'+id+'"]');if(!host)return;
+  if(cfg.legend){var lg=document.createElement('div');lg.className='legend-row';
+    cfg.legend.forEach(function(l){var li=document.createElement('span');li.className='li';
+      var sw=document.createElement('span');sw.className=l.round?'dotc':'linec';sw.style.background=l.color;
+      if(l.dash){sw.style.background='none';sw.style.borderTop='2px dashed '+l.color;sw.style.height='0';sw.style.width='14px';sw.style.borderRadius='0'}
+      li.appendChild(sw);li.appendChild(document.createTextNode(l.label));lg.appendChild(li)});
+    host.parentNode.insertBefore(lg,host)}
+  var svg=E('svg',{viewBox:'0 0 '+W+' '+H,preserveAspectRatio:'xMidYMid meet'});host.appendChild(svg);
+  var yMin=cfg.yMin||0,yMax=cfg.yMax,y2Max=cfg.y2Max||0;
+  function Y(v){if(cfg.log){var lo=Math.log10(cfg.logMin||1),hi=Math.log10(yMax);return M.t+ph()*(1-(Math.log10(Math.max(v,cfg.logMin||1))-lo)/(hi-lo))}
+    return M.t+ph()*(1-(v-yMin)/(yMax-yMin))}
+  function Y2(v){return M.t+ph()*(1-v/y2Max)}
+  var n=cfg.labels?cfg.labels.length:0,bw=n?pw()/n:0;
+  function X(i){return M.l+(i+0.5)*bw}
+  function XV(v){return M.l+pw()*((v-cfg.xMin)/(cfg.xMax-cfg.xMin))}
+  /* gridlines + y ticks */
+  var ticks=cfg.yTicks||5;
+  for(var i=0;i<=ticks;i++){var tv=yMin+(yMax-yMin)*i/ticks,ty=cfg.log?null:Y(tv);
+    if(cfg.log)continue;
+    svg.appendChild(E('line',{x1:M.l,x2:W-M.r,y1:ty,y2:ty,stroke:GRID,'stroke-dasharray':'3,3','stroke-width':1}));
+    svg.appendChild(E('text',{x:M.l-6,y:ty+3,'text-anchor':'end','font-size':9,'font-family':FM,fill:AXT},cfg.yFmt?cfg.yFmt(tv):(+tv.toFixed(1))));}
+  if(cfg.log){[100,30,10,3,1].forEach(function(tv){if(tv>yMax)return;var ty=Y(tv);
+    svg.appendChild(E('line',{x1:M.l,x2:W-M.r,y1:ty,y2:ty,stroke:GRID,'stroke-dasharray':'3,3','stroke-width':1}));
+    svg.appendChild(E('text',{x:M.l-6,y:ty+3,'text-anchor':'end','font-size':9,'font-family':FM,fill:AXT},tv+'%'))})}
+  if(y2Max){for(var j=0;j<=4;j++){var t2=y2Max*j/4;
+    svg.appendChild(E('text',{x:W-M.r+8,y:Y2(t2)+3,'font-size':9,'font-family':FM,fill:AXT},cfg.y2Fmt?cfg.y2Fmt(t2):t2))}}
+  /* x labels */
+  (cfg.labels||[]).forEach(function(lb,i){
+    var t=E('text',{x:X(i),y:H-M.b+14,'text-anchor':'middle','font-size':9,'font-family':FA,fill:AXT},lb);
+    if(cfg.tiltX){t.setAttribute('transform','rotate(-24 '+X(i)+' '+(H-M.b+14)+')');t.setAttribute('text-anchor','end')}
+    svg.appendChild(t)});
+  if(cfg.xTitle)svg.appendChild(E('text',{x:M.l+pw()/2,y:H-4,'text-anchor':'middle','font-size':9.5,'font-family':FA,fill:AXT},cfg.xTitle));
+  if(cfg.yTitle)svg.appendChild(E('text',{x:11,y:M.t+ph()/2,'text-anchor':'middle','font-size':9.5,'font-family':FA,fill:AXT,transform:'rotate(-90 11 '+(M.t+ph()/2)+')'},cfg.yTitle));
+  if(cfg.y2Title)svg.appendChild(E('text',{x:W-8,y:M.t+ph()/2,'text-anchor':'middle','font-size':9.5,'font-family':FA,fill:AXT,transform:'rotate(90 '+(W-8)+' '+(M.t+ph()/2)+')'},cfg.y2Title));
+  /* layers */
+  var barGroups=(cfg.layers||[]).filter(function(l){return l.type==='bar'&&!l.stack});
+  (cfg.layers||[]).forEach(function(l){
+    if(l.type==='bar'&&!l.stack){
+      var gi=barGroups.indexOf(l),gn=barGroups.length,w=Math.min(bw*0.62/gn,34);
+      l.data.forEach(function(v,i){if(v==null)return;
+        var x=X(i)-(gn*w)/2+gi*w,y=(l.axis==='y2'?Y2(v):Y(v)),base=(l.axis==='y2'?Y2(0):Y(0));
+        var r=E('rect',{x:x,y:y,width:w-2,height:Math.max(base-y,0),rx:2,fill:(l.colors?l.colors[i]:l.color),opacity:l.opacity!=null?(Array.isArray(l.opacity)?l.opacity[i]:l.opacity):1});
+        TT(r,(cfg.labels?cfg.labels[i]+': ':'')+v+(l.tt?' — '+(Array.isArray(l.tt)?l.tt[i]:l.tt):''));svg.appendChild(r)});
+    }
+    if(l.type==='stackbar'){
+      var w2=Math.min(bw*0.55,34),acc=[];
+      l.series.forEach(function(s){s.data.forEach(function(v,i){acc[i]=acc[i]||0;
+        var y0=Y(acc[i]),y1=Y(acc[i]+v);
+        var r=E('rect',{x:X(i)-w2/2,y:y1,width:w2,height:y0-y1,fill:s.color});
+        TT(r,cfg.labels[i]+' · '+s.label+': '+v);svg.appendChild(r);acc[i]+=v})});
+    }
+    if(l.type==='stackarea'){
+      var accA=cfg.labels.map(function(){return 0});
+      l.series.forEach(function(s){
+        var pts0=accA.slice(),pts1=accA.map(function(a,i){return a+s.data[i]});
+        var d='M'+X(0)+' '+Y(pts1[0]);pts1.forEach(function(v,i){if(i)d+=' L'+X(i)+' '+Y(v)});
+        for(var i=pts0.length-1;i>=0;i--)d+=' L'+X(i)+' '+Y(pts0[i]);d+=' Z';
+        svg.appendChild(E('path',{d:d,fill:s.color,opacity:0.55}));
+        var dl='M'+X(0)+' '+Y(pts1[0]);pts1.forEach(function(v,i){if(i)dl+=' L'+X(i)+' '+Y(v)});
+        svg.appendChild(E('path',{d:dl,fill:'none',stroke:s.color,'stroke-width':1.5}));
+        accA=pts1});
+    }
+    if(l.type==='line'){
+      var d='',started=false;
+      l.data.forEach(function(v,i){if(v==null){return}var px=X(i),py=(l.axis==='y2'?Y2(v):Y(v));
+        d+=(started?' L':'M')+px+' '+py;started=true});
+      if(l.fill){var dd=d;var lastIdx=l.data.length-1;while(l.data[lastIdx]==null)lastIdx--;
+        dd+=' L'+X(lastIdx)+' '+Y(yMin)+' L'+X(0)+' '+Y(yMin)+' Z';
+        svg.appendChild(E('path',{d:dd,fill:l.color,opacity:0.10}))}
+      var p=E('path',{d:d,fill:'none',stroke:l.color,'stroke-width':2});
+      if(l.dash)p.setAttribute('stroke-dasharray','5,4');svg.appendChild(p);
+      if(l.points!==false)l.data.forEach(function(v,i){if(v==null)return;
+        var c=E('circle',{cx:X(i),cy:(l.axis==='y2'?Y2(v):Y(v)),r:3,fill:'#FFF',stroke:l.color,'stroke-width':1.8});
+        TT(c,(cfg.labels?cfg.labels[i]+': ':'')+v);svg.appendChild(c)});
+    }
+    if(l.type==='hline'){var hy=(l.axis==='y2'?Y2(l.y):Y(l.y));
+      svg.appendChild(E('line',{x1:M.l,x2:W-M.r,y1:hy,y2:hy,stroke:l.color,'stroke-width':1.6,'stroke-dasharray':'6,4'}));
+      if(l.label)svg.appendChild(E('text',{x:W-M.r-4,y:hy-5,'text-anchor':'end','font-size':9,'font-family':FA,fill:l.color},l.label));}
+    if(l.type==='vline'){var vx=XV(l.x);
+      svg.appendChild(E('line',{x1:vx,x2:vx,y1:M.t,y2:H-M.b,stroke:l.color,'stroke-width':1.4,'stroke-dasharray':'5,4'}));
+      if(l.label)svg.appendChild(E('text',{x:vx+4,y:M.t+10,'font-size':9,'font-family':FA,fill:l.color},l.label));}
+    if(l.type==='fitline'){
+      svg.appendChild(E('line',{x1:XV(l.x1),y1:Y(l.y1),x2:XV(l.x2),y2:Y(l.y2),stroke:l.color,'stroke-width':1.8,'stroke-dasharray':'6,4'}));
+      if(l.label)svg.appendChild(E('text',{x:XV(l.x2)-4,y:Y(l.y2)-8,'text-anchor':'end','font-size':9,'font-family':FA,fill:l.color},l.label));}
+    if(l.type==='scatter'){
+      l.points.forEach(function(pt){var px=(cfg.xMin!=null?XV(pt.x):X(pt.x)),py=Y(pt.y);
+        var m;if(l.shape==='tri'){m=E('path',{d:'M'+px+' '+(py-5)+' L'+(px+5)+' '+(py+4)+' L'+(px-5)+' '+(py+4)+' Z',fill:l.color})}
+        else{m=E('circle',{cx:px,cy:py,r:l.r||3.5,fill:l.color,opacity:l.opacity||0.75})}
+        TT(m,(pt.t||('('+pt.x+', '+pt.y+')')));svg.appendChild(m)});
+    }
+    if(l.type==='xnums'){ /* numeric x ticks for scatter charts */
+      l.ticks.forEach(function(tv){var px=XV(tv);
+        svg.appendChild(E('text',{x:px,y:H-M.b+14,'text-anchor':'middle','font-size':9,'font-family':FM,fill:AXT},tv))});
+    }
+  });
+  /* plot frame baseline */
+  svg.appendChild(E('line',{x1:M.l,x2:W-M.r,y1:H-M.b,y2:H-M.b,stroke:'#CBD5E1','stroke-width':1}));
+}
+function donut(id,cfg){
+  var host=document.querySelector('[data-chart="'+id+'"]');if(!host)return;
+  var svg=E('svg',{viewBox:'0 0 '+W+' '+H});host.appendChild(svg);
+  var cx=200,cy=150,R=95,r=58,total=cfg.data.reduce(function(a,b){return a+b.v},0),a0=-Math.PI/2;
+  cfg.data.forEach(function(s){
+    var a1=a0+s.v/total*Math.PI*2,large=(a1-a0)>Math.PI?1:0;
+    var d='M'+(cx+R*Math.cos(a0))+' '+(cy+R*Math.sin(a0))+' A'+R+' '+R+' 0 '+large+' 1 '+(cx+R*Math.cos(a1))+' '+(cy+R*Math.sin(a1))+
+      ' L'+(cx+r*Math.cos(a1))+' '+(cy+r*Math.sin(a1))+' A'+r+' '+r+' 0 '+large+' 0 '+(cx+r*Math.cos(a0))+' '+(cy+r*Math.sin(a0))+' Z';
+    var p=E('path',{d:d,fill:s.c,stroke:'#FFF','stroke-width':2});TT(p,s.l+': '+s.v+(s.tt?' — '+s.tt:''));svg.appendChild(p);
+    a0=a1});
+  cfg.data.forEach(function(s,i){
+    var ly=70+i*34;
+    svg.appendChild(E('circle',{cx:390,cy:ly-4,r:5,fill:s.c}));
+    svg.appendChild(E('text',{x:404,y:ly,'font-size':11.5,'font-family':FA,fill:'#334155'},s.l+' ('+s.v+')'));
+    if(s.tt)svg.appendChild(E('text',{x:404,y:ly+13,'font-size':9.5,'font-family':FA,fill:'#94A3B8'},s.tt));});
+}
+function radar(id,cfg){
+  var host=document.querySelector('[data-chart="'+id+'"]');if(!host)return;
+  var svg=E('svg',{viewBox:'0 0 '+W+' '+H});host.appendChild(svg);
+  var cx=W/2,cy=H/2+6,R=100,n=cfg.axes.length;
+  function pt(i,v){var a=-Math.PI/2+i*2*Math.PI/n,rr=R*v/cfg.max;return[cx+rr*Math.cos(a),cy+rr*Math.sin(a)]}
+  [0.25,0.5,0.75,1].forEach(function(f){
+    var d='';for(var i=0;i<n;i++){var p=pt(i,cfg.max*f);d+=(i?' L':'M')+p[0]+' '+p[1]}d+=' Z';
+    svg.appendChild(E('path',{d:d,fill:'none',stroke:GRID,'stroke-width':1}))});
+  for(var i=0;i<n;i++){var p=pt(i,cfg.max);
+    svg.appendChild(E('line',{x1:cx,y1:cy,x2:p[0],y2:p[1],stroke:GRID,'stroke-width':1}));
+    var lp=pt(i,cfg.max*1.22);
+    svg.appendChild(E('text',{x:lp[0],y:lp[1]+3,'text-anchor':'middle','font-size':10,'font-family':FA,fill:'#475569'},cfg.axes[i]))}
+  cfg.series.forEach(function(s){
+    var d='';for(var i=0;i<n;i++){var p=pt(i,s.data[i]);d+=(i?' L':'M')+p[0]+' '+p[1]}d+=' Z';
+    var path=E('path',{d:d,fill:s.c,'fill-opacity':0.12,stroke:s.c,'stroke-width':2});
+    if(s.dash)path.setAttribute('stroke-dasharray','5,4');svg.appendChild(path);
+    for(var i=0;i<n;i++){var p=pt(i,s.data[i]);var c=E('circle',{cx:p[0],cy:p[1],r:2.6,fill:s.c});TT(c,cfg.axes[i]+' · '+s.l+': '+s.data[i]+'%');svg.appendChild(c)}});
+}
+function hbar(id,cfg){
+  var host=document.querySelector('[data-chart="'+id+'"]');if(!host)return;
+  if(cfg.legend){var lg=document.createElement('div');lg.className='legend-row';
+    cfg.legend.forEach(function(l){var li=document.createElement('span');li.className='li';
+      var sw=document.createElement('span');sw.className='dotc';sw.style.background=l.color;li.appendChild(sw);
+      li.appendChild(document.createTextNode(l.label));lg.appendChild(li)});
+    host.parentNode.insertBefore(lg,host)}
+  var HH=cfg.h||300;
+  var svg=E('svg',{viewBox:'0 0 '+W+' '+HH});host.appendChild(svg);
+  var ml=150,mr=40,mt=10,mb=26,n=cfg.labels.length,rowH=(HH-mt-mb)/n;
+  function XX(v){return ml+(W-ml-mr)*(v/cfg.xMax)}
+  for(var i=0;i<=4;i++){var tv=cfg.xMax*i/4,tx=XX(tv);
+    svg.appendChild(E('line',{x1:tx,x2:tx,y1:mt,y2:HH-mb,stroke:GRID,'stroke-dasharray':'3,3','stroke-width':1}));
+    svg.appendChild(E('text',{x:tx,y:HH-mb+13,'text-anchor':'middle','font-size':9,'font-family':FM,fill:AXT},cfg.xFmt?cfg.xFmt(tv):tv))}
+  var gn=cfg.series.length,bh=Math.min(rowH*0.6/gn,14);
+  cfg.labels.forEach(function(lb,i){
+    svg.appendChild(E('text',{x:ml-8,y:mt+rowH*i+rowH/2+3,'text-anchor':'end','font-size':10,'font-family':FA,fill:'#475569'},lb));
+    cfg.series.forEach(function(s,si){var v=s.data[i];if(v==null)return;
+      var y=mt+rowH*i+rowH/2-(gn*bh)/2+si*bh;
+      var r=E('rect',{x:ml,y:y,width:XX(v)-ml,height:bh-1.5,rx:2,fill:(s.colors?s.colors[i]:s.color)});
+      TT(r,lb+' · '+(s.label||'')+': '+v+(s.tt?' — '+s.tt[i]:''));svg.appendChild(r)})});
+  if(cfg.xTitle)svg.appendChild(E('text',{x:ml+(W-ml-mr)/2,y:HH-2,'text-anchor':'middle','font-size':9.5,'font-family':FA,fill:AXT},cfg.xTitle));
+}
+
+/* ══ BF Chart configs ══ */
+
+var BLUE='#3B82F6',GREEN='#10B981',GREY='#CBD5E1',RED='#EF4444',AMBER='#F59E0B',PURPLE='#8B5CF6',TEAL='#14B8A6';
+
+donut('srcVerify',{data:[
+  {l:'通過（≥4 來源）',v:3,c:GREEN,tt:'重搜到 4 個或以上獨立真實報道'},
+  {l:'通過（2–3 來源）',v:3,c:BLUE,tt:'達到 ≥2 獨立來源門檻'},
+  {l:'失敗 · 來源查不到',v:1,c:RED,tt:'模型給的連結不存在或無法核實'},
+  {l:'失敗 · 只有單一來源',v:1,c:AMBER,tt:'只搜到內容農場轉載'},
+  {l:'尚未觸發驗證',v:12,c:GREY,tt:'懶驗證——編輯還沒打開這些候選'}]});
+
+chart('poolCat',{labels:['Business & Finance','News & Current Affairs','Tech & Innovation','Society & Culture','Lifestyle & P.D.'],yMax:80,yTitle:'%',tiltX:true,yFmt:function(v){return v+'%'},
+  legend:[{label:'今日池佔比 %',color:BLUE,round:true},{label:'頁面語料佔比 %（FB 90D）',color:GREY,round:true}],
+  layers:[{type:'bar',data:[45,20,15,10,10],color:BLUE,tt:['9 條','4 條','3 條','2 條','2 條']},
+          {type:'bar',data:[72.0,17.5,16.8,22.4,4.9],color:GREY,tt:['103 posts','25 posts','24 posts','32 posts','7 posts']}]});
+</script>
+</body></html>
