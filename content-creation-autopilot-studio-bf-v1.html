@@ -397,6 +397,11 @@ a{text-decoration:none;color:inherit}
 .explain__nav{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .recipe-bar{display:flex;gap:3px;margin:10px 0 6px}
 .recipe-bar .rseg{flex:1;text-align:center;font:700 9px/1 var(--font-metric);padding:7px 2px;border-radius:4px}
+
+.rmbanner{display:flex;align-items:flex-start;gap:10px;background:#FFF8E6;border:1px solid #F2D98C;border-radius:12px;padding:12px 16px;margin-bottom:16px}
+.rmbanner .rmb-tag{flex:0 0 auto;background:#B8860B;color:#fff;border-radius:6px;padding:2px 8px;font:700 10px var(--font-body);letter-spacing:.04em;margin-top:1px}
+.rmbanner .rmb-t{font:600 12.5px var(--font-body);color:#6B4E00;line-height:1.55}
+.rmbanner .rmb-t b{color:#4A3600}
 </style>
 </head>
 <body>
@@ -440,7 +445,7 @@ a{text-decoration:none;color:inherit}
 <main class="ml-main"><div class="ml-content">
 
 <div class="dm-title-page">Creation &amp; Autopilot Studio — BF</div>
-<div class="dm-page-sub">The BusinessFocus autopilot use case: a daily topic pool assembled by two discovery tracks, editor-confirmed, then generated, assembled, scored and queued — the same Studio flow, with topics as the new front door.</div>
+<div class="dm-page-sub"><b>v1 上線範圍</b>：每日自動選題（LLM 軌）→ 編輯挑題 → 生成文章 → <b>編輯確認（唯一闸门）</b> → 出 6 圖與 2 條 post → 落 Content Publish 草稿區由編輯自己發。<b>v1 不做</b>定時發布、Calendar、Autopilot、雙軌選題。</div>
 
 <nav class="dm-page-menu"><div class="menu-list">
   <button class="menu-item is-active" data-tab="topic">Topic Studio</button>
@@ -450,6 +455,7 @@ a{text-decoration:none;color:inherit}
   <button class="menu-item" data-tab="score">Pre-flight Score</button>
   <button class="menu-item" data-tab="calendar">Calendar</button>
   <button class="menu-item" data-tab="autopilot">Autopilot</button>
+  <span style="align-self:center;margin-left:10px;font:600 10px var(--font-body);color:var(--dm-slate-400);white-space:nowrap">v1 上線 = Topic + Post ｜ 其餘為路線圖</span>
 </div></nav>
 
 <div class="dm-controls-row">
@@ -480,32 +486,32 @@ a{text-decoration:none;color:inherit}
 
 <div class="sec-head">
   <div class="dm-title-section">Topic Studio — 選題、證據、文章，都在這一頁</div>
-  <span class="dm-subtitle">每天 10:00 HKT 兩條發現軌建 20 條選題池；確認一條就<b>立刻生成文章</b>。這一頁是編輯唯一的內容闸门——文章通過了才去做 6 張圖（成本 1:6，一題被否只浪費一篇文章而不是六張圖）。也可以<b>手動錄入</b>：給題目讓 skill 擴展，或直接貼已寫好的稿。</span>
+  <span class="dm-subtitle">每天 10:00 HKT 自動找題（<b>v1 只走 LLM 一條軌</b>：用 editor 原本那段 ChatGPT 選題 prompt，已固化進 skill）；確認一條就<b>立刻生成文章</b>。這一頁是編輯唯一的內容闸门——文章通過了才去做 6 張圖（成本 1:6，一題被否只浪費一篇文章）。也可以<b>手動錄入</b>：給題目讓 skill 擴展，或直接貼已寫好的稿。</span>
 </div>
 
 <div class="stagebar">
-  <div class="stg done">① 建池<span class="sub">cron 10:00 · 雙軌 20 條</span></div>
+  <div class="stg done">① 找題<span class="sub">cron 10:00 · LLM 軌 20 條</span></div>
   <div class="stg done">② 確認並生成文章<span class="sub">research pack + 01 文章</span></div>
   <div class="stg now">③ 文章闸门<span class="sub">編輯在此確認 ← 你在這裡</span></div>
   <div class="stg">④ 生成 6 圖 + 組 post<span class="sub">02–07 + FB/IG</span></div>
-  <div class="stg">⑤ 審批 → 排期<span class="sub">Calendar</span></div>
+  <div class="stg">⑤ 落草稿區<span class="sub">Content Publish · 編輯自己發</span></div>
 </div>
 
 <div class="dm-kpi-row">
-  <div class="dm-kpi-card"><div class="kpi__label">Today's pool</div><div class="kpi__metric">20</div><div class="kpi__sub">run #34 · 10:00:12 HKT</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">Trends 轨命中</div><div class="kpi__metric">11</div><div class="kpi__sub">google_trends · HK · 24h</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">LLM (skill) 轨命中</div><div class="kpi__metric">6</div><div class="kpi__sub up">已重搜验证 · 2 条被拒</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">今日候選</div><div class="kpi__metric">20</div><div class="kpi__sub">run #34 · 10:00:12 HKT · LLM 軌</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">通過來源驗證</div><div class="kpi__metric">14</div><div class="kpi__sub up">≥2 個獨立真實報道</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">驗證被拒</div><div class="kpi__metric">6</div><div class="kpi__sub down">模型給的來源查不到 · 已留檔</div></div>
   <div class="dm-kpi-card"><div class="kpi__label">手動錄入</div><div class="kpi__metric">2</div><div class="kpi__sub">不佔 daily_count 配額</div></div>
   <div class="dm-kpi-card"><div class="kpi__label">文章已就緒</div><div class="kpi__metric">3</div><div class="kpi__sub up">待編輯確認</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">Degraded</div><div class="kpi__metric">0</div><div class="kpi__sub up">未触发降级链</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">待確認文章</div><div class="kpi__metric">3</div><div class="kpi__sub">編輯闸门</div></div>
 </div>
 
 <section class="dm-card">
-  <div class="dm-title-card">Discovery configuration<span class="dmode dmode-live">LIVE</span></div>
-  <span class="dm-subtitle">v1 四個能力字段鎖定只讀。mode pills 顯示 BFSchedule.discovery_mode 當前值——trends 先行，ChatGPT 軌補差額並作為最後一級降級。</span>
+  <div class="dm-title-card">排程與規則（v1 只讀）<span class="dmode dmode-live">LIVE</span></div>
+  <span class="dm-subtitle">v1 不做獨立的 Autopilot tab——排程配置與能力版本在這裡只讀展示。選題模式固定 <b>llm_only</b>（單軌），雙軌與降級鏈屬路線圖。</span>
   <div class="dm-controls-row" style="padding:0 0 12px">
-    <span class="dm-ctl-label">Discovery mode</span>
-    <div class="pill-row" style="margin-bottom:0"><button class="pill is-active">trends_first</button><button class="pill">cross_check</button><button class="pill">llm_only</button></div>
+    <span class="dm-ctl-label">選題模式</span>
+    <div class="pill-row" style="margin-bottom:0"><button class="pill is-active">llm_only 🔒</button><button class="pill" style="opacity:.45">trends_first（路線圖）</button><button class="pill" style="opacity:.45">cross_check（路線圖）</button></div>
     <span class="spacer"></span>
     <button class="btn btn--primary btn--sm" id="btnManual">+ 手動錄入</button>
   </div>
@@ -550,19 +556,19 @@ a{text-decoration:none;color:inherit}
   <section class="dm-card md-list" style="padding:0">
     <div style="padding:20px 20px 0">
       <div class="dm-title-card">Today's topic pool — 24 Aug 2026<span class="dmode dmode-mock">MOCK</span></div>
-      <span class="dm-subtitle">點任一列在右側看證據與文章。score 為 100 分制（手動錄入 = —）。</span>
+      <span class="dm-subtitle">點任一列在右側看證據與文章。score 為 100 分制（手動錄入 = —）。v1 全部候選來自 LLM 軌 + 來源驗證。</span>
     </div>
     <div class="dm-table-scroll"><table class="dm-modern-table dm-modern-table--compact">
       <thead><tr><th></th><th>#</th><th>Topic</th><th>Score</th><th>Origin</th><th>State</th></tr></thead>
       <tbody>
-        <tr class="is-sel"><td>☑</td><td class="num">1</td><td>英偉達財報前夕美股 AI 板塊震盪 港股科技股連鎖反應點睇？<div class="dm-cell-sub">Trends ↑#3 +180% · 雙軌 · 4 來源</div></td><td class="num"><b>87</b></td><td><span class="origin origin-pool">pool</span></td><td><span class="tg tg-g">文章就緒</span></td></tr>
-        <tr><td>☑</td><td class="num">2</td><td>人民幣中間價創逾一年新高 出口商結匯潮對聯繫匯率有咩壓力<div class="dm-cell-sub">Trends #11 · 3 來源</div></td><td class="num">84</td><td><span class="origin origin-pool">pool</span></td><td><span class="tg tg-g">文章就緒</span></td></tr>
-        <tr><td>☑</td><td class="num">3</td><td>香港加密幣投資平台懷疑詐騙案 警方拘 12 人涉款 2.3 億<div class="dm-cell-sub">LLM (skill) · 已重搜驗證 ✓ · 3 來源</div></td><td class="num">81</td><td><span class="origin origin-pool">pool</span></td><td><span class="tg tg-g">文章就緒</span></td></tr>
+        <tr class="is-sel"><td>☑</td><td class="num">1</td><td>英偉達財報前夕美股 AI 板塊震盪 港股科技股連鎖反應點睇？<div class="dm-cell-sub">LLM 軌 · 已重搜驗證 ✓ · 4 來源（含 1 個原始資料）</div></td><td class="num"><b>87</b></td><td><span class="origin origin-pool">pool</span></td><td><span class="tg tg-g">文章就緒</span></td></tr>
+        <tr><td>☑</td><td class="num">2</td><td>人民幣中間價創逾一年新高 出口商結匯潮對聯繫匯率有咩壓力<div class="dm-cell-sub">LLM 軌 · 已重搜驗證 ✓ · 3 來源</div></td><td class="num">84</td><td><span class="origin origin-pool">pool</span></td><td><span class="tg tg-g">文章就緒</span></td></tr>
+        <tr><td>☑</td><td class="num">3</td><td>香港加密幣投資平台懷疑詐騙案 警方拘 12 人涉款 2.3 億<div class="dm-cell-sub">LLM 軌 · 已重搜驗證 ✓ · 3 來源</div></td><td class="num">81</td><td><span class="origin origin-pool">pool</span></td><td><span class="tg tg-g">文章就緒</span></td></tr>
         <tr><td>—</td><td class="num">M1</td><td>港交所擬改革創業板上市門檻 中小企融資影響<div class="dm-cell-sub">手動題目 · research pack 進行中</div></td><td>—</td><td><span class="origin origin-mt">手動題</span></td><td><span class="tg tg-b">生成中</span></td></tr>
         <tr><td>—</td><td class="num">M2</td><td>編輯部觀點：港股回購潮背後的資金邏輯<div class="dm-cell-sub">錄入成稿 · 錨點已確認 · ⚠ 未經平台來源驗證</div></td><td>—</td><td><span class="origin origin-ma">手動稿</span></td><td><span class="tg tg-a">待確認</span></td></tr>
         <tr><td>☐</td><td class="num">4</td><td>馬斯克 xAI 據報洽談新一輪融資 估值挑戰 2,000 億美元</td><td class="num">78</td><td><span class="origin origin-pool">pool</span></td><td><span class="tg tg-n">池中</span></td></tr>
         <tr><td>☐</td><td class="num">5</td><td>ESG 基金第三季資金外流創紀錄 亞太區點解逆勢淨流入</td><td class="num">74</td><td><span class="origin origin-pool">pool</span></td><td><span class="tg tg-n">池中</span></td></tr>
-        <tr class="row-r"><td>—</td><td class="num">8</td><td>女保險代理呃錢案餘波 業界監管收緊傳聞</td><td class="num">58</td><td><span class="origin origin-pool">pool</span></td><td><span class="tg tg-r">Dropped · 單一來源 −15</span></td></tr>
+        <tr class="row-r"><td>—</td><td class="num">8</td><td>女保險代理呃錢案餘波 業界監管收緊傳聞</td><td class="num">58</td><td><span class="origin origin-pool">pool</span></td><td><span class="tg tg-r">Dropped · 來源驗證失敗</span></td></tr>
       </tbody>
     </table></div>
     <div class="foot-note" style="padding:0 20px 14px">另 12 條在池中（rank 6–20）。剔除規則：純波動／噪音／重複／無實質／影響有限／HK 關聯弱；同 category 最多 2 條。</div>
@@ -579,13 +585,14 @@ a{text-decoration:none;color:inherit}
       <div class="md-detail__title">#1 英偉達財報前夕美股 AI 板塊震盪 港股科技股連鎖反應點睇？</div>
       <span class="dmode dmode-mock">MOCK</span>
     </div>
-    <span class="dm-subtitle" style="margin-bottom:0">score 87 · 雙軌命中 · 4 來源（含 1 個 tier3）· 文章已生成待確認</span>
+    <span class="dm-subtitle" style="margin-bottom:0">score 87 · LLM 軌 · 來源驗證通過 · 4 來源（含 1 個原始資料）· 文章已生成待確認</span>
 
     <div class="md-sec">
       <div class="md-sec__t"><span class="n">1</span>選題信息與來源</div>
       <div class="ev-row"><span class="lbl">brief</span><span class="val">英偉達財報前夕，美股 AI 板塊出現獲利回吐；港股科技股與 ADR 存在傳導鏈。對香港投資者而言，關鍵是回吐是否已反映在估值裡。</span></div>
       <div class="ev-row"><span class="lbl">category</span><span class="val">Business &amp; Finance</span></div>
       <div class="ev-row"><span class="lbl">why selected</span><span class="val">財報日在即、有實數可核、港股有直接傳導、討論度高。</span></div>
+      <div class="ev-row"><span class="lbl">來源驗證</span><span class="val"><span class="tg tg-g">通過</span> 模型初給 2 條連結均不可用，重搜後找到 4 條真實報道</span></div>
       <div class="ev-row"><span class="lbl">來源</span><span class="val">Bloomberg<span class="tier tier-1">T1</span> · 信報<span class="tier tier-1">T1</span> · Yahoo Fin HK<span class="tier tier-2">T2</span> · <b>SEC 10-Q</b><span class="tier tier-3">T3</span></span></div>
     </div>
 
@@ -615,31 +622,27 @@ a{text-decoration:none;color:inherit}
       </div>
     </div>
 
-    <div class="ctl-inline" style="margin-top:12px">
-      <span>發佈時段</span>
-      <select class="dm-select" style="width:190px"><option>今日 19:00（推薦 +48%）</option><option>今日 18:00（+33%）</option><option>今日 20:30（+24%）</option><option>明日 08:30（開市前 +5%）</option></select>
-      <span class="dm-meta-label">唯一可調項——格式與語氣由 skill 鎖定</span>
-    </div>
+    <div class="foot-note" style="margin-top:12px">v1 不做定時發布，所以這裡沒有時段選擇——確認後直接出圖與 post，落 Content Publish 草稿區由編輯自己發。（發布時段推薦隨 Calendar 一起後延。）</div>
 
     <div class="action-row" style="margin:14px 0 0">
       <button class="btn btn--primary btn--sm">確認並生成圖片與 post →</button>
       <button class="btn btn--secondary btn--sm">重寫某一段</button>
       <button class="btn btn--secondary btn--sm">退回選題池</button>
     </div>
-    <div class="foot-note">確認後才會呼叫 6 次 image gen。48 小時未審 → 標 <code>stale</code>，不刪除、不自動放行。</div>
+    <div class="foot-note">確認後才會呼叫 6 次 image gen。48 小時未確認 → 標 <code>stale</code>，不刪除、不自動放行。</div>
   </section>
 </div>
 
 <div class="callout callout--b">
-  <div class="callout__title">「ChatGPT 按 skill 給選題」的三條硬規則 — 印在 UI 上</div>
-  <div class="callout__body">① prompt 不再由 editor 每天手貼——它是 <b>bf-topic-selection v1</b> 的一部分，按排程自動執行、有版本、有留檔；② <b>LLM 給的 URL 一律不採信</b>——必須重新搜到 ≥2 個獨立真實報道才進池，驗證失敗的候選進 run.llm_unverified[]（本次 2 條，可展開查看）；③ trends 軌故障時 LLM 軌是降級鏈的最後一級（48h → buzz keywords → 12 來源頭條 → llm_only）。<b>手動錄入的模式 B 同樣要跑 research pack</b>——題是人給的，數字照樣要核。</div>
-  <div class="callout__meta"><span>今日 LLM 轨贡献: <b>6 進池 · 2 被拒</b></span><span>雙軌命中: <b>3</b></span><span>手動錄入: <b>2</b></span><span>降級: <b>0 級</b></span></div>
+  <div class="callout__title">v1 只有一條軌 — 所以「來源驗證」是唯一的質量防線</div>
+  <div class="callout__body">① prompt 不再由 editor 每天手貼——它是 <b>bf-topic-selection v1</b> 的一部分，按排程自動執行、有版本、有留檔；② <b>LLM 給的 URL 一律不採信</b>——必須重新搜到 ≥2 個獨立真實報道才進池，驗證失敗的候選留檔可查（本次 6 條）；③ <b>沒有 trends 軌做交叉驗證</b>，所以這條規則不許為了湊夠候選數而放寬——放寬就是直接的內容事故風險。<b>手動錄入的模式 B 同樣要跑證據查核</b>——題是人給的，數字照樣要核。<br><b>要盯的兩個數</b>：每日通過驗證數與被拒數。被拒率長期偏高 ＝ 模型在編造來源，屆時再談補第二條軌。</div>
+  <div class="callout__meta"><span>通過驗證: <b>14</b></span><span>被拒: <b>6</b></span><span>手動錄入: <b>2</b></span><span>待確認文章: <b>3</b></span></div>
 </div>
 
 <div class="dm-row">
   <section class="dm-card">
-    <div class="dm-title-card">Found-by distribution — today's pool<span class="dmode dmode-mock">MOCK</span></div>
-    <span class="dm-subtitle">20 條候選的來源分佈。兩軌在三條最大的新聞上重疊——這個重疊率正是 cross_check 要量的健康信號。</span>
+    <div class="dm-title-card">來源驗證結果 — 今日 run<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">LLM 給的 26 條線索裡，有多少通過了「重搜到 ≥2 個獨立真實報道」。v1 單軌之下，這張圖就是質量儀表盤——被拒率長期偏高代表模型在編造來源。</span>
     <div class="dm-chart-area" data-chart="tpFound"></div>
   </section>
   <section class="dm-card">
@@ -651,10 +654,10 @@ a{text-decoration:none;color:inherit}
 
 <section class="ai-card">
   <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Topic Studio</div></div>
-  <div class="ai-card__sub">Grounded on run #34 · 20-topic pool · dual-track discovery · Confidence: Medium</div>
-  <div class="ai-insight-item"><span class="ib ib-b">Overlap</span><b>兩軌同時命中的三條，正是今日分數最高的三條。</b> 英偉達財報、人民幣中間價、xAI 融資同時被 trends 軌（名次 #3/#11/#7）與 LLM 軌發現——雙軌重疊率 15% 是健康信號：trends 保證即時性，LLM 軌保證財經敘事完整性。<b>維持 trends_first，LLM 軌作補差與敘事校驗。</b></div>
-  <div class="ai-insight-item warn"><span class="ib ib-a">Coverage</span><b>今日 50 條 HK trends 只有 14 條財經相關（28%）。</b> 低於 30% 的日子本月已出現 9 次；若一週滾動低於 20%，降級鏈會把 hours 擴到 48h 並把 outlet scan 升為常規軌。<b>O8 實測仍在進行——月底前不要改 hours 默認值。</b></div>
-  <div class="ai-insight-item alert"><span class="ib ib-r">Guard</span><b>LLM 軌今日被拒的 2 條都是「來源驗證失敗」。</b> 一條引用了不存在的 SCMP 報道，一條只搜到內容農場轉載。這正是「URL 不採信」規則存在的原因——被拒候選記入 run.llm_unverified[]，可追溯、可复盘。<b>不要為湊池數放寬 ≥2 獨立來源的門檻。</b></div>
+  <div class="ai-card__sub">Grounded on run #34 · 20-topic pool · LLM-only discovery（v1）· Confidence: Medium</div>
+  <div class="ai-insight-item"><span class="ib ib-b">來源驗證</span><b>今日 20 條進池、6 條被拒——被拒率 23%，全部因為模型給的連結查不到或只有單一來源。</b> 英偉達財報、人民幣中間價、xAI 融資三條分數最高的候選，都是重搜後找到 4 個以上獨立報道的。<b>v1 只有一條軌，這道驗證就是唯一的質量防線——被拒率長期高於 30% 就要考慮補第二條軌。</b></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">Coverage</span><b>20 條進池的候選裡，Business &amp; Finance 佔 13 條（65%），已觸到「同 category 最多 2 條」的上限四次。</b> 這是 BusinessFocus 的正常形態（頁面語料本身 72% 是財經），但意味著編輯每天真正可選的題材面比池子看起來窄。<b>需要更寬的題材面時，要改的是 skill 裡的 topic_prompt，不是放寬 category 上限。</b></div>
+  <div class="ai-insight-item alert"><span class="ib ib-r">Guard</span><b>今日被拒的 6 條：4 條引用了查不到的報道（其中一條是不存在的 SCMP 連結），2 條只搜到內容農場轉載。</b> 這正是「LLM 給的 URL 一律不採信」規則存在的原因——被拒候選全部記入 <code>BFRun.llm_unverified[]</code>，可追溯、可複盤。<b>v1 沒有第二條軌做交叉驗證，所以這道門檻不能為了湊池數放寬——放寬一次就是一次內容事故。</b></div>
   <div class="ai-ask"><input type="text" placeholder="Ask about the pool — e.g. 「點解第 8 條被 dropped？」"><button class="btn btn--primary btn--sm">Ask</button></div>
 </section>
 
@@ -719,7 +722,7 @@ a{text-decoration:none;color:inherit}
   <div class="dm-kpi-card"><div class="kpi__label">FB caption</div><div class="kpi__metric">1,709</div><div class="kpi__sub">字 · s1..s7</div></div>
   <div class="dm-kpi-card"><div class="kpi__label">IG caption</div><div class="kpi__metric">1,923</div><div class="kpi__sub up">字 · s1..s8 · ≤2,200 ✓</div></div>
   <div class="dm-kpi-card"><div class="kpi__label">Best pre-flight</div><div class="kpi__metric">76</div><div class="kpi__sub up">FB post · ship bar 70</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">Link post</div><div class="kpi__metric">預留</div><div class="kpi__sub">等 article URL 回填</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">出口</div><div class="kpi__metric">草稿</div><div class="kpi__sub">Content Publish · 編輯自己發</div></div>
 </div>
 
 <div class="dm-row">
@@ -785,10 +788,10 @@ a{text-decoration:none;color:inherit}
 </div>
 
 <div class="action-row">
-  <button class="btn btn--primary">Send both to approval →</button>
+  <button class="btn btn--primary">送去 Content Publish 草稿 →</button>
   <button class="btn btn--secondary">Regenerate 該項</button>
   <button class="btn btn--secondary">Open in Content Publish</button>
-  <span class="who">同一條記錄同時出現在 Studio 與 Content Publish · BF agent Draft</span>
+  <span class="who">v1 出口：落 Content Publish 草稿區（BF agent Draft），編輯在平時用的發布模組自己發 — 不排期、不定時發</span>
 </div>
 
 <section class="ai-card">
@@ -803,6 +806,7 @@ a{text-decoration:none;color:inherit}
 </div>
 <!-- ══════════ TAB 4 · VISUAL STUDIO (BF) ══════════ -->
 <div class="tab-panel" id="tab-visual">
+<div class="rmbanner"><span class="rmb-tag">路線圖</span><div class="rmb-t"><b>v1 不做獨立的 Visual Studio。</b>BF 的視覺完全由 skill 的模板規則鎖定（比例、品牌色、字體、圖內數字校驗），編輯沒有可調項——所以 v1 把 6 張圖直接放在 Post Studio 裡看。這一頁展示的是未來多品牌／可調模板時才需要的能力。</div></div>
 
 <div class="sec-head">
   <div class="dm-title-section">Visual Studio — template-locked, ratio-gated, facts verified</div>
@@ -855,6 +859,7 @@ a{text-decoration:none;color:inherit}
 </div>
 <!-- ══════════ TAB 5 · PRE-FLIGHT SCORE (BF) ══════════ -->
 <div class="tab-panel" id="tab-score">
+<div class="rmbanner"><span class="rmb-tag">路線圖</span><div class="rmb-t"><b>v1 用的是 Readiness Check，不是這套 7 分量打分。</b>Readiness Check 只做三件事：硬校驗（8 錨點／小標題／字數／圖比例）、7 天近重複、展示選題分——全部不需要新模型，所以 BF 不用等主線的打分服務。這一頁是主線打分上線後 BF 會接上的樣子。</div></div>
 
 <div class="sec-head">
   <div class="dm-title-section">Pre-flight Score — the same gate, BF's own yardstick</div>
@@ -878,7 +883,7 @@ a{text-decoration:none;color:inherit}
     </div>
     <div class="sbar"><div class="sbar__top"><span class="sbar__name">Category fit（B&amp;F 主品類）· weight 20%</span><span class="sbar__val">88</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:88%"></div></div></div>
     <div class="sbar"><div class="sbar__top"><span class="sbar__name">Hook / 標題強度（數字前置「10億」「92億」）· weight 20%</span><span class="sbar__val">82</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:82%"></div></div></div>
-    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Keyword timeliness（香港IPO · trends rising）· weight 15%</span><span class="sbar__val">79</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:79%"></div></div></div>
+    <div class="sbar"><div class="sbar__top"><span class="sbar__name">Keyword timeliness（香港IPO · 選題分帶入）· weight 15%</span><span class="sbar__val">79</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:79%"></div></div></div>
     <div class="sbar"><div class="sbar__top"><span class="sbar__name">Voice match（BF 財經書面語 + 尾綴 + 代碼格式）· weight 15%</span><span class="sbar__val">91</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:91%"></div></div></div>
     <div class="sbar"><div class="sbar__top"><span class="sbar__name">Format &amp; length fit · weight 15%</span><span class="sbar__val">68</span></div><div class="sbar__rail"><div class="sbar__fill f-a" style="width:68%"></div></div></div>
     <div class="sbar"><div class="sbar__top"><span class="sbar__name">近重復（7 天同題材 similar 檢索）· weight 10%</span><span class="sbar__val">90</span></div><div class="sbar__rail"><div class="sbar__fill f-g" style="width:90%"></div></div></div>
@@ -923,7 +928,7 @@ a{text-decoration:none;color:inherit}
 <section class="ai-card">
   <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Pre-flight Score</div></div>
   <div class="ai-card__sub">Grounded on 38 BF calibration posts · BF 頁分布 · Confidence: Medium</div>
-  <div class="ai-insight-item"><span class="ib ib-b">Yardstick</span><b>BF 的 keyword 分量天生強——選題就是從 trends 來的。</b> 主線 brief 要另查 Buzz 驗證時效；BF post 的題目本身帶 trend 名次與升幅。<b>keyword timeliness 直接讀 topic signal，這個分量在 BF 流永遠不會是拖分項。</b></div>
+  <div class="ai-insight-item"><span class="ib ib-b">Yardstick</span><b>BF 的 keyword 分量天生強——選題階段已經核過時效與來源。</b> 主線 brief 要另查 Buzz 驗證時效；BF post 的題目本身帶 trend 名次與升幅。<b>keyword timeliness 直接讀 topic signal，這個分量在 BF 流永遠不會是拖分項。</b></div>
   <div class="ai-insight-item warn"><span class="ib ib-a">Length</span><b>Format &amp; length 是 BF 兩條 post 的共同拖分項（68）。</b> 全文版 caption 是產品決策（一致性、SEO、資訊完整），不是要改掉的毛病——但它結構性壓低這個分量。<b>給 BF 流單獨設 format 分量的 BF 基準（以全文版分布為分母），而不是沿用主線的短文案分布。</b></div>
   <div class="ai-insight-item alert"><span class="ib ib-r">Honesty</span><b>n=38 的校準只夠支撐 gate，不夠支撐排序。</b> 76 vs 73 的差異在噪聲帶內——兩條 post 都該進審批，而不是只發高分那條。<b>UI 顯示分數帶（High/Mid/Low）；10 月中 150 帖前不開 auto_publish 的分數門檻。</b></div>
   <div class="ai-ask"><input type="text" placeholder="Ask about scoring — e.g. 「BF 嘅 fatigue 點解唔睇 category 集中度？」"><button class="btn btn--primary btn--sm">Ask</button></div>
@@ -932,6 +937,7 @@ a{text-decoration:none;color:inherit}
 </div>
 <!-- ══════════ TAB 6 · CALENDAR (BF) ══════════ -->
 <div class="tab-panel" id="tab-calendar">
+<div class="rmbanner"><span class="rmb-tag">v1 不做</span><div class="rmb-t"><b>v1 不做 Calendar，也不做定時發布。</b>Post 完成後直接落 <b>Content Publish 草稿區</b>（BF agent Draft），編輯在平時用的發布模組自己發——這讓 v1 完全繞開 Meta 定時發布權限的依賴。月曆、審批隊列、發布時段推薦、auto_publish 都隨這一頁一起後延。<br>⚠ 要區分：<b>每天自動找題的排程保留</b>（否則編輯每天得手動點一次），不做的是<b>定時發布</b>。</div></div>
 
 <div class="sec-head">
   <div class="dm-title-section">Calendar — the daily run meets the human queue</div>
@@ -1037,13 +1043,14 @@ a{text-decoration:none;color:inherit}
   <div class="ai-card__sub">Grounded on 32 queued posts · BF online-follower hours · run cadence · Confidence: Medium</div>
   <div class="ai-insight-item"><span class="ib ib-b">Cadence</span><b>BF flow 每日 6 條 + 人工 2 條，IG 已達現狀 5 帖/日的節奏上限。</b> 再加量會稀釋單帖互動（BF 的競品優勢正是量少質精 300.3/帖）。<b>daily_count 保持 3；要加量先看單帖互動有沒有掉。</b></div>
   <div class="ai-insight-item good"><span class="ib ib-g">Slot</span><b>78% 的隊列已落在推薦時段——比主線 GirlStyle 的 67% 健康。</b> 因為 BF 的排期是 run 自動分配的，不經過「編輯順手選 09:00」這一步。<b>自動排程本身就是 slot 合規率的保證，保持 scheduler 只從 top-4 slot 分配。</b></div>
-  <div class="ai-insight-item warn"><span class="ib ib-a">Weekend</span><b>週末財經 trends 供給薄（BFRun.is_weekend），daily_count 自動降到 2。</b> 8 月四個週末的池均值只有 12 條合格候選。<b>週末檔改推 Lifestyle/理財故事類（如「43歲家庭主婦」）——這類題材週末互動反而 +20%。</b></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">Weekend</span><b>週末財經新聞供給薄（BFRun.is_weekend），daily_count 自動降到 2。</b> 8 月四個週末的池均值只有 12 條合格候選。<b>週末檔改推 Lifestyle/理財故事類（如「43歲家庭主婦」）——這類題材週末互動反而 +20%。</b></div>
   <div class="ai-ask"><input type="text" placeholder="Ask about the queue — e.g. 「點解第 6 條 below bar？」"><button class="btn btn--primary btn--sm">Ask</button></div>
 </section>
 
 </div>
 <!-- ══════════ TAB 7 · AUTOPILOT (BF) ══════════ -->
 <div class="tab-panel" id="tab-autopilot">
+<div class="rmbanner"><span class="rmb-tag">v1 不做</span><div class="rmb-t"><b>Autopilot 不是 v1 的核心變化。</b>v1 只保留「每天 10:00 自動找題」這一條排程，配置在 Topic Studio 頂部只讀展示——不做獨立的 Autopilot 配置頁，也不做全自動發布。這一頁是校準達標（≥150 帖 · r≥0.4 · 4 週審批通過率 ≥85%）之後才談的事。</div></div>
 
 <div class="sec-head">
   <div class="dm-title-section">Autopilot — the schedule is the contract</div>
@@ -1067,14 +1074,14 @@ a{text-decoration:none;color:inherit}
     <div class="lockrow">daily_count <b>3</b> · pool_size <b>20</b> · weekend 自動降量<span class="lk"></span></div>
     <div class="lockrow">auto_publish <b>OFF</b>（=true 時直發並標 unreviewed）<span class="lk"></span></div>
     <div class="lockrow">topic_skill <b>bf-topic-selection @v1</b><span class="lk">🔒</span></div>
-    <div class="lockrow">discovery_mode <b>trends_first</b><span class="lk">🔒</span></div>
+    <div class="lockrow">discovery_mode <b>llm_only</b><span class="lk">🔒</span><span class="lk" style="opacity:.6">v1 固定</span></div>
     <div class="lockrow">writing_skill <b>bf-content-package @v1</b><span class="lk">🔒</span></div>
     <div class="lockrow">cover_style <b>BF media template2</b><span class="lk">🔒</span></div>
     <div class="foot-note">隔離原則（結構性，不靠 prompt 自律）：<b>bf_agent 是獨立 root agent</b>，不掛 medialens_agent.sub_agents——既不轉出也不被轉入；google_search 以 AgentTool 掛載而非 transfer，隔離不破。</div>
   </section>
   <section class="dm-card">
     <div class="dm-title-card">Run history — last 8 weeks<span class="dmode dmode-mock">MOCK</span></div>
-    <span class="dm-subtitle">Pool built → editor confirmed → generated → published, per week. The one degraded run fell back to 48h trends + outlet scan and still delivered.</span>
+    <span class="dm-subtitle">每週的「找題 → 編輯確認 → 生成 → 落草稿」通過量。v1 的觀察重點是<b>確認率</b>（池子建得再多，編輯不確認就沒有產出）與<b>驗證被拒率</b>。</span>
     <div class="dm-chart-area" style="height:300px" data-chart="bfRuns"></div>
   </section>
 </div>
@@ -1087,7 +1094,7 @@ a{text-decoration:none;color:inherit}
 <div class="prop-card">
   <div class="prop-card__main">
     <div class="prop-card__t">Publish FB post「英偉達財報前夕美股 AI 板塊震盪」 at 今日 19:00</div>
-    <div class="prop-card__e">Evidence: pre-flight 76（ship bar 70 ✓）；19:00 slot 在線粉絲 18.9% · lift +48%；topic score 87 · 雙軌命中 · 4 來源；7 產物比例校驗全過。</div>
+    <div class="prop-card__e">Evidence: Readiness Check 全過；topic score 87 · 來源驗證通過 · 4 來源；7 產物比例校驗全過。</div>
     <div class="prop-card__tags"><span class="tg tg-b">Publish</span><span class="tg tg-a">Blocked on Meta permissions</span><span class="tg tg-n">Reversible: delete within 24h</span></div>
     <div class="prop-card__foot"><button class="btn btn--primary btn--sm">Approve</button><button class="btn btn--secondary btn--sm">Modify</button><button class="btn btn--secondary btn--sm">Reject</button><span class="prop-card__by">Proposed 2h ago · bf_agent</span></div>
   </div>
@@ -1358,11 +1365,11 @@ function hbar(id,cfg){
 var BLUE='#3B82F6',GREEN='#10B981',GREY='#CBD5E1',RED='#EF4444',AMBER='#F59E0B',PURPLE='#8B5CF6',TEAL='#14B8A6',PINK='#EC4899';
 
 donut('tpFound',{data:[
-  {l:'Trends 轨独有',v:8,c:BLUE,tt:'google_trends HK/24h'},
-  {l:'LLM (skill) 轨独有',v:6,c:PURPLE,tt:'topic_prompt · 已重搜验证（另有 2 条被拒）'},
-  {l:'双轨命中',v:3,c:GREEN,tt:'trends + LLM 同时发现'},
-  {l:'Outlet scan',v:2,c:AMBER,tt:'12 来源头条扫描'},
-  {l:'Buzz keywords',v:1,c:TEAL,tt:'降级链备用轨'}]});
+  {l:'通過（≥4 來源）',v:9,c:GREEN,tt:'重搜到 4 個或以上獨立真實報道'},
+  {l:'通過（2–3 來源）',v:5,c:BLUE,tt:'達到 ≥2 獨立來源門檻，剛好進池'},
+  {l:'被拒 · 來源查不到',v:4,c:RED,tt:'模型給的連結不存在或無法核實'},
+  {l:'被拒 · 只有單一來源',v:2,c:AMBER,tt:'未達 ≥2 獨立來源門檻'},
+  {l:'手動錄入（免驗證軌）',v:2,c:GREY,tt:'編輯自行錄入 · 標記 source_verified=false'}]});
 
 chart('tpCat',{labels:['Business & Finance','News & Current Affairs','Tech & Innovation','Society & Culture','Lifestyle & P.D.'],yMax:80,yTitle:'%',tiltX:true,yFmt:function(v){return v+'%'},
   legend:[{label:'今日池占比 %',color:BLUE,round:true},{label:'页面语料占比 %（FB 90D）',color:GREY,round:true}],
