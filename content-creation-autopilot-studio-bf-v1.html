@@ -601,7 +601,8 @@ a{text-decoration:none;color:inherit}
 
     <div class="md-sec">
       <div class="md-sec__t"><span class="n">3</span>article 全文（可編輯 · 支援單段重寫）</div>
-      <div class="gate">✓ <span><b>Readiness Check（文章部分）通過</b>：8 區段錨點齊全 · 全文 1,942 字（≤2,000）· 近 7 天無撞題</span></div>
+      <div class="gate">✓ <span><b>Readiness Check（文章部分）9 項全通過</b>：8 區段錨點齊全 · 標題尾綴正確 · s3/s4/s5 各有小標題且各 2 個自然段 · s6 無小標題 · s7 以 #BusinessFocus #BF #Insight 開頭 · s8 逐字一致 · 全文 1,942 字（≤2,000）· 近 7 天無撞題</span></div>
+      <div class="foot-note" style="border:none;padding:0;margin:0 0 10px">口徑來源：8 區段與「每大段小標題 + 2 個自然段」「結尾段無小標題」是 editor 原始 skill 的硬要求；<b>錨點 <code>&lt;!-- sN --&gt;</code> 是工程約定（原文沒有）</b>——所以任何手上的稿子都不帶錨點，模式 C 必須自動切段。結構缺失與逐字契約 = fail；主觀判斷（自然段劃分／字數）= warn。</div>
       <div class="art-box">
         <div class="seg-line"><span class="seg seg-s1">s1 標題</span><b>英偉達財報前夕美股 AI 板塊震盪！港股科技股連鎖反應點睇 回吐定轉勢？【 @businessfocus.io 】【#BF社會熱話】</b></div>
         <div class="seg-line"><span class="seg seg-s2">s2 導言</span>英偉達（美股：NVDA）財報公布前夕，美股 AI 板塊出現明顯獲利回吐，恒生科技指數近五個交易日跌 4.2%……</div>
@@ -693,7 +694,8 @@ a{text-decoration:none;color:inherit}
       <div class="chk"><span class="ok">✓</span>非股價金額補「（約合港元）」；股價只寫原幣種</div>
     </div>
     <div>
-      <div class="chk"><span class="ok">✓</span>8 區段結構 s1..s8（錨點是組裝硬契約）· 全文約 2,000 字內</div>
+      <div class="chk"><span class="ok">✓</span>8 區段結構 s1..s8 · 三大段各含小標題 + 固定 2 個自然段 · 結尾段無小標題</div>
+      <div class="chk"><span class="ok">✓</span>全文約 2,000 字內（原文寫 about 2000，屬軟要求）</div>
       <div class="chk"><span class="ok">✓</span>比例硬性：4:5 ×5 + 1000×525 ×1 — 不符即重生成</div>
       <div class="chk"><span class="ok">✓</span>數字必須先核實才上圖 — 不可腦補</div>
       <div class="chk"><span class="ok">✓</span>固定文末聲明與品牌文字（s8 原文照抄）</div>
