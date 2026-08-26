@@ -348,6 +348,55 @@ a{text-decoration:none;color:inherit}
 .lockrow{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--dm-border-light);border-radius:8px;background:var(--dm-slate-50);font:500 12px var(--font-body);color:var(--dm-slate-600);margin-bottom:8px}
 .lockrow b{color:var(--dm-slate-900);font-family:var(--font-metric);font-weight:500}
 .lockrow .lk{margin-left:auto;font-size:12px}
+/* ── master-detail 详情面板 / 录入 / 阶段条 ── */
+.md-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:20px;align-items:start}
+@media(max-width:1180px){.md-wrap{grid-template-columns:1fr}}
+.md-list .dm-modern-table tbody tr{cursor:pointer}
+.md-list .dm-modern-table tbody tr.is-sel td{background:var(--brand-blue-tint) !important;box-shadow:inset 3px 0 0 var(--brand-blue)}
+.md-sec{border-top:1px solid var(--dm-slate-100);padding:14px 0 0;margin-top:14px}
+.md-sec:first-of-type{border-top:none;padding-top:0;margin-top:8px}
+.md-sec__t{display:flex;align-items:center;gap:8px;font:600 12px var(--font-heading);color:var(--dm-slate-700);margin-bottom:9px}
+.md-sec__t .n{width:17px;height:17px;border-radius:50%;background:var(--dm-slate-100);color:var(--dm-slate-600);font:700 9.5px/17px var(--font-metric);text-align:center;flex-shrink:0}
+.ev-row{display:flex;gap:8px;padding:7px 0;border-bottom:1px dashed var(--dm-slate-100);font:400 11.5px/1.6 var(--font-body);color:var(--dm-slate-600)}
+.ev-row:last-child{border-bottom:none}
+.ev-row .lbl{flex-shrink:0;width:86px;font-weight:600;color:var(--dm-slate-700)}
+.ev-row .val{flex:1;min-width:0}
+.ev-row .val b{color:var(--dm-slate-900);font-family:var(--font-metric)}
+.src-link{color:var(--brand-blue);text-decoration:underline;font-size:10.5px}
+.tier{display:inline-block;font:700 8.5px/1 var(--font-metric);padding:2px 5px;border-radius:3px;margin-left:5px}
+.tier-1{background:var(--nl);color:var(--n)}.tier-2{background:var(--bl);color:var(--b)}.tier-3{background:var(--gl);color:var(--g)}
+.miss{background:var(--al);border-radius:6px;padding:8px 10px;font:400 11px/1.6 var(--font-body);color:var(--a);margin-top:8px}
+.art-box{border:1px solid var(--dm-slate-200);border-radius:8px;background:var(--dm-slate-50);padding:13px;font:400 12px/1.85 var(--font-body);color:var(--dm-slate-700);max-height:320px;overflow-y:auto}
+.art-box .seg-line{margin-bottom:11px}
+.art-box b{color:var(--dm-slate-900)}
+.origin{display:inline-block;font:700 8.5px/1 var(--font-metric);padding:3px 6px;border-radius:4px;white-space:nowrap}
+.origin-pool{background:var(--nl);color:var(--n)}
+.origin-mt{background:var(--pl);color:var(--p)}
+.origin-ma{background:#ECFEFF;color:#0E7490}
+.entry-card{border:1.5px dashed var(--dm-slate-200);border-radius:10px;padding:14px;background:var(--dm-slate-50)}
+.entry-card.hl{border-color:var(--brand-blue);background:var(--brand-blue-tint)}
+.entry-card__t{font:600 12.5px var(--font-heading);color:var(--dm-text-heading);display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.entry-card__b{font:400 11.5px/1.65 var(--font-body);color:var(--dm-slate-600)}
+.fld{margin-top:9px}
+.fld label{display:block;font:600 10px var(--font-body);color:var(--dm-slate-600);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+.fld input,.fld textarea{width:100%;border:1px solid var(--dm-slate-200);border-radius:6px;padding:7px 10px;font:400 12px/1.6 var(--font-body);color:var(--dm-slate-700);background:#FFF;font-family:var(--font-body)}
+.fld textarea{min-height:62px;resize:vertical}
+.fld input::placeholder,.fld textarea::placeholder{color:var(--dm-slate-400)}
+.gate{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:8px;background:var(--gl);border-left:3px solid var(--g);font:400 11.5px/1.6 var(--font-body);color:var(--dm-slate-700);margin-bottom:10px}
+.gate.warn{background:var(--al);border-left-color:var(--dm-warning)}
+.gate b{color:var(--dm-slate-900)}
+.stagebar{display:flex;gap:0;margin:0 0 16px}
+.stg{flex:1;text-align:center;font:600 10.5px/1.3 var(--font-body);color:var(--dm-slate-400);padding:8px 4px;border-bottom:3px solid var(--dm-slate-100)}
+.stg.done{color:var(--g);border-bottom-color:#86EFAC}
+.stg.now{color:var(--brand-blue);border-bottom-color:var(--brand-blue)}
+.stg .sub{display:block;font-weight:400;font-size:9.5px;color:var(--dm-slate-400);margin-top:2px}
+.explain{max-width:720px;margin:16px auto;text-align:center;padding:30px 24px}
+.explain__ico{font-size:32px;margin-bottom:12px}
+.explain__t{font:600 17px var(--font-heading);color:var(--dm-text-heading);margin-bottom:10px}
+.explain__b{font:400 12.5px/1.9 var(--font-body);color:var(--dm-slate-600);text-align:left;max-width:620px;margin:0 auto 16px}
+.explain__nav{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.recipe-bar{display:flex;gap:3px;margin:10px 0 6px}
+.recipe-bar .rseg{flex:1;text-align:center;font:700 9px/1 var(--font-metric);padding:7px 2px;border-radius:4px}
 </style>
 </head>
 <body>
@@ -430,81 +479,171 @@ a{text-decoration:none;color:inherit}
 <div class="tab-panel active" id="tab-topic">
 
 <div class="sec-head">
-  <div class="dm-title-section">Topic Studio — the day starts with a pool, not a prompt</div>
-  <span class="dm-subtitle">Every morning at 10:00 HKT two discovery tracks build a 20-topic pool: the MediaLens track (Google Trends HK → finance filter → source whitelist) and the ChatGPT-by-skill track (the editor's old topic prompt, now versioned inside bf-topic-selection v1). Every candidate carries its sources, its score breakdown and the track that found it. The editor confirms; nothing generates without a tick.</span>
+  <div class="dm-title-section">Topic Studio — 選題、證據、文章，都在這一頁</div>
+  <span class="dm-subtitle">每天 10:00 HKT 兩條發現軌建 20 條選題池；確認一條就<b>立刻生成文章</b>。這一頁是編輯唯一的內容闸门——文章通過了才去做 6 張圖（成本 1:6，一題被否只浪費一篇文章而不是六張圖）。也可以<b>手動錄入</b>：給題目讓 skill 擴展，或直接貼已寫好的稿。</span>
+</div>
+
+<div class="stagebar">
+  <div class="stg done">① 建池<span class="sub">cron 10:00 · 雙軌 20 條</span></div>
+  <div class="stg done">② 確認並生成文章<span class="sub">research pack + 01 文章</span></div>
+  <div class="stg now">③ 文章闸门<span class="sub">編輯在此確認 ← 你在這裡</span></div>
+  <div class="stg">④ 生成 6 圖 + 組 post<span class="sub">02–07 + FB/IG</span></div>
+  <div class="stg">⑤ 審批 → 排期<span class="sub">Calendar</span></div>
 </div>
 
 <div class="dm-kpi-row">
   <div class="dm-kpi-card"><div class="kpi__label">Today's pool</div><div class="kpi__metric">20</div><div class="kpi__sub">run #34 · 10:00:12 HKT</div></div>
   <div class="dm-kpi-card"><div class="kpi__label">Trends 轨命中</div><div class="kpi__metric">11</div><div class="kpi__sub">google_trends · HK · 24h</div></div>
   <div class="dm-kpi-card"><div class="kpi__label">LLM (skill) 轨命中</div><div class="kpi__metric">6</div><div class="kpi__sub up">已重搜验证 · 2 条被拒</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">双轨命中</div><div class="kpi__metric">3</div><div class="kpi__sub up">两轨同时发现</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">Selected</div><div class="kpi__metric">3/3</div><div class="kpi__sub">daily_count 3 · 待生成</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">手動錄入</div><div class="kpi__metric">2</div><div class="kpi__sub">不佔 daily_count 配額</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">文章已就緒</div><div class="kpi__metric">3</div><div class="kpi__sub up">待編輯確認</div></div>
   <div class="dm-kpi-card"><div class="kpi__label">Degraded</div><div class="kpi__metric">0</div><div class="kpi__sub up">未触发降级链</div></div>
 </div>
 
 <section class="dm-card">
   <div class="dm-title-card">Discovery configuration<span class="dmode dmode-live">LIVE</span></div>
-  <span class="dm-subtitle">v1 ships these four fields locked (read-only). The mode pills show the current value of BFSchedule.discovery_mode — trends first, with the ChatGPT track topping up the pool and acting as the last fallback.</span>
+  <span class="dm-subtitle">v1 四個能力字段鎖定只讀。mode pills 顯示 BFSchedule.discovery_mode 當前值——trends 先行，ChatGPT 軌補差額並作為最後一級降級。</span>
   <div class="dm-controls-row" style="padding:0 0 12px">
     <span class="dm-ctl-label">Discovery mode</span>
     <div class="pill-row" style="margin-bottom:0"><button class="pill is-active">trends_first</button><button class="pill">cross_check</button><button class="pill">llm_only</button></div>
-    <span class="dm-meta-label">trends 不足时 LLM 轨补差额；cross_check 每周一次做双轨对照</span>
+    <span class="spacer"></span>
+    <button class="btn btn--primary btn--sm" id="btnManual">+ 手動錄入</button>
   </div>
   <div class="split2">
     <div>
-      <div class="lockrow">选题 skill <b>bf-topic-selection @v1</b><span class="lk">🔒</span></div>
+      <div class="lockrow">選題 skill <b>bf-topic-selection @v1</b><span class="lk">🔒</span></div>
       <div class="lockrow">Writing skill <b>bf-content-package @v1</b><span class="lk">🔒</span></div>
       <div class="lockrow">Image cover style <b>BF media template2</b><span class="lk">🔒</span></div>
       <div class="lockrow">Run time <b>每日 10:00 · Asia/Hong_Kong</b> · daily_count <b>3</b> · pool_size <b>20</b><span class="lk">🔒</span></div>
     </div>
-    <div class="mini-info" style="margin-bottom:0"><div class="mini-info__t">topic_prompt（ChatGPT 轨，已固化进 skill · 只读）</div><div class="mini-info__b">「截止到目前，給出 20 個全球熱點的行業財經選題。輸出標題和 brief，附每條選題的資訊來源。」——editor 原来每天手贴的 prompt，现在由 skill 按排程自动执行；<b>模型给的 URL 一律不采信</b>，重搜到 ≥2 独立来源才进池。</div></div>
+    <div class="mini-info" style="margin-bottom:0"><div class="mini-info__t">topic_prompt（ChatGPT 軌，已固化進 skill · 只讀）</div><div class="mini-info__b">「截止到目前，給出 20 個全球熱點的行業財經選題。輸出標題和 brief，附每條選題的資訊來源。」——editor 原來每天手貼的 prompt，現在由 skill 按排程自動執行；<b>模型給的 URL 一律不採信</b>，重搜到 ≥2 獨立來源才進池。</div></div>
   </div>
 </section>
 
-<section class="dm-card dm-card--table">
-  <div class="dm-card__header" style="padding:20px 20px 0">
-    <div>
-      <div class="dm-title-card">Today's topic pool — 24 Aug 2026 <span class="tg-new">NEW</span><span class="dmode dmode-mock">MOCK</span></div>
-      <span class="dm-subtitle">Top 8 of 20 shown. Score is the 100-point rubric (即時性25 · 影響22 · 數據18 · HK關聯18 · 討論度12 · 敘事5, minus penalties). Every row can expand its full source list with outlet and tier.</span>
+<!-- 手動錄入（默认折叠，点 + 手動錄入 展开） -->
+<section class="dm-card" id="manualEntry" style="display:none">
+  <div class="dm-title-card">手動錄入 <span class="tg-new">NEW</span><span class="dmode dmode-mock">MOCK</span></div>
+  <span class="dm-subtitle">突發新聞、上頭指定題目、或稿已經寫好——兩種模式都能進這條生產線，不用退回手工。權限：admin / manager / editor。不佔 daily_count 配額，但受日發布上限護欄約束。</span>
+  <div class="split2">
+    <div class="entry-card hl">
+      <div class="entry-card__t">模式 B · 輸入題目，由 skill 擴展 <span class="origin origin-mt">manual_topic</span></div>
+      <div class="entry-card__b">跳過建池與評分（題是人定的，不需要機器挑），但<b>照常跑 research pack</b>——手動給的題一樣要核數字，這是 BF 的可信度底線。</div>
+      <div class="fld"><label>標題／方向（必填）</label><input type="text" value="港交所擬改革創業板上市門檻 中小企融資影響"></div>
+      <div class="fld"><label>參考 URL（可選，多條換行）</label><textarea placeholder="https://…hkex…&#10;https://…scmp…"></textarea></div>
+      <div class="action-row" style="margin:12px 0 0"><button class="btn btn--primary btn--sm">跑 research pack 並生成文章 →</button></div>
+    </div>
+    <div class="entry-card">
+      <div class="entry-card__t">模式 C · 直接錄入成稿 <span class="origin origin-ma">manual_article</span></div>
+      <div class="entry-card__b">跳過 research pack 與文章生成，直接進文章闸门。<b>⚠ 兩個硬規則</b>：① 貼進來的文章沒有 <code>&lt;!-- sN --&gt;</code> 錨點，系統按 8 區段自動切段 → 你確認／拖動調整 → 才寫入（<b>不允許無錨點入庫</b>，組裝程序完全依賴錨點）；② 交付上會顯示<b>「此文未經平台來源驗證」</b>——人工錄入的事實由錄入者負責。</div>
+      <div class="fld"><label>標題（必填）</label><input type="text" placeholder="貼上標題（尾綴會自動補【 @businessfocus.io 】【#BF社會熱話】）"></div>
+      <div class="fld"><label>文章全文（必填）</label><textarea placeholder="貼上全文…系統會嘗試切成 8 區段讓你確認"></textarea></div>
+      <div class="fld"><label>來源 URL（可選）</label><input type="text" placeholder="https://…"></div>
+      <div class="action-row" style="margin:12px 0 0"><button class="btn btn--secondary btn--sm">自動切段並預覽 →</button></div>
     </div>
   </div>
-  <div class="dm-table-scroll"><table class="dm-modern-table dm-modern-table--compact">
-    <thead><tr><th></th><th>#</th><th>Topic</th><th>Category</th><th>Score</th><th>Found by</th><th>Sources</th><th>State</th></tr></thead>
-    <tbody>
-      <tr class="row-g"><td>☑</td><td class="num">1</td><td>英偉達財報前夕美股 AI 板塊震盪 港股科技股連鎖反應點睇？</td><td>Business &amp; Finance</td><td class="num"><b>87</b></td><td><span class="tg tg-b">Trends ↑#3 +180%</span> <span class="tg tg-p">LLM (skill)</span></td><td class="num">4 · Bloomberg / 信報 / Yahoo Fin HK / HK01</td><td><span class="tg tg-g">Selected</span></td></tr>
-      <tr class="row-g"><td>☑</td><td class="num">2</td><td>人民幣中間價創逾一年新高 出口商結匯潮對聯繫匯率有咩壓力</td><td>Business &amp; Finance</td><td class="num"><b>84</b></td><td><span class="tg tg-b">Trends #11</span></td><td class="num">3 · 華爾街見聞 / 金十 / SCMP</td><td><span class="tg tg-g">Selected</span></td></tr>
-      <tr class="row-g"><td>☑</td><td class="num">3</td><td>香港加密幣投資平台懷疑詐騙案 警方拘 12 人涉款 2.3 億</td><td>News &amp; Current Affairs</td><td class="num"><b>81</b></td><td><span class="tg tg-p">LLM (skill) · 已重搜驗證 ✓</span></td><td class="num">3 · HK01 / SCMP / Now財經</td><td><span class="tg tg-g">Selected</span></td></tr>
-      <tr><td>☐</td><td class="num">4</td><td>馬斯克 xAI 據報洽談新一輪融資 估值挑戰 2,000 億美元</td><td>Technology &amp; Innovation</td><td class="num">78</td><td><span class="tg tg-b">Trends #7</span> <span class="tg tg-p">LLM (skill)</span></td><td class="num">2 · TechCrunch / Bloomberg</td><td><span class="tg tg-n">Pool</span></td></tr>
-      <tr><td>☐</td><td class="num">5</td><td>ESG 基金第三季資金外流創紀錄 亞太區點解逆勢淨流入</td><td>Business &amp; Finance</td><td class="num">74</td><td><span class="tg tg-p">LLM (skill) · 已重搜驗證 ✓</span></td><td class="num">2 · Bloomberg / 信報</td><td><span class="tg tg-n">Pool</span></td></tr>
-      <tr><td>☐</td><td class="num">6</td><td>全港最低工資檢討報告出爐 商界勞工界分歧再現</td><td>Society &amp; Culture</td><td class="num">71</td><td><span class="tg tg-a">Outlet scan</span></td><td class="num">3 · HK01 / SCMP / Now財經</td><td><span class="tg tg-n">Pool</span></td></tr>
-      <tr><td>☐</td><td class="num">7</td><td>43歲家庭主婦月供 8 千滾出 300 萬 退休部署三步曲</td><td>Lifestyle &amp; Personal Dev</td><td class="num">66</td><td><span class="tg tg-p">LLM (skill) · 已重搜驗證 ✓</span></td><td class="num">2 · EDigest / 信報</td><td><span class="tg tg-n">Pool</span></td></tr>
-      <tr class="row-r"><td>—</td><td class="num">8</td><td>女保險代理呃錢案餘波 業界監管收緊傳聞</td><td>News &amp; Current Affairs</td><td class="num">58</td><td><span class="tg tg-b">Trends #28</span></td><td class="num">1 · HK01</td><td><span class="tg tg-r">Dropped · 單一來源 −15</span></td></tr>
-    </tbody>
-  </table></div>
-  <div class="foot-note" style="padding:0 20px 16px">12 more in pool（rank 9–20）。剔除規則：純波動 / 噪音 / 重複 / 無實質 / 影響有限 / HK 關聯弱；同 category 最多 2 條。扣分：單一來源 −15 · 寫不出成因 −10 · 同批重疊 −20。</div>
-  <div class="action-row" style="padding:0 20px 20px;margin-bottom:0">
-    <button class="btn btn--primary">確認生成（3/3）→</button>
-    <button class="btn btn--secondary">換一批（重跑 STAGE 1）</button>
-    <span class="who">D1：勾選確認後才進生成 · 獨立於 auto_publish</span>
-  </div>
 </section>
+
+<!-- ===== master-detail ===== -->
+<div class="md-wrap">
+
+  <!-- 左：列表 -->
+  <section class="dm-card md-list" style="padding:0">
+    <div style="padding:20px 20px 0">
+      <div class="dm-title-card">Today's topic pool — 24 Aug 2026<span class="dmode dmode-mock">MOCK</span></div>
+      <span class="dm-subtitle">點任一列在右側看證據與文章。score 為 100 分制（手動錄入 = —）。</span>
+    </div>
+    <div class="dm-table-scroll"><table class="dm-modern-table dm-modern-table--compact">
+      <thead><tr><th></th><th>#</th><th>Topic</th><th>Score</th><th>Origin</th><th>State</th></tr></thead>
+      <tbody>
+        <tr class="is-sel"><td>☑</td><td class="num">1</td><td>英偉達財報前夕美股 AI 板塊震盪 港股科技股連鎖反應點睇？<div class="dm-cell-sub">Trends ↑#3 +180% · 雙軌 · 4 來源</div></td><td class="num"><b>87</b></td><td><span class="origin origin-pool">pool</span></td><td><span class="tg tg-g">文章就緒</span></td></tr>
+        <tr><td>☑</td><td class="num">2</td><td>人民幣中間價創逾一年新高 出口商結匯潮對聯繫匯率有咩壓力<div class="dm-cell-sub">Trends #11 · 3 來源</div></td><td class="num">84</td><td><span class="origin origin-pool">pool</span></td><td><span class="tg tg-g">文章就緒</span></td></tr>
+        <tr><td>☑</td><td class="num">3</td><td>香港加密幣投資平台懷疑詐騙案 警方拘 12 人涉款 2.3 億<div class="dm-cell-sub">LLM (skill) · 已重搜驗證 ✓ · 3 來源</div></td><td class="num">81</td><td><span class="origin origin-pool">pool</span></td><td><span class="tg tg-g">文章就緒</span></td></tr>
+        <tr><td>—</td><td class="num">M1</td><td>港交所擬改革創業板上市門檻 中小企融資影響<div class="dm-cell-sub">手動題目 · research pack 進行中</div></td><td>—</td><td><span class="origin origin-mt">手動題</span></td><td><span class="tg tg-b">生成中</span></td></tr>
+        <tr><td>—</td><td class="num">M2</td><td>編輯部觀點：港股回購潮背後的資金邏輯<div class="dm-cell-sub">錄入成稿 · 錨點已確認 · ⚠ 未經平台來源驗證</div></td><td>—</td><td><span class="origin origin-ma">手動稿</span></td><td><span class="tg tg-a">待確認</span></td></tr>
+        <tr><td>☐</td><td class="num">4</td><td>馬斯克 xAI 據報洽談新一輪融資 估值挑戰 2,000 億美元</td><td class="num">78</td><td><span class="origin origin-pool">pool</span></td><td><span class="tg tg-n">池中</span></td></tr>
+        <tr><td>☐</td><td class="num">5</td><td>ESG 基金第三季資金外流創紀錄 亞太區點解逆勢淨流入</td><td class="num">74</td><td><span class="origin origin-pool">pool</span></td><td><span class="tg tg-n">池中</span></td></tr>
+        <tr class="row-r"><td>—</td><td class="num">8</td><td>女保險代理呃錢案餘波 業界監管收緊傳聞</td><td class="num">58</td><td><span class="origin origin-pool">pool</span></td><td><span class="tg tg-r">Dropped · 單一來源 −15</span></td></tr>
+      </tbody>
+    </table></div>
+    <div class="foot-note" style="padding:0 20px 14px">另 12 條在池中（rank 6–20）。剔除規則：純波動／噪音／重複／無實質／影響有限／HK 關聯弱；同 category 最多 2 條。</div>
+    <div class="action-row" style="padding:0 20px 18px;margin-bottom:0">
+      <button class="btn btn--primary btn--sm">確認並生成文章（3/3）</button>
+      <button class="btn btn--secondary btn--sm">換一批</button>
+      <span class="who">D1：勾選確認後才生成文章 · 尚未承諾發布</span>
+    </div>
+  </section>
+
+  <!-- 右：详情 -->
+  <section class="dm-card">
+    <div class="md-detail__head">
+      <div class="md-detail__title">#1 英偉達財報前夕美股 AI 板塊震盪 港股科技股連鎖反應點睇？</div>
+      <span class="dmode dmode-mock">MOCK</span>
+    </div>
+    <span class="dm-subtitle" style="margin-bottom:0">score 87 · 雙軌命中 · 4 來源（含 1 個 tier3）· 文章已生成待確認</span>
+
+    <div class="md-sec">
+      <div class="md-sec__t"><span class="n">1</span>選題信息與來源</div>
+      <div class="ev-row"><span class="lbl">brief</span><span class="val">英偉達財報前夕，美股 AI 板塊出現獲利回吐；港股科技股與 ADR 存在傳導鏈。對香港投資者而言，關鍵是回吐是否已反映在估值裡。</span></div>
+      <div class="ev-row"><span class="lbl">category</span><span class="val">Business &amp; Finance</span></div>
+      <div class="ev-row"><span class="lbl">why selected</span><span class="val">財報日在即、有實數可核、港股有直接傳導、討論度高。</span></div>
+      <div class="ev-row"><span class="lbl">來源</span><span class="val">Bloomberg<span class="tier tier-1">T1</span> · 信報<span class="tier tier-1">T1</span> · Yahoo Fin HK<span class="tier tier-2">T2</span> · <b>SEC 10-Q</b><span class="tier tier-3">T3</span></span></div>
+    </div>
+
+    <div class="md-sec">
+      <div class="md-sec__t"><span class="n">2</span>research pack 證據</div>
+      <div class="ev-row"><span class="lbl">angle</span><span class="val">唔係講佢財報好唔好，係講呢個回吐幅度反映咗幾多預期。</span></div>
+      <div class="ev-row"><span class="lbl">data point</span><span class="val">Nvidia 數據中心季度收入 <b>$26.3B</b>（as of 2026-08-20）<a class="src-link" href="#">SEC 10-Q ↗</a></span></div>
+      <div class="ev-row"><span class="lbl">data point</span><span class="val">恒生科技指數近 5 日 <b>−4.2%</b>（as of 2026-08-23）<a class="src-link" href="#">信報 ↗</a></span></div>
+      <div class="ev-row"><span class="lbl">counter view</span><span class="val"><span class="tg tg-a">bearish</span> 回吐只是估值修正的開始，AI capex 週期未見頂 <a class="src-link" href="#">Bloomberg ↗</a></span></div>
+      <div class="ev-row"><span class="lbl">quote</span><span class="val">「市場對 AI 資本開支的假設過於線性」——某大行策略師 <a class="src-link" href="#">來源 ↗</a></span></div>
+      <div class="miss">⚠ missing[]：拿不到港股 ADR 套利價差的即時數據 —— 文章不會編這個數字，只寫可核部分。</div>
+    </div>
+
+    <div class="md-sec">
+      <div class="md-sec__t"><span class="n">3</span>article 全文（可編輯 · 支援單段重寫）</div>
+      <div class="gate">✓ <span><b>Readiness Check（文章部分）通過</b>：8 區段錨點齊全 · 全文 1,942 字（≤2,000）· 近 7 天無撞題</span></div>
+      <div class="art-box">
+        <div class="seg-line"><span class="seg seg-s1">s1 標題</span><b>英偉達財報前夕美股 AI 板塊震盪！港股科技股連鎖反應點睇 回吐定轉勢？【 @businessfocus.io 】【#BF社會熱話】</b></div>
+        <div class="seg-line"><span class="seg seg-s2">s2 導言</span>英偉達（美股：NVDA）財報公布前夕，美股 AI 板塊出現明顯獲利回吐，恒生科技指數近五個交易日跌 4.2%……</div>
+        <div class="seg-line"><span class="seg seg-s3">s3 段一</span><b>回吐幅度反映咗幾多預期</b> — 數據中心收入 $26.3B（SEC 10-Q）已經係市場共識上限……</div>
+        <div class="seg-line"><span class="seg seg-s4">s4 段二</span><b>港股傳導鏈唔係一比一</b> — ADR 與港股同源標的之間的價差機制……</div>
+        <div class="seg-line"><span class="seg seg-s5">s5 段三</span><b>capex 週期係最大變數</b> — 若 AI 資本開支假設由線性轉為階梯……</div>
+        <div class="seg-line"><span class="seg seg-s6">s6 結語</span>投資者真正要面對的不是財報好壞，而是市場願意為「線性增長假設」付多少溢價。</div>
+        <div class="seg-line"><span class="seg seg-s7">s7 標籤</span>#BusinessFocus #BF #Insight #英偉達 #美股 #港股科技股 #AI</div>
+        <div class="seg-line"><span class="seg seg-s8">s8 品牌塊</span>Text by BusinessFocus Editorial · 免責聲明 · 📣 請即 follow @businessfocus.io</div>
+      </div>
+    </div>
+
+    <div class="ctl-inline" style="margin-top:12px">
+      <span>發佈時段</span>
+      <select class="dm-select" style="width:190px"><option>今日 19:00（推薦 +48%）</option><option>今日 18:00（+33%）</option><option>今日 20:30（+24%）</option><option>明日 08:30（開市前 +5%）</option></select>
+      <span class="dm-meta-label">唯一可調項——格式與語氣由 skill 鎖定</span>
+    </div>
+
+    <div class="action-row" style="margin:14px 0 0">
+      <button class="btn btn--primary btn--sm">確認並生成圖片與 post →</button>
+      <button class="btn btn--secondary btn--sm">重寫某一段</button>
+      <button class="btn btn--secondary btn--sm">退回選題池</button>
+    </div>
+    <div class="foot-note">確認後才會呼叫 6 次 image gen。48 小時未審 → 標 <code>stale</code>，不刪除、不自動放行。</div>
+  </section>
+</div>
 
 <div class="callout callout--b">
   <div class="callout__title">「ChatGPT 按 skill 給選題」的三條硬規則 — 印在 UI 上</div>
-  <div class="callout__body">① prompt 不再由 editor 每天手貼——它是 <b>bf-topic-selection v1</b> 的一部分，按排程自動執行、有版本、有留檔；② <b>LLM 給的 URL 一律不採信</b>——必須重新搜到 ≥2 個獨立真實報道才進池，驗證失敗的候選進 run.llm_unverified[]（本次 2 條，可展開查看）；③ trends 軌故障時 LLM 軌是降級鏈的最後一級（48h → buzz keywords → 12 來源頭條 → llm_only）。</div>
-  <div class="callout__meta"><span>今日 LLM 轨贡献: <b>6 進池 · 2 被拒</b></span><span>雙軌命中: <b>3</b></span><span>降級: <b>0 級</b></span></div>
+  <div class="callout__body">① prompt 不再由 editor 每天手貼——它是 <b>bf-topic-selection v1</b> 的一部分，按排程自動執行、有版本、有留檔；② <b>LLM 給的 URL 一律不採信</b>——必須重新搜到 ≥2 個獨立真實報道才進池，驗證失敗的候選進 run.llm_unverified[]（本次 2 條，可展開查看）；③ trends 軌故障時 LLM 軌是降級鏈的最後一級（48h → buzz keywords → 12 來源頭條 → llm_only）。<b>手動錄入的模式 B 同樣要跑 research pack</b>——題是人給的，數字照樣要核。</div>
+  <div class="callout__meta"><span>今日 LLM 轨贡献: <b>6 進池 · 2 被拒</b></span><span>雙軌命中: <b>3</b></span><span>手動錄入: <b>2</b></span><span>降級: <b>0 級</b></span></div>
 </div>
 
 <div class="dm-row">
   <section class="dm-card">
     <div class="dm-title-card">Found-by distribution — today's pool<span class="dmode dmode-mock">MOCK</span></div>
-    <span class="dm-subtitle">Where the 20 candidates came from. The two tracks overlap on the three biggest stories — that overlap is the health signal cross_check exists to measure.</span>
+    <span class="dm-subtitle">20 條候選的來源分佈。兩軌在三條最大的新聞上重疊——這個重疊率正是 cross_check 要量的健康信號。</span>
     <div class="dm-chart-area" data-chart="tpFound"></div>
   </section>
   <section class="dm-card">
     <div class="dm-title-card">Pool category mix vs page corpus<span class="dmode dmode-mock">MOCK</span></div>
-    <span class="dm-subtitle">BusinessFocus already publishes 72% Business &amp; Finance. The pool respects the「同 category 最多 2 條」selection rule so the day's slate is not five takes on the same market story.</span>
+    <span class="dm-subtitle">BusinessFocus 本身已有 72% Business &amp; Finance。選題池遵守「同 category 最多 2 條」，避免一天五條都在講同一個大盤故事。</span>
     <div class="dm-chart-area" data-chart="tpCat"></div>
   </section>
 </div>
@@ -519,82 +658,52 @@ a{text-decoration:none;color:inherit}
 </section>
 
 </div>
-<!-- ══════════ TAB 2 · BRIEF STUDIO (BF) ══════════ -->
+
 <div class="tab-panel" id="tab-brief">
 
-<div class="sec-head">
-  <div class="dm-title-section">Brief 確認 — 證據在這一頁，決定不在這一頁</div>
-  <span class="dm-subtitle">BF 的格式、結構、字數、語氣、比例全部由 <b>bf-content-package v1</b> 鎖定，所以這一頁不是裝配台，是<b>確認頁</b>：只讀展示 research pack（角度／事實／帶來源的數據／對立觀點／缺口）與固定規格，唯一可調的是<b>發佈時段</b>。要改寫作規則＝升 skill 版本，不是在這裡改設定。</span>
-</div>
-
-<div class="dm-kpi-row">
-  <div class="dm-kpi-card"><div class="kpi__label">Grounding corpus</div><div class="kpi__metric">186</div><div class="kpi__sub">FB 136 + IG 50 · window</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">FB Post ER</div><div class="kpi__metric">0.56%</div><div class="kpi__sub up">+66.24% vs prior</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">IG Post ER</div><div class="kpi__metric">0.21%</div><div class="kpi__sub up">+50.07% vs prior</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">Avg eng / post（竞品组）</div><div class="kpi__metric">300.3</div><div class="kpi__sub up">全組第一 · EDigest 123.9</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">Comments / Post</div><div class="kpi__metric">54</div><div class="kpi__sub up">FB · +139.78%</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">IG Saves</div><div class="kpi__metric">6,253</div><div class="kpi__sub up">+63.22% · 強指標</div></div>
-</div>
+<section class="dm-card explain">
+  <div class="explain__ico">🔒</div>
+  <div class="explain__t">BF 流程不使用這一步</div>
+  <div class="explain__b">
+    BF 的內容規格由 <b>bf-content-package v1</b> 鎖定——8 區段結構、約 2,000 字、4:5×5 + 1000×525、FB = s1..s7 / IG = s1..s8，全部是硬契約，<b>沒有可決策項</b>。主線 Studio 的 brief 要選 angle／format／字數／語氣，因為那是通用頁面；BF 不需要。<br><br>
+    · 選題、證據與文章 → <b>Topic Studio</b><br>
+    · 6 張圖與兩條 post → <b>Post Studio</b><br>
+    · 寫作與視覺規則（brand_profile）→ 見下方只讀卡<br>
+    · 要改規則 ＝ <b>升 skill 版本</b>，不是在這裡改設定
+  </div>
+  <div class="explain__nav">
+    <button class="btn btn--primary btn--sm" data-goto="topic">去 Topic Studio →</button>
+    <button class="btn btn--secondary btn--sm" data-goto="post">去 Post Studio →</button>
+  </div>
+</section>
 
 <div class="callout callout--b">
-  <div class="callout__title">這一頁沒有決策項 — 這是刻意的</div>
-  <div class="callout__body">主線 Studio 的 brief 要選 angle／format／字數／語氣，因為那是通用頁面。BF 不需要：8 區段結構、約 2000 字、4:5×5 + 1000×525、FB=s1..s7、IG=s1..s8 全部是 writing skill 的硬契約。<b>編輯要看的是「證據夠不夠」，不是「格式選咩」。</b>唯一可調＝發佈時段；要跳過這條選題就回選題池。</div>
-  <div class="callout__meta"><span>只讀：<b>research pack + 固定規格</b></span><span>可調：<b>發佈時段</b></span><span>要改規則：<b>升 skill 版本</b></span></div>
+  <div class="callout__title">為什麼保留這個 tab 而不是隱藏它</div>
+  <div class="callout__body">① 灰掉會被當成 bug；② 隱藏會讓 tab 結構在不同品牌之間不一致；③ <b>未來品牌 #2 如果是非新聞類</b>（要選 angle／format／長度），brief 就落在這一屏——這是給未來留的空位，不是浪費。</div>
 </div>
 
 <section class="dm-card">
-  <div class="dm-title-card">Research pack — topic #1「英偉達財報前夕美股 AI 板塊震盪」<span class="dmode dmode-mock">MOCK</span></div>
-  <span class="dm-subtitle">bf-topic-selection STAGE 3 的產物（只讀）。每個數據點必須帶來源 URL 與截取時間，查不到的進 missing[] —— 寧願不放，不可腦補。</span>
-  <div class="dm-table-scroll"><table class="dm-modern-table">
-    <thead><tr><th>Brief element</th><th>Decision</th><th>Evidence</th><th>Source</th></tr></thead>
-    <tbody>
-      <tr><td>Topic</td><td>英偉達財報前夕美股 AI 板塊震盪 港股科技股連鎖反應</td><td>Score 87 · Trends ↑#3 +180% · 雙軌命中 · 4 來源</td><td><span class="mf">Topic Studio · run #34</span></td></tr>
-      <tr><td>Angle（research pack 給出）</td><td>拆局分析型 — 數據前置、成因與港股傳導鏈</td><td>BF 主品類 Business &amp; Finance 佔本頁 72%（FB）/ 80%（IG）；拆局是 BF 語態</td><td><span class="mf">My Pages · category 分布</span></td></tr>
-      <tr><td>結構 <span class="tg tg-n">固定</span></td><td>8 區段（s1 標題 → s2 導言 → s3–s5 三大段 → s6 結語 → s7 hashtags → s8 品牌塊）</td><td>bf-content-package 固定契約；錨點供組裝切段</td><td><span class="mf">Writing skill v1</span></td></tr>
-      <tr><td>Keywords</td><td>美股 · AI · 英偉達 · 港股科技股</td><td>繼承選題 signal.trend_queries；「美股」「AI」同時是本頁 90D 熱詞</td><td><span class="mf">Topic signal + 頁面熱詞</span></td></tr>
-      <tr><td>Format <span class="tg tg-n">固定</span></td><td>FB image post（s1..s7 + 封面）+ IG carousel（s1..s8 + 5 圖）</td><td>固定組裝配方；FB 帖型現狀 Status 47.8% / Link 30.9%，image post 是 BF 高互動形態</td><td><span class="mf">bf-post-assembly</span></td></tr>
-      <tr><td>Posting slot <span class="tg tg-b">可調</span></td><td>今日 19:00 HKT</td><td>IG top posts 實測集中 18:11 / 19:01 / 20:51；19:00 slot 在線粉絲峰值</td><td><span class="mf">My Pages · online followers</span></td></tr>
-      <tr><td>Predicted eng</td><td>FB 412 / IG 1.4K likes（80% CI）</td><td>Pre-flight model v1（BF 校準 n=38，區間偏寬）</td><td><span class="mf">Pre-flight model v1</span></td></tr>
-    </tbody>
-  </table></div>
-</section>
-
-<div class="dm-row">
-  <section class="dm-card">
-    <div class="dm-title-card">BF writing rules = brand_profile（v1 鎖定只讀）<span class="dmode dmode-live">LIVE</span></div>
-    <span class="dm-subtitle">這就是 BusinessFocus 的 brandline —— v1 寫死在 bf-content-package v1 裡（Settings 的 writing_skill 🔒）。品牌 #2 上線時，這張卡的內容改由 Brand Guideline 卡編輯，skill 引擎不變。比例與事實兩條是失敗條件，不是風格建議。</span>
-    <div class="chk"><span class="ok">✓</span>繁體中文財經分析報道 · 港式書面語（唔會/點解 只入引語）</div>
-    <div class="chk"><span class="ok">✓</span>標題固定尾綴 【 @businessfocus.io 】【#BF社會熱話】</div>
-    <div class="chk"><span class="ok">✓</span>股票代碼規則：美股：GM · 日股：7203 · A股：600104 · 德股：MBG</div>
-    <div class="chk"><span class="ok">✓</span>數字必須先核實才上圖 — 不可腦補</div>
-    <div class="chk"><span class="ok">✓</span>比例硬性：4:5 ×5 + 1000×525 ×1 — 不符即重生成</div>
-    <div class="chk"><span class="ok">✓</span>固定文末聲明與品牌文字（s8）</div>
-  </section>
-  <section class="dm-card">
-    <div class="dm-title-card">Posting slot — BusinessFocus hours<span class="dmode dmode-agg">AGG</span></div>
-    <span class="dm-subtitle">Hourly online-follower share for BusinessFocus IG + FB, with the recommended evening slot marked. Finance pages get a second commuter shoulder at 08:30.</span>
-    <div class="dm-chart-area" data-chart="bfSlot"></div>
-  </section>
-</div>
-
-<div class="action-row">
-  <button class="btn btn--primary">確認並生成交付 →</button>
-  <button class="btn btn--secondary">改發佈時段</button>
-  <button class="btn btn--secondary">跳過這條 · 回選題池</button>
-  <span class="who">bf_agent · bf-content-package v1 · 一次產出全套 7 產物（含 07 橫版）</span>
-</div>
-
-<section class="ai-card">
-  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Brief 確認</div></div>
-  <div class="ai-card__sub">Grounded on FB 136 + IG 50 posts · topic signal · BF writing skill · Confidence: Medium</div>
-  <div class="ai-insight-item"><span class="ib ib-b">Signal</span><b>選題自帶 keyword 時效性——這是 BF brief 天生比通用 brief 強的地方。</b>「英偉達」在 HK trends 排 #3 且 +180%，brief 的 keyword 分量不需要另外驗證時效。<b>keyword timeliness 分量直接吃 topic signal，省一次 Buzz 查詢。</b></div>
-  <div class="ai-insight-item good"><span class="ib ib-g">Benchmark</span><b>BusinessFocus 平均每帖互動 300.3，是競品組第一——高出第二名 EDigest 2.4 倍。</b> 這個領先來自量少質精（week 窗口 114 帖 vs 香港01 的 358 帖）。<b>brief 的目標不是追發帖量，是守住單帖互動的領先。</b></div>
-  <div class="ai-insight-item warn"><span class="ib ib-a">Watch</span><b>IG saves +63.22% 是本月最強的正向信號。</b> 財經資訊圖的收藏行為（袋住慢慢睇）與 IG 演算法的非粉觸達強相關。<b>brief 的 CTA 從「讚好」改成「收藏」，資訊圖 03–06 的最後一格帶收藏提示。</b></div>
-  <div class="ai-ask"><input type="text" placeholder="Ask about this brief — e.g. 「點解揀 19:00 唔係開市前？」"><button class="btn btn--primary btn--sm">Ask</button></div>
+  <div class="dm-title-card">brand_profile — BusinessFocus 的 brandline（v1 鎖定只讀）<span class="dmode dmode-live">LIVE</span></div>
+  <span class="dm-subtitle">這就是 BF 的 brandline，v1 寫死在 bf-content-package v1 裡（Settings 的 writing_skill 🔒）。品牌 #2 上線時，這張卡的內容改由 Brand Guideline 卡編輯，skill 引擎不變。比例與事實兩條是失敗條件，不是風格建議。</span>
+  <div class="split2">
+    <div>
+      <div class="chk"><span class="ok">✓</span>繁體中文財經分析報道 · 港式書面語</div>
+      <div class="chk"><span class="ok">✓</span>標題固定尾綴 【 @businessfocus.io 】【#BF社會熱話】</div>
+      <div class="chk"><span class="ok">✓</span>股票代碼規則：美股：NVDA · 日股：7203 · A股：600104</div>
+      <div class="chk"><span class="ok">✓</span>非股價金額補「（約合港元）」；股價只寫原幣種</div>
+    </div>
+    <div>
+      <div class="chk"><span class="ok">✓</span>8 區段結構 s1..s8（錨點是組裝硬契約）· 全文約 2,000 字內</div>
+      <div class="chk"><span class="ok">✓</span>比例硬性：4:5 ×5 + 1000×525 ×1 — 不符即重生成</div>
+      <div class="chk"><span class="ok">✓</span>數字必須先核實才上圖 — 不可腦補</div>
+      <div class="chk"><span class="ok">✓</span>固定文末聲明與品牌文字（s8 原文照抄）</div>
+    </div>
+  </div>
+  <div class="foot-note">品牌色 <b>#184c83</b> 科技藍 · <b>#fefb09</b> 檸檬黃；模板 registry = 封面／資訊圖／橫版三張參考圖（⚠ 需先搬入 MediaLens <code>bf-templates/</code>）。</div>
 </section>
 
 </div>
-<!-- ══════════ TAB 3 · POST STUDIO (BF) ══════════ -->
+
 <div class="tab-panel" id="tab-post">
 
 <div class="sec-head">
@@ -625,18 +734,17 @@ a{text-decoration:none;color:inherit}
     <div class="foot-note">狀態機：generating → review（7 asset + 2 post 齊備）→ partial_published / published；比例不符 / 圖缺 / 區段缺 → 該項重生成，組裝缺件 → 整條 post 不建立、交付標 failed。</div>
   </section>
   <section class="dm-card">
-    <div class="dm-title-card">01_文章全文 — 8 區段（golden sample 真實內容）<span class="dmode dmode-live">LIVE</span></div>
-    <span class="dm-subtitle">Anchors are the hard contract the assembler cuts by. Section colours match the recipe chips on the post cards.</span>
-    <div class="article-block">
-      <div class="seg-line"><span class="seg seg-s1">s1 標題</span><b>Momenta擬港籌10億美元！中國自動駕駛AI新股光環背後 三年蝕逾92億問盈利何時到？【 @businessfocus.io 】【#BF社會熱話】</b></div>
-      <div class="seg-line"><span class="seg seg-s2">s2 導言</span>中國自動駕駛獨角獸 Momenta 擬在香港 IPO，集資額或約 10 億美元（約78億港元），估值約 90 億美元。通用汽車（美股：GM）、豐田汽車（日股：7203）、上汽集團（A股：600104）、Mercedes-Benz（德股：MBG）在股東或合作方名單中……</div>
-      <div class="seg-line"><span class="seg seg-s3">s3 段一</span><b>車企背書夠豪華 但港股要看的不是名單</b> — 2025 年收入增至人民幣 24.13 億元，毛利率 71.6%；量產車方案安裝量超過 68 萬套，城市 NOA 超過 65 萬套……</div>
-      <div class="seg-line"><span class="seg seg-s4">s4 段二</span><b>收入增長快 虧損曲線仍是最大陰影</b> — 收入 7.43 億 → 24.13 億（三年 CAGR &gt;80%）；虧損 25.70 / 32.06 / 34.58 億，三年合計逾 92 億；非 IFRS 經調整虧損收窄至 3.03 億……</div>
-      <div class="seg-line"><span class="seg seg-s5">s5 段三</span><b>Robotaxi 是想像空間 也是估值風險</b> — 與 Uber（美股：UBER）2026 年慕尼黑測試 L4；Mercedes-Benz 及 Lumo 阿布扎比；Grab（美股：GRAB）東南亞……</div>
-      <div class="seg-line"><span class="seg seg-s6">s6 結語</span>2026 年上半年香港 IPO 融資額達 216 億美元，按年升 51%（LSEG）。下一隻 AI 新股能否成為長線贏家，不在於故事有幾震撼，而在於它何時證明自動駕駛不只是會開車，還真的會賺錢。</div>
-      <div class="seg-line"><span class="seg seg-s7">s7 標籤</span>#BusinessFocus #BF #Insight #Momenta #香港IPO #自動駕駛 #Robotaxi #AI新股</div>
-      <div class="seg-line"><span class="seg seg-s8">s8 品牌塊</span>Text by BusinessFocus Editorial · 免責聲明（固定文末聲明）· 📣 請即 follow @businessfocus.io 發掘更多商業智慧 投資靈感 及 創業故事！</div>
+    <div class="dm-title-card">caption 從哪些區段切出來<span class="dmode dmode-live">LIVE</span></div>
+    <span class="dm-subtitle">文章全文在 <b>Topic Studio</b> 已確認（避免兩處維護同一內容必然漂移）。這裡只顯示組裝映射：兩條 caption 都是從同一篇文章按錨點切出，不經第二次生成。</span>
+    <div style="font:600 11px var(--font-body);color:var(--dm-slate-600);margin-bottom:2px">Facebook image post — caption = s1..s7 · 媒體 = 02 封面單圖</div>
+    <div class="recipe-bar">
+      <span class="rseg seg-s1">s1</span><span class="rseg seg-s2">s2</span><span class="rseg seg-s3">s3</span><span class="rseg seg-s4">s4</span><span class="rseg seg-s5">s5</span><span class="rseg seg-s6">s6</span><span class="rseg seg-s7">s7</span><span class="rseg" style="background:var(--dm-slate-100);color:var(--dm-slate-400)">s8 不用</span>
     </div>
+    <div style="font:600 11px var(--font-body);color:var(--dm-slate-600);margin:14px 0 2px">Instagram carousel — caption = s1..s8 · 媒體 = 02→06 五圖依序</div>
+    <div class="recipe-bar">
+      <span class="rseg seg-s1">s1</span><span class="rseg seg-s2">s2</span><span class="rseg seg-s3">s3</span><span class="rseg seg-s4">s4</span><span class="rseg seg-s5">s5</span><span class="rseg seg-s6">s6</span><span class="rseg seg-s7">s7</span><span class="rseg seg-s8">s8</span>
+    </div>
+    <div class="foot-note">s8 = 固定文末聲明 + 品牌文字，只有 IG 版帶（FB 版不帶）。IG 若超 2,200 字 → 先截 s8 免責段<b>並回報</b>，不靜默截斷。錨點 schema 不可改——它是組裝程序的輸入契約。<br>→ 要看／改文章全文：<b>Topic Studio → 詳情面板 ③</b></div>
   </section>
 </div>
 
@@ -884,6 +992,7 @@ a{text-decoration:none;color:inherit}
   <section class="dm-card">
     <div class="dm-title-card">Slot recommendation — BusinessFocus hours<span class="dmode dmode-agg">AGG</span></div>
     <span class="dm-subtitle">From this page's own online-follower hours and measured slot ER. Evening dominates; the pre-market commuter band is the finance-page bonus slot.</span>
+    <div class="dm-chart-area short" data-chart="bfSlot"></div>
     <div class="dm-table-scroll"><table class="dm-modern-table dm-modern-table--compact">
       <thead><tr><th>Slot</th><th>Online followers</th><th>Posts in slot (90D)</th><th>Median eng / post</th><th>Lift vs page median</th><th>Queue usage</th></tr></thead>
       <tbody>
@@ -1046,6 +1155,29 @@ document.querySelectorAll('.dm-page-menu .menu-item').forEach(function(btn){
     });
   });
 })();
+/* ── 手動錄入 toggle ── */
+(function(){
+  var b=document.getElementById('btnManual'), p=document.getElementById('manualEntry');
+  if(b&&p) b.addEventListener('click',function(){
+    var open = p.style.display!=='none';
+    p.style.display = open ? 'none' : 'block';
+    b.textContent = open ? '+ 手動錄入' : '× 收起錄入';
+  });
+})();
+/* ── 說明屏跳轉 ── */
+document.querySelectorAll('[data-goto]').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var t=document.querySelector('.dm-page-menu .menu-item[data-tab="'+btn.dataset.goto+'"]');
+    if(t) t.click();
+  });
+});
+/* ── master-detail 列表選中態（示意） ── */
+document.querySelectorAll('.md-list .dm-modern-table tbody tr').forEach(function(tr){
+  tr.addEventListener('click',function(){
+    tr.closest('tbody').querySelectorAll('tr').forEach(function(x){x.classList.remove('is-sel')});
+    tr.classList.add('is-sel');
+  });
+});
 /* ── Pills toggle (visual only) ── */
 document.querySelectorAll('.pill-row').forEach(function(row){
   row.querySelectorAll('.pill').forEach(function(p){
