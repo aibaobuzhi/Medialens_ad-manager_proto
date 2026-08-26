@@ -402,6 +402,24 @@ a{text-decoration:none;color:inherit}
 .rmbanner .rmb-tag{flex:0 0 auto;background:#B8860B;color:#fff;border-radius:6px;padding:2px 8px;font:700 10px var(--font-body);letter-spacing:.04em;margin-top:1px}
 .rmbanner .rmb-t{font:600 12.5px var(--font-body);color:#6B4E00;line-height:1.55}
 .rmbanner .rmb-t b{color:#4A3600}
+
+.artfold{border:1px solid var(--dm-slate-200);border-radius:10px;background:var(--dm-slate-50);overflow:hidden}
+.artfold>summary{cursor:pointer;list-style:none;padding:11px 14px;display:flex;align-items:center;gap:9px;font:600 12px var(--font-body);color:var(--dm-slate-700)}
+.artfold>summary::-webkit-details-marker{display:none}
+.artfold>summary::before{content:'▸';color:var(--dm-slate-400);font-size:11px}
+.artfold[open]>summary::before{content:'▾'}
+.artfold .ro{margin-left:auto;background:var(--dm-slate-200);color:var(--dm-slate-600);border-radius:5px;padding:2px 7px;font:700 9.5px var(--font-body)}
+.artfold .bd{padding:0 14px 14px;font:400 12px/1.75 var(--font-body);color:var(--dm-slate-700);border-top:1px solid var(--dm-slate-200);padding-top:12px}
+.gatecmp{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.gatecmp .g1{border:1px solid var(--dm-slate-200);border-radius:10px;padding:12px 14px;background:#fff}
+.gatecmp .g1.here{border-color:var(--dm-primary);background:#F2F9FF}
+.gatecmp .gn{font:700 9.5px var(--font-body);letter-spacing:.05em;color:var(--dm-slate-400);margin-bottom:5px}
+.gatecmp .gq{font:600 12.5px var(--font-body);color:var(--dm-slate-800);line-height:1.5;margin-bottom:7px}
+.gatecmp .gb{font:600 11px var(--font-body);color:var(--dm-primary);background:#fff;border:1px solid var(--dm-primary);border-radius:6px;padding:3px 9px;display:inline-block}
+.gatecmp .g1:not(.here) .gb{color:var(--dm-slate-500);border-color:var(--dm-slate-300)}
+.regen{display:inline-flex;align-items:center;gap:4px;margin-left:auto;font:600 10px var(--font-body);color:var(--dm-primary);border:1px solid var(--dm-slate-300);border-radius:6px;padding:2px 7px;background:#fff;cursor:pointer}
+.capedit{border:1px dashed var(--dm-slate-300);border-radius:7px;padding:7px 10px;margin-top:8px;font:400 11px/1.6 var(--font-body);color:var(--dm-slate-600);background:var(--dm-slate-50)}
+.capedit b{color:var(--dm-slate-800)}
 </style>
 </head>
 <body>
@@ -445,7 +463,7 @@ a{text-decoration:none;color:inherit}
 <main class="ml-main"><div class="ml-content">
 
 <div class="dm-title-page">Creation &amp; Autopilot Studio — BF</div>
-<div class="dm-page-sub"><b>v1 上線範圍</b>：每日自動選題（LLM 軌）→ 編輯挑題 → 生成文章 → <b>編輯確認（唯一闸门）</b> → 出 6 圖與 2 條 post → 落 Content Publish 草稿區由編輯自己發。<b>v1 不做</b>定時發布、Calendar、Autopilot、雙軌選題。</div>
+<div class="dm-page-sub"><b>v1 上線範圍</b>：每日自動選題（LLM 軌）→ 編輯挑題 → 生成文章 → <b>編輯確認（唯一闸门）</b> → 出 6 圖與 2 條 post → 編輯在 <b>Post Studio</b> review、改 caption、需要時單張重生圖 → <b>就在那一頁確認並發布</b>。<b>v1 不做</b>定時發布、Calendar、Autopilot、雙軌選題。</div>
 
 <nav class="dm-page-menu"><div class="menu-list">
   <button class="menu-item is-active" data-tab="topic">Topic Studio</button>
@@ -494,7 +512,7 @@ a{text-decoration:none;color:inherit}
   <div class="stg done">② 確認並生成文章<span class="sub">research pack + 01 文章</span></div>
   <div class="stg now">③ 文章闸门<span class="sub">編輯在此確認 ← 你在這裡</span></div>
   <div class="stg">④ 生成 6 圖 + 組 post<span class="sub">02–07 + FB/IG</span></div>
-  <div class="stg">⑤ 落草稿區<span class="sub">Content Publish · 編輯自己發</span></div>
+  <div class="stg">⑤ 確認並發布<span class="sub">Post Studio 內完成</span></div>
 </div>
 
 <div class="dm-kpi-row">
@@ -712,8 +730,8 @@ a{text-decoration:none;color:inherit}
 <div class="tab-panel" id="tab-post">
 
 <div class="sec-head">
-  <div class="dm-title-section">Post Studio — one topic, one delivery folder, two ready posts</div>
-  <span class="dm-subtitle">The article is the single source of truth. Both captions are cut from it by anchor — engineering, not a second generation pass: reproducible, zero hallucination, and every failure has an address. Example below is the real golden sample（delivery-20260625-momenta）.</span>
+  <div class="dm-title-section">Post Studio — review、編輯、重生圖、確認發布</div>
+  <span class="dm-subtitle"><b>這是編輯 review 成品的唯一一頁</b>：看圖、校數字、改 caption、需要時單張重生圖，確認後<b>直接在這裡發布</b>——不用跳去別的模組。文章仍是單一事實源：兩條 caption 都從它按錨點切出，不經第二次生成。示例是真實 golden sample（delivery-20260625-momenta）。</span>
 </div>
 
 <div class="dm-kpi-row">
@@ -721,26 +739,52 @@ a{text-decoration:none;color:inherit}
   <div class="dm-kpi-card"><div class="kpi__label">Posts assembled</div><div class="kpi__metric">2</div><div class="kpi__sub">FB image + IG carousel</div></div>
   <div class="dm-kpi-card"><div class="kpi__label">FB caption</div><div class="kpi__metric">1,709</div><div class="kpi__sub">字 · s1..s7</div></div>
   <div class="dm-kpi-card"><div class="kpi__label">IG caption</div><div class="kpi__metric">1,923</div><div class="kpi__sub up">字 · s1..s8 · ≤2,200 ✓</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">Best pre-flight</div><div class="kpi__metric">76</div><div class="kpi__sub up">FB post · ship bar 70</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">出口</div><div class="kpi__metric">草稿</div><div class="kpi__sub">Content Publish · 編輯自己發</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">可發布</div><div class="kpi__metric">2 / 2</div><div class="kpi__sub up">FB image + IG carousel</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Readiness</div><div class="kpi__metric">通過</div><div class="kpi__sub up">0 fail · 1 warn（IG 字數餘量）</div></div>
 </div>
+
+<div class="gatecmp">
+  <div class="g1">
+    <div class="gn">閘門 1 · 在 TOPIC STUDIO</div>
+    <div class="gq">這個題、這篇文章，值不值得花 6 次出圖？</div>
+    <span class="gb">確認並生成圖片與 post</span>
+  </div>
+  <div class="g1 here">
+    <div class="gn">閘門 2 · 就在這一頁</div>
+    <div class="gq">圖對不對、數字準不準、caption 切得對不對？</div>
+    <span class="gb">確認並發布</span>
+  </div>
+</div>
+
+<section class="dm-card" style="margin-bottom:16px">
+  <div class="dm-title-card">文章全文（折疊只讀）<span class="dmode dmode-live">LIVE</span></div>
+  <span class="dm-subtitle">校圖上數字、校 caption 切得對不對時要能就地對照原文，所以放在這裡。但<b>只讀</b>——文章的編輯入口只保留 Topic Studio 一處：caption 是從文章切出來的，文章有兩個可編輯入口會直接導致「改了哪一份」說不清。</span>
+  <details class="artfold">
+    <summary>01_文章全文.md · 8 區段 s1..s8 · 錨點完整 · 2,104 字<span class="ro">只讀</span></summary>
+    <div class="bd"><b>s1</b> Momenta擬港籌10億美元！中國自動駕駛AI新股光環背後 三年蝕逾92億問盈利何時到？【 @businessfocus.io 】【#BF社會熱話】<br><br><b>s2</b> 中國自動駕駛獨角獸 Momenta 擬在香港 IPO，集資額或約 10 億美元…<br><br><b>s3–s5</b>（事件拆解 / 痛點分析 / 解法重點，各兩個自然段）…<br><br><b>s6</b> 無小標題結尾段…<br><br><b>s7</b> 導流前綴行 · <b>s8</b> 固定文末聲明與品牌文字（逐字，只有 IG 版帶）</div>
+  </details>
+  <div class="action-row" style="padding-top:12px">
+    <button class="btn btn--secondary btn--sm">回 Topic Studio 編輯 →</button>
+    <span class="who">改完文章回到這裡，會提示是否用新版重切 caption</span>
+  </div>
+</section>
 
 <div class="dm-row">
   <section class="dm-card">
     <div class="dm-title-card">Delivery folder — 20260625_Momenta擬港籌10億美元<span class="dmode dmode-live">LIVE</span></div>
-    <span class="dm-subtitle">7 products, fixed names, fixed order. Ratio validation is a gate: a failed image regenerates, it never ships.</span>
+    <span class="dm-subtitle">7 個產物、固定檔名、固定順序。比例校驗是硬閘門，不合格的圖重生成、不會出貨。<b>每張圖可以單獨重生</b>——一次 image gen，不重跑整套；重生後仍要過比例與圖內數字校驗。</span>
     <div class="chk"><span class="ok">✓</span><b>01_文章全文.md</b><span class="meta"><span class="tg tg-b">8 區段 s1..s8</span><span class="tg tg-g">錨點完整</span></span></div>
-    <div class="chk"><span class="ok">✓</span><b>02_直版封面_4x5.png</b><span class="meta"><span class="tg tg-n">4:5</span><span class="tg tg-g">verified</span></span></div>
-    <div class="chk"><span class="ok">✓</span><b>03_資訊圖1_事件拆解_4x5.png</b><span class="meta"><span class="tg tg-n">4:5</span><span class="tg tg-g">verified</span></span></div>
-    <div class="chk"><span class="ok">✓</span><b>04_資訊圖2_痛點分析_4x5.png</b><span class="meta"><span class="tg tg-n">4:5</span><span class="tg tg-g">verified</span></span></div>
-    <div class="chk"><span class="ok">✓</span><b>05_資訊圖3_解法重點_4x5.png</b><span class="meta"><span class="tg tg-n">4:5</span><span class="tg tg-g">verified</span></span></div>
-    <div class="chk"><span class="ok">✓</span><b>06_資訊圖4_CTA_4x5.png</b><span class="meta"><span class="tg tg-n">4:5</span><span class="tg tg-g">verified</span></span></div>
-    <div class="chk"><span class="ok">✓</span><b>07_橫版封面_1000x525.png</b><span class="meta"><span class="tg tg-n">1000×525</span><span class="tg tg-a">網站 hero 用</span></span></div>
+    <div class="chk"><span class="ok">✓</span><b>02_直版封面_4x5.png</b><span class="meta"><span class="tg tg-n">4:5</span><span class="tg tg-g">verified</span><button class="regen">↻ 重生這張</button></span></div>
+    <div class="chk"><span class="ok">✓</span><b>03_資訊圖1_事件拆解_4x5.png</b><span class="meta"><span class="tg tg-n">4:5</span><span class="tg tg-g">verified</span><button class="regen">↻ 重生這張</button></span></div>
+    <div class="chk"><span class="ok">✓</span><b>04_資訊圖2_痛點分析_4x5.png</b><span class="meta"><span class="tg tg-n">4:5</span><span class="tg tg-g">verified</span><button class="regen">↻ 重生這張</button></span></div>
+    <div class="chk"><span class="ok">✓</span><b>05_資訊圖3_解法重點_4x5.png</b><span class="meta"><span class="tg tg-n">4:5</span><span class="tg tg-g">verified</span><button class="regen">↻ 重生這張</button></span></div>
+    <div class="chk"><span class="ok">✓</span><b>06_資訊圖4_CTA_4x5.png</b><span class="meta"><span class="tg tg-n">4:5</span><span class="tg tg-g">verified</span><button class="regen">↻ 重生這張</button></span></div>
+    <div class="chk"><span class="ok">✓</span><b>07_橫版封面_1000x525.png</b><span class="meta"><span class="tg tg-n">1000×525</span><span class="tg tg-a">網站 hero 用</span><button class="regen">↻ 重生這張</button></span></div>
     <div class="foot-note">狀態機：generating → review（7 asset + 2 post 齊備）→ partial_published / published；比例不符 / 圖缺 / 區段缺 → 該項重生成，組裝缺件 → 整條 post 不建立、交付標 failed。</div>
   </section>
   <section class="dm-card">
     <div class="dm-title-card">caption 從哪些區段切出來<span class="dmode dmode-live">LIVE</span></div>
-    <span class="dm-subtitle">文章全文在 <b>Topic Studio</b> 已確認（避免兩處維護同一內容必然漂移）。這裡只顯示組裝映射：兩條 caption 都是從同一篇文章按錨點切出，不經第二次生成。</span>
+    <span class="dm-subtitle">組裝映射：兩條 caption 都是從同一篇文章按錨點切出，不經第二次生成。文章本身在上方折疊卡裡可對照（只讀）。</span>
     <div style="font:600 11px var(--font-body);color:var(--dm-slate-600);margin-bottom:2px">Facebook image post — caption = s1..s7 · 媒體 = 02 封面單圖</div>
     <div class="recipe-bar">
       <span class="rseg seg-s1">s1</span><span class="rseg seg-s2">s2</span><span class="rseg seg-s3">s3</span><span class="rseg seg-s4">s4</span><span class="rseg seg-s5">s5</span><span class="rseg seg-s6">s6</span><span class="rseg seg-s7">s7</span><span class="rseg" style="background:var(--dm-slate-100);color:var(--dm-slate-400)">s8 不用</span>
@@ -749,7 +793,7 @@ a{text-decoration:none;color:inherit}
     <div class="recipe-bar">
       <span class="rseg seg-s1">s1</span><span class="rseg seg-s2">s2</span><span class="rseg seg-s3">s3</span><span class="rseg seg-s4">s4</span><span class="rseg seg-s5">s5</span><span class="rseg seg-s6">s6</span><span class="rseg seg-s7">s7</span><span class="rseg seg-s8">s8</span>
     </div>
-    <div class="foot-note">s8 = 固定文末聲明 + 品牌文字，只有 IG 版帶（FB 版不帶）。IG 若超 2,200 字 → 先截 s8 免責段<b>並回報</b>，不靜默截斷。錨點 schema 不可改——它是組裝程序的輸入契約。<br>→ 要看／改文章全文：<b>Topic Studio → 詳情面板 ③</b></div>
+    <div class="foot-note">s8 = 固定文末聲明 + 品牌文字，只有 IG 版帶（FB 版不帶）。IG 若超 2,200 字 → 先截 s8 免責段<b>並回報</b>，不靜默截斷。錨點 schema 不可改——它是組裝程序的輸入契約。<br>→ 要<b>改</b>文章：上方折疊卡的「回 Topic Studio 編輯」</div>
   </section>
 </div>
 
@@ -759,6 +803,7 @@ a{text-decoration:none;color:inherit}
     <div class="var-card__body">Momenta擬港籌10億美元！中國自動駕駛AI新股光環背後 三年蝕逾92億問盈利何時到？【 @businessfocus.io 】【#BF社會熱話】 ⸺ 中國自動駕駛獨角獸 Momenta 擬在香港 IPO，集資額或約 10 億美元…（s2–s6 全文）… #BusinessFocus #BF #Insight #Momenta #香港IPO #自動駕駛 #Robotaxi #AI新股</div>
     <div class="var-card__tags"><span class="seg seg-s1">s1</span><span class="seg seg-s2">s2</span><span class="seg seg-s3">s3</span><span class="seg seg-s4">s4</span><span class="seg seg-s5">s5</span><span class="seg seg-s6">s6</span><span class="seg seg-s7">s7</span></div>
     <div class="var-card__meta"><span>平台 <b>Facebook</b></span><span>postType <b>image</b></span><span>mediaItems <b>[02]</b></span><span>createdVia <b>bf_agent</b></span><span>全文版 · 不加導流兩行</span></div>
+    <div class="capedit"><b>caption 可直接在這裡改。</b>一旦你手改過，文章之後再變動<b>不會</b>自動用新版重切蓋掉你的修改——改為提示「文章已更新，是否用新版重切？（會覆蓋你的修改）」由你決定，<b>默認不覆蓋</b>。</div>
   </div>
   <div class="var-card__score"><div class="n g">76</div><div class="l">PRE-FLIGHT</div></div>
 </div>
@@ -769,6 +814,7 @@ a{text-decoration:none;color:inherit}
     <div class="var-card__body">同一篇文章按錨點切出，再加 s8 固定文末聲明與品牌文字。五張圖依序：02 直版封面 → 03 事件拆解 → 04 痛點分析 → 05 解法重點 → 06 CTA。超過 2,200 字時先截 s8 免責段並回報——不靜默截斷。</div>
     <div class="var-card__tags"><span class="seg seg-s1">s1</span><span class="seg seg-s2">s2</span><span class="seg seg-s3">s3</span><span class="seg seg-s4">s4</span><span class="seg seg-s5">s5</span><span class="seg seg-s6">s6</span><span class="seg seg-s7">s7</span><span class="seg seg-s8">s8</span></div>
     <div class="var-card__meta"><span>平台 <b>Instagram</b></span><span>postType <b>carousel</b></span><span>mediaItems <b>[02,03,04,05,06]</b></span><span>createdVia <b>bf_agent</b></span></div>
+    <div class="capedit"><b>caption 可直接在這裡改</b>（同上防覆蓋規則）。圖序 = mediaItems 陣列順序，拖動即改序。</div>
   </div>
   <div class="var-card__score"><div class="n a">73</div><div class="l">PRE-FLIGHT</div></div>
 </div>
@@ -788,17 +834,18 @@ a{text-decoration:none;color:inherit}
 </div>
 
 <div class="action-row">
-  <button class="btn btn--primary">送去 Content Publish 草稿 →</button>
-  <button class="btn btn--secondary">Regenerate 該項</button>
-  <button class="btn btn--secondary">Open in Content Publish</button>
-  <span class="who">v1 出口：落 Content Publish 草稿區（BF agent Draft），編輯在平時用的發布模組自己發 — 不排期、不定時發</span>
+  <button class="btn btn--primary">確認並發布（2 條）</button>
+  <button class="btn btn--secondary">只發 FB</button>
+  <button class="btn btn--secondary">存為草稿</button>
+  <span class="who">走 Content Publish 已在用的同一條發布鏈路、同一條 publishPost 記錄 — 不重建發布後端、不新增 Meta 依賴。權限 = <b>Page role</b>（admin / manager / editor 可發；analyst &amp; sales 不可）。Readiness 有 fail 項時按鈕禁用並列出原因；warn 項可發但要顯式確認一次。<b>v1 不排期、不定時發</b>。</span>
 </div>
 
 <section class="ai-card">
   <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Post Studio</div></div>
-  <div class="ai-card__sub">Grounded on golden sample 契約 · 組裝驗證日誌 · BF 語料 · Confidence: Medium</div>
+  <div class="ai-card__sub">Grounded on golden sample 契約 · 組裝驗證日誌 · Readiness Check 規則 · Confidence: Medium</div>
   <div class="ai-insight-item"><span class="ib ib-b">Contract</span><b>錨點契約是整條流水線最便宜的保險。</b> 8 個 sN 錨點讓組裝零猜測；歷史驗證失敗全部可定位到具體區段或圖。<b>writing skill 升版時錨點 schema 不許動——它是 bf-post-assembly 的輸入契約。</b></div>
   <div class="ai-insight-item warn"><span class="ib ib-a">Length</span><b>IG caption 1,923 字距離 2,200 上限只有 277 字餘量。</b> 免責聲明段（s8）約 180 字——文章任何一段加長都可能觸發截斷回報。<b>把 s3–s5 的段長上限寫進 writing skill 的生成約束，而不是事後截。</b></div>
+  <div class="ai-insight-item alert"><span class="ib ib-r">Overwrite</span><b>最容易吃掉編輯工作的地方，是「文章更新後自動重切 caption」。</b> caption 是從文章切出來的，所以「文章變了就重切」看起來很順——但編輯剛手改過的 caption 會被靜默蓋掉，而且他不會馬上發現。<b>手改過就置 caption_edited=true，此後只提示、不自動覆蓋，默認保留他的版本。</b></div>
   <div class="ai-insight-item good"><span class="ib ib-g">Reuse</span><b>FB 與 IG 用同一篇文章切段，內容一致性 100%，且單帖成本只算一次生成。</b> editor 過去手動拼貼最常出的錯（兩平台數字不一致）在結構上不可能再發生。<b>保持全文版 caption——導流兩行只屬於 Link post。</b></div>
   <div class="ai-ask"><input type="text" placeholder="Ask about assembly — e.g. 「IG 超字數會點處理？」"><button class="btn btn--primary btn--sm">Ask</button></div>
 </section>
@@ -1088,12 +1135,17 @@ a{text-decoration:none;color:inherit}
 
 <div class="sec-head">
   <div class="dm-title-section">Action queue — today</div>
+</div>
+
+<div class="rmbanner"><span class="rmb-tag">BF 刪除</span><div class="rmb-t"><b>BF 不做 action queue —— 這是刪掉的概念，不是後延。</b>下面第一條提案「Publish FB post … at 今日 19:00」與 Post Studio 的「確認並發布」<b>是同一條 post、同一個決策、同一個人做</b>。主線的 action queue 為「一個 agent 提一堆異構建議」設計（改預算 / 加 boost / rerun research / 發布）；BF 每天只產 6 條結構完全一致的 post，套進提案隊列等於給一個同質動作多包一層審批語義，讓人把同一件事做兩遍。<b>BF 唯一的「提案」就是「這條能不能發」，那屬於 Post Studio。</b></div></div>
+
+<div class="sec-head" style="margin-top:0">
   <span class="dm-subtitle">BF 提案與主線共用同一個持久化隊列（autopilotProposal）。每條帶證據、預測效果與回滾。</span>
 </div>
 
 <div class="prop-card">
   <div class="prop-card__main">
-    <div class="prop-card__t">Publish FB post「英偉達財報前夕美股 AI 板塊震盪」 at 今日 19:00</div>
+    <div class="prop-card__t"><span class="tg tg-r">BF 不適用</span> Publish FB post「英偉達財報前夕美股 AI 板塊震盪」 at 今日 19:00</div>
     <div class="prop-card__e">Evidence: Readiness Check 全過；topic score 87 · 來源驗證通過 · 4 來源；7 產物比例校驗全過。</div>
     <div class="prop-card__tags"><span class="tg tg-b">Publish</span><span class="tg tg-a">Blocked on Meta permissions</span><span class="tg tg-n">Reversible: delete within 24h</span></div>
     <div class="prop-card__foot"><button class="btn btn--primary btn--sm">Approve</button><button class="btn btn--secondary btn--sm">Modify</button><button class="btn btn--secondary btn--sm">Reject</button><span class="prop-card__by">Proposed 2h ago · bf_agent</span></div>
