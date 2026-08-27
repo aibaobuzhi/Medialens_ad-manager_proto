@@ -580,6 +580,64 @@ a{text-decoration:none;color:inherit}
 .srclink{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed var(--dm-slate-200);font:400 11.5px var(--font-body);color:var(--dm-slate-600)}
 .srclink:last-child{border-bottom:none}
 .srclink a{color:var(--dm-primary);text-decoration:underline;text-underline-offset:2px}
+
+/* ── v2.3: Content-Publish style rows + Edit post modal ── */
+.plrow{display:flex;align-items:center;gap:13px;background:#fff;border:1px solid var(--dm-border-light);border-radius:10px;padding:13px 16px;margin-bottom:9px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.plrow:hover{border-color:var(--dm-primary);box-shadow:0 2px 8px rgba(35,169,246,.10)}
+.plrow__ic{flex:0 0 auto;width:38px;height:38px;border-radius:9px;background:var(--brand-blue-tint);display:flex;align-items:center;justify-content:center;font-size:17px}
+.plrow__m{flex:1;min-width:0}
+.plrow__t{font:600 13.5px var(--font-heading);color:var(--dm-slate-800);line-height:1.45;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.plrow__s{font:400 11.5px var(--font-body);color:var(--dm-slate-500);margin-top:3px}
+.vbadge{background:#EEF2FF;color:#4338CA;border-radius:5px;padding:1px 7px;font:700 10px var(--font-metric)}
+.st{border-radius:20px;padding:2px 9px;font:600 10.5px var(--font-body);white-space:nowrap}
+.st--draft{background:var(--dm-slate-100);color:var(--dm-slate-600)}
+.st--partial{background:#FFF7ED;color:#B45309}
+.st--all{background:#ECFDF5;color:#047857}
+.st--fail{background:#FEF2F2;color:#B91C1C}
+.st--arch{background:#F1F5F9;color:#94A3B8}
+.plrow__thumbs{flex:0 0 auto;display:flex;gap:4px}
+.plrow__thumbs i{display:block;width:26px;height:34px;border-radius:3px;background:linear-gradient(135deg,#E8EDF3,#DCE3EC);border:1px solid var(--dm-slate-200)}
+.plrow__thumbs i.wide{width:44px}
+.plrow__go{flex:0 0 auto;font:600 11.5px var(--font-body);color:var(--dm-primary)}
+.epm{background:#fff;border-radius:14px;width:100%;max-width:880px;box-shadow:0 24px 60px rgba(15,23,42,.28);overflow:hidden;position:relative}
+.epm__hd{padding:15px 20px;border-bottom:1px solid var(--dm-border-light);display:flex;align-items:center}
+.epm__ti{font:600 15px var(--font-heading);color:var(--dm-slate-800);flex:1}
+.epm__bd{display:grid;grid-template-columns:1fr 340px;gap:20px;padding:18px 20px;max-height:calc(100vh - 250px);overflow-y:auto}
+.epm__sec{margin-bottom:16px}
+.epm__sect{font:700 10px var(--font-body);letter-spacing:.06em;color:var(--dm-slate-400);margin-bottom:9px}
+.epm__lab{font:600 11.5px var(--font-body);color:var(--dm-slate-700);margin-bottom:5px;display:flex;align-items:center;gap:7px}
+.epm__cnt{background:var(--brand-blue-tint);color:var(--dm-accent);border-radius:5px;padding:1px 7px;font:700 10px var(--font-body)}
+.epm__ta{width:100%;border:1px solid var(--dm-slate-300);border-radius:8px;padding:10px 12px;font:400 12px/1.8 var(--font-body);color:var(--dm-slate-700);min-height:132px;resize:none}
+.epm__hint{font:400 11px var(--font-body);color:var(--dm-slate-500);margin:8px 0 7px}
+.epm__strip{display:flex;gap:7px;flex-wrap:wrap}
+.epm__slot{position:relative;width:74px;border:1px solid var(--dm-slate-200);border-radius:7px;overflow:hidden;background:#fff;cursor:grab}
+.epm__slotimg{height:92px;background:linear-gradient(135deg,#E8EDF3,#DCE3EC);display:flex;align-items:center;justify-content:center;font:700 11px var(--font-metric);color:var(--dm-slate-400)}
+.epm__slotimg.gen{background:linear-gradient(135deg,#EFF6FF,#DBEAFE);color:#1D4ED8;flex-direction:column;gap:4px;font:600 9px var(--font-body)}
+.epm__slotimg.err{background:linear-gradient(135deg,#FEF2F2,#FEE2E2);color:#B91C1C;flex-direction:column;gap:2px;font:600 9px var(--font-body);text-align:center;line-height:1.3}
+.epm__spin{width:13px;height:13px;border:2px solid rgba(29,78,216,.25);border-top-color:#1D4ED8;border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.epm__slotx{position:absolute;top:3px;right:3px;width:16px;height:16px;border:none;border-radius:50%;background:rgba(15,23,42,.6);color:#fff;font-size:9px;line-height:1;cursor:pointer}
+.epm__grip{display:flex;align-items:center;justify-content:space-between;padding:3px 6px;border-top:1px solid var(--dm-slate-200);font:700 9.5px var(--font-metric);color:var(--dm-slate-500)}
+.epm__grip i{font-style:normal;opacity:.45;letter-spacing:-1px}
+.epm__add{width:74px;height:120px;border:1px dashed var(--dm-slate-300);border-radius:7px;background:var(--dm-slate-50);color:var(--dm-slate-500);font:600 10.5px var(--font-body);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.epm__add span{font-size:16px;font-weight:400}
+.epm__acts{display:flex;align-items:center;gap:7px;margin-top:10px;flex-wrap:wrap}
+.epm__cap{font:400 11px var(--font-body);color:var(--dm-slate-500)}
+.epm__pv{background:var(--dm-slate-50);border:1px solid var(--dm-slate-200);border-radius:10px;padding:13px}
+.epm__pvh{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.epm__pva{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#23A9F6,#7C5CFF);color:#fff;display:flex;align-items:center;justify-content:center;font:700 12px var(--font-heading)}
+.epm__pvn{font:600 11.5px var(--font-body);color:var(--dm-slate-800);line-height:1.3}
+.epm__pvn em{display:block;font-style:normal;font:400 9.5px var(--font-body);color:var(--dm-slate-400)}
+.epm__pvc{font:400 10.5px/1.6 var(--font-body);color:var(--dm-slate-600);max-height:96px;overflow:hidden;margin-bottom:9px}
+.fpp{position:relative;border-radius:8px;overflow:hidden;background:#0A1F2C;aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;color:#fff;font:700 13px var(--font-metric)}
+.fpp__counter{position:absolute;top:7px;right:8px;background:rgba(10,31,44,.72);border-radius:11px;padding:2px 8px;font:700 9.5px var(--font-metric)}
+.fpp__nav{position:absolute;top:50%;transform:translateY(-50%);width:24px;height:24px;border:none;border-radius:50%;background:rgba(255,255,255,.9);color:#0A1F2C;font-size:13px;cursor:pointer;line-height:1}
+.fpp__nav--prev{left:7px}.fpp__nav--next{right:7px}
+.fpp__dots{display:flex;gap:4px;justify-content:center;margin-top:8px}
+.fpp__dots i{width:5px;height:5px;border-radius:50%;background:var(--dm-slate-300)}
+.fpp__dots i.on{background:var(--dm-primary);width:14px;border-radius:3px}
+.epm__ft{padding:13px 20px;border-top:1px solid var(--dm-border-light);background:var(--dm-slate-50);display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.epm__sel{border:1px solid var(--dm-slate-300);border-radius:7px;padding:6px 10px;font:600 11.5px var(--font-body);color:var(--dm-slate-700);background:#fff}
 </style>
 <aside class="ml-sidebar">
   <div class="ml-sidebar__section">Intelligence</div>
@@ -612,7 +670,7 @@ a{text-decoration:none;color:inherit}
 <nav class="dm-page-menu"><div class="menu-list">
   <button class="menu-item is-active" data-tab="work">Topics</button>
   <button class="menu-item" data-tab="lib">Publish Library</button>
-  <span style="align-self:center;margin-left:10px;font:600 10px var(--font-body);color:var(--dm-slate-400);white-space:nowrap">Two tabs — Topics holds topic + body + sources; confirming sends it straight to the Publish Library</span>
+  <span style="align-self:center;margin-left:10px;font:600 10px var(--font-body);color:var(--dm-slate-400);white-space:nowrap">Two tabs · details open in dialogs · filter cards differ per view mode</span>
 </div></nav>
 
 <div class="dm-controls-row">
@@ -750,126 +808,156 @@ a{text-decoration:none;color:inherit}
 <div class="tab-panel" id="tab-lib">
 
 <div class="sec-head">
-  <div class="dm-title-section">Publish Library — S4 · review, edit and publish the assembled posts</div>
-  <span class="dm-subtitle">Grouped <b>by topic</b> by default — the editor's unit of thought is "one story, two posts". <b>By post</b> is the cross-cutting view, for bulk actions and for answering "what is still unpublished today".<br><b>This is also where the generated images are reviewed.</b> They arrive here already assembled into the posts, which is the only place you can judge whether a cover works against its caption or whether the carousel reads in the right order.</span>
-</div>
-
-<div class="dm-kpi-row">
-  <div class="dm-kpi-card"><div class="kpi__label">Ready to publish</div><div class="kpi__metric">2</div><div class="kpi__sub">1 topic · FB + IG</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">Published today</div><div class="kpi__metric">4</div><div class="kpi__sub up">2 topics</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">Readiness</div><div class="kpi__metric">0 fail</div><div class="kpi__sub up">1 warn (IG length headroom)</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">Hand-edited</div><div class="kpi__metric">1</div><div class="kpi__sub">override · never silently overwritten</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">FB caption</div><div class="kpi__metric">1,709</div><div class="kpi__sub">chars</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">IG caption</div><div class="kpi__metric">1,923</div><div class="kpi__sub up">chars · ≤2,200 ✓</div></div>
+  <div class="dm-title-section">Publish Library — S4 · review, edit and publish</div>
+  <span class="dm-subtitle">Two view modes with <b>their own filter cards</b>. Rows follow the existing Content Publish list. <b>The generated images are reviewed here too</b> — inside the post, which is the only place you can judge whether a cover works against its caption or whether the carousel reads in the right order.</span>
 </div>
 
 <div class="subpill">
-  <button class="on">By topic (default)</button>
-  <button>By post</button>
+  <button class="on" data-view="topic">By topic (default)</button>
+  <button data-view="post">By post</button>
 </div>
 
-<div class="tprow">
-  <div class="tprow__hd">
-    <span class="prog prog--ready"><i></i>Ready</span>
-    <div class="tprow__t">xAI 新一輪融資估值傳達 2000 億美元</div>
-    <span class="dm-meta-label">2 posts · 7/7 assets · score 79</span>
-    <span style="color:var(--dm-slate-400);font-size:12px">▾</span>
+<!-- ══ BY TOPIC ══ -->
+<div id="vTopic">
+  <div class="dm-kpi-row">
+    <div class="dm-kpi-card is-filter2 on" data-f2="all"><div class="kpi__label">All topics</div><div class="kpi__metric">14</div><div class="kpi__sub">this window</div></div>
+    <div class="dm-kpi-card is-filter2" data-f2="draft"><div class="kpi__label">Draft</div><div class="kpi__metric">3</div><div class="kpi__sub">nothing published yet</div></div>
+    <div class="dm-kpi-card is-filter2" data-f2="partial"><div class="kpi__label">Partial published</div><div class="kpi__metric">2</div><div class="kpi__sub down">some posts still out</div></div>
+    <div class="dm-kpi-card is-filter2" data-f2="all-pub"><div class="kpi__label">Published all</div><div class="kpi__metric">7</div><div class="kpi__sub up">every post live</div></div>
+    <div class="dm-kpi-card is-filter2" data-f2="fail"><div class="kpi__label">Published fail</div><div class="kpi__metric">1</div><div class="kpi__sub down">needs a retry</div></div>
+    <div class="dm-kpi-card is-filter2" data-f2="arch"><div class="kpi__label">Archive</div><div class="kpi__metric">1</div><div class="kpi__sub">explicitly archived</div></div>
   </div>
-  <div class="tprow__bd">
-    <div class="pv">
-      <div class="pv__hd">Facebook · image feed<span style="margin-left:auto" class="tg tg-n">1,709 chars</span></div>
-      <div class="pv__md"><div class="th">02</div></div>
-      <div class="pv__cp">xAI 新一輪融資估值傳達 2000 億美元！馬斯克的 AI 帝國憑什麼撐起這個數字？【 @businessfocus.io 】【#BF社會熱話】 ⸺ 據多家外媒報道，xAI 正進行新一輪融資…</div>
-      <div class="pv__ft"><button class="btn btn--primary btn--sm">Confirm &amp; Publish</button><button class="btn btn--secondary btn--sm">Edit</button><span class="dm-meta-label" style="margin-left:auto">mediaItems [02]</span></div>
+  <div class="filterbar" id="fbar2" hidden><span>Filtered by <b id="fbar2Name">—</b></span><span class="dm-meta-label" id="fbar2N"></span><span class="x" id="fbar2X">Clear ✕</span></div>
+
+  <div class="plrow" data-topic="1">
+    <div class="plrow__ic">🗂</div>
+    <div class="plrow__m">
+      <div class="plrow__t">2026-08-11 · Momenta 擬香港 IPO：下一隻 AI 新股係咪真係賺到錢？<span class="vbadge">v2</span><span class="st st--draft">Draft</span></div>
+      <div class="plrow__s">4 posts · updated 12 minutes ago · 7/7 assets</div>
     </div>
-    <div class="pv">
-      <div class="pv__hd">Instagram · carousel<span style="margin-left:auto" class="tg tg-n">1,923 chars</span></div>
-      <div class="pv__md"><div class="th">02</div><div class="th">03</div><div class="th">04</div><div class="th">05</div><div class="th">06</div></div>
-      <div class="pv__cp">Cut from the same draft, with the fixed closing statement appended for Instagram only. Five images in order: cover → breakdown → pain point → solution → CTA.</div>
-      <div class="pv__ft"><button class="btn btn--primary btn--sm">Confirm &amp; Publish</button><button class="btn btn--secondary btn--sm">Edit</button><span class="dm-meta-label" style="margin-left:auto">mediaItems [02–06] ordered</span></div>
+    <div class="plrow__thumbs"><i></i><i></i><i></i><i></i><i></i><i class="wide"></i></div>
+    <span class="plrow__go">Open ›</span>
+  </div>
+
+  <div class="plrow" data-topic="1">
+    <div class="plrow__ic">🗂</div>
+    <div class="plrow__m">
+      <div class="plrow__t">2026-08-10 · 港股午後急挫：估值水位與盈利預期的落差<span class="vbadge">v1</span><span class="st st--partial">Partial published (2/4)</span></div>
+      <div class="plrow__s">4 posts · yesterday · FB live, IG pending</div>
     </div>
+    <div class="plrow__thumbs"><i></i><i></i><i></i><i></i><i></i><i class="wide"></i></div>
+    <span class="plrow__go">Open ›</span>
   </div>
+
+  <div class="plrow" data-topic="1">
+    <div class="plrow__ic">🗂</div>
+    <div class="plrow__m">
+      <div class="plrow__t">2026-08-09 · xAI 新一輪融資估值傳達 2000 億美元<span class="vbadge">v1</span><span class="st st--all">Published all</span></div>
+      <div class="plrow__s">2 posts · 2 days ago</div>
+    </div>
+    <div class="plrow__thumbs"><i></i><i></i><i></i><i></i><i></i><i class="wide"></i></div>
+    <span class="plrow__go">Open ›</span>
+  </div>
+
+  <div class="plrow" data-topic="1">
+    <div class="plrow__ic">🗂</div>
+    <div class="plrow__m">
+      <div class="plrow__t">2026-08-08 · 人民幣中間價連續第三日走強<span class="vbadge">v3</span><span class="st st--fail">Published fail</span></div>
+      <div class="plrow__s">2 posts · IG rejected the carousel ratio · retry available</div>
+    </div>
+    <div class="plrow__thumbs"><i></i><i></i><i></i><i></i><i></i><i class="wide"></i></div>
+    <span class="plrow__go">Open ›</span>
+  </div>
+
+  <div class="plrow" style="opacity:.62" data-topic="1">
+    <div class="plrow__ic">🗂</div>
+    <div class="plrow__m">
+      <div class="plrow__t">2026-08-05 · 最低工資檢討首輪諮詢<span class="vbadge">v1</span><span class="st st--arch">Archive</span></div>
+      <div class="plrow__s">2 posts · archived by Kelvin</div>
+    </div>
+    <div class="plrow__thumbs"><i></i><i></i><i></i><i></i><i></i><i class="wide"></i></div>
+    <span class="plrow__go">Open ›</span>
+  </div>
+
+  <div class="foot-note">A topic's status is <b>derived from its posts</b> — <code>draft</code> (nothing published) → <code>partial published</code> (some) → <code>published all</code> → <code>published fail</code> (any post failed). <b><code>archive</code> is the only non-derived state</b> and needs its own field (B38).<br>⚠ <b>Partial published exists only at topic level</b> — a single post is either published or not. That is exactly why the two views cannot share one set of filter cards.<br>⚠ Don't confuse this with the <b>production progress</b> states on the Topics tab: that one answers "how far along is this?", this one answers "did it go out?".</div>
 </div>
 
-<div class="tprow">
-  <div class="tprow__hd">
-    <span class="prog prog--pub"><i></i>Published</span>
-    <div class="tprow__t">人民幣中間價連續第三日走強</div>
-    <span class="ovr">caption hand-edited</span>
-    <span class="dm-meta-label">2 posts · today 11:24 / 11:26</span>
-    <span style="color:var(--dm-slate-400);font-size:12px">▸</span>
+<!-- ══ BY POST ══ -->
+<div id="vPost" hidden>
+  <div class="dm-kpi-row">
+    <div class="dm-kpi-card is-filter3 on" data-f3="all"><div class="kpi__label">All posts</div><div class="kpi__metric">34</div><div class="kpi__sub">this window</div></div>
+    <div class="dm-kpi-card is-filter3" data-f3="draft"><div class="kpi__label">Draft</div><div class="kpi__metric">9</div><div class="kpi__sub">not published</div></div>
+    <div class="dm-kpi-card is-filter3" data-f3="pub"><div class="kpi__label">Published</div><div class="kpi__metric">24</div><div class="kpi__sub up">live on Meta</div></div>
+    <div class="dm-kpi-card is-filter3" data-f3="fail"><div class="kpi__label">Publish fail</div><div class="kpi__metric">1</div><div class="kpi__sub down">subStatus = failed</div></div>
   </div>
-</div>
+  <div class="filterbar" id="fbar3" hidden><span>Filtered by <b id="fbar3Name">—</b></span><span class="dm-meta-label" id="fbar3N"></span><span class="x" id="fbar3X">Clear ✕</span></div>
 
-<div class="tprow">
-  <div class="tprow__hd">
-    <span class="prog prog--pub"><i></i>Published</span>
-    <div class="tprow__t">港樓按息連續兩月回落 · 供樓負擔比率</div>
-    <span class="dm-meta-label">2 posts · today 09:12 / 09:15</span>
-    <span style="color:var(--dm-slate-400);font-size:12px">▸</span>
+  <div class="plrow" data-post="1">
+    <div class="plrow__ic">📘</div>
+    <div class="plrow__m">
+      <div class="plrow__t">Facebook · image feed — Momenta 擬香港 IPO<span class="st st--draft">Draft</span></div>
+      <div class="plrow__s">1,709 chars · mediaItems [02] · createdVia bf_agent</div>
+    </div>
+    <div class="plrow__thumbs"><i></i></div>
+    <span class="plrow__go">Edit ›</span>
   </div>
-</div>
 
-<section class="dm-card">
-  <div class="dm-title-card">Delivery assets — reviewed here, in post context<span class="dmode dmode-live">LIVE</span></div>
-  <span class="dm-subtitle">The six images generate in the background after G2 and land straight in the assembled posts. Each one can be regenerated on its own — <b>one image costs one generation, not six</b>.</span>
-  <div class="grid6">
-    <div class="acell"><div class="acell__ph"><span class="acell__sq">02</span><span class="acell__rt">4:5 ✓</span>Cover</div><div class="acell__bd"><div class="acell__nm">02_cover_4x5.png</div><div class="acell__ck">Code checks <b>4/4</b><br>In-image figures <b>needs your eye</b></div><div class="regenbox"><input placeholder="brighter…"><button>↻</button></div></div></div>
-    <div class="acell"><div class="acell__ph"><span class="acell__sq">03</span><span class="acell__rt">4:5 ✓</span>Breakdown</div><div class="acell__bd"><div class="acell__nm">03_info1_breakdown.png</div><div class="acell__ck">Code checks <b>4/4</b><br>Figures <b>match the draft</b></div><div class="regenbox"><input placeholder="one-line instruction…"><button>↻</button></div></div></div>
-    <div class="acell"><div class="acell__ph fail"><span class="acell__sq">04</span><span class="acell__rt">ratio off</span>Regen (2)</div><div class="acell__bd"><div class="acell__nm">04_info2_painpoint.png</div><div class="acell__ck" style="color:#B91C1C">outputRatio <b>1.02:1</b> ≠ 4:5<br>auto-regen attempt 2</div><div class="regenbox"><input placeholder="use Q2 figures…"><button>↻</button></div></div></div>
-    <div class="acell"><div class="acell__ph gen"><span class="acell__sq">05</span><span class="acell__rt">generating</span>Generating…</div><div class="acell__bd"><div class="acell__nm">05_info3_solution.png</div><div class="acell__ck">Queued · async worker running</div><div class="regenbox"><input placeholder="(generating)" disabled><button>↻</button></div></div></div>
-    <div class="acell"><div class="acell__ph gen"><span class="acell__sq">06</span><span class="acell__rt">queued</span>Queued</div><div class="acell__bd"><div class="acell__nm">06_info4_cta.png</div><div class="acell__ck">Queued · not blocking the others</div><div class="regenbox"><input placeholder="(queued)" disabled><button>↻</button></div></div></div>
-    <div class="acell"><div class="acell__ph"><span class="acell__sq">07</span><span class="acell__rt">1.91:1 ✓</span>Banner · site hero</div><div class="acell__bd"><div class="acell__nm">07_banner_1000x525.png</div><div class="acell__ck">Code checks <b>3/4</b><br><b>1024×536</b> (approx)</div><div class="regenbox"><input placeholder="one-line instruction…"><button>↻</button></div></div></div>
+  <div class="plrow" data-post="1">
+    <div class="plrow__ic">📸</div>
+    <div class="plrow__m">
+      <div class="plrow__t">Instagram · carousel — Momenta 擬香港 IPO<span class="st st--draft">Draft</span><span class="ovr">caption hand-edited</span></div>
+      <div class="plrow__s">1,923 chars · mediaItems [02–06] ordered · 1 image still generating</div>
+    </div>
+    <div class="plrow__thumbs"><i></i><i></i><i></i><i></i><i></i></div>
+    <span class="plrow__go">Edit ›</span>
   </div>
-  <div class="ckbar"><span class="cnt">4 / 6</span>Ratio, dimensions, completeness and naming checked automatically — <b>2 items need your eye</b> (in-image figures)
-    <span style="margin-left:auto;font-weight:400;font-size:10.5px">The checking agent narrows <b>where you look — it does not look for you</b>. That is why there is no green tick here.</span></div>
-  <div class="foot-note"><b>Parallel</b>: all six are enqueued at once after G2 and processed by async workers — nothing waits on the slowest one. <b>Per-image regeneration</b> reuses the same <code>generationRequestId</code> and increments <code>version</code>, so history is kept. <b>Validation compares <code>outputRatio</code></b>, the ratio actually produced — comparing the requested value would validate nothing.<br>⚠ Image 07: <code>1.91:1</code> is a valid bucket, but enqueue can only request a <b>ratio</b>, not <b>exact pixels</b>. 1000×525 needs a resize/crop step after generation — open decision (B27).<br>Swapping or reordering media inside a post goes through the existing <code>MediaStrip</code> in the edit modal and sets <code>overrides.media</code>.</div>
-</section>
+
+  <div class="plrow" data-post="1">
+    <div class="plrow__ic">📘</div>
+    <div class="plrow__m">
+      <div class="plrow__t">Facebook · image feed — 港股午後急挫<span class="st st--all">Published</span></div>
+      <div class="plrow__s">1,640 chars · published yesterday 11:24 · View on Meta</div>
+    </div>
+    <div class="plrow__thumbs"><i></i></div>
+    <span class="plrow__go">Edit ›</span>
+  </div>
+
+  <div class="plrow" data-post="1">
+    <div class="plrow__ic">📸</div>
+    <div class="plrow__m">
+      <div class="plrow__t">Instagram · carousel — 人民幣中間價連續第三日走強<span class="st st--fail">Publish fail</span></div>
+      <div class="plrow__s">Meta rejected: carousel images must share one ratio · image 04 is 1.02:1</div>
+    </div>
+    <div class="plrow__thumbs"><i></i><i></i><i></i><i></i><i></i></div>
+    <span class="plrow__go">Edit ›</span>
+  </div>
+
+  <div class="foot-note">Post status maps straight onto the real enums (<code>models/publishPost.js</code>): <code>topStatus</code> ∈ {draft, published} and <code>subStatus</code> ∈ {null, meta_draft, published, scheduled, processing, failed}. <b>No partial state here</b> — that only exists one level up.<br>Clicking a row opens the <b>Edit post</b> dialog directly.</div>
+</div>
 
 <div class="callout callout--b">
   <div class="callout__title">A post is a <b>projection</b> of the delivery, not a snapshot — this rule decides whose work gets thrown away</div>
-  <div class="callout__body">When the delivery changes (you regenerate image 4, say) the posts are <b>re-assembled</b> — <b>except</b> for anything carrying an override.<br>Captions are cut from the draft, so "the draft changed, therefore re-cut the caption" is the obvious implementation. It is also the one that <b>silently discards an edit the editor just finished</b>, and they won't notice for a while. So: a hand edit sets <code>overrides.caption</code>, and from then on we only offer — "the draft has been updated, re-cut with the new version? (this replaces your edit)" — and <b>default to keeping their version</b>. Media reordering and swaps behave the same way via <code>overrides.media</code>.<br>Treating the post as a one-time snapshot instead leaves you maintaining the dirty state where "a post assembled from delivery v1 is showing v2's images".</div>
-  <div class="callout__meta"><span>Field: <b>BFPost.overrides{caption,media}</b></span><span>Default: <b>keep the human edit</b></span><span>Overrides here: <b>1</b></span></div>
+  <div class="callout__body">When the delivery changes (you regenerate an image, say) the posts are <b>re-assembled</b> — <b>except</b> anything carrying an override.<br>Captions are cut from the draft, so "the draft changed, therefore re-cut the caption" is the obvious implementation. It is also the one that <b>silently discards an edit the editor just finished</b>, and they won't notice for a while. So a hand edit sets <code>overrides.caption</code>, and from then on we only offer — "the draft has been updated, re-cut with the new version? (this replaces your edit)" — and <b>default to keeping their version</b>. Reordering or swapping media behaves the same way via <code>overrides.media</code>.</div>
+  <div class="callout__meta"><span>Field: <b>BFPost.overrides{caption,media}</b></span><span>Default: <b>keep the human edit</b></span></div>
 </div>
 
 <section class="dm-card">
-  <div class="dm-title-card">Editing reuses the existing modals — no new editor is built<span class="dmode dmode-live">LIVE</span></div>
-  <span class="dm-subtitle">The Edit button opens the two modals Content Publish already runs in production. Opening one sets the corresponding override flag.</span>
-  <table class="dm-modern-table dm-modern-table--compact">
-    <thead><tr><th>Platform</th><th>Component</th><th>Already provides</th></tr></thead>
-    <tbody>
-      <tr><td>Facebook</td><td><code>publish/EditPostModal.vue</code><div class="dm-cell-sub">1,735 lines</div></td>
-          <td>caption editing · <b>MediaStrip</b> (add / remove / drag to reorder — index <i>is</i> reading order) · pick from Assets · local upload (one file at a time, preserving pick order) · verbatim server-side validation messages</td></tr>
-      <tr><td>Instagram</td><td><code>publish/IgEditPostModal.vue</code><div class="dm-cell-sub">1,794 lines</div></td>
-          <td>the above, plus <b>character / hashtag / mention counters against the platform ceilings</b> and carousel readiness warnings (mixed ratios, carousel down to one item)</td></tr>
-    </tbody>
-  </table>
-  <div class="foot-note">Ceilings come from Meta and are single-sourced in <code>utils/igCaptionRules.js</code>: <b>≤2,200 characters / ≤30 hashtags / ≤20 mentions</b>. That file's own comment draws the line we follow — those are <b>platform</b> limits, <b>not our style rules</b>; brand style ("add 5 SEO hashtags") lives in the skill and <i>must not be folded in</i>. So platform limits are a hard gate; brand style is advisory.</div>
-</section>
-
-<section class="dm-card">
   <div class="dm-title-card">Assembly is wiring, not building<span class="dmode dmode-live">LIVE</span></div>
-  <span class="dm-subtitle">The answer to "manual assembly" — the existing script already accepts every parameter we need. The only new code is the section split.</span>
+  <span class="dm-subtitle">The existing script already accepts every parameter we need; the only new code is the section split.</span>
   <div class="chk"><span class="ok">✓</span><b>full-post-gen/scripts/assemble_post_draft.py</b><span class="meta"><span class="tg tg-g">already available</span></span></div>
   <div style="font:400 11.5px/1.9 var(--font-body);color:var(--dm-slate-600);padding:8px 0 0 4px">
     <code>--caption</code> · <code>--media-asset-ids</code> (plural = carousel) · <code>--platform</code> · <code>--page-id</code> / <code>--ig-user-id</code> · <code>--created-via</code> · <code>--aspect-ratio</code>
   </div>
-  <div class="foot-note">Called <b>twice</b>: Facebook (<code>--platform facebook --media-asset-ids 02</code>) and Instagram (<code>--platform instagram --media-asset-ids 02..06</code>), both with <code>--created-via bf_agent</code>.<br>⚠ <b>Prerequisite</b>: <code>bf_agent</code> must be added to the <code>createdVia</code> enum first, and that is <b>not a one-line change</b> — <code>constants/agentSources.js</code> is the authoritative registry with two verbatim mirrors (frontend <code>utils/agentSource.js</code> and the ADK full-post-gen common module). <b>Parity tests fail otherwise</b>, and the registry is add-only: append, never rename.<br>Assembly <b>must not use an LLM to rewrite</b> — plain splitting is reproducible, hallucination-free and every failure has an address. Missing section, incomplete image set or wrong ratio → <b>the post is not created at all</b>, the delivery is marked failed and reports which item broke.</div>
+  <div class="foot-note">Called <b>twice</b>: Facebook (<code>--media-asset-ids 02</code>) and Instagram (<code>--media-asset-ids 02..06</code>), both with <code>--created-via bf_agent</code>.<br>⚠ <b>Prerequisite</b>: <code>bf_agent</code> must be added to the <code>createdVia</code> enum, and that is <b>not a one-line change</b> — <code>constants/agentSources.js</code> is authoritative with two verbatim mirrors (frontend + ADK). <b>Parity tests fail otherwise</b>; the registry is add-only.<br>Assembly <b>must not use an LLM to rewrite</b>. Missing section, incomplete image set or wrong ratio → <b>the post is not created at all</b>, the delivery is marked failed and reports which item broke.</div>
 </section>
-
-<div class="action-row">
-  <button class="btn btn--primary">Confirm &amp; Publish (2)</button>
-  <button class="btn btn--secondary">Facebook only</button>
-  <span class="who"><b>G3</b> — runs on the <b>same publish path and the same publishPost record</b> Content Publish already uses: no new publishing backend and no new Meta dependency. Permission is the <b>Page role</b> axis (admin / manager / editor may publish; analyst &amp; sales may not — ⚠ this is <i>not</i> the ad-account role axis used by Pause Ad). A Readiness fail disables the button and lists the reason; a warn publishes but asks for one explicit confirmation. <b>No scheduling, no timed publishing.</b></span>
-</div>
 
 <section class="ai-card">
   <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Publish Library</div></div>
   <div class="ai-card__sub">Grounded on the golden-sample contract · assembly validation log · Readiness rules · Confidence: Medium</div>
   <div class="ai-insight-item"><span class="ib ib-b">Contract</span><b>The section contract is the cheapest insurance on this pipeline.</b> Anchors let assembly run without guessing, and every historical failure traces to a specific section or asset. <b>A writing-skill upgrade must not change the anchor schema — it is the assembler's input contract.</b></div>
-  <div class="ai-insight-item warn"><span class="ib ib-a">Length</span><b>The IG caption sits 277 characters below the 2,200 ceiling</b>, and the fixed closing statement alone is ~180. Any section growing longer can trigger a truncation report. <b>Put the per-section length ceiling into the writing skill's generation constraints rather than truncating afterwards.</b></div>
-  <div class="ai-insight-item alert"><span class="ib ib-r">Overwrite</span><b>This page is where the editor's work is most likely to be destroyed.</b> "The draft changed, so re-cut the caption" is the natural implementation and the dangerous one — it is silent, invisible and discovered late. <b>Defaulting overrides to "keep the human edit" matters more here than any validation rule.</b></div>
-  <div class="ai-card__ask"><input placeholder="Ask about assembly — e.g. &quot;what happens when the IG caption goes over?&quot;"><button class="btn btn--primary btn--sm">Ask</button></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">Ratio</span><b>Today's one publish failure is a carousel ratio mismatch</b> — image 04 came back at 1.02:1 against 4:5. Meta rejects the whole carousel for this, not the single image. <b>This is exactly why validation compares <code>outputRatio</code> and not the requested value; catching it before assembly is cheaper than catching it at Meta.</b></div>
+  <div class="ai-insight-item alert"><span class="ib ib-r">Overwrite</span><b>This page is where the editor's work is most likely to be destroyed.</b> "The draft changed, so re-cut the caption" is the natural implementation and the dangerous one — silent, invisible, discovered late. <b>Defaulting overrides to "keep the human edit" matters more here than any validation rule.</b></div>
+  <div class="ai-card__ask"><input placeholder="Ask about assembly — e.g. &quot;why did the IG carousel get rejected?&quot;"><button class="btn btn--primary btn--sm">Ask</button></div>
 </section>
 
 </div>
@@ -968,70 +1056,179 @@ a{text-decoration:none;color:inherit}
 </div>
 </div>
 
-<div class="proto-badge">PRODUCT PROTOTYPE v2.2 · BF</div>
+<div class="mask" id="pmask" hidden>
+<div class="epm">
+  <div class="epm__hd">
+    <div class="epm__ti">Edit post</div>
+    <button class="modal__x" id="pmaskX">✕</button>
+  </div>
+
+  <div class="epm__bd">
+    <div>
+      <div class="epm__sec">
+        <div class="epm__sect">CONTENT</div>
+        <div class="epm__lab">Caption</div>
+        <textarea class="epm__ta" placeholder="Write your caption…">Momenta 擬港籌 10 億美元！中國自動駕駛 AI 新股光環背後 三年蝕逾 92 億問盈利何時到？【 @businessfocus.io 】【#BF社會熱話】
+
+⸺ 中國自動駕駛獨角獸 Momenta 已向港交所遞表，市場預期集資額約 10 億美元…
+
+#BusinessFocus #BF #Insight #Momenta #香港IPO #自動駕駛 #Robotaxi #AI新股</textarea>
+
+        <div class="epm__lab" style="margin-top:14px">Media <span class="epm__cnt">5 · Carousel</span></div>
+        <p class="epm__hint">Drag to reorder — this is the order followers swipe through.</p>
+        <div class="epm__strip">
+          <div class="epm__slot" draggable="true"><div class="epm__slotimg">02</div><button class="epm__slotx">✕</button><div class="epm__grip"><b>1</b><i>⋮⋮</i></div></div>
+          <div class="epm__slot" draggable="true"><div class="epm__slotimg">03</div><button class="epm__slotx">✕</button><div class="epm__grip"><b>2</b><i>⋮⋮</i></div></div>
+          <div class="epm__slot" draggable="true"><div class="epm__slotimg err">⚠<br>Failed<br><u>Retry</u></div><button class="epm__slotx">✕</button><div class="epm__grip"><b>3</b><i>⋮⋮</i></div></div>
+          <div class="epm__slot" draggable="true"><div class="epm__slotimg gen"><span class="epm__spin"></span>Generating…</div><button class="epm__slotx">✕</button><div class="epm__grip"><b>4</b><i>⋮⋮</i></div></div>
+          <div class="epm__slot" draggable="true"><div class="epm__slotimg">06</div><button class="epm__slotx">✕</button><div class="epm__grip"><b>5</b><i>⋮⋮</i></div></div>
+          <button class="epm__add"><span>+</span>Add</button>
+        </div>
+        <div class="epm__acts">
+          <button class="btn btn--secondary btn--sm">🖼 Add image</button>
+          <button class="btn btn--secondary btn--sm">⤴ Upload</button>
+          <span class="epm__cap">Up to 10 · all images must be the same ratio</span>
+        </div>
+        <div class="foot-note" style="margin-top:9px">The two non-image slots above are the <b>existing</b> async states in this dialog — <code>Generating…</code> and <code>⚠ Failed / Retry</code>. They map straight onto <code>aiAsset.status</code> (queued / generating / finished / failed), so <b>per-image regeneration needs no new UI</b>. Reordering or removing sets <code>overrides.media</code>, which the delivery will then never silently overwrite.</div>
+      </div>
+
+      <div class="epm__sec" style="margin-bottom:0">
+        <div class="epm__sect">PUBLISH TO</div>
+        <div class="epm__lab">Page</div>
+        <select class="epm__sel" style="width:100%"><option>BusinessFocus</option></select>
+        <div class="foot-note" style="margin-top:8px">Publishing runs on the <b>same path and the same <code>publishPost</code> record</b> Content Publish already uses — no new backend, no new Meta dependency. Permission is the <b>Page role</b> axis (admin / manager / editor may publish). <b>No scheduling.</b></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="epm__pv">
+        <div class="epm__pvh">
+          <div class="epm__pva">B</div>
+          <div class="epm__pvn">BusinessFocus<em>Instagram · Draft</em></div>
+        </div>
+        <div class="epm__pvc">Momenta 擬港籌 10 億美元！中國自動駕駛 AI 新股光環背後 三年蝕逾 92 億問盈利何時到？【 @businessfocus.io 】【#BF社會熱話】 ⸺ 中國自動駕駛獨角獸 Momenta 已向港交所遞表…</div>
+        <div class="fpp">02
+          <span class="fpp__counter">1 / 5</span>
+          <button class="fpp__nav fpp__nav--prev">‹</button>
+          <button class="fpp__nav fpp__nav--next">›</button>
+        </div>
+        <div class="fpp__dots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+      </div>
+
+      <div class="injected" style="margin-top:12px">
+        <div class="injected__t">✨ WHAT THE AI BUBBLE INJECTS HERE</div>
+        <span class="injchip"><span class="k">post</span> title + caption</span>
+        <span class="injchip"><span class="k">assets</span> image1…image5</span>
+        <div class="foot-note" style="margin-top:6px"><b>No new reference dimension is needed on this side.</b> References already have exactly the two channels this dialog wants — <code>post</code> (the post itself) and <code>asset</code> with a stable <code>assignedNo</code> like <code>image3</code>, which is how you say "regenerate the third one" in chat.<br>So the fifth <code>topic</code> dimension is only needed on the <b>Topics</b> tab; here it is zero new plumbing. <code>bf_agent</code> still has to join <code>KNOWN_AGENTS</code> though — that part applies to both sides.<br>Regeneration from chat goes through the same <code>enqueue</code> (same <code>generationRequestId</code>, multi-round Re-gen) and lands back in the slot above.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="epm__ft">
+    <button class="btn btn--primary">Publish now</button>
+    <button class="btn btn--secondary">Save draft</button>
+    <button class="btn btn--secondary" id="pmaskCancel">Cancel</button>
+    <span class="dirty">Unsaved changes are never discarded silently</span>
+    <span class="who" style="margin-left:auto">Readiness fail disables Publish and lists the reason · warn publishes after one explicit confirmation</span>
+  </div>
+
+  <button class="fab" id="pfab"><span class="sp"></span>✨ Ask AI about this post</button>
+  <span class="fabnote">Same FAB as Buzz · injects post + its images</span>
+</div>
+</div>
+
+<div class="proto-badge">PRODUCT PROTOTYPE v2.3 · BF</div>
 
 <script>
+function q(s){return document.querySelector(s)}
+function qa(s){return [].slice.call(document.querySelectorAll(s))}
+
 /* tabs */
-document.querySelectorAll('.dm-page-menu .menu-item').forEach(function(btn){
+qa('.dm-page-menu .menu-item').forEach(function(btn){
   btn.addEventListener('click',function(){
-    document.querySelectorAll('.dm-page-menu .menu-item').forEach(function(b){b.classList.remove('is-active')});
+    qa('.dm-page-menu .menu-item').forEach(function(b){b.classList.remove('is-active')});
     btn.classList.add('is-active');
-    document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active')});
+    qa('.tab-panel').forEach(function(p){p.classList.remove('active')});
     var el=document.getElementById('tab-'+btn.dataset.tab); if(el)el.classList.add('active');
     window.scrollTo(0,0);
   });
 });
-/* by topic / by post */
-document.querySelectorAll('.subpill button').forEach(function(b){
+
+/* view mode: by topic / by post — swaps the whole block incl. its own filter cards */
+qa('.subpill button').forEach(function(b){
   b.addEventListener('click',function(){
     b.parentNode.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});
     b.classList.add('on');
+    var v=b.dataset.view;
+    q('#vTopic').hidden = (v!=='topic');
+    q('#vPost').hidden  = (v!=='post');
   });
 });
-/* topic row expand in Publish Library */
-document.querySelectorAll('.tprow__hd').forEach(function(h){
-  h.addEventListener('click',function(){
-    var bd=h.parentNode.querySelector('.tprow__bd');
-    var cv=h.querySelector('span:last-child');
-    if(bd){ var open=bd.style.display!=='none'&&bd.offsetParent!==null;
-      bd.style.display=open?'none':'grid'; if(cv)cv.textContent=open?'\u25B8':'\u25BE'; }
+
+/* generic single-select filter wiring */
+function wireFilter(cardSel, barId, nameId, countId, clearId, names, counts){
+  var bar=document.getElementById(barId);
+  qa(cardSel).forEach(function(c){
+    c.addEventListener('click',function(){
+      qa(cardSel).forEach(function(x){x.classList.remove('on')});
+      c.classList.add('on');
+      var f=c.dataset.f2||c.dataset.f3||c.dataset.filter;
+      if(f==='all'){ bar.hidden=true; return; }
+      bar.hidden=false;
+      document.getElementById(nameId).textContent=names[f]||f;
+      document.getElementById(countId).textContent=counts[f]||'';
+    });
   });
-});
-/* KPI cards act as single-select filters */
-var FNAMES={all:"Today's candidates",checked:'Sources checked',failed:'Check failed',progress:'In progress',awaiting:'Awaiting G2',reshuffle:'Replaced batches'};
-var FCOUNT={all:'20 shown',checked:'6 shown',failed:'2 shown',progress:'3 shown',awaiting:'1 shown',reshuffle:'1 batch on record'};
-var bar=document.getElementById('fbar');
-document.querySelectorAll('.dm-kpi-card.is-filter').forEach(function(c){
-  c.addEventListener('click',function(){
-    document.querySelectorAll('.dm-kpi-card.is-filter').forEach(function(x){x.classList.remove('on')});
-    c.classList.add('on');
-    var f=c.dataset.filter;
-    if(f==='all'){ bar.hidden=true; return; }
-    bar.hidden=false;
-    document.getElementById('fbarName').textContent=FNAMES[f]||f;
-    document.getElementById('fbarN').textContent=FCOUNT[f]||'';
+  document.getElementById(clearId).addEventListener('click',function(){
+    bar.hidden=true;
+    qa(cardSel).forEach(function(x){x.classList.remove('on')});
+    qa(cardSel)[0].classList.add('on');
   });
-});
-document.getElementById('fbarX').addEventListener('click',function(){
-  bar.hidden=true;
-  document.querySelectorAll('.dm-kpi-card.is-filter').forEach(function(x){x.classList.remove('on')});
-  document.querySelector('.dm-kpi-card.is-filter[data-filter="all"]').classList.add('on');
-});
-/* topic row -> details dialog */
-var mask=document.getElementById('tmask');
-document.querySelectorAll('tr.trow').forEach(function(r){
-  r.addEventListener('click',function(){ mask.hidden=false; document.body.style.overflow='hidden'; });
-});
-function closeMask(){ mask.hidden=true; document.body.style.overflow=''; }
-document.getElementById('tmaskX').addEventListener('click',closeMask);
-mask.addEventListener('click',function(e){ if(e.target===mask) closeMask(); });
-document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!mask.hidden) closeMask(); });
-/* AI bubble */
-document.getElementById('tfab').addEventListener('click',function(){
-  var n=document.querySelector('.injected');
-  if(n){ n.scrollIntoView({behavior:'smooth',block:'center'}); n.style.boxShadow='0 0 0 3px rgba(124,92,255,.35)';
-    setTimeout(function(){ n.style.boxShadow=''; },1400); }
-});
+}
+wireFilter('#tab-work .dm-kpi-card.is-filter','fbar','fbarName','fbarN','fbarX',
+  {checked:'Sources checked',failed:'Check failed',progress:'In progress',awaiting:'Awaiting G2',reshuffle:'Replaced batches'},
+  {checked:'6 shown',failed:'2 shown',progress:'3 shown',awaiting:'1 shown',reshuffle:'1 batch on record'});
+wireFilter('.dm-kpi-card.is-filter2','fbar2','fbar2Name','fbar2N','fbar2X',
+  {draft:'Draft','partial':'Partial published','all-pub':'Published all',fail:'Published fail',arch:'Archive'},
+  {draft:'3 topics','partial':'2 topics','all-pub':'7 topics',fail:'1 topic',arch:'1 topic'});
+wireFilter('.dm-kpi-card.is-filter3','fbar3','fbar3Name','fbar3N','fbar3X',
+  {draft:'Draft',pub:'Published',fail:'Publish fail'},
+  {draft:'9 posts',pub:'24 posts',fail:'1 post'});
+
+/* dialogs */
+function openMask(m){ m.hidden=false; document.body.style.overflow='hidden'; }
+function closeMask(m){ m.hidden=true; document.body.style.overflow=''; }
+var tmask=document.getElementById('tmask'), pmask=document.getElementById('pmask');
+
+qa('tr.trow').forEach(function(r){ r.addEventListener('click',function(){ openMask(tmask); }); });
+qa('.plrow[data-post]').forEach(function(r){ r.addEventListener('click',function(){ openMask(pmask); }); });
+qa('.plrow[data-topic]').forEach(function(r){ r.addEventListener('click',function(){
+  q('.subpill button[data-view="post"]').click(); window.scrollTo(0,0); }); });
+
+document.getElementById('tmaskX').addEventListener('click',function(){closeMask(tmask)});
+document.getElementById('pmaskX').addEventListener('click',function(){closeMask(pmask)});
+document.getElementById('pmaskCancel').addEventListener('click',function(){closeMask(pmask)});
+[tmask,pmask].forEach(function(m){ m.addEventListener('click',function(e){ if(e.target===m) closeMask(m); }); });
+document.addEventListener('keydown',function(e){ if(e.key!=='Escape')return;
+  if(!pmask.hidden) closeMask(pmask); else if(!tmask.hidden) closeMask(tmask); });
+
+/* AI bubbles highlight what they inject */
+function flash(sel){ var n=q(sel); if(!n)return;
+  n.scrollIntoView({behavior:'smooth',block:'center'});
+  n.style.boxShadow='0 0 0 3px rgba(124,92,255,.35)';
+  setTimeout(function(){ n.style.boxShadow=''; },1400); }
+document.getElementById('tfab').addEventListener('click',function(){ flash('#tmask .injected'); });
+document.getElementById('pfab').addEventListener('click',function(){ flash('#pmask .injected'); });
+
+/* carousel dots in the preview */
+(function(){
+  var dots=qa('#pmask .fpp__dots i'), cnt=q('#pmask .fpp__counter'), stage=q('#pmask .fpp');
+  var labels=['02','03','—','—','06'], cur=0;
+  function draw(){ dots.forEach(function(d,i){ d.classList.toggle('on',i===cur) });
+    cnt.textContent=(cur+1)+' / 5'; stage.firstChild.nodeValue=labels[cur]; }
+  q('#pmask .fpp__nav--next').addEventListener('click',function(e){e.stopPropagation();cur=(cur+1)%5;draw()});
+  q('#pmask .fpp__nav--prev').addEventListener('click',function(e){e.stopPropagation();cur=(cur+4)%5;draw()});
+})();
 </script>
 
 <script>
@@ -1201,13 +1398,11 @@ function hbar(id,cfg){
 /* ══ BF Chart configs ══ */
 
 var BLUE='#3B82F6',GREEN='#10B981',GREY='#CBD5E1',RED='#EF4444',AMBER='#F59E0B',PURPLE='#8B5CF6',TEAL='#14B8A6';
-
 donut('srcVerify',{data:[
-  {l:'Passed — figures confirmed',v:6,c:GREEN,tt:'Cited pages opened; the figures used in the body appear on them'},
+  {l:'Passed — figures confirmed',v:6,c:GREEN,tt:'Cited pages opened; figures appear on them'},
   {l:'Failed — page unreachable',v:1,c:RED,tt:'Cited URLs returned 404'},
-  {l:'Failed — not independent',v:1,c:AMBER,tt:'All links are reprints of one wire story'},
-  {l:'Not checked yet',v:12,c:GREY,tt:'Deferred — the editor has not opened these candidates'}]});
-
+  {l:'Failed — not independent',v:1,c:AMBER,tt:'All links reprint one wire story'},
+  {l:'Not checked yet',v:12,c:GREY,tt:'Deferred — editor has not opened these'}]});
 chart('poolCat',{labels:['Business & Finance','News & Current Affairs','Tech & Innovation','Society & Culture','Lifestyle & P.D.'],yMax:80,yTitle:'%',tiltX:true,yFmt:function(v){return v+'%'},
   legend:[{label:"Today's pool %",color:BLUE,round:true},{label:'Page corpus % (FB 90D)',color:GREY,round:true}],
   layers:[{type:'bar',data:[45,20,15,10,10],color:BLUE,tt:['9 items','4 items','3 items','2 items','2 items']},
