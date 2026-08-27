@@ -638,6 +638,51 @@ a{text-decoration:none;color:inherit}
 .fpp__dots i.on{background:var(--dm-primary);width:14px;border-radius:3px}
 .epm__ft{padding:13px 20px;border-top:1px solid var(--dm-border-light);background:var(--dm-slate-50);display:flex;align-items:center;gap:9px;flex-wrap:wrap}
 .epm__sel{border:1px solid var(--dm-slate-300);border-radius:7px;padding:6px 10px;font:600 11.5px var(--font-body);color:var(--dm-slate-700);background:#fff}
+
+/* ── v2.4: score chip, link affordances, delivery detail screen ── */
+.sc{flex:0 0 auto;text-align:right;min-width:46px}
+.sc__n{font:700 17px var(--font-metric);color:var(--dm-primary);font-variant-numeric:tabular-nums;line-height:1}
+.sc__l{font:600 8px var(--font-body);letter-spacing:.05em;color:var(--dm-slate-400);margin-top:1px}
+.sc--pend .sc__n{color:var(--dm-slate-300);font-size:15px}
+.lnkbtn{flex:0 0 auto;border:1px solid var(--dm-slate-300);background:#fff;color:var(--dm-slate-600);border-radius:6px;padding:4px 9px;font:600 10.5px var(--font-body);cursor:pointer;white-space:nowrap}
+.lnkbtn:hover{border-color:var(--dm-primary);color:var(--dm-primary)}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(14px);z-index:600;background:#0A1F2C;color:#fff;border-radius:9px;padding:10px 16px;font:600 12px var(--font-body);opacity:0;transition:all .22s;pointer-events:none;max-width:560px}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast em{font-style:normal;opacity:.7;font-weight:400;display:block;margin-top:3px;font-size:10.5px}
+/* delivery detail screen */
+.dd{display:none}
+.dd.on{display:block}
+.dd__top{display:flex;align-items:flex-start;gap:14px;padding:0 0 16px;border-bottom:1px solid var(--dm-border-light);margin-bottom:18px}
+.dd__back{flex:0 0 auto;border:1px solid var(--dm-slate-300);background:#fff;color:var(--dm-slate-600);border-radius:7px;padding:5px 11px;font:600 11.5px var(--font-body);cursor:pointer}
+.dd__m{flex:1;min-width:0}
+.dd__t{font:600 17px var(--font-heading);color:var(--dm-slate-800);line-height:1.4}
+.dd__chips{display:flex;align-items:center;gap:8px;margin-top:7px;flex-wrap:wrap;font:400 11.5px var(--font-body);color:var(--dm-slate-500)}
+.dd__a{flex:0 0 auto;display:flex;gap:7px}
+.dd__pkg{display:grid;grid-template-columns:1fr 400px;gap:20px}
+.dd__lbl{font:700 10px var(--font-body);letter-spacing:.06em;color:var(--dm-slate-400);margin-bottom:8px}
+.dd__art{border:1px solid var(--dm-slate-200);border-radius:9px;background:#FCFCFD;padding:14px 16px;font:400 12px/1.85 var(--font-body);color:var(--dm-slate-700);max-height:340px;overflow-y:auto}
+.dd__art p{margin:0 0 12px}
+.dd__assets{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.dd__as{text-align:center}
+.dd__asb{aspect-ratio:4/5;border:1px solid var(--dm-slate-200);border-radius:7px;background:linear-gradient(135deg,#EAF3FB,#DCE8F5);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.dd__asb b{font:700 15px var(--font-metric);color:var(--dm-accent)}
+.dd__asb i{font-style:normal;font:600 8.5px var(--font-body);color:var(--dm-slate-500)}
+.dd__asn{font:400 8.5px var(--font-body);color:var(--dm-slate-500);margin-top:4px;line-height:1.3}
+.dd__wide .dd__asb{aspect-ratio:1000/525}
+.dd__srcs{display:flex;align-items:center;background:var(--brand-blue-tint);border-radius:8px;padding:9px 13px;margin-top:12px;font:600 11.5px var(--font-body);color:var(--dm-accent)}
+.dd__srcs u{margin-left:auto;cursor:pointer}
+.dd__posts{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ddp{border:1px solid var(--dm-border-light);border-radius:11px;background:#fff;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.ddp__h{padding:10px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--dm-slate-100)}
+.ddp__av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 9.5px var(--font-heading);color:#fff;flex:0 0 auto}
+.ddp__n{flex:1;min-width:0;font:600 10.5px var(--font-body);color:var(--dm-slate-700);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ddp__n em{display:block;font-style:normal;font:400 8.5px var(--font-body);color:var(--dm-slate-400)}
+.ddp__b{padding:10px 12px;font:400 10.5px/1.6 var(--font-body);color:var(--dm-slate-600);min-height:74px}
+.ddp__md{height:64px;background:linear-gradient(135deg,#EEF2F7,#E1E8F0);display:flex;align-items:center;justify-content:center;font:600 9px var(--font-body);color:var(--dm-slate-400)}
+.ddp__f{padding:9px 12px;border-top:1px solid var(--dm-slate-100);display:flex;align-items:center;gap:6px}
+.dd__bar{position:sticky;bottom:0;display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--dm-border-light);border-radius:11px;padding:12px 16px;margin-top:18px;box-shadow:0 -2px 10px rgba(15,23,42,.05)}
+.dd__bar b{color:var(--dm-slate-800)}
+.dd__bari{flex:1;font:400 11.5px var(--font-body);color:var(--dm-slate-500)}
 </style>
 <aside class="ml-sidebar">
   <div class="ml-sidebar__section">Intelligence</div>
@@ -670,7 +715,7 @@ a{text-decoration:none;color:inherit}
 <nav class="dm-page-menu"><div class="menu-list">
   <button class="menu-item is-active" data-tab="work">Topics</button>
   <button class="menu-item" data-tab="lib">Publish Library</button>
-  <span style="align-self:center;margin-left:10px;font:600 10px var(--font-body);color:var(--dm-slate-400);white-space:nowrap">Two tabs · details open in dialogs · filter cards differ per view mode</span>
+  <span style="align-self:center;margin-left:10px;font:600 10px var(--font-body);color:var(--dm-slate-400);white-space:nowrap">Two tabs · details open in dialogs · every delivery and every post has its own link</span>
 </div></nav>
 
 <div class="dm-controls-row">
@@ -807,9 +852,10 @@ a{text-decoration:none;color:inherit}
 
 <div class="tab-panel" id="tab-lib">
 
+<div id="libList">
 <div class="sec-head">
-  <div class="dm-title-section">Publish Library — S4 · review, edit and publish</div>
-  <span class="dm-subtitle">Two view modes with <b>their own filter cards</b>. Rows follow the existing Content Publish list. <b>The generated images are reviewed here too</b> — inside the post, which is the only place you can judge whether a cover works against its caption or whether the carousel reads in the right order.</span>
+  <div class="dm-title-section">Publish Library</div>
+  <span class="dm-subtitle">Two view modes, each with its own filter cards. <b>By topic</b> opens the full delivery; <b>by post</b> opens the post editor.</span>
 </div>
 
 <div class="subpill">
@@ -817,15 +863,14 @@ a{text-decoration:none;color:inherit}
   <button data-view="post">By post</button>
 </div>
 
-<!-- ══ BY TOPIC ══ -->
 <div id="vTopic">
   <div class="dm-kpi-row">
     <div class="dm-kpi-card is-filter2 on" data-f2="all"><div class="kpi__label">All topics</div><div class="kpi__metric">14</div><div class="kpi__sub">this window</div></div>
-    <div class="dm-kpi-card is-filter2" data-f2="draft"><div class="kpi__label">Draft</div><div class="kpi__metric">3</div><div class="kpi__sub">nothing published yet</div></div>
+    <div class="dm-kpi-card is-filter2" data-f2="draft"><div class="kpi__label">Draft</div><div class="kpi__metric">3</div><div class="kpi__sub">nothing published</div></div>
     <div class="dm-kpi-card is-filter2" data-f2="partial"><div class="kpi__label">Partial published</div><div class="kpi__metric">2</div><div class="kpi__sub down">some posts still out</div></div>
     <div class="dm-kpi-card is-filter2" data-f2="all-pub"><div class="kpi__label">Published all</div><div class="kpi__metric">7</div><div class="kpi__sub up">every post live</div></div>
     <div class="dm-kpi-card is-filter2" data-f2="fail"><div class="kpi__label">Published fail</div><div class="kpi__metric">1</div><div class="kpi__sub down">needs a retry</div></div>
-    <div class="dm-kpi-card is-filter2" data-f2="arch"><div class="kpi__label">Archive</div><div class="kpi__metric">1</div><div class="kpi__sub">explicitly archived</div></div>
+    <div class="dm-kpi-card is-filter2" data-f2="arch"><div class="kpi__label">Archive</div><div class="kpi__metric">1</div><div class="kpi__sub">archived</div></div>
   </div>
   <div class="filterbar" id="fbar2" hidden><span>Filtered by <b id="fbar2Name">—</b></span><span class="dm-meta-label" id="fbar2N"></span><span class="x" id="fbar2X">Clear ✕</span></div>
 
@@ -835,54 +880,57 @@ a{text-decoration:none;color:inherit}
       <div class="plrow__t">2026-08-11 · Momenta 擬香港 IPO：下一隻 AI 新股係咪真係賺到錢？<span class="vbadge">v2</span><span class="st st--draft">Draft</span></div>
       <div class="plrow__s">4 posts · updated 12 minutes ago · 7/7 assets</div>
     </div>
+    <div class="sc"><div class="sc__n">87</div><div class="sc__l">SCORE</div></div>
     <div class="plrow__thumbs"><i></i><i></i><i></i><i></i><i></i><i class="wide"></i></div>
+    <button class="lnkbtn" data-copy="share">Copy link</button>
     <span class="plrow__go">Open ›</span>
   </div>
-
   <div class="plrow" data-topic="1">
     <div class="plrow__ic">🗂</div>
     <div class="plrow__m">
       <div class="plrow__t">2026-08-10 · 港股午後急挫：估值水位與盈利預期的落差<span class="vbadge">v1</span><span class="st st--partial">Partial published (2/4)</span></div>
       <div class="plrow__s">4 posts · yesterday · FB live, IG pending</div>
     </div>
+    <div class="sc"><div class="sc__n">76</div><div class="sc__l">SCORE</div></div>
     <div class="plrow__thumbs"><i></i><i></i><i></i><i></i><i></i><i class="wide"></i></div>
+    <button class="lnkbtn" data-copy="share">Copy link</button>
     <span class="plrow__go">Open ›</span>
   </div>
-
   <div class="plrow" data-topic="1">
     <div class="plrow__ic">🗂</div>
     <div class="plrow__m">
       <div class="plrow__t">2026-08-09 · xAI 新一輪融資估值傳達 2000 億美元<span class="vbadge">v1</span><span class="st st--all">Published all</span></div>
       <div class="plrow__s">2 posts · 2 days ago</div>
     </div>
+    <div class="sc"><div class="sc__n">79</div><div class="sc__l">SCORE</div></div>
     <div class="plrow__thumbs"><i></i><i></i><i></i><i></i><i></i><i class="wide"></i></div>
+    <button class="lnkbtn" data-copy="share">Copy link</button>
     <span class="plrow__go">Open ›</span>
   </div>
-
   <div class="plrow" data-topic="1">
     <div class="plrow__ic">🗂</div>
     <div class="plrow__m">
       <div class="plrow__t">2026-08-08 · 人民幣中間價連續第三日走強<span class="vbadge">v3</span><span class="st st--fail">Published fail</span></div>
-      <div class="plrow__s">2 posts · IG rejected the carousel ratio · retry available</div>
+      <div class="plrow__s">2 posts · IG rejected the carousel ratio</div>
     </div>
+    <div class="sc"><div class="sc__n">81</div><div class="sc__l">SCORE</div></div>
     <div class="plrow__thumbs"><i></i><i></i><i></i><i></i><i></i><i class="wide"></i></div>
+    <button class="lnkbtn" data-copy="share">Copy link</button>
     <span class="plrow__go">Open ›</span>
   </div>
-
   <div class="plrow" style="opacity:.62" data-topic="1">
     <div class="plrow__ic">🗂</div>
     <div class="plrow__m">
       <div class="plrow__t">2026-08-05 · 最低工資檢討首輪諮詢<span class="vbadge">v1</span><span class="st st--arch">Archive</span></div>
       <div class="plrow__s">2 posts · archived by Kelvin</div>
     </div>
+    <div class="sc"><div class="sc__n">64</div><div class="sc__l">SCORE</div></div>
     <div class="plrow__thumbs"><i></i><i></i><i></i><i></i><i></i><i class="wide"></i></div>
+    <button class="lnkbtn" data-copy="share">Copy link</button>
     <span class="plrow__go">Open ›</span>
   </div>
-
-  <div class="foot-note">A topic's status is <b>derived from its posts</b> — <code>draft</code> (nothing published) → <code>partial published</code> (some) → <code>published all</code> → <code>published fail</code> (any post failed). <b><code>archive</code> is the only non-derived state</b> and needs its own field (B38).<br>⚠ <b>Partial published exists only at topic level</b> — a single post is either published or not. That is exactly why the two views cannot share one set of filter cards.<br>⚠ Don't confuse this with the <b>production progress</b> states on the Topics tab: that one answers "how far along is this?", this one answers "did it go out?".</div>
 </div>
 
-<!-- ══ BY POST ══ -->
 <div id="vPost" hidden>
   <div class="dm-kpi-row">
     <div class="dm-kpi-card is-filter3 on" data-f3="all"><div class="kpi__label">All posts</div><div class="kpi__metric">34</div><div class="kpi__sub">this window</div></div>
@@ -893,72 +941,161 @@ a{text-decoration:none;color:inherit}
   <div class="filterbar" id="fbar3" hidden><span>Filtered by <b id="fbar3Name">—</b></span><span class="dm-meta-label" id="fbar3N"></span><span class="x" id="fbar3X">Clear ✕</span></div>
 
   <div class="plrow" data-post="1">
-    <div class="plrow__ic">📘</div>
+    <div class="plrow__ic">🌐</div>
     <div class="plrow__m">
-      <div class="plrow__t">Facebook · image feed — Momenta 擬香港 IPO<span class="st st--draft">Draft</span></div>
-      <div class="plrow__s">1,709 chars · mediaItems [02] · createdVia bf_agent</div>
+      <div class="plrow__t">Website Article — Momenta 擬香港 IPO<span class="st st--draft">Draft</span></div>
+      <div class="plrow__s">businessfocus.io/article/… · link preview from Open Graph</div>
     </div>
+    <div class="sc sc--pend"><div class="sc__n">—</div><div class="sc__l">SCORE</div></div>
     <div class="plrow__thumbs"><i></i></div>
+    <button class="lnkbtn" data-copy="deep">Copy link</button>
     <span class="plrow__go">Edit ›</span>
   </div>
-
+  <div class="plrow" data-post="1">
+    <div class="plrow__ic">📘</div>
+    <div class="plrow__m">
+      <div class="plrow__t">Facebook · link post — Momenta 擬香港 IPO<span class="st st--draft">Draft</span></div>
+      <div class="plrow__s">short_link · preview generated by Meta</div>
+    </div>
+    <div class="sc sc--pend"><div class="sc__n">—</div><div class="sc__l">SCORE</div></div>
+    <div class="plrow__thumbs"><i></i></div>
+    <button class="lnkbtn" data-copy="deep">Copy link</button>
+    <span class="plrow__go">Edit ›</span>
+  </div>
   <div class="plrow" data-post="1">
     <div class="plrow__ic">📸</div>
     <div class="plrow__m">
       <div class="plrow__t">Instagram · carousel — Momenta 擬香港 IPO<span class="st st--draft">Draft</span><span class="ovr">caption hand-edited</span></div>
-      <div class="plrow__s">1,923 chars · mediaItems [02–06] ordered · 1 image still generating</div>
+      <div class="plrow__s">1,923 chars · mediaItems [02–06] · 1 image still generating</div>
     </div>
+    <div class="sc sc--pend"><div class="sc__n">—</div><div class="sc__l">SCORE</div></div>
     <div class="plrow__thumbs"><i></i><i></i><i></i><i></i><i></i></div>
+    <button class="lnkbtn" data-copy="deep">Copy link</button>
     <span class="plrow__go">Edit ›</span>
   </div>
-
+  <div class="plrow" data-post="1">
+    <div class="plrow__ic">📘</div>
+    <div class="plrow__m">
+      <div class="plrow__t">Facebook · image feed — Momenta 擬香港 IPO<span class="st st--draft">Draft</span></div>
+      <div class="plrow__s">1,709 chars · mediaItems [02]</div>
+    </div>
+    <div class="sc sc--pend"><div class="sc__n">—</div><div class="sc__l">SCORE</div></div>
+    <div class="plrow__thumbs"><i></i></div>
+    <button class="lnkbtn" data-copy="deep">Copy link</button>
+    <span class="plrow__go">Edit ›</span>
+  </div>
   <div class="plrow" data-post="1">
     <div class="plrow__ic">📘</div>
     <div class="plrow__m">
       <div class="plrow__t">Facebook · image feed — 港股午後急挫<span class="st st--all">Published</span></div>
-      <div class="plrow__s">1,640 chars · published yesterday 11:24 · View on Meta</div>
+      <div class="plrow__s">published yesterday 11:24 · View on Meta</div>
     </div>
+    <div class="sc sc--pend"><div class="sc__n">—</div><div class="sc__l">SCORE</div></div>
     <div class="plrow__thumbs"><i></i></div>
+    <button class="lnkbtn" data-copy="deep">Copy link</button>
     <span class="plrow__go">Edit ›</span>
   </div>
-
   <div class="plrow" data-post="1">
     <div class="plrow__ic">📸</div>
     <div class="plrow__m">
       <div class="plrow__t">Instagram · carousel — 人民幣中間價連續第三日走強<span class="st st--fail">Publish fail</span></div>
       <div class="plrow__s">Meta rejected: carousel images must share one ratio · image 04 is 1.02:1</div>
     </div>
+    <div class="sc sc--pend"><div class="sc__n">—</div><div class="sc__l">SCORE</div></div>
     <div class="plrow__thumbs"><i></i><i></i><i></i><i></i><i></i></div>
+    <button class="lnkbtn" data-copy="deep">Copy link</button>
     <span class="plrow__go">Edit ›</span>
   </div>
-
-  <div class="foot-note">Post status maps straight onto the real enums (<code>models/publishPost.js</code>): <code>topStatus</code> ∈ {draft, published} and <code>subStatus</code> ∈ {null, meta_draft, published, scheduled, processing, failed}. <b>No partial state here</b> — that only exists one level up.<br>Clicking a row opens the <b>Edit post</b> dialog directly.</div>
+</div>
 </div>
 
-<div class="callout callout--b">
-  <div class="callout__title">A post is a <b>projection</b> of the delivery, not a snapshot — this rule decides whose work gets thrown away</div>
-  <div class="callout__body">When the delivery changes (you regenerate an image, say) the posts are <b>re-assembled</b> — <b>except</b> anything carrying an override.<br>Captions are cut from the draft, so "the draft changed, therefore re-cut the caption" is the obvious implementation. It is also the one that <b>silently discards an edit the editor just finished</b>, and they won't notice for a while. So a hand edit sets <code>overrides.caption</code>, and from then on we only offer — "the draft has been updated, re-cut with the new version? (this replaces your edit)" — and <b>default to keeping their version</b>. Reordering or swapping media behaves the same way via <code>overrides.media</code>.</div>
-  <div class="callout__meta"><span>Field: <b>BFPost.overrides{caption,media}</b></span><span>Default: <b>keep the human edit</b></span></div>
-</div>
-
-<section class="dm-card">
-  <div class="dm-title-card">Assembly is wiring, not building<span class="dmode dmode-live">LIVE</span></div>
-  <span class="dm-subtitle">The existing script already accepts every parameter we need; the only new code is the section split.</span>
-  <div class="chk"><span class="ok">✓</span><b>full-post-gen/scripts/assemble_post_draft.py</b><span class="meta"><span class="tg tg-g">already available</span></span></div>
-  <div style="font:400 11.5px/1.9 var(--font-body);color:var(--dm-slate-600);padding:8px 0 0 4px">
-    <code>--caption</code> · <code>--media-asset-ids</code> (plural = carousel) · <code>--platform</code> · <code>--page-id</code> / <code>--ig-user-id</code> · <code>--created-via</code> · <code>--aspect-ratio</code>
+<!-- ══ DELIVERY DETAIL (drill-down from a topic row) ══ -->
+<div class="dd" id="ddScreen">
+  <div class="dd__top">
+    <button class="dd__back" id="ddBack">‹ Back</button>
+    <div class="dd__m">
+      <div class="dd__t">2026-08-11 · Momenta 擬香港 IPO：下一隻 AI 新股係咪真係賺到錢？</div>
+      <div class="dd__chips">
+        <span class="vbadge">v2</span>
+        <span class="st st--partial">Pending review · 4</span>
+        <span>BF agent · Julie Li</span>
+        <a href="#" style="color:var(--dm-primary);text-decoration:none">Version history (2)</a>
+        <span class="sc" style="min-width:auto;display:flex;align-items:center;gap:6px"><b style="font:700 15px var(--font-metric);color:var(--dm-primary)">87</b><span class="sc__l">SCORE</span></span>
+      </div>
+    </div>
+    <div class="dd__a">
+      <button class="btn btn--secondary btn--sm" data-copy="share">Copy link</button>
+      <button class="btn btn--primary btn--sm">Confirm &amp; Publish</button>
+    </div>
   </div>
-  <div class="foot-note">Called <b>twice</b>: Facebook (<code>--media-asset-ids 02</code>) and Instagram (<code>--media-asset-ids 02..06</code>), both with <code>--created-via bf_agent</code>.<br>⚠ <b>Prerequisite</b>: <code>bf_agent</code> must be added to the <code>createdVia</code> enum, and that is <b>not a one-line change</b> — <code>constants/agentSources.js</code> is authoritative with two verbatim mirrors (frontend + ADK). <b>Parity tests fail otherwise</b>; the registry is add-only.<br>Assembly <b>must not use an LLM to rewrite</b>. Missing section, incomplete image set or wrong ratio → <b>the post is not created at all</b>, the delivery is marked failed and reports which item broke.</div>
-</section>
 
-<section class="ai-card">
-  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Publish Library</div></div>
-  <div class="ai-card__sub">Grounded on the golden-sample contract · assembly validation log · Readiness rules · Confidence: Medium</div>
-  <div class="ai-insight-item"><span class="ib ib-b">Contract</span><b>The section contract is the cheapest insurance on this pipeline.</b> Anchors let assembly run without guessing, and every historical failure traces to a specific section or asset. <b>A writing-skill upgrade must not change the anchor schema — it is the assembler's input contract.</b></div>
-  <div class="ai-insight-item warn"><span class="ib ib-a">Ratio</span><b>Today's one publish failure is a carousel ratio mismatch</b> — image 04 came back at 1.02:1 against 4:5. Meta rejects the whole carousel for this, not the single image. <b>This is exactly why validation compares <code>outputRatio</code> and not the requested value; catching it before assembly is cheaper than catching it at Meta.</b></div>
-  <div class="ai-insight-item alert"><span class="ib ib-r">Overwrite</span><b>This page is where the editor's work is most likely to be destroyed.</b> "The draft changed, so re-cut the caption" is the natural implementation and the dangerous one — silent, invisible, discovered late. <b>Defaulting overrides to "keep the human edit" matters more here than any validation rule.</b></div>
-  <div class="ai-card__ask"><input placeholder="Ask about assembly — e.g. &quot;why did the IG carousel get rejected?&quot;"><button class="btn btn--primary btn--sm">Ask</button></div>
-</section>
+  <div class="dd__lbl" style="font-size:13px;color:var(--dm-slate-800);font-weight:600;letter-spacing:0;margin-bottom:12px">Delivery</div>
+  <div class="dd__pkg">
+    <div>
+      <div class="dd__lbl">CAPTION</div>
+      <div class="dd__art">
+        <p>Momenta 擬港籌 10 億美元！中國自動駕駛 AI 新股光環背後 三年蝕逾 92 億問盈利何時到？【 @businessfocus.io 】【#BF社會熱話】</p>
+        <p>中國自動駕駛獨角獸 Momenta Global Limited 擬在香港 IPO，據報最快下周啟動招股，集資額或約 10 億美元（約合 78 億港元），估值約 90 億美元（約 702 億港元）。</p>
+        <p><b>車企背書夠豪華 但港股要看的不是名單</b></p>
+        <p>Momenta 主打自動駕駛及高階輔助駕駛方案。招股文件披露，2025 年收入增至人民幣 24.13 億元，毛利率升至 71.6%；截至 2025 年底，量產車方案安裝量超過 68 萬套。</p>
+        <p><b>收入增長快 虧損曲線仍是最大陰影</b></p>
+        <p>不過，光環背後是高燒錢模式：過去三年累計虧損 92.3 億元人民幣，研發支出佔收入比重達 61%。</p>
+      </div>
+    </div>
+    <div>
+      <div class="dd__lbl">MEDIA</div>
+      <div class="dd__assets">
+        <div class="dd__as"><div class="dd__asb"><b>2</b><i>封面</i></div><div class="dd__asn">02_直版封面<br>4:5</div></div>
+        <div class="dd__as"><div class="dd__asb"><b>3</b><i>事件拆解</i></div><div class="dd__asn">03_資訊圖1<br>4:5</div></div>
+        <div class="dd__as"><div class="dd__asb"><b>4</b><i>痛點分析</i></div><div class="dd__asn">04_資訊圖2<br>4:5</div></div>
+        <div class="dd__as"><div class="dd__asb"><b>5</b><i>解法重點</i></div><div class="dd__asn">05_資訊圖3<br>4:5</div></div>
+        <div class="dd__as"><div class="dd__asb"><b>6</b><i>CTA</i></div><div class="dd__asn">06_資訊圖4<br>4:5</div></div>
+      </div>
+      <div class="dd__assets dd__wide" style="grid-template-columns:1fr 4fr;margin-top:9px">
+        <div class="dd__as"><div class="dd__asb"><b>7</b><i>橫版 hero</i></div><div class="dd__asn">07_橫版封面 · 1000×525</div></div>
+        <div></div>
+      </div>
+      <div class="dd__srcs"><b>Verified sources · 6</b><u>View</u></div>
+    </div>
+  </div>
+
+  <div class="sec-head" style="margin-top:24px">
+    <div class="dm-title-section">4 posts</div>
+    <span class="tg tg-n" style="margin-left:auto">One delivery</span>
+  </div>
+  <div class="dd__posts">
+    <div class="ddp">
+      <div class="ddp__h"><div class="ddp__av" style="background:#64748B">W</div><div class="ddp__n">businessfocus.io<em>Website Article · Draft</em></div></div>
+      <div class="ddp__b">Momenta擬港籌10億美元！中國自動駕駛AI新股光環背後 三年蝕逾92億問盈利何時到？</div>
+      <div class="ddp__md">Open Graph preview</div>
+      <div class="ddp__f"><button class="btn btn--secondary btn--sm">Edit</button><button class="lnkbtn" data-copy="deep">Copy link</button></div>
+    </div>
+    <div class="ddp">
+      <div class="ddp__h"><div class="ddp__av" style="background:#1877F2">f</div><div class="ddp__n">BusinessFocus<em>Facebook link · Draft</em></div></div>
+      <div class="ddp__b">下一隻AI新股來了？自動駕駛獨角獸 Momenta 據報擬在香港IPO，集資約10億美元…</div>
+      <div class="ddp__md">🔗 Link preview — generated by Meta</div>
+      <div class="ddp__f"><button class="btn btn--secondary btn--sm">Edit</button><button class="lnkbtn" data-copy="deep">Copy link</button></div>
+    </div>
+    <div class="ddp">
+      <div class="ddp__h"><div class="ddp__av" style="background:linear-gradient(135deg,#F58529,#DD2A7B)">IG</div><div class="ddp__n">businessfocus.io<em>Instagram carousel · 5 · Draft</em></div></div>
+      <div class="ddp__b">下一隻AI新股來了？Momenta 擬港籌 10 億美元。三年蝕逾 92 億，AI 故事幾時先賺到錢？</div>
+      <div class="ddp__md">02_直版封面 · 4:5</div>
+      <div class="ddp__f"><button class="btn btn--secondary btn--sm">Edit</button><button class="lnkbtn" data-copy="deep">Copy link</button></div>
+    </div>
+    <div class="ddp">
+      <div class="ddp__h"><div class="ddp__av" style="background:#1877F2">f</div><div class="ddp__n">BusinessFocus<em>Facebook image · Draft</em></div></div>
+      <div class="ddp__b">三年燒錢 92 億，Momenta 擬港籌 10 億美元。港股敢唔敢接下一隻 AI 新股？</div>
+      <div class="ddp__md">02_直版封面 · 4:5</div>
+      <div class="ddp__f"><button class="btn btn--secondary btn--sm">Edit</button><button class="lnkbtn" data-copy="deep">Copy link</button></div>
+    </div>
+  </div>
+
+  <div class="dd__bar">
+    <span class="dd__bari"><b>4 ready to publish</b> · Order: Website Article → Facebook Link · IG Carousel &amp; FB Image in parallel</span>
+    <button class="btn btn--secondary btn--sm" data-copy="share">Copy link</button>
+    <button class="btn btn--primary btn--sm">Confirm &amp; Publish</button>
+  </div>
+</div>
 
 </div>
 
@@ -1128,6 +1265,8 @@ a{text-decoration:none;color:inherit}
     <button class="btn btn--primary">Publish now</button>
     <button class="btn btn--secondary">Save draft</button>
     <button class="btn btn--secondary" id="pmaskCancel">Cancel</button>
+    <button class="lnkbtn" data-copy="deep">Copy link</button>
+    <button class="lnkbtn" data-copy="share">Share read-only</button>
     <span class="dirty">Unsaved changes are never discarded silently</span>
     <span class="who" style="margin-left:auto">Readiness fail disables Publish and lists the reason · warn publishes after one explicit confirmation</span>
   </div>
@@ -1137,35 +1276,33 @@ a{text-decoration:none;color:inherit}
 </div>
 </div>
 
-<div class="proto-badge">PRODUCT PROTOTYPE v2.3 · BF</div>
+<div class="toast" id="toast"></div>
+<div class="proto-badge">PRODUCT PROTOTYPE v2.4 · BF</div>
 
 <script>
 function q(s){return document.querySelector(s)}
 function qa(s){return [].slice.call(document.querySelectorAll(s))}
 
-/* tabs */
 qa('.dm-page-menu .menu-item').forEach(function(btn){
   btn.addEventListener('click',function(){
     qa('.dm-page-menu .menu-item').forEach(function(b){b.classList.remove('is-active')});
     btn.classList.add('is-active');
     qa('.tab-panel').forEach(function(p){p.classList.remove('active')});
     var el=document.getElementById('tab-'+btn.dataset.tab); if(el)el.classList.add('active');
+    q('#ddScreen').classList.remove('on'); q('#libList').style.display='';
     window.scrollTo(0,0);
   });
 });
 
-/* view mode: by topic / by post — swaps the whole block incl. its own filter cards */
 qa('.subpill button').forEach(function(b){
   b.addEventListener('click',function(){
     b.parentNode.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});
     b.classList.add('on');
-    var v=b.dataset.view;
-    q('#vTopic').hidden = (v!=='topic');
-    q('#vPost').hidden  = (v!=='post');
+    q('#vTopic').hidden = (b.dataset.view!=='topic');
+    q('#vPost').hidden  = (b.dataset.view!=='post');
   });
 });
 
-/* generic single-select filter wiring */
 function wireFilter(cardSel, barId, nameId, countId, clearId, names, counts){
   var bar=document.getElementById(barId);
   qa(cardSel).forEach(function(c){
@@ -1180,9 +1317,7 @@ function wireFilter(cardSel, barId, nameId, countId, clearId, names, counts){
     });
   });
   document.getElementById(clearId).addEventListener('click',function(){
-    bar.hidden=true;
-    qa(cardSel).forEach(function(x){x.classList.remove('on')});
-    qa(cardSel)[0].classList.add('on');
+    bar.hidden=true; qa(cardSel).forEach(function(x){x.classList.remove('on')}); qa(cardSel)[0].classList.add('on');
   });
 }
 wireFilter('#tab-work .dm-kpi-card.is-filter','fbar','fbarName','fbarN','fbarX',
@@ -1198,29 +1333,57 @@ wireFilter('.dm-kpi-card.is-filter3','fbar3','fbar3Name','fbar3N','fbar3X',
 /* dialogs */
 function openMask(m){ m.hidden=false; document.body.style.overflow='hidden'; }
 function closeMask(m){ m.hidden=true; document.body.style.overflow=''; }
-var tmask=document.getElementById('tmask'), pmask=document.getElementById('pmask');
-
+var tmask=q('#tmask'), pmask=q('#pmask');
 qa('tr.trow').forEach(function(r){ r.addEventListener('click',function(){ openMask(tmask); }); });
-qa('.plrow[data-post]').forEach(function(r){ r.addEventListener('click',function(){ openMask(pmask); }); });
-qa('.plrow[data-topic]').forEach(function(r){ r.addEventListener('click',function(){
-  q('.subpill button[data-view="post"]').click(); window.scrollTo(0,0); }); });
-
-document.getElementById('tmaskX').addEventListener('click',function(){closeMask(tmask)});
-document.getElementById('pmaskX').addEventListener('click',function(){closeMask(pmask)});
-document.getElementById('pmaskCancel').addEventListener('click',function(){closeMask(pmask)});
+q('#tmaskX').addEventListener('click',function(){closeMask(tmask)});
+q('#pmaskX').addEventListener('click',function(){closeMask(pmask)});
+q('#pmaskCancel').addEventListener('click',function(){closeMask(pmask)});
 [tmask,pmask].forEach(function(m){ m.addEventListener('click',function(e){ if(e.target===m) closeMask(m); }); });
 document.addEventListener('keydown',function(e){ if(e.key!=='Escape')return;
   if(!pmask.hidden) closeMask(pmask); else if(!tmask.hidden) closeMask(tmask); });
 
-/* AI bubbles highlight what they inject */
+/* topic row -> delivery detail screen ; post row -> edit dialog */
+qa('.plrow[data-topic]').forEach(function(r){
+  r.addEventListener('click',function(e){
+    if(e.target.closest('[data-copy]')) return;
+    q('#libList').style.display='none'; q('#ddScreen').classList.add('on'); window.scrollTo(0,0);
+  });
+});
+qa('.plrow[data-post]').forEach(function(r){
+  r.addEventListener('click',function(e){
+    if(e.target.closest('[data-copy]')) return;
+    openMask(pmask);
+  });
+});
+q('#ddBack').addEventListener('click',function(){
+  q('#ddScreen').classList.remove('on'); q('#libList').style.display=''; window.scrollTo(0,0);
+});
+qa('.ddp__f .btn').forEach(function(b){ b.addEventListener('click',function(){ openMask(pmask); }); });
+
+/* link affordances — two kinds, deliberately different */
+var toast=q('#toast'), tt=null;
+function say(html){ toast.innerHTML=html; toast.classList.add('on');
+  clearTimeout(tt); tt=setTimeout(function(){ toast.classList.remove('on'); },4200); }
+qa('[data-copy]').forEach(function(b){
+  b.addEventListener('click',function(e){
+    e.stopPropagation();
+    if(b.dataset.copy==='deep'){
+      say('Deep link copied<em>Permanent link — opens for view <b>and edit</b>. Requires sign-in and a Page role (admin / manager / editor). A stranger with this URL cannot open it.</em>');
+    } else {
+      say('Read-only share link copied<em>Tokenised and <b>expiring</b> — for showing a leader or an outsider. View only: it cannot edit and cannot publish. Reuses the existing Share Campaign link pattern.</em>');
+    }
+  });
+});
+
+/* AI bubbles */
 function flash(sel){ var n=q(sel); if(!n)return;
   n.scrollIntoView({behavior:'smooth',block:'center'});
   n.style.boxShadow='0 0 0 3px rgba(124,92,255,.35)';
   setTimeout(function(){ n.style.boxShadow=''; },1400); }
-document.getElementById('tfab').addEventListener('click',function(){ flash('#tmask .injected'); });
-document.getElementById('pfab').addEventListener('click',function(){ flash('#pmask .injected'); });
+q('#tfab').addEventListener('click',function(){ flash('#tmask .injected'); });
+q('#pfab').addEventListener('click',function(){ flash('#pmask .injected'); });
 
-/* carousel dots in the preview */
+/* preview carousel */
 (function(){
   var dots=qa('#pmask .fpp__dots i'), cnt=q('#pmask .fpp__counter'), stage=q('#pmask .fpp');
   var labels=['02','03','—','—','06'], cur=0;
@@ -1397,7 +1560,7 @@ function hbar(id,cfg){
 
 /* ══ BF Chart configs ══ */
 
-var BLUE='#3B82F6',GREEN='#10B981',GREY='#CBD5E1',RED='#EF4444',AMBER='#F59E0B',PURPLE='#8B5CF6',TEAL='#14B8A6';
+var BLUE='#3B82F6',GREEN='#10B981',GREY='#CBD5E1',RED='#EF4444',AMBER='#F59E0B';
 donut('srcVerify',{data:[
   {l:'Passed — figures confirmed',v:6,c:GREEN,tt:'Cited pages opened; figures appear on them'},
   {l:'Failed — page unreachable',v:1,c:RED,tt:'Cited URLs returned 404'},
