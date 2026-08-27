@@ -547,6 +547,39 @@ a{text-decoration:none;color:inherit}
 .sd__v{flex:0 0 42px;text-align:right;font:700 11px var(--font-metric);color:var(--dm-slate-700);font-variant-numeric:tabular-nums}
 .invnote{background:#FFF7ED;border:1px solid #F2D98C;border-radius:9px;padding:10px 13px;margin-top:12px;font:400 11px/1.65 var(--font-body);color:#7C4A03}
 .invnote b{color:#5C3702}
+
+/* ── v2.2: filter cards / modal / FAB ── */
+.dm-kpi-card.is-filter{cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.dm-kpi-card.is-filter:hover{border-color:var(--dm-primary)}
+.dm-kpi-card.is-filter.on{border-color:var(--dm-primary);box-shadow:0 0 0 2px rgba(35,169,246,.16)}
+.dm-kpi-card.is-filter .kpi__label:after{content:'▾';margin-left:5px;font-size:8px;opacity:.45}
+.filterbar{display:flex;align-items:center;gap:9px;background:#F2F9FF;border:1px solid #BFDBFE;border-radius:9px;padding:8px 13px;margin-bottom:12px;font:600 11.5px var(--font-body);color:#1D4ED8}
+.filterbar .x{margin-left:auto;cursor:pointer;color:#1D4ED8;font-weight:700;padding:0 4px}
+.filterbar[hidden]{display:none}
+.trow{cursor:pointer}
+.trow:hover{background:#F8FAFC}
+.trow .go{color:var(--dm-slate-300);font-size:12px}
+.trow:hover .go{color:var(--dm-primary)}
+.mask{position:fixed;inset:0;background:rgba(15,23,42,.42);z-index:400;display:flex;align-items:flex-start;justify-content:center;padding:44px 20px;overflow-y:auto}
+.mask[hidden]{display:none}
+.modal{background:#FFF;border-radius:14px;width:100%;max-width:940px;box-shadow:0 24px 60px rgba(15,23,42,.28);overflow:hidden;position:relative}
+.modal__hd{padding:16px 22px;border-bottom:1px solid var(--dm-border-light);display:flex;align-items:flex-start;gap:14px}
+.modal__ti{font:600 15px var(--font-heading);color:var(--dm-slate-800);line-height:1.45;flex:1}
+.modal__x{flex:0 0 auto;border:none;background:var(--dm-slate-100);color:var(--dm-slate-500);border-radius:7px;width:28px;height:28px;font-size:15px;cursor:pointer;line-height:1}
+.modal__x:hover{background:var(--dm-slate-200)}
+.modal__bd{padding:20px 22px;max-height:calc(100vh - 230px);overflow-y:auto}
+.modal__ft{padding:14px 22px;border-top:1px solid var(--dm-border-light);background:var(--dm-slate-50);display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.dirty{background:#FFF7ED;border:1px solid #F2D98C;border-radius:7px;padding:6px 11px;font:600 10.5px var(--font-body);color:#7C4A03}
+.fab{position:absolute;right:20px;bottom:74px;z-index:5;display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#23A9F6,#7C5CFF);color:#fff;border:none;border-radius:26px;padding:11px 17px;font:600 12.5px var(--font-body);cursor:pointer;box-shadow:0 8px 22px rgba(35,169,246,.36)}
+.fab .sp{width:8px;height:8px;border-radius:50%;background:#fff;animation:pls 1.5s infinite}
+.fabnote{position:absolute;right:20px;bottom:38px;z-index:5;font:600 9.5px var(--font-body);color:var(--dm-slate-400);background:rgba(255,255,255,.92);border-radius:5px;padding:2px 7px}
+.injected{background:#F5F3FF;border:1px solid #DDD6FE;border-radius:9px;padding:11px 14px;margin-top:12px}
+.injected__t{font:700 10px var(--font-body);letter-spacing:.05em;color:#6D28D9;margin-bottom:7px}
+.injchip{display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid #DDD6FE;border-radius:6px;padding:3px 9px;margin:0 5px 5px 0;font:600 10.5px var(--font-body);color:#5B21B6}
+.injchip .k{color:#8B7BC8;font-weight:500}
+.srclink{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed var(--dm-slate-200);font:400 11.5px var(--font-body);color:var(--dm-slate-600)}
+.srclink:last-child{border-bottom:none}
+.srclink a{color:var(--dm-primary);text-decoration:underline;text-underline-offset:2px}
 </style>
 <aside class="ml-sidebar">
   <div class="ml-sidebar__section">Intelligence</div>
@@ -577,9 +610,9 @@ a{text-decoration:none;color:inherit}
 
 
 <nav class="dm-page-menu"><div class="menu-list">
-  <button class="menu-item is-active" data-tab="work">Topic Workbench</button>
+  <button class="menu-item is-active" data-tab="work">Topics</button>
   <button class="menu-item" data-tab="lib">Publish Library</button>
-  <span style="align-self:center;margin-left:10px;font:600 10px var(--font-body);color:var(--dm-slate-400);white-space:nowrap">Four stages, two tabs — stages are progress inside the detail panel, not navigation levels</span>
+  <span style="align-self:center;margin-left:10px;font:600 10px var(--font-body);color:var(--dm-slate-400);white-space:nowrap">Two tabs — Topics holds topic + body + sources; confirming sends it straight to the Publish Library</span>
 </div></nav>
 
 <div class="dm-controls-row">
@@ -593,59 +626,33 @@ a{text-decoration:none;color:inherit}
 
 <div class="tab-panel active" id="tab-work">
 
-<div class="painmap">
-  <div class="pain">
-    <div class="pain__h"><span class="x">PAIN</span>Image generation is slow</div>
-    <div class="pain__r">Cause: the skill runs 6 generations <b>serially</b> inside one chat turn — image 6 waits for the first five.</div>
-    <div class="pain__f">After G2, <b>all 6 are enqueued at once</b>; async workers run them in parallel and each one shows up as it finishes.</div>
-    <div class="pain__e">enqueue.py — does NOT generate, poll, or wait</div>
-  </div>
-  <div class="pain">
-    <div class="pain__h"><span class="x">PAIN</span>Image output is unreliable</div>
-    <div class="pain__r">Cause: no template anchor; validation compares the <i>requested</i> ratio; one bad image means regenerating all six.</div>
-    <div class="pain__f">Template as reference (<b>clone_creative</b>) · validate against <b>outputRatio</b> (what was actually produced) · <b>regenerate one image</b> for the cost of one generation.</div>
-    <div class="pain__e">outputRatio — may differ from requested after model rounding</div>
-  </div>
-  <div class="pain">
-    <div class="pain__h"><span class="x">PAIN</span>Manual assembly</div>
-    <div class="pain__r">Cause: a human moves assets between Drive and Notion, matches sections, pastes captions by hand.</div>
-    <div class="pain__f">Section splitting is plain Python, then we <b>call the existing script</b> assemble_post_draft twice. Assembly is not something to build — it is something to wire.</div>
-    <div class="pain__e">--caption / --media-asset-ids / --platform / --created-via</div>
-  </div>
-</div>
-
 <div class="gates">
-  <div class="gt on"><div class="gt__k">G1 · DETAIL PANEL</div><div class="gt__q">Is this topic worth writing a draft for?</div><span class="gt__b">Adopt</span></div>
-  <div class="gt on"><div class="gt__k">G2 · DETAIL PANEL</div><div class="gt__q">Is this draft worth six image generations? (cost ratio 1:6)</div><span class="gt__b">Confirm Draft &amp; Generate Images</span></div>
-  <div class="gt free"><div class="gt__k">S3 → S4 · NO GATE</div><div class="gt__q">Assembly is plain Python and costs no tokens — a gate in front of a free operation is pure friction.</div><span class="gt__b">Auto-assembled</span></div>
+  <div class="gt on"><div class="gt__k">G1 · TOPIC DETAILS</div><div class="gt__q">Is this topic worth writing a draft for?</div><span class="gt__b">Adopt</span></div>
+  <div class="gt on"><div class="gt__k">G2 · TOPIC DETAILS</div><div class="gt__q">Is this draft good to go? Confirming sends it straight to the Publish Library.</div><span class="gt__b">Confirm &amp; Send to Publish Library</span></div>
+  <div class="gt free"><div class="gt__k">AFTER G2 · NO GATE</div><div class="gt__q">Images generate in the background and the posts assemble themselves — both are reviewed in the Publish Library, in post context.</div><span class="gt__b">Automatic</span></div>
 </div>
 
 <div class="dm-kpi-row">
-  <div class="dm-kpi-card"><div class="kpi__label">Today's candidates</div><div class="kpi__metric">20</div><div class="kpi__sub">run #34 · 10:00:12 HKT</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">Sources checked</div><div class="kpi__metric">6</div><div class="kpi__sub up">claims found on the cited pages</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">Check failed</div><div class="kpi__metric">2</div><div class="kpi__sub down">page unreachable / figure not found</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">In progress</div><div class="kpi__metric">3</div><div class="kpi__sub">past G1 · not published</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">Drafts awaiting G2</div><div class="kpi__metric">1</div><div class="kpi__sub">editor decision</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">Reshuffles today</div><div class="kpi__metric">1</div><div class="kpi__sub">previous batch kept on record</div></div>
+  <div class="dm-kpi-card is-filter on" data-filter="all"><div class="kpi__label">Today's candidates</div><div class="kpi__metric">20</div><div class="kpi__sub">run #34 · 10:00:12 HKT</div></div>
+  <div class="dm-kpi-card is-filter" data-filter="checked"><div class="kpi__label">Sources checked</div><div class="kpi__metric">6</div><div class="kpi__sub up">claims found on cited pages</div></div>
+  <div class="dm-kpi-card is-filter" data-filter="failed"><div class="kpi__label">Check failed</div><div class="kpi__metric">2</div><div class="kpi__sub down">unreachable / not independent</div></div>
+  <div class="dm-kpi-card is-filter" data-filter="progress"><div class="kpi__label">In progress</div><div class="kpi__metric">3</div><div class="kpi__sub">past G1 · not published</div></div>
+  <div class="dm-kpi-card is-filter" data-filter="awaiting"><div class="kpi__label">Awaiting G2</div><div class="kpi__metric">1</div><div class="kpi__sub">draft written, not confirmed</div></div>
+  <div class="dm-kpi-card is-filter" data-filter="reshuffle"><div class="kpi__label">Reshuffles today</div><div class="kpi__metric">1</div><div class="kpi__sub">previous batch on record</div></div>
 </div>
 
+<div class="filterbar" id="fbar" hidden><span>Filtered by <b id="fbarName">—</b></span><span class="dm-meta-label" id="fbarN"></span><span class="x" id="fbarX">Clear ✕</span></div>
+
 <div class="callout callout--a">
-  <div class="callout__title">"6 of 20 checked" is not a bug — checking is deferred on purpose</div>
-  <div class="callout__body">Topics are generated <b>grounded</b>: every source is echoed verbatim from the search tool, never composed by the model. Checking then happens <b>only for the candidate you are about to adopt</b> — we open the cited pages and confirm the figures in the brief actually appear there.<br>That is a page fetch, <b>not a new search</b> — so the added cost is a handful of fetches a day rather than re-searching all 20 candidates.<br>⚠ Two honest labels: the list score is a <b>provisional</b> score (it can drop after checking — single source is −15), and "check failed" is a <b>partial count</b>, covering only what has been checked so far.</div>
+  <div class="callout__title">Two things this page deliberately does not do</div>
+  <div class="callout__body"><b>No Reject button.</b> A topic you don't want needs no action. Hiding something that should have shown costs five seconds of recognising "seen it"; hiding something that <b>shouldn't</b> have been hidden costs a real story and you never find out. With one discovery track, coverage is already the risk. Duplicate protection sits at the publish gate instead, where it reads "you're about to publish a repeat".<br><b>No image grid.</b> Confirming a draft sends it straight to the Publish Library — images generate in the background and are reviewed <b>in post context</b>, which is where you can actually judge whether a cover works against its caption. The cost gate is unaffected: six generations still fire only for a confirmed topic.</div>
   <div class="callout__meta"><span>Checked: <b>8 / 20</b></span><span>Passed: <b>6</b></span><span>Failed: <b>2</b></span><span>Added cost: <b>~8 page fetches</b></span></div>
 </div>
 
 <section class="dm-card">
   <div class="dm-title-card">Schedule &amp; rules (read-only)<span class="dmode dmode-live">LIVE</span></div>
-  <span class="dm-subtitle">There is no separate Autopilot page — the schedule and the locked capability versions are shown here read-only. <b>The daily discovery schedule stays</b>; what we are not building is <b>scheduled publishing</b>. Those are two different things.</span>
-  <div class="dm-controls-row" style="padding:0 0 12px">
-    <span class="dm-ctl-label">DISCOVERY</span>
-    <div class="pill-row" style="margin-bottom:0"><button class="pill is-active">llm_only 🔒</button><button class="pill" style="opacity:.45">trends_first (roadmap)</button></div>
-    <span class="spacer"></span>
-    <button class="btn btn--secondary btn--sm">+ Add manually (P1)</button>
-  </div>
-  <div class="lockrow">run_time <b>10:00 · Asia/Hong_Kong</b> · daily_count <b>3</b> · pool_size <b>20</b><span class="lk">🔒</span></div>
-  <div class="lockrow">topic_skill <b>bf-topic-selection@v1</b> · writing_skill <b>bf-content-package@v1</b><span class="lk">🔒</span></div>
+  <span class="dm-subtitle">No separate Autopilot page — the schedule and locked capability versions live here, read-only. <b>The daily discovery schedule stays</b>; what we are not building is <b>scheduled publishing</b>.</span>
+  <div class="lockrow">run_time <b>10:00 · Asia/Hong_Kong</b> · daily_count <b>3</b> · pool_size <b>20</b> · discovery <b>llm_only</b><span class="lk">🔒</span></div>
   <div class="lockrow">scoring_profile <b>bf/lead-first</b> — lead_time.direction = <b>prefer_early</b><span class="lk">🔒</span></div>
   <div class="lockrow">delivery_spec <b>bf/default</b> — 6 × 4:5 + 1 × 1.91:1 · required_sections 8<span class="lk">🔒</span></div>
 </section>
@@ -657,17 +664,17 @@ a{text-decoration:none;color:inherit}
 </div>
 <section class="dm-card" style="margin-bottom:20px">
   <table class="dm-modern-table dm-modern-table--compact">
-    <thead><tr><th>Topic</th><th>Progress</th><th>Adopted by</th><th style="text-align:right">Score</th></tr></thead>
+    <thead><tr><th>Topic</th><th>Progress</th><th>Adopted by</th><th style="text-align:right">Score</th><th></th></tr></thead>
     <tbody>
-      <tr><td><div class="dm-cell-main">英偉達財報前夕美股 AI 板塊震盪</div><div class="dm-cell-sub">4 sources (1 primary filing) · draft written</div></td>
-          <td><span class="prog prog--wait"><i></i>Draft awaiting G2</span></td><td>Kelvin</td><td style="text-align:right"><b>87</b></td></tr>
-      <tr><td><div class="dm-cell-main">人民幣中間價連續第三日走強</div><div class="dm-cell-sub">3 sources · images generating</div></td>
-          <td><span class="prog prog--gen"><i></i>Images 4/6</span></td><td>Kelvin</td><td style="text-align:right"><b>81</b></td></tr>
-      <tr><td><div class="dm-cell-main">xAI 新一輪融資估值傳達 2000 億美元</div><div class="dm-cell-sub">4 sources · 2 posts assembled</div></td>
-          <td><span class="prog prog--ready"><i></i>Ready to publish</span></td><td>Amy</td><td style="text-align:right"><b>79</b></td></tr>
+      <tr class="trow" data-open="1"><td><div class="dm-cell-main">英偉達財報前夕美股 AI 板塊震盪</div><div class="dm-cell-sub">4 sources (1 primary filing) · draft written</div></td>
+          <td><span class="prog prog--wait"><i></i>Awaiting G2</span></td><td>Kelvin</td><td style="text-align:right"><b>87</b></td><td class="go">›</td></tr>
+      <tr class="trow"><td><div class="dm-cell-main">人民幣中間價連續第三日走強</div><div class="dm-cell-sub">3 sources · confirmed 11:02 · images generating</div></td>
+          <td><span class="prog prog--gen"><i></i>In Publish Library</span></td><td>Kelvin</td><td style="text-align:right"><b>81</b></td><td class="go">›</td></tr>
+      <tr class="trow"><td><div class="dm-cell-main">xAI 新一輪融資估值傳達 2000 億美元</div><div class="dm-cell-sub">4 sources · 2 posts assembled</div></td>
+          <td><span class="prog prog--ready"><i></i>Ready to publish</span></td><td>Amy</td><td style="text-align:right"><b>79</b></td><td class="go">›</td></tr>
     </tbody>
   </table>
-  <div class="foot-note">Progress is <b>derived</b> — it is read off whether the downstream artifacts exist, not set by anyone clicking a status. No movement for 48h marks the item <code>stale</code>: <b>flagged only, never deleted and never auto-released</b>.</div>
+  <div class="foot-note">Progress is <b>derived</b> — read off whether the downstream artifacts exist, not set by anyone clicking a status. No movement for 48h marks the item <code>stale</code>: flagged only, never deleted and never auto-released.</div>
 </section>
 
 <div class="zone">
@@ -676,125 +683,28 @@ a{text-decoration:none;color:inherit}
   <button class="btn btn--secondary btn--sm">↻ Reshuffle (1 today)</button>
 </div>
 <section class="dm-card">
-  <span class="dm-subtitle">Click any row to see sources, evidence and the draft below. <b>There is no Reject button</b> — a topic you don't want needs no action.<br>Why no reject: hiding something that should have shown costs you five seconds of recognising "seen it"; hiding something that <b>shouldn't</b> have been hidden costs you a real story, and you never find out. With a single discovery track, coverage is already the risk — we are not adding a mechanism that silently removes candidates. Duplicate protection sits at the publish gate instead (7-day near-duplicate), where it reads "you're about to publish a repeat" rather than "I hid two things for you".</span>
+  <span class="dm-subtitle">Click any row to open its details. The list and the detail are separate surfaces — details open in a dialog, so the list keeps its scroll position and filter.</span>
   <table class="dm-modern-table dm-modern-table--compact">
-    <thead><tr><th>Topic</th><th>Source check</th><th>Sources</th><th>Origin</th><th style="text-align:right">Provisional</th></tr></thead>
+    <thead><tr><th>Topic</th><th>Source check</th><th>Sources</th><th>Origin</th><th style="text-align:right">Provisional</th><th></th></tr></thead>
     <tbody>
-      <tr style="background:#F2F9FF"><td><div class="dm-cell-main">Momenta 擬港籌 10 億美元 · 自動駕駛 AI 新股</div><div class="dm-cell-sub">Figures confirmed on the cited pages</div></td>
-          <td><span class="vfy vfy--ok">✓ Checked</span></td><td>4 (1 primary)</td><td>pool</td><td style="text-align:right"><b>87</b></td></tr>
-      <tr><td><div class="dm-cell-main">港樓按息連續兩月回落 · 供樓負擔比率</div><div class="dm-cell-sub">Figures confirmed on the cited pages</div></td>
-          <td><span class="vfy vfy--ok">✓ Checked</span></td><td>3</td><td>pool</td><td style="text-align:right"><b>76</b></td></tr>
-      <tr><td><div class="dm-cell-main">最低工資檢討 · 商會與勞方分歧</div><div class="dm-cell-sub">Not opened yet — check not triggered</div></td>
-          <td><span class="vfy vfy--no">Not checked</span></td><td>2</td><td>pool</td><td style="text-align:right">72</td></tr>
-      <tr><td><div class="dm-cell-main">加密幣投資平台監管諮詢期結束</div><div class="dm-cell-sub">Both cited pages returned 404</div></td>
-          <td><span class="vfy vfy--bad">✕ Check failed</span></td><td>0 live</td><td>pool</td><td style="text-align:right">68</td></tr>
-      <tr><td><div class="dm-cell-main">本地餐飲業結業數創三年新高</div><div class="dm-cell-sub">All 4 links are reprints of one wire story</div></td>
-          <td><span class="vfy vfy--bad">✕ Not independent</span></td><td>1 effective</td><td>pool</td><td style="text-align:right">64</td></tr>
-      <tr><td><div class="dm-cell-main">中概股回港二次上市窗口</div><div class="dm-cell-sub">Not opened yet — check not triggered</div></td>
-          <td><span class="vfy vfy--no">Not checked</span></td><td>3</td><td>pool</td><td style="text-align:right">61</td></tr>
-      <tr style="opacity:.75"><td><div class="dm-cell-main">聯儲局點陣圖與港息走向</div><div class="dm-cell-sub">Created by Amy in chat · awaiting check</div></td>
-          <td><span class="vfy vfy--no">Awaiting check</span></td><td>—</td><td><span class="tg tg-p">chat · Amy</span></td><td style="text-align:right">—</td></tr>
+      <tr class="trow" data-open="1" style="background:#F2F9FF"><td><div class="dm-cell-main">Momenta 擬港籌 10 億美元 · 自動駕駛 AI 新股</div><div class="dm-cell-sub">Figures confirmed on the cited pages</div></td>
+          <td><span class="vfy vfy--ok">✓ Checked</span></td><td>4 (1 primary)</td><td>pool</td><td style="text-align:right"><b>87</b></td><td class="go">›</td></tr>
+      <tr class="trow"><td><div class="dm-cell-main">港樓按息連續兩月回落 · 供樓負擔比率</div><div class="dm-cell-sub">Figures confirmed on the cited pages</div></td>
+          <td><span class="vfy vfy--ok">✓ Checked</span></td><td>3</td><td>pool</td><td style="text-align:right"><b>76</b></td><td class="go">›</td></tr>
+      <tr class="trow"><td><div class="dm-cell-main">最低工資檢討 · 商會與勞方分歧</div><div class="dm-cell-sub">Not opened yet — check not triggered</div></td>
+          <td><span class="vfy vfy--no">Not checked</span></td><td>2</td><td>pool</td><td style="text-align:right">72</td><td class="go">›</td></tr>
+      <tr class="trow"><td><div class="dm-cell-main">加密幣投資平台監管諮詢期結束</div><div class="dm-cell-sub">Both cited pages returned 404</div></td>
+          <td><span class="vfy vfy--bad">✕ Check failed</span></td><td>0 live</td><td>pool</td><td style="text-align:right">68</td><td class="go">›</td></tr>
+      <tr class="trow"><td><div class="dm-cell-main">本地餐飲業結業數創三年新高</div><div class="dm-cell-sub">All 4 links are reprints of one wire story</div></td>
+          <td><span class="vfy vfy--bad">✕ Not independent</span></td><td>1 effective</td><td>pool</td><td style="text-align:right">64</td><td class="go">›</td></tr>
+      <tr class="trow"><td><div class="dm-cell-main">中概股回港二次上市窗口</div><div class="dm-cell-sub">Not opened yet — check not triggered</div></td>
+          <td><span class="vfy vfy--no">Not checked</span></td><td>3</td><td>pool</td><td style="text-align:right">61</td><td class="go">›</td></tr>
+      <tr class="trow" style="opacity:.75"><td><div class="dm-cell-main">聯儲局點陣圖與港息走向</div><div class="dm-cell-sub">Created by Amy in chat · awaiting check</div></td>
+          <td><span class="vfy vfy--no">Awaiting check</span></td><td>—</td><td><span class="tg tg-p">chat · Amy</span></td><td style="text-align:right">—</td><td class="go">›</td></tr>
     </tbody>
   </table>
-  <div class="foot-note">13 more · <span style="color:var(--dm-primary);font-weight:600">Replaced batch (20) · 09:41 by Kelvin ▸</span><br>Reshuffle <b>only replaces candidates with no downstream artifacts</b> — the three items under "In progress" are untouched (without this rule you get the bug where a topic that is mid-generation disappears). No cap on reshuffles, <b>but every one is recorded</b>: the only constraint is gone, so at minimum you must be able to see afterwards what happened.</div>
+  <div class="foot-note">13 more · <span style="color:var(--dm-primary);font-weight:600">Replaced batch (20) · 09:41 by Kelvin ▸</span><br>Reshuffle <b>only replaces candidates with no downstream artifacts</b> — the three items under "In progress" are untouched. No cap on reshuffles, <b>but every one is recorded</b>: the only constraint is gone, so at minimum you must be able to see afterwards what happened.</div>
 </section>
-
-<div class="zone" style="margin-top:22px"><div class="zone__t">Detail panel · S1 → S3</div><div class="zone__sp"></div><span class="dm-meta-label">Master-detail: G1 and G2 both act on the same object, so they must sit on the same screen</span></div>
-
-<div class="det">
-  <div class="det__hd">
-    <div class="det__ti">Momenta 擬港籌 10 億美元！中國自動駕駛 AI 新股光環背後 三年蝕逾 92 億問盈利何時到？
-      <div style="margin-top:6px"><span class="vfy vfy--ok">✓ Checked · 4 sources</span> <span class="prog prog--wait"><i></i>Draft awaiting G2</span> <span class="dm-meta-label">origin pool · adopted by Kelvin</span></div>
-    </div>
-    <div class="det__sc"><div class="n">87</div><div class="l">SCORE</div></div>
-  </div>
-
-  <div class="seg"><div class="seg__hd"><span class="seg__n">1</span>Topic &amp; sources</div><div class="seg__bd">
-    <div class="ev-row"><span class="lbl">Why selected</span><span class="val">A filing with hard numbers, a Hong Kong listing, and a valuation story that cuts against three years of losses.</span></div>
-    <div class="scorebd">
-      <div class="sd"><span class="sd__n">Brand Fit <em>shifts value distribution</em></span><span class="sd__rail"><span class="sd__fill" style="width:92%;background:#10B981"></span></span><span class="sd__v">23/25</span></div>
-      <div class="sd"><span class="sd__n">Lead Time <em>discussion not yet formed</em></span><span class="sd__rail"><span class="sd__fill" style="width:91%;background:#10B981"></span></span><span class="sd__v">20/22</span></div>
-      <div class="sd"><span class="sd__n">Data Verifiability <em>filing figures</em></span><span class="sd__rail"><span class="sd__fill" style="width:94%;background:#10B981"></span></span><span class="sd__v">17/18</span></div>
-      <div class="sd"><span class="sd__n">Topic History <em>"IPO / 自動駕駛" family</em></span><span class="sd__rail"><span class="sd__fill" style="width:80%;background:#3B82F6"></span></span><span class="sd__v">12/15</span></div>
-      <div class="sd"><span class="sd__n">Geo Relevance <em>HK listing</em></span><span class="sd__rail"><span class="sd__fill" style="width:87%;background:#3B82F6"></span></span><span class="sd__v">13/15</span></div>
-      <div class="sd"><span class="sd__n">Narrative <em>cause is thin</em></span><span class="sd__rail"><span class="sd__fill" style="width:40%;background:#F59E0B"></span></span><span class="sd__v">2/5</span></div>
-    </div>
-    <div class="invnote"><b>Lead Time is deliberately inverted for BusinessFocus.</b> A topic that is already widely discussed scores <b>lower</b>, not higher — the brand's position is to lead the discussion rather than arrive after it peaks. That is separate from <b>Topic History</b>, which asks whether this <i>kind</i> of story has historically performed on this page (computed from keyword-level engagement on the page's own posts). One is a timing signal, the other a forward-looking one; they point in opposite directions and must never be collapsed into a single "buzz" number.<br>Both the weights and <code>lead_time.direction</code> live in <code>topic_policy.scoring_profile</code> — a publication that <i>does</i> want to follow trends sets <code>prefer_trending</code>. Configuration, not a code branch.</div>
-    <div style="margin-top:12px">
-      <div class="srcrow"><span class="t3">primary</span>HKEXnews — listing application (source document)<span style="margin-left:auto;color:var(--dm-slate-400)">08-24 09:12</span></div>
-      <div class="srcrow"><span class="t12">tier1</span>SCMP — Momenta files for Hong Kong listing<span style="margin-left:auto;color:var(--dm-slate-400)">08-24 07:40</span></div>
-      <div class="srcrow"><span class="t12">tier1</span>信報 hkej.com — 自動駕駛新股招股在即<span style="margin-left:auto;color:var(--dm-slate-400)">08-24 08:05</span></div>
-      <div class="srcrow"><span class="t12">tier2</span>華爾街見聞 — three-year loss detail<span style="margin-left:auto;color:var(--dm-slate-400)">08-24 08:33</span></div>
-    </div>
-    <div class="foot-note">Sources are echoed verbatim from the search tool, never composed by the model. At adopt time we opened all four pages and confirmed the figures used in the brief appear on them — <b>a URL the model produced is not evidence it read the page</b>.</div>
-  </div></div>
-
-  <div class="seg"><div class="seg__hd"><span class="seg__n">2</span>Evidence (research pack)</div><div class="seg__bd">
-    <div class="ev-row"><span class="lbl">Angle</span><span class="val">The halo versus the P&amp;L — how an AI listing story is priced against three years of losses.</span></div>
-    <div class="ev-row"><span class="lbl">Data points</span><span class="val">Raise ≈ US$1.0bn (HKEXnews) · cumulative loss RMB 9.23bn over three years (prospectus) · R&amp;D 61% of revenue (prospectus)</span></div>
-    <div class="ev-row"><span class="lbl">Counter view</span><span class="val">If robotaxi commercialisation lands earlier than expected, losses narrow faster than the market is pricing.</span></div>
-    <div class="ev-row"><span class="lbl">Missing</span><span class="val">Cornerstone investors undisclosed; price range not set.</span></div>
-  </div></div>
-
-  <div class="seg"><div class="seg__hd"><span class="seg__n">3</span>Draft</div><div class="seg__bd">
-    <div class="dfield">
-      <div class="dfield__l">TITLE <span class="req">fixed suffix locked</span></div>
-      <div class="tinput">
-        <input value="Momenta 擬港籌 10 億美元！中國自動駕駛 AI 新股光環背後 三年蝕逾 92 億問盈利何時到？">
-        <span class="sfx"><span class="lk">🔒</span>【 @businessfocus.io 】【#BF社會熱話】</span>
-      </div>
-    </div>
-
-    <div class="dfield">
-      <div class="dfield__l">BODY <span class="req">rich text</span></div>
-      <div class="rte">
-        <div class="rte__tb">
-          <button style="font-weight:700">B</button><button style="font-style:italic">I</button><button>H2</button>
-          <span class="div"></span>
-          <button>🔗 Link</button><button>“ Quote</button><button>• List</button>
-          <button class="aiw">✨ AI Write</button>
-        </div>
-        <div class="rte__bd">
-          <p>中國自動駕駛獨角獸 Momenta 已向港交所遞表，市場預期集資額約 <strong>10 億美元</strong>，成為今年港股最受關注的 AI 新股之一。遞表文件見 <span class="shortlink">bit.ly/mmt-f1 <span class="arw">→</span> <span class="dest">hkexnews.hk</span></span>。</p>
-          <p><strong>事件拆解</strong>｜招股書顯示，公司過去三年累計虧損 <strong>92.3 億元人民幣</strong>，研發支出佔收入比重達 61%。這個比例在同業中屬偏高一端，也是市場對其盈利時點分歧的來源。</p>
-          <p>值得注意的是，這次遞表距離上一輪融資僅九個月，而估值區間尚未公開。<a class="lnk" href="#">信報早前報道</a>指基石投資者名單仍在洽談中。</p>
-          <p><strong>痛點分析</strong>｜自動駕駛的商業化路徑一直是估值爭議核心。Robotaxi 若能提前放量，虧損收窄速度可能快於市場預期；反之則要面對持續的研發投入壓力。</p>
-          <p>對港股投資者而言，這條新聞的意義不只是一家公司上市 —— 它會影響同類 AI 標的的定價參照。</p>
-        </div>
-        <div class="tagrow">
-          <span class="tagpill">#BusinessFocus</span><span class="tagpill">#BF</span><span class="tagpill">#Insight</span>
-          <span class="tagpill">#Momenta</span><span class="tagpill">#香港IPO</span><span class="tagpill">#自動駕駛</span>
-          <span class="tagpill">#Robotaxi</span><span class="tagpill">#AI新股</span>
-          <span class="tagpill men">@businessfocus.io</span>
-          <span class="tagcount"><span>Chars <b>2,104</b> / 2,200</span><span class="ok">Hashtags <b>8</b> / 30</span><span class="ok">Mentions <b>1</b> / 20</span></span>
-        </div>
-      </div>
-      <div class="foot-note">Section markers (<code>s1…s8</code>) are <b>not shown and never leave this system</b> — they are an assembly contract, not content, and other brands have no such structure. They live as <b>block metadata</b>, so editing rich text must preserve the block↔section mapping; if it can't, the editor is told the mapping needs re-confirming rather than silently producing a wrong split.<br>Character / hashtag / mention ceilings come from the platform (<code>igCaptionRules.js</code>: ≤2,200 / ≤30 / ≤20) and are <b>hard</b>. Brand style rules — "add 5 SEO hashtags" — live in the skill and are advisory only; the two must not be merged.</div>
-    </div>
-
-    <div class="action-row" style="padding-top:4px">
-      <button class="btn btn--primary">Confirm Draft &amp; Generate Images →</button>
-      <button class="btn btn--secondary">✨ AI Write</button>
-      <span class="who"><b>G2 · cost gate</b> — six image generations fire only after this. The draft has exactly one editing surface: captions are cut from it, so a second editable copy would drift.</span>
-    </div>
-  </div></div>
-
-  <div class="seg"><div class="seg__hd"><span class="seg__n">4</span>Delivery (S3) · 6 images in parallel</div><div class="seg__bd">
-    <div class="grid6">
-      <div class="acell"><div class="acell__ph"><span class="acell__sq">02</span><span class="acell__rt">4:5 ✓</span>Cover</div><div class="acell__bd"><div class="acell__nm">02_cover_4x5.png</div><div class="acell__ck">Code checks <b>4/4</b><br>In-image figures <b>needs your eye</b></div><div class="regenbox"><input placeholder="brighter…"><button>↻</button></div></div></div>
-      <div class="acell"><div class="acell__ph"><span class="acell__sq">03</span><span class="acell__rt">4:5 ✓</span>Breakdown</div><div class="acell__bd"><div class="acell__nm">03_info1_breakdown.png</div><div class="acell__ck">Code checks <b>4/4</b><br>Figures <b>match the draft</b></div><div class="regenbox"><input placeholder="one-line instruction…"><button>↻</button></div></div></div>
-      <div class="acell"><div class="acell__ph fail"><span class="acell__sq">04</span><span class="acell__rt">ratio off</span>Regen (2)</div><div class="acell__bd"><div class="acell__nm">04_info2_painpoint.png</div><div class="acell__ck" style="color:#B91C1C">outputRatio <b>1.02:1</b> ≠ 4:5<br>auto-regen attempt 2</div><div class="regenbox"><input placeholder="use Q2 figures…"><button>↻</button></div></div></div>
-      <div class="acell"><div class="acell__ph gen"><span class="acell__sq">05</span><span class="acell__rt">generating</span>Generating…</div><div class="acell__bd"><div class="acell__nm">05_info3_solution.png</div><div class="acell__ck">Queued · async worker running</div><div class="regenbox"><input placeholder="(generating)" disabled><button>↻</button></div></div></div>
-      <div class="acell"><div class="acell__ph gen"><span class="acell__sq">06</span><span class="acell__rt">queued</span>Queued</div><div class="acell__bd"><div class="acell__nm">06_info4_cta.png</div><div class="acell__ck">Queued · not blocking the others</div><div class="regenbox"><input placeholder="(queued)" disabled><button>↻</button></div></div></div>
-      <div class="acell"><div class="acell__ph"><span class="acell__sq">07</span><span class="acell__rt">1.91:1 ✓</span>Banner · site hero</div><div class="acell__bd"><div class="acell__nm">07_banner_1000x525.png</div><div class="acell__ck">Code checks <b>3/4</b><br><b>1024×536</b> (approx)</div><div class="regenbox"><input placeholder="one-line instruction…"><button>↻</button></div></div></div>
-    </div>
-
-    <div class="ckbar"><span class="cnt">4 / 6</span>Ratio, dimensions, completeness and naming checked automatically — <b>2 items need your eye</b> (in-image figures)
-      <span style="margin-left:auto;font-weight:400;font-size:10.5px">The checking agent narrows <b>where you look — it does not look for you</b>. That is why there is no green tick here.</span></div>
-
-    <div class="foot-note"><b>Parallel</b>: after G2 all six are enqueued at once and processed by async workers — nothing waits on the slowest one. <b>Per-image regeneration</b>: one image costs one generation, not six; the same <code>generationRequestId</code> is reused and each attempt increments <code>version</code> so history is kept. <b>Validation compares <code>outputRatio</code></b>, the ratio actually produced — comparing the requested value would validate nothing.<br>⚠ Image 07: <code>1.91:1</code> is a valid bucket, but enqueue can only request a <b>ratio</b>, not <b>exact pixels</b>. 1000×525 needs a resize/crop step after generation — open decision (B27): accept the approximation, or add the step.</div>
-  </div></div>
-</div>
 
 <div class="dm-row">
   <section class="dm-card">
@@ -810,28 +720,28 @@ a{text-decoration:none;color:inherit}
 </div>
 
 <section class="ai-card">
-  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Topic Workbench</div></div>
+  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Topics</div></div>
   <div class="ai-card__sub">Grounded on run #34 · 20-candidate pool · llm_only discovery · Confidence: Medium</div>
-  <div class="ai-insight-item"><span class="ib ib-b">Scoring</span><b>Two of today's top five score high on Brand Fit but low on Lead Time</b> — the story is real and on-thesis, but the discussion has already formed. Under <code>prefer_early</code> they drop below topics with thinner coverage. <b>That is the profile working as intended, not a bug to tune away.</b></div>
-  <div class="ai-insight-item warn"><span class="ib ib-a">Coverage</span><b>13 of 20 candidates are Business &amp; Finance</b>, and the "at most 2 per category" rule has bound four times today. This is normal for this page (72% of its corpus), but it means the editor's real choice is narrower than the pool looks. <b>Widen it by changing the topic prompt, not by loosening the category cap.</b></div>
-  <div class="ai-insight-item alert"><span class="ib ib-r">Blocked</span><b>The template images are still not in MediaLens <code>bf-templates/</code>.</b> Without a reference image, <code>clone_creative</code> has nothing to anchor to and the template-check agent has nothing to compare against — <b>half of "unreliable image output" cannot be fixed until this lands</b>, and it has been outstanding since v1.</div>
-  <div class="ai-card__ask"><input placeholder="Ask about the pool — e.g. &quot;why did candidate 4 fail its source check?&quot;"><button class="btn btn--primary btn--sm">Ask</button></div>
+  <div class="ai-insight-item"><span class="ib ib-b">Scoring</span><b>Two of today's top five score high on Brand Fit but low on Lead Time</b> — real, on-thesis stories where the discussion has already formed. Under <code>prefer_early</code> they fall below topics with thinner coverage. <b>That is the profile working as intended, not something to tune away.</b></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">Coverage</span><b>13 of 20 candidates are Business &amp; Finance</b> and the "at most 2 per category" rule bound four times today. Normal for this page (72% of its corpus), but the editor's real choice is narrower than the pool looks. <b>Widen it via the topic prompt, not by loosening the category cap.</b></div>
+  <div class="ai-insight-item alert"><span class="ib ib-r">Blocked</span><b>Template images are still not in MediaLens <code>bf-templates/</code>.</b> Without a reference image <code>clone_creative</code> has nothing to anchor to and the check agent nothing to compare against — <b>half of "unreliable image output" cannot be fixed until this lands</b>, outstanding since v1.</div>
+  <div class="ai-card__ask"><input placeholder="Ask about the pool — e.g. &quot;why did the crypto item fail its source check?&quot;"><button class="btn btn--primary btn--sm">Ask</button></div>
 </section>
 
 <details class="arch" style="margin-top:20px">
   <summary>Architecture — why the mainline does not need a second pipeline</summary>
   <div class="arch__bd">
-    <span class="dm-subtitle">The four stages are named after <b>objects</b>, so BusinessFocus becomes a configuration rather than a bespoke set of screens. Brand differences live in three objects; no skill is forked.</span>
+    <span class="dm-subtitle">The stages are named after <b>objects</b>, so BusinessFocus is a configuration rather than a bespoke set of screens.</span>
     <table class="dm-modern-table dm-modern-table--compact">
       <thead><tr><th>Stage</th><th>Object</th><th>BusinessFocus config</th><th>Mainline config (future)</th></tr></thead>
       <tbody>
         <tr><td><b>S1 Candidate</b></td><td><code>Candidate</code></td><td>20 topics/day · single LLM track + source check + score</td><td>brief / idea pool</td></tr>
-        <tr><td><b>S2 Draft</b></td><td><code>Draft</code></td><td>8-section article (anchors s1..s8)</td><td>copy variants (N)</td></tr>
-        <tr><td><b>S3 Delivery</b></td><td><code>Delivery</code> + <code>Asset[]</code></td><td>article + 6 images, fixed template and ratios</td><td>N creatives, free ratios</td></tr>
+        <tr><td><b>S2 Draft</b></td><td><code>Draft</code></td><td>title + body + cited sources</td><td>copy variants (N)</td></tr>
+        <tr><td><b>S3 Delivery</b></td><td><code>Delivery</code> + <code>Asset[]</code></td><td>6 images, fixed template — generated after G2, reviewed in post context</td><td>N creatives, free ratios</td></tr>
         <tr><td><b>S4 Post</b></td><td><code>publishPost[]</code></td><td>FB image + IG carousel</td><td><b>identical</b></td></tr>
       </tbody>
     </table>
-    <div class="foot-note"><code>brand_profile</code> (voice, colours, type) · <code>topic_policy</code> (discovery rules, <b>scoring_profile</b>, <b>brand_thesis</b>) · <code>delivery_spec</code> (what S2 produces, how many assets and which ratios in S3, the S4 assembly recipe).<br><b>S4 is identical on both sides</b> — so it deserves the most care and the least brand-specific logic. Splitting the signature into three objects <b>costs nothing today</b> and is zero behaviour change; doing it after a second brand arrives means forking a skill.</div>
+    <div class="foot-note"><code>brand_profile</code> (voice, colours, type) · <code>topic_policy</code> (discovery rules, <b>scoring_profile</b>, <b>brand_thesis</b>) · <code>delivery_spec</code> (what S2 produces, S3's asset count and ratios, the S4 assembly recipe).<br><b>S4 is identical on both sides</b> — it deserves the most care and the least brand-specific logic. Splitting the signature into three objects <b>costs nothing today</b>; doing it after a second brand arrives means forking a skill.</div>
   </div>
 </details>
 
@@ -841,7 +751,7 @@ a{text-decoration:none;color:inherit}
 
 <div class="sec-head">
   <div class="dm-title-section">Publish Library — S4 · review, edit and publish the assembled posts</div>
-  <span class="dm-subtitle">Grouped <b>by topic</b> by default — the editor's unit of thought is "one story, two posts". <b>By post</b> is the cross-cutting view, for bulk actions and for answering "what is still unpublished today".</span>
+  <span class="dm-subtitle">Grouped <b>by topic</b> by default — the editor's unit of thought is "one story, two posts". <b>By post</b> is the cross-cutting view, for bulk actions and for answering "what is still unpublished today".<br><b>This is also where the generated images are reviewed.</b> They arrive here already assembled into the posts, which is the only place you can judge whether a cover works against its caption or whether the carousel reads in the right order.</span>
 </div>
 
 <div class="dm-kpi-row">
@@ -900,6 +810,22 @@ a{text-decoration:none;color:inherit}
   </div>
 </div>
 
+<section class="dm-card">
+  <div class="dm-title-card">Delivery assets — reviewed here, in post context<span class="dmode dmode-live">LIVE</span></div>
+  <span class="dm-subtitle">The six images generate in the background after G2 and land straight in the assembled posts. Each one can be regenerated on its own — <b>one image costs one generation, not six</b>.</span>
+  <div class="grid6">
+    <div class="acell"><div class="acell__ph"><span class="acell__sq">02</span><span class="acell__rt">4:5 ✓</span>Cover</div><div class="acell__bd"><div class="acell__nm">02_cover_4x5.png</div><div class="acell__ck">Code checks <b>4/4</b><br>In-image figures <b>needs your eye</b></div><div class="regenbox"><input placeholder="brighter…"><button>↻</button></div></div></div>
+    <div class="acell"><div class="acell__ph"><span class="acell__sq">03</span><span class="acell__rt">4:5 ✓</span>Breakdown</div><div class="acell__bd"><div class="acell__nm">03_info1_breakdown.png</div><div class="acell__ck">Code checks <b>4/4</b><br>Figures <b>match the draft</b></div><div class="regenbox"><input placeholder="one-line instruction…"><button>↻</button></div></div></div>
+    <div class="acell"><div class="acell__ph fail"><span class="acell__sq">04</span><span class="acell__rt">ratio off</span>Regen (2)</div><div class="acell__bd"><div class="acell__nm">04_info2_painpoint.png</div><div class="acell__ck" style="color:#B91C1C">outputRatio <b>1.02:1</b> ≠ 4:5<br>auto-regen attempt 2</div><div class="regenbox"><input placeholder="use Q2 figures…"><button>↻</button></div></div></div>
+    <div class="acell"><div class="acell__ph gen"><span class="acell__sq">05</span><span class="acell__rt">generating</span>Generating…</div><div class="acell__bd"><div class="acell__nm">05_info3_solution.png</div><div class="acell__ck">Queued · async worker running</div><div class="regenbox"><input placeholder="(generating)" disabled><button>↻</button></div></div></div>
+    <div class="acell"><div class="acell__ph gen"><span class="acell__sq">06</span><span class="acell__rt">queued</span>Queued</div><div class="acell__bd"><div class="acell__nm">06_info4_cta.png</div><div class="acell__ck">Queued · not blocking the others</div><div class="regenbox"><input placeholder="(queued)" disabled><button>↻</button></div></div></div>
+    <div class="acell"><div class="acell__ph"><span class="acell__sq">07</span><span class="acell__rt">1.91:1 ✓</span>Banner · site hero</div><div class="acell__bd"><div class="acell__nm">07_banner_1000x525.png</div><div class="acell__ck">Code checks <b>3/4</b><br><b>1024×536</b> (approx)</div><div class="regenbox"><input placeholder="one-line instruction…"><button>↻</button></div></div></div>
+  </div>
+  <div class="ckbar"><span class="cnt">4 / 6</span>Ratio, dimensions, completeness and naming checked automatically — <b>2 items need your eye</b> (in-image figures)
+    <span style="margin-left:auto;font-weight:400;font-size:10.5px">The checking agent narrows <b>where you look — it does not look for you</b>. That is why there is no green tick here.</span></div>
+  <div class="foot-note"><b>Parallel</b>: all six are enqueued at once after G2 and processed by async workers — nothing waits on the slowest one. <b>Per-image regeneration</b> reuses the same <code>generationRequestId</code> and increments <code>version</code>, so history is kept. <b>Validation compares <code>outputRatio</code></b>, the ratio actually produced — comparing the requested value would validate nothing.<br>⚠ Image 07: <code>1.91:1</code> is a valid bucket, but enqueue can only request a <b>ratio</b>, not <b>exact pixels</b>. 1000×525 needs a resize/crop step after generation — open decision (B27).<br>Swapping or reordering media inside a post goes through the existing <code>MediaStrip</code> in the edit modal and sets <code>overrides.media</code>.</div>
+</section>
+
 <div class="callout callout--b">
   <div class="callout__title">A post is a <b>projection</b> of the delivery, not a snapshot — this rule decides whose work gets thrown away</div>
   <div class="callout__body">When the delivery changes (you regenerate image 4, say) the posts are <b>re-assembled</b> — <b>except</b> for anything carrying an override.<br>Captions are cut from the draft, so "the draft changed, therefore re-cut the caption" is the obvious implementation. It is also the one that <b>silently discards an edit the editor just finished</b>, and they won't notice for a while. So: a hand edit sets <code>overrides.caption</code>, and from then on we only offer — "the draft has been updated, re-cut with the new version? (this replaces your edit)" — and <b>default to keeping their version</b>. Media reordering and swaps behave the same way via <code>overrides.media</code>.<br>Treating the post as a one-time snapshot instead leaves you maintaining the dirty state where "a post assembled from delivery v1 is showing v2's images".</div>
@@ -949,9 +875,103 @@ a{text-decoration:none;color:inherit}
 </div>
 
 </div></main>
-<div class="proto-badge">PRODUCT PROTOTYPE v2.1 · BF</div>
+
+<div class="mask" id="tmask" hidden>
+<div class="modal">
+  <div class="modal__hd">
+    <div class="modal__ti">Momenta 擬港籌 10 億美元！中國自動駕駛 AI 新股光環背後 三年蝕逾 92 億問盈利何時到？
+      <div style="margin-top:6px"><span class="vfy vfy--ok">✓ Checked · 4 sources</span> <span class="prog prog--wait"><i></i>Awaiting G2</span> <span class="dm-meta-label">origin pool · adopted by Kelvin · score 87</span></div>
+    </div>
+    <button class="modal__x" id="tmaskX">✕</button>
+  </div>
+
+  <div class="modal__bd">
+
+    <div class="dfield">
+      <div class="dfield__l">TITLE <span class="req">fixed suffix locked</span></div>
+      <div class="tinput">
+        <input value="Momenta 擬港籌 10 億美元！中國自動駕駛 AI 新股光環背後 三年蝕逾 92 億問盈利何時到？">
+        <span class="sfx"><span class="lk">🔒</span>【 @businessfocus.io 】【#BF社會熱話】</span>
+      </div>
+    </div>
+
+    <div class="dfield">
+      <div class="dfield__l">BODY <span class="req">rich text</span></div>
+      <div class="rte">
+        <div class="rte__tb">
+          <button style="font-weight:700">B</button><button style="font-style:italic">I</button><button>H2</button>
+          <span class="div"></span>
+          <button>🔗 Link</button><button>“ Quote</button><button>• List</button>
+          <button class="aiw">✨ AI Write</button>
+        </div>
+        <div class="rte__bd">
+          <p>中國自動駕駛獨角獸 Momenta 已向港交所遞表，市場預期集資額約 <strong>10 億美元</strong>，成為今年港股最受關注的 AI 新股之一。遞表文件見 <span class="shortlink">bit.ly/mmt-f1 <span class="arw">→</span> <span class="dest">hkexnews.hk</span></span>。</p>
+          <p><strong>事件拆解</strong>｜招股書顯示，公司過去三年累計虧損 <strong>92.3 億元人民幣</strong>，研發支出佔收入比重達 61%。這個比例在同業中屬偏高一端，也是市場對其盈利時點分歧的來源。</p>
+          <p>值得注意的是，這次遞表距離上一輪融資僅九個月，而估值區間尚未公開。<a class="lnk" href="#">信報早前報道</a>指基石投資者名單仍在洽談中。</p>
+          <p><strong>痛點分析</strong>｜自動駕駛的商業化路徑一直是估值爭議核心。Robotaxi 若能提前放量，虧損收窄速度可能快於市場預期；反之則要面對持續的研發投入壓力。</p>
+          <p>對港股投資者而言，這條新聞的意義不只是一家公司上市 —— 它會影響同類 AI 標的的定價參照。</p>
+        </div>
+        <div class="tagrow">
+          <span class="tagpill">#BusinessFocus</span><span class="tagpill">#BF</span><span class="tagpill">#Insight</span>
+          <span class="tagpill">#Momenta</span><span class="tagpill">#香港IPO</span><span class="tagpill">#自動駕駛</span>
+          <span class="tagpill">#Robotaxi</span><span class="tagpill">#AI新股</span>
+          <span class="tagpill men">@businessfocus.io</span>
+          <span class="tagcount"><span>Chars <b>2,104</b> / 2,200</span><span class="ok">Hashtags <b>8</b> / 30</span><span class="ok">Mentions <b>1</b> / 20</span></span>
+        </div>
+      </div>
+      <div class="foot-note">Section markers (<code>s1…s8</code>) are <b>not shown and never leave this system</b> — an assembly contract, not content, and other brands have no such structure. They live as <b>block metadata</b>, so rich-text editing must preserve the block↔section mapping; if it can't, the editor is told the mapping needs re-confirming rather than silently producing a wrong split.<br>Character / hashtag / mention ceilings come from the platform (<code>igCaptionRules.js</code>: ≤2,200 / ≤30 / ≤20) and are <b>hard</b>. Brand style rules — "add 5 SEO hashtags" — live in the skill and are advisory; the two must not be merged.</div>
+    </div>
+
+    <div class="dfield">
+      <div class="dfield__l">CITED SOURCES <span class="req">4 · opened and checked at adopt time</span></div>
+      <div class="srclink"><span class="t3">primary</span><a href="#">HKEXnews — listing application</a><span style="margin-left:auto;color:var(--dm-slate-400)">08-24 09:12</span></div>
+      <div class="srclink"><span class="t12">tier1</span><a href="#">SCMP — Momenta files for Hong Kong listing</a><span style="margin-left:auto;color:var(--dm-slate-400)">08-24 07:40</span></div>
+      <div class="srclink"><span class="t12">tier1</span><a href="#">信報 hkej.com — 自動駕駛新股招股在即</a><span style="margin-left:auto;color:var(--dm-slate-400)">08-24 08:05</span></div>
+      <div class="srclink"><span class="t12">tier2</span><a href="#">華爾街見聞 — three-year loss detail</a><span style="margin-left:auto;color:var(--dm-slate-400)">08-24 08:33</span></div>
+      <div class="foot-note">Sources are echoed verbatim from the search tool, never composed by the model. All four pages were opened at adopt time and the figures used in the body were confirmed to appear on them — <b>a URL the model produced is not evidence it read the page</b>.</div>
+    </div>
+
+    <div class="dfield" style="margin-bottom:0">
+      <div class="dfield__l">SCORE BREAKDOWN <span class="req">weights from topic_policy.scoring_profile</span></div>
+      <div class="scorebd">
+        <div class="sd"><span class="sd__n">Brand Fit <em>shifts value distribution</em></span><span class="sd__rail"><span class="sd__fill" style="width:92%;background:#10B981"></span></span><span class="sd__v">23/25</span></div>
+        <div class="sd"><span class="sd__n">Lead Time <em>discussion not yet formed</em></span><span class="sd__rail"><span class="sd__fill" style="width:91%;background:#10B981"></span></span><span class="sd__v">20/22</span></div>
+        <div class="sd"><span class="sd__n">Data Verifiability <em>filing figures</em></span><span class="sd__rail"><span class="sd__fill" style="width:94%;background:#10B981"></span></span><span class="sd__v">17/18</span></div>
+        <div class="sd"><span class="sd__n">Topic History <em>"IPO / 自動駕駛" family</em></span><span class="sd__rail"><span class="sd__fill" style="width:80%;background:#3B82F6"></span></span><span class="sd__v">12/15</span></div>
+        <div class="sd"><span class="sd__n">Geo Relevance <em>HK listing</em></span><span class="sd__rail"><span class="sd__fill" style="width:87%;background:#3B82F6"></span></span><span class="sd__v">13/15</span></div>
+        <div class="sd"><span class="sd__n">Narrative <em>cause is thin</em></span><span class="sd__rail"><span class="sd__fill" style="width:40%;background:#F59E0B"></span></span><span class="sd__v">2/5</span></div>
+      </div>
+      <div class="invnote"><b>Lead Time is deliberately inverted for BusinessFocus.</b> A topic already widely discussed scores <b>lower</b> — the brand's position is to lead the discussion, not arrive after it peaks. That is separate from <b>Topic History</b>, which asks whether this <i>kind</i> of story has historically performed on this page (keyword-level engagement on the page's own posts). One is a timing signal, the other forward-looking; they point in opposite directions and must never collapse into a single "buzz" number.<br>Weights and <code>lead_time.direction</code> live in <code>topic_policy.scoring_profile</code> — a publication that <i>does</i> follow trends sets <code>prefer_trending</code>. Configuration, not a code branch.</div>
+    </div>
+
+    <div class="injected">
+      <div class="injected__t">✨ WHAT THE AI BUBBLE INJECTS AS A REFERENCE</div>
+      <span class="injchip"><span class="k">candidate_id</span> cand_8f21</span>
+      <span class="injchip"><span class="k">title</span> Momenta 擬港籌 10 億美元…</span>
+      <span class="injchip"><span class="k">score</span> 87 + breakdown</span>
+      <span class="injchip"><span class="k">sources</span> 4 (url · outlet · tier)</span>
+      <span class="injchip"><span class="k">body</span> summary only</span>
+      <div class="foot-note" style="margin-top:6px">The reference payload is <b>bounded on purpose</b>. The house rule is "drop unbounded content, keep bounded references" — a full body would be silently dropped once it grows past the cap, leaving the agent editing half an article. When the agent actually needs the full text it reads it through a tool (<code>get_draft(candidate_id)</code>).<br>Reuses Buzz's wiring verbatim — <code>AiAssistantDrawer</code> + <code>CreativeStudioFab</code>, injected via the drawer's <code>addReferences()</code> proxy — with three values changed: <code>surface="bf-studio"</code> · <code>session-type="bf"</code> · <code>initial-agent="bf_agent"</code>.<br>⚠ Two prerequisites: references currently have exactly four dimensions (upload / asset / mypage / post), so <b><code>topic</code> needs to be added as a fifth</b> (the file's own rule: a dimension exists when the host surface owns that list plus its selection state — this one does); and <code>bf_agent</code> is <b>not in <code>KNOWN_AGENTS</code></b> yet.</div>
+    </div>
+
+  </div>
+
+  <div class="modal__ft">
+    <button class="btn btn--primary">Confirm &amp; Send to Publish Library →</button>
+    <button class="btn btn--secondary">Save draft</button>
+    <span class="dirty">Unsaved changes are blocked from being discarded silently</span>
+    <span class="who" style="margin-left:auto"><b>G2</b> — six image generations fire after this, then the two posts assemble themselves.</span>
+  </div>
+
+  <button class="fab" id="tfab"><span class="sp"></span>✨ Ask AI about this topic</button>
+  <span class="fabnote">Same FAB as Buzz · injects this topic as a reference</span>
+</div>
+</div>
+
+<div class="proto-badge">PRODUCT PROTOTYPE v2.2 · BF</div>
 
 <script>
+/* tabs */
 document.querySelectorAll('.dm-page-menu .menu-item').forEach(function(btn){
   btn.addEventListener('click',function(){
     document.querySelectorAll('.dm-page-menu .menu-item').forEach(function(b){b.classList.remove('is-active')});
@@ -961,12 +981,14 @@ document.querySelectorAll('.dm-page-menu .menu-item').forEach(function(btn){
     window.scrollTo(0,0);
   });
 });
+/* by topic / by post */
 document.querySelectorAll('.subpill button').forEach(function(b){
   b.addEventListener('click',function(){
     b.parentNode.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});
     b.classList.add('on');
   });
 });
+/* topic row expand in Publish Library */
 document.querySelectorAll('.tprow__hd').forEach(function(h){
   h.addEventListener('click',function(){
     var bd=h.parentNode.querySelector('.tprow__bd');
@@ -975,11 +997,40 @@ document.querySelectorAll('.tprow__hd').forEach(function(h){
       bd.style.display=open?'none':'grid'; if(cv)cv.textContent=open?'\u25B8':'\u25BE'; }
   });
 });
-document.querySelectorAll('.seg__hd').forEach(function(h){
-  h.addEventListener('click',function(){
-    var bd=h.parentNode.querySelector('.seg__bd');
-    if(bd) bd.style.display = (bd.style.display==='none') ? 'block' : 'none';
+/* KPI cards act as single-select filters */
+var FNAMES={all:"Today's candidates",checked:'Sources checked',failed:'Check failed',progress:'In progress',awaiting:'Awaiting G2',reshuffle:'Replaced batches'};
+var FCOUNT={all:'20 shown',checked:'6 shown',failed:'2 shown',progress:'3 shown',awaiting:'1 shown',reshuffle:'1 batch on record'};
+var bar=document.getElementById('fbar');
+document.querySelectorAll('.dm-kpi-card.is-filter').forEach(function(c){
+  c.addEventListener('click',function(){
+    document.querySelectorAll('.dm-kpi-card.is-filter').forEach(function(x){x.classList.remove('on')});
+    c.classList.add('on');
+    var f=c.dataset.filter;
+    if(f==='all'){ bar.hidden=true; return; }
+    bar.hidden=false;
+    document.getElementById('fbarName').textContent=FNAMES[f]||f;
+    document.getElementById('fbarN').textContent=FCOUNT[f]||'';
   });
+});
+document.getElementById('fbarX').addEventListener('click',function(){
+  bar.hidden=true;
+  document.querySelectorAll('.dm-kpi-card.is-filter').forEach(function(x){x.classList.remove('on')});
+  document.querySelector('.dm-kpi-card.is-filter[data-filter="all"]').classList.add('on');
+});
+/* topic row -> details dialog */
+var mask=document.getElementById('tmask');
+document.querySelectorAll('tr.trow').forEach(function(r){
+  r.addEventListener('click',function(){ mask.hidden=false; document.body.style.overflow='hidden'; });
+});
+function closeMask(){ mask.hidden=true; document.body.style.overflow=''; }
+document.getElementById('tmaskX').addEventListener('click',closeMask);
+mask.addEventListener('click',function(e){ if(e.target===mask) closeMask(); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!mask.hidden) closeMask(); });
+/* AI bubble */
+document.getElementById('tfab').addEventListener('click',function(){
+  var n=document.querySelector('.injected');
+  if(n){ n.scrollIntoView({behavior:'smooth',block:'center'}); n.style.boxShadow='0 0 0 3px rgba(124,92,255,.35)';
+    setTimeout(function(){ n.style.boxShadow=''; },1400); }
 });
 </script>
 
@@ -1152,7 +1203,7 @@ function hbar(id,cfg){
 var BLUE='#3B82F6',GREEN='#10B981',GREY='#CBD5E1',RED='#EF4444',AMBER='#F59E0B',PURPLE='#8B5CF6',TEAL='#14B8A6';
 
 donut('srcVerify',{data:[
-  {l:'Passed — figures confirmed',v:6,c:GREEN,tt:'Cited pages opened; the figures used in the brief appear on them'},
+  {l:'Passed — figures confirmed',v:6,c:GREEN,tt:'Cited pages opened; the figures used in the body appear on them'},
   {l:'Failed — page unreachable',v:1,c:RED,tt:'Cited URLs returned 404'},
   {l:'Failed — not independent',v:1,c:AMBER,tt:'All links are reprints of one wire story'},
   {l:'Not checked yet',v:12,c:GREY,tt:'Deferred — the editor has not opened these candidates'}]});
