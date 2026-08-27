@@ -757,6 +757,26 @@ body.dd-page .ml-content{padding-top:18px}
 .val{flex:0 0 auto;border-radius:5px;padding:1px 7px;font:700 9.5px var(--font-body);white-space:nowrap}
 .val--ok{background:#ECFDF5;color:#047857}
 .val--bad{background:#FEF2F2;color:#B91C1C}
+/* ── v2.8: settings config page ── */
+.cfg{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.cfgsec{border:1px solid var(--dm-border-light);border-radius:12px;background:#fff;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.cfgsec--locked{background:var(--dm-slate-50)}
+.cfgsec__h{font:600 13px var(--font-heading);color:var(--dm-slate-800);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.cfgsec__h .lk{font:600 9.5px var(--font-body);color:var(--dm-slate-500);background:var(--dm-slate-200);border-radius:5px;padding:1px 7px}
+.cfgsub{font:700 9.5px var(--font-body);letter-spacing:.06em;color:var(--dm-slate-400);margin:14px 0 8px;padding-top:12px;border-top:1px solid var(--dm-slate-100)}
+.cfgrow{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:7px 0}
+.cfgrow > label{flex:0 0 130px;font:600 11.5px var(--font-body);color:var(--dm-slate-600)}
+.cfgrow .ctin,.cfgrow .ctta{margin-bottom:0}
+.cfgrow .ctta{flex:1;min-width:200px}
+.cfghint{flex:1 1 100%;font:400 10.5px/1.55 var(--font-body);color:var(--dm-slate-500);padding-left:139px}
+.cfgval{font:600 11.5px var(--font-metric);color:var(--dm-slate-700)}
+.cfgw{margin-top:6px;border:1px solid var(--dm-slate-200);border-radius:9px;padding:10px 12px;background:var(--dm-slate-50)}
+.cfgw__r{display:flex;align-items:center;gap:9px;padding:3px 0}
+.cfgw__r span{flex:1;font:600 11px var(--font-body);color:var(--dm-slate-600)}
+.cfgw__t{margin-top:7px;padding-top:7px;border-top:1px solid var(--dm-slate-200);font:600 11px var(--font-body);color:var(--dm-slate-600);text-align:right}
+.cfgw__t b{font-family:var(--font-metric);color:var(--dm-slate-800)}
+.swatch{width:22px;height:22px;border-radius:5px;border:1px solid var(--dm-slate-300)}
+.te__sc .dvlink{margin-left:auto;font:700 11px var(--font-metric);color:var(--dm-primary)}
 </style>
 <aside class="ml-sidebar">
   <div class="ml-sidebar__section">Intelligence</div>
@@ -826,6 +846,7 @@ body.dd-page .ml-content{padding-top:18px}
     <div class="tthead__n">20</div>
     <span class="spacer" style="flex:1"></span>
     <button class="btn btn--secondary btn--sm">↻ Reshuffle (1 today)</button>
+    <button class="lnkbtn" id="btnSettings">⚙ Settings</button>
     <button class="btn btn--primary btn--sm" id="btnCreate">+ Create Topic</button>
   </div>
   <table class="dm-modern-table dm-modern-table--compact">
@@ -864,17 +885,17 @@ body.dd-page .ml-content{padding-top:18px}
           <td><span class="stt stt--draft"><i></i>Draft</span></td>
           <td style="text-align:right"><b>64</b></td><td class="go">›</td></tr>
       <tr class="trow"><td><div class="dm-cell-main">聯儲局點陣圖與港息走向</div><div class="dm-cell-sub">Amy typed this in — you own the facts</div></td>
-          <td><span class="chk3 chk3--man">— Not verified · manual</span></td><td>—</td><td>manual_topic</td>
+          <td><span style="color:var(--dm-slate-400)">—</span></td><td>—</td><td>manual_topic</td>
           <td><span class="stt stt--draft"><i></i>Draft</span></td>
           <td style="text-align:right"><b>—</b></td><td class="go">›</td></tr>
       <tr class="trow" style="opacity:.72"><td><div class="dm-cell-main">中概股回港二次上市窗口 · 已貼全文</div><div class="dm-cell-sub">Pasted article · split into 8 sections · you own the facts</div></td>
-          <td><span class="chk3 chk3--man">— Not verified · manual</span></td><td>—</td><td>manual_article</td>
+          <td><span style="color:var(--dm-slate-400)">—</span></td><td>—</td><td>manual_article</td>
           <td><span class="stt stt--draft"><i></i>Draft</span></td>
           <td style="text-align:right"><b>—</b></td><td class="go">›</td></tr>
     </tbody>
   </table>
   <div class="foot-note">10 of 20 shown · <span style="color:var(--dm-primary);font-weight:600">Replaced batch (20) · 09:41 by Kelvin ›</span><br>
-  <b>Source check has three outcomes, and two of them look similar but mean the opposite thing.</b> <span class="chk3 chk3--bad">✕ Check failed</span> means verification ran and failed — <b>Confirm is disabled</b> and the reason is shown. <span class="chk3 chk3--man">— Not verified · manual</span> means a person typed it in, so it was never verified by design — <b>Confirm is allowed</b> after one explicit acknowledgement that the facts are theirs.<br>
+  <b>A failed source check blocks Confirm; a manual topic does not.</b> <span class="chk3 chk3--bad">✕ Check failed</span> means verification ran and could not stand the claims up — Confirm is disabled and the reason is shown. A manually created topic has no sources to verify, so <b>Origin</b> is what tells you who owns the facts; Confirm is allowed after one explicit acknowledgement.<br>
   Reshuffle only replaces <b>Draft</b> rows. <b>Confirmed</b> rows are never touched.</div>
 </section>
 
@@ -889,12 +910,73 @@ body.dd-page .ml-content{padding-top:18px}
   </section>
 </div>
 
-<section class="dm-card">
-  <div class="dm-title-card">Schedule &amp; rules (read-only)<span class="dmode dmode-live">LIVE</span></div>
-  <div class="lockrow">run_time <b>10:00 · Asia/Hong_Kong</b> · daily_count <b>3</b> · pool_size <b>20</b> · discovery <b>llm_only</b><span class="lk">🔒</span></div>
-  <div class="lockrow">scoring_profile <b>bf/lead-first</b> — lead_time.direction = <b>prefer_early</b><span class="lk">🔒</span></div>
-  <div class="lockrow">delivery_spec <b>bf/default</b> — 6 × 4:5 + 1 × 1.91:1 · required_sections 8<span class="lk">🔒</span></div>
-</section>
+
+
+<div class="te" id="cfgScreen">
+  <div class="te__top">
+    <button class="dd__back" id="cfgBack">‹ Back</button>
+    <div class="te__m">
+      <div class="te__t">Settings — BusinessFocus</div>
+      <div class="te__meta"><span>Everything a new brand needs to configure. No skill is forked.</span></div>
+    </div>
+    <div class="te__actions">
+      <button class="btn btn--secondary btn--sm">Reset</button>
+      <button class="btn btn--primary btn--sm">Save settings</button>
+    </div>
+  </div>
+
+  <div class="cfg">
+    <section class="cfgsec">
+      <div class="cfgsec__h">Schedule</div>
+      <div class="cfgrow"><label>Run time</label><input class="ctin" value="10:00" style="max-width:110px;margin:0"><select class="epm__sel"><option>Asia/Hong_Kong</option></select></div>
+      <div class="cfgrow"><label>Topics per run</label><input class="ctin" value="3" style="max-width:80px;margin:0"><span class="cfghint">how many get adopted per day</span></div>
+      <div class="cfgrow"><label>Pool size</label><input class="ctin" value="20" style="max-width:80px;margin:0"><span class="cfghint">candidates generated per run</span></div>
+      <div class="cfgrow"><label>Enabled</label><span class="tg tg-g">On</span></div>
+    </section>
+
+    <section class="cfgsec">
+      <div class="cfgsec__h">topic_policy</div>
+      <div class="cfgrow"><label>Discovery</label>
+        <div class="pill-row" style="margin:0"><button class="pill is-active">llm_only</button><button class="pill" style="opacity:.45">trends_first</button><button class="pill" style="opacity:.45">cross_check</button></div></div>
+      <div class="cfgrow"><label>Brand thesis</label><textarea class="ctta" style="min-height:56px">News that could shift, or is shifting, how value is distributed in capital or business markets.</textarea></div>
+      <div class="cfgrow"><label>Max per category</label><input class="ctin" value="2" style="max-width:80px;margin:0"></div>
+
+      <div class="cfgsub">scoring_profile</div>
+      <div class="cfgrow"><label>Lead time direction</label>
+        <div class="pill-row" style="margin:0"><button class="pill is-active">prefer_early</button><button class="pill">prefer_trending</button></div>
+        <span class="cfghint"><b>This is the switch.</b> BusinessFocus leads the discussion, so a topic already widely covered scores lower. A publication that follows trends flips this.</span></div>
+      <div class="cfgw"><div class="cfgw__r"><span>Brand Fit</span><input class="ctin" value="25" style="max-width:64px;margin:0"></div>
+        <div class="cfgw__r"><span>Lead Time</span><input class="ctin" value="22" style="max-width:64px;margin:0"></div>
+        <div class="cfgw__r"><span>Data Verifiability</span><input class="ctin" value="18" style="max-width:64px;margin:0"></div>
+        <div class="cfgw__r"><span>Topic History</span><input class="ctin" value="15" style="max-width:64px;margin:0"></div>
+        <div class="cfgw__r"><span>Geo Relevance</span><input class="ctin" value="15" style="max-width:64px;margin:0"></div>
+        <div class="cfgw__r"><span>Narrative</span><input class="ctin" value="5" style="max-width:64px;margin:0"></div>
+        <div class="cfgw__t">Total <b>100</b></div></div>
+    </section>
+
+    <section class="cfgsec">
+      <div class="cfgsec__h">delivery_spec</div>
+      <div class="cfgrow"><label>Required sections</label><input class="ctin" value="8" style="max-width:80px;margin:0"><span class="cfghint">a brand with no fixed structure sets this to 0 — then the body is plain rich text with no anchors</span></div>
+      <div class="cfgrow"><label>Assets</label><span class="tg tg-n">6 × 4:5</span><span class="tg tg-n">1 × 1.91:1</span><button class="lnkbtn">Edit list</button></div>
+      <div class="cfgrow"><label>Assembly recipe</label><span class="cfghint">Facebook = sections 1–7 + cover · Instagram = sections 1–8 + 5 images</span><button class="lnkbtn">Edit</button></div>
+    </section>
+
+    <section class="cfgsec">
+      <div class="cfgsec__h">brand_profile</div>
+      <div class="cfgrow"><label>Fixed title suffix</label><input class="ctin" value="【 @businessfocus.io 】【#BF社會熱話】" style="margin:0"></div>
+      <div class="cfgrow"><label>Brand colours</label><span class="swatch" style="background:#184c83"></span><span class="swatch" style="background:#fefb09"></span><button class="lnkbtn">Edit</button></div>
+      <div class="cfgrow"><label>Template images</label><span class="tg tg-a">Not uploaded</span><button class="lnkbtn">Upload</button><span class="cfghint">required before images can be generated</span></div>
+    </section>
+
+    <section class="cfgsec cfgsec--locked">
+      <div class="cfgsec__h">Capability versions <span class="lk">🔒 platform-managed</span></div>
+      <div class="cfgrow"><label>topic_skill</label><span class="cfgval">bf-topic-selection@v1</span></div>
+      <div class="cfgrow"><label>writing_skill</label><span class="cfgval">bf-content-package@v1</span></div>
+      <div class="cfgrow"><label>cover_style</label><span class="cfgval">bf/default</span></div>
+      <div class="cfghint" style="padding:4px 0 0">These stay locked. A brand that can edit its own skill version can break its own pipeline.</div>
+    </section>
+  </div>
+</div>
 
 <div class="te" id="teScreen">
   <div class="te__top">
@@ -908,6 +990,7 @@ body.dd-page .ml-content{padding-top:18px}
       </div>
     </div>
     <div class="te__actions">
+      <button class="lnkbtn" id="teReshuffle">↻ Reshuffle this topic</button>
       <button class="lnkbtn" data-copy="share">Copy link</button>
       <button class="btn btn--secondary btn--sm">Save</button>
       <button class="btn btn--primary btn--sm">Confirm &amp; Send to Publish Library</button>
@@ -969,7 +1052,7 @@ body.dd-page .ml-content{padding-top:18px}
       </div>
 
       <div class="te__sc" style="margin-top:14px">
-        <div class="te__l" style="margin-bottom:10px">DATA SOURCES VALIDATION</div>
+        <div class="te__l" style="margin-bottom:10px;display:flex;align-items:center">DATA SOURCES VALIDATION<span class="dvlink">17 / 18</span></div>
         <div class="te__src"><span class="t3">primary</span><a href="#">HKEXnews — listing application</a><span class="val val--ok">✓ passed</span><span class="te__ts">08-24 09:12</span></div>
         <div class="te__src"><span class="t12">tier1</span><a href="#">SCMP — Momenta files for HK listing</a><span class="val val--ok">✓ passed</span><span class="te__ts">07:40</span></div>
         <div class="te__src"><span class="t12">tier1</span><a href="#">信報 hkej.com — 自動駕駛新股招股在即</a><span class="val val--ok">✓ passed</span><span class="te__ts">08:05</span></div>
@@ -1359,7 +1442,7 @@ body.dd-page .ml-content{padding-top:18px}
 </div>
 </div>
 <div class="toast" id="toast"></div>
-<div class="proto-badge">PRODUCT PROTOTYPE v2.7 · BF</div>
+<div class="proto-badge">PRODUCT PROTOTYPE v2.8 · BF</div>
 
 <script>
 function q(s){return document.querySelector(s)}
@@ -1368,6 +1451,7 @@ function qa(s){return [].slice.call(document.querySelectorAll(s))}
 function exitPages(){
   q('#ddScreen').classList.remove('on');
   q('#teScreen').classList.remove('on');
+  var cfg=q('#cfgScreen'); if(cfg) cfg.classList.remove('on');
   q('#libList').style.display='';
   qa('#tab-work > *').forEach(function(el){ if(el.id!=='teScreen') el.style.display=''; });
   document.body.classList.remove('dd-page');
@@ -1437,6 +1521,20 @@ qa('tr.trow').forEach(function(r){ r.addEventListener('click',function(){ enterT
 q('#teBack').addEventListener('click',function(){ exitPages(); window.scrollTo(0,0); });
 
 q('#btnCreate').addEventListener('click',function(){ openMask(cmask); });
+
+/* settings config page */
+function enterCfg(){
+  qa('#tab-work > *').forEach(function(el){ if(el.id!=='cfgScreen') el.style.display='none'; });
+  q('#cfgScreen').classList.add('on');
+  document.body.classList.add('dd-page'); window.scrollTo(0,0);
+}
+q('#btnSettings').addEventListener('click', enterCfg);
+q('#cfgBack').addEventListener('click',function(){ exitPages(); window.scrollTo(0,0); });
+
+/* per-topic reshuffle — different scope from the list-level one, and it overwrites */
+q('#teReshuffle').addEventListener('click',function(){
+  say('Reshuffle this topic?<em>Re-runs source discovery and <b>regenerates the title and body</b> for this one topic — the topic itself stays. Not the same as Reshuffle on the list, which swaps the whole candidate batch.<br>The body has been hand-edited, so this would replace your version. The previous version is kept in history.</em>');
+});
 q('#cmaskX').addEventListener('click',function(){closeMask(cmask)});
 q('#cmaskCancel').addEventListener('click',function(){closeMask(cmask)});
 qa('.ctm').forEach(function(m){
