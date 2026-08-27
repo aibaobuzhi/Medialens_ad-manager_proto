@@ -1442,7 +1442,7 @@ body.dd-page .ml-content{padding-top:18px}
 </div>
 </div>
 <div class="toast" id="toast"></div>
-<div class="proto-badge">PRODUCT PROTOTYPE v2.8 · BF</div>
+<div class="proto-badge">PRODUCT PROTOTYPE v2.8.1 · BF</div>
 
 <script>
 function q(s){return document.querySelector(s)}
@@ -1453,7 +1453,9 @@ function exitPages(){
   q('#teScreen').classList.remove('on');
   var cfg=q('#cfgScreen'); if(cfg) cfg.classList.remove('on');
   q('#libList').style.display='';
-  qa('#tab-work > *').forEach(function(el){ if(el.id!=='teScreen') el.style.display=''; });
+  /* restore EVERY sibling. .te{display:none} already hides the page surfaces,
+     so leaving an inline display:none on one of them makes it unopenable. */
+  qa('#tab-work > *').forEach(function(el){ el.style.display=''; });
   document.body.classList.remove('dd-page');
 }
 function enterDelivery(){
