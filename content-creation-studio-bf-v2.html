@@ -508,6 +508,45 @@ a{text-decoration:none;color:inherit}
 .pain__f{font:600 11.5px/1.6 var(--font-body);color:#047857;padding-top:8px;border-top:1px dashed var(--dm-slate-200)}
 .pain__f b{color:#065F46}
 .pain__e{font:400 9.5px/1.5 var(--font-body);color:var(--dm-slate-400);margin-top:6px;font-family:var(--font-metric)}
+
+/* ── v2.1: rich-text draft editor ── */
+.dfield{margin-bottom:14px}
+.dfield__l{font:700 9.5px var(--font-body);letter-spacing:.06em;color:var(--dm-slate-400);margin-bottom:5px;display:flex;align-items:center;gap:7px}
+.dfield__l .req{background:var(--dm-slate-100);color:var(--dm-slate-500);border-radius:4px;padding:1px 6px;font-size:9px;letter-spacing:0}
+.tinput{display:flex;align-items:stretch;border:1px solid var(--dm-slate-300);border-radius:8px;overflow:hidden;background:#fff}
+.tinput input{flex:1;min-width:0;border:none;outline:none;padding:9px 11px;font:600 13.5px var(--font-heading);color:var(--dm-slate-800)}
+.tinput .sfx{flex:0 0 auto;display:flex;align-items:center;gap:5px;background:var(--dm-slate-50);border-left:1px dashed var(--dm-slate-300);padding:0 11px;font:600 11px var(--font-body);color:var(--dm-slate-500);white-space:nowrap}
+.tinput .sfx .lk{font-size:10px;opacity:.6}
+.rte{border:1px solid var(--dm-slate-300);border-radius:8px;background:#fff;overflow:hidden}
+.rte__tb{display:flex;align-items:center;gap:2px;padding:6px 8px;border-bottom:1px solid var(--dm-slate-200);background:var(--dm-slate-50);flex-wrap:wrap}
+.rte__tb button{border:none;background:none;border-radius:5px;padding:3px 7px;font:600 11.5px var(--font-body);color:var(--dm-slate-600);cursor:pointer}
+.rte__tb button:hover{background:var(--dm-slate-200)}
+.rte__tb .div{width:1px;height:16px;background:var(--dm-slate-300);margin:0 4px}
+.rte__tb .aiw{margin-left:auto;background:var(--dm-primary);color:#fff;font-weight:600;padding:4px 11px}
+.rte__tb .aiw:hover{background:#1B8FD4}
+.rte__bd{padding:14px 16px;font:400 13px/1.85 var(--font-body);color:var(--dm-slate-700);max-height:260px;overflow-y:auto}
+.rte__bd p{margin:0 0 12px}
+.rte__bd p:last-child{margin-bottom:0}
+.rte__bd strong{color:var(--dm-slate-900);font-weight:700}
+.rte a.lnk{color:var(--dm-primary);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px}
+.shortlink{display:inline-flex;align-items:center;gap:5px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:5px;padding:0 6px;font:600 11px var(--font-metric);color:#1D4ED8;vertical-align:1px}
+.shortlink .arw{color:#93B4E8;font-size:9px}
+.shortlink .dest{color:#475569;font-weight:500}
+.tagrow{display:flex;flex-wrap:wrap;gap:5px;padding:11px 16px;border-top:1px dashed var(--dm-slate-200);align-items:center}
+.tagpill{background:#F1F5F9;color:#334155;border-radius:20px;padding:2px 9px;font:600 11px var(--font-body)}
+.tagpill.men{background:#F5F3FF;color:#6D28D9}
+.tagcount{margin-left:auto;display:flex;gap:12px;font:600 10.5px var(--font-metric);color:var(--dm-slate-500)}
+.tagcount b{color:var(--dm-slate-700)}
+.tagcount .ok{color:#047857}
+.scorebd{display:grid;grid-template-columns:1fr 1fr;gap:9px 18px;margin-top:11px}
+.sd{display:flex;align-items:center;gap:8px}
+.sd__n{flex:1;font:600 11.5px var(--font-body);color:var(--dm-slate-700)}
+.sd__n em{font-style:normal;color:var(--dm-slate-400);font-weight:400;font-size:10.5px}
+.sd__rail{flex:0 0 74px;height:5px;border-radius:3px;background:var(--dm-slate-200);overflow:hidden}
+.sd__fill{height:100%;border-radius:3px}
+.sd__v{flex:0 0 42px;text-align:right;font:700 11px var(--font-metric);color:var(--dm-slate-700);font-variant-numeric:tabular-nums}
+.invnote{background:#FFF7ED;border:1px solid #F2D98C;border-radius:9px;padding:10px 13px;margin-top:12px;font:400 11px/1.65 var(--font-body);color:#7C4A03}
+.invnote b{color:#5C3702}
 </style>
 <aside class="ml-sidebar">
   <div class="ml-sidebar__section">Intelligence</div>
@@ -534,19 +573,19 @@ a{text-decoration:none;color:inherit}
 <main class="ml-main"><div class="ml-content">
 
 <div class="dm-title-page">Creation Studio — BusinessFocus</div>
-<div class="dm-page-sub">一条生產線，三道闘門：<b>每日自動找題</b> → <b>G1 採用</b> → 生成文稿 → <b>G2 確認文稿</b> → <b>6 張圖並行生成</b> → 自動拼裝 2 條 post → <b>G3 確認並發布</b>。<br>Stage 按對象命名（S1 候選 / S2 文稿 / S3 交付版本 / S4 post），品牌差異全落 <code>brand_profile</code> / <code>topic_policy</code> / <code>delivery_spec</code> 三個對象——所以主線不用再建一套。</div>
+<div class="dm-page-sub">One production line, three gates: <b>daily topic discovery</b> → <b>G1 Adopt</b> → draft written → <b>G2 Confirm Draft</b> → <b>6 images generated in parallel</b> → 2 posts assembled automatically → <b>G3 Confirm &amp; Publish</b>.<br>Stages are named after objects (S1 Candidate / S2 Draft / S3 Delivery / S4 Post) and every brand difference lives in <code>brand_profile</code> / <code>topic_policy</code> / <code>delivery_spec</code> — so the mainline reuses this pipeline instead of rebuilding it.</div>
 
 
 <nav class="dm-page-menu"><div class="menu-list">
-  <button class="menu-item is-active" data-tab="work">選題工作臺</button>
-  <button class="menu-item" data-tab="lib">發佈庫</button>
-  <span style="align-self:center;margin-left:10px;font:600 10px var(--font-body);color:var(--dm-slate-400);white-space:nowrap">v2 — 四個 Stage，兩個 Tab（stage 是詳情面裏的進度，不是導航層級）</span>
+  <button class="menu-item is-active" data-tab="work">Topic Workbench</button>
+  <button class="menu-item" data-tab="lib">Publish Library</button>
+  <span style="align-self:center;margin-left:10px;font:600 10px var(--font-body);color:var(--dm-slate-400);white-space:nowrap">Four stages, two tabs — stages are progress inside the detail panel, not navigation levels</span>
 </div></nav>
 
 <div class="dm-controls-row">
   <span class="dm-ctl-label">GROUNDING WINDOW</span>
   <div class="dm-datepick"><span class="ic">🗓</span>Last 90 Days<span class="sep">·</span><span class="rng">May 26 – Aug 24</span><span class="cv">▾</span></div>
-  <span class="dm-ctl-label" style="margin-left:8px">MODEL</span>
+  <span class="dm-ctl-label" style="margin-left:8px">AGENT</span>
   <div class="dm-select-lite">bf_agent v2<span class="cv">▾</span></div>
   <span class="spacer"></span>
   <span class="dm-meta-label">Aug 2026 · FB 136 &amp; IG 50 posts · run #34 · 10:00 HKT daily</span>
@@ -556,208 +595,243 @@ a{text-decoration:none;color:inherit}
 
 <div class="painmap">
   <div class="pain">
-    <div class="pain__h"><span class="x">痛點</span>生圖慢</div>
-    <div class="pain__r">根因：skill 在會話裏<b>串行</b>跑 6 次生成，第 6 張要等前 5 張。</div>
-    <div class="pain__f">過 G2 後 <b>6 張一次全部發出去</b>，異步 worker 並行處理，先完成的先顯示。</div>
-    <div class="pain__e">enqueue.py：does NOT generate, poll, or wait</div>
+    <div class="pain__h"><span class="x">PAIN</span>Image generation is slow</div>
+    <div class="pain__r">Cause: the skill runs 6 generations <b>serially</b> inside one chat turn — image 6 waits for the first five.</div>
+    <div class="pain__f">After G2, <b>all 6 are enqueued at once</b>; async workers run them in parallel and each one shows up as it finishes.</div>
+    <div class="pain__e">enqueue.py — does NOT generate, poll, or wait</div>
   </div>
   <div class="pain">
-    <div class="pain__h"><span class="x">痛點</span>生圖不穩定</div>
-    <div class="pain__r">根因：沒有模板錨定；校驗比的是「請求的比例」；錯一張要重跑全套。</div>
-    <div class="pain__f">模板圖作參照（<b>clone_creative</b>）· 校驗比 <b>outputRatio</b>（實際產出）· <b>逐張重生</b>，一次只花一次生成。</div>
-    <div class="pain__e">outputRatio: may differ from requested after model rounding</div>
+    <div class="pain__h"><span class="x">PAIN</span>Image output is unreliable</div>
+    <div class="pain__r">Cause: no template anchor; validation compares the <i>requested</i> ratio; one bad image means regenerating all six.</div>
+    <div class="pain__f">Template as reference (<b>clone_creative</b>) · validate against <b>outputRatio</b> (what was actually produced) · <b>regenerate one image</b> for the cost of one generation.</div>
+    <div class="pain__e">outputRatio — may differ from requested after model rounding</div>
   </div>
   <div class="pain">
-    <div class="pain__h"><span class="x">痛點</span>手動拼接</div>
-    <div class="pain__r">根因：人在 Drive / Notion 之間搬素材、對區段、貼 caption。</div>
-    <div class="pain__f">切段是純 Python，然後<b>複用現成腳本</b> assemble_post_draft 調兩次。拼裝不是要建，是要接。</div>
+    <div class="pain__h"><span class="x">PAIN</span>Manual assembly</div>
+    <div class="pain__r">Cause: a human moves assets between Drive and Notion, matches sections, pastes captions by hand.</div>
+    <div class="pain__f">Section splitting is plain Python, then we <b>call the existing script</b> assemble_post_draft twice. Assembly is not something to build — it is something to wire.</div>
     <div class="pain__e">--caption / --media-asset-ids / --platform / --created-via</div>
   </div>
 </div>
 
 <div class="gates">
-  <div class="gt on"><div class="gt__k">G1 · 本頁詳情面</div><div class="gt__q">這條題值不值得寫一篇文章？</div><span class="gt__b">採用</span></div>
-  <div class="gt on"><div class="gt__k">G2 · 本頁詳情面</div><div class="gt__q">這篇文章值不值得花 6 次出圖？（成本 1:6）</div><span class="gt__b">確認文稿並生成圖片</span></div>
-  <div class="gt free"><div class="gt__k">S3 → S4 · 無閘門</div><div class="gt__q">拼裝是純 Python、零 token —— 在免費操作前設閘門是純摩擦。</div><span class="gt__b">自動拼裝</span></div>
+  <div class="gt on"><div class="gt__k">G1 · DETAIL PANEL</div><div class="gt__q">Is this topic worth writing a draft for?</div><span class="gt__b">Adopt</span></div>
+  <div class="gt on"><div class="gt__k">G2 · DETAIL PANEL</div><div class="gt__q">Is this draft worth six image generations? (cost ratio 1:6)</div><span class="gt__b">Confirm Draft &amp; Generate Images</span></div>
+  <div class="gt free"><div class="gt__k">S3 → S4 · NO GATE</div><div class="gt__q">Assembly is plain Python and costs no tokens — a gate in front of a free operation is pure friction.</div><span class="gt__b">Auto-assembled</span></div>
 </div>
 
 <div class="dm-kpi-row">
-  <div class="dm-kpi-card"><div class="kpi__label">今日候選</div><div class="kpi__metric">20</div><div class="kpi__sub">run #34 · 10:00:12 HKT · LLM 單軌</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">已驗證</div><div class="kpi__metric">6</div><div class="kpi__sub up">≥2 個獨立真實報道</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">驗證失敗</div><div class="kpi__metric">2</div><div class="kpi__sub down">來源查不到 / 單一來源</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">進行中</div><div class="kpi__metric">3</div><div class="kpi__sub">已過 G1 · 未發布</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">文稿待確認</div><div class="kpi__metric">1</div><div class="kpi__sub">等 G2</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">今日已換批</div><div class="kpi__metric">1</div><div class="kpi__sub">舊批次已摺疊留檔</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Today's candidates</div><div class="kpi__metric">20</div><div class="kpi__sub">run #34 · 10:00:12 HKT</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Sources checked</div><div class="kpi__metric">6</div><div class="kpi__sub up">claims found on the cited pages</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Check failed</div><div class="kpi__metric">2</div><div class="kpi__sub down">page unreachable / figure not found</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">In progress</div><div class="kpi__metric">3</div><div class="kpi__sub">past G1 · not published</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Drafts awaiting G2</div><div class="kpi__metric">1</div><div class="kpi__sub">editor decision</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Reshuffles today</div><div class="kpi__metric">1</div><div class="kpi__sub">previous batch kept on record</div></div>
 </div>
 
 <div class="callout callout--a">
-  <div class="callout__title">「已驗證 6 / 20」不是 bug —— 這是懶驗證</div>
-  <div class="callout__body">建池時<b>不驗證</b>，只算初評分；<b>打開哪條才驗證哪條</b>。因為換一批不設上限，如果每批都全驗，一天 3 次換批就是 <b>150+ 次搜索調用</b>，而且大部分驗的是編輯根本沒滾到的候選；懶驗證降到約 40 次。<br>不變量守住了：<b>只有驗證過的候選能被採用</b>——未驗證時按鈕顯示「驗證並採用」，驗證失敗則攔住並說明原因。<br>⚠ 兩個誠實標註：列表上的分數是<b>初評</b>（驗證後可能掉，單一來源 −15）；「驗證失敗」是<b>部分統計</b>，只統計已經驗過的那些。</div>
-  <div class="callout__meta"><span>本批已驗: <b>8 / 20</b></span><span>通過: <b>6</b></span><span>失敗: <b>2</b></span><span>省下: <b>約 110 次搜索</b></span></div>
+  <div class="callout__title">"6 of 20 checked" is not a bug — checking is deferred on purpose</div>
+  <div class="callout__body">Topics are generated <b>grounded</b>: every source is echoed verbatim from the search tool, never composed by the model. Checking then happens <b>only for the candidate you are about to adopt</b> — we open the cited pages and confirm the figures in the brief actually appear there.<br>That is a page fetch, <b>not a new search</b> — so the added cost is a handful of fetches a day rather than re-searching all 20 candidates.<br>⚠ Two honest labels: the list score is a <b>provisional</b> score (it can drop after checking — single source is −15), and "check failed" is a <b>partial count</b>, covering only what has been checked so far.</div>
+  <div class="callout__meta"><span>Checked: <b>8 / 20</b></span><span>Passed: <b>6</b></span><span>Failed: <b>2</b></span><span>Added cost: <b>~8 page fetches</b></span></div>
 </div>
 
 <section class="dm-card">
-  <div class="dm-title-card">排程與規則（v2 只讀）<span class="dmode dmode-live">LIVE</span></div>
-  <span class="dm-subtitle">不做獨立 Autopilot 配置頁——排程與能力版本在這裏只讀展示。<b>每日自動找題的排程保留</b>；不做的是<b>定時發布</b>，這兩件事別混。</span>
+  <div class="dm-title-card">Schedule &amp; rules (read-only)<span class="dmode dmode-live">LIVE</span></div>
+  <span class="dm-subtitle">There is no separate Autopilot page — the schedule and the locked capability versions are shown here read-only. <b>The daily discovery schedule stays</b>; what we are not building is <b>scheduled publishing</b>. Those are two different things.</span>
   <div class="dm-controls-row" style="padding:0 0 12px">
-    <span class="dm-ctl-label">選題模式</span>
-    <div class="pill-row" style="margin-bottom:0"><button class="pill is-active">llm_only 🔒</button><button class="pill" style="opacity:.45">trends_first（路線圖）</button></div>
+    <span class="dm-ctl-label">DISCOVERY</span>
+    <div class="pill-row" style="margin-bottom:0"><button class="pill is-active">llm_only 🔒</button><button class="pill" style="opacity:.45">trends_first (roadmap)</button></div>
     <span class="spacer"></span>
-    <button class="btn btn--secondary btn--sm">+ 手動錄入（P1）</button>
+    <button class="btn btn--secondary btn--sm">+ Add manually (P1)</button>
   </div>
   <div class="lockrow">run_time <b>10:00 · Asia/Hong_Kong</b> · daily_count <b>3</b> · pool_size <b>20</b><span class="lk">🔒</span></div>
   <div class="lockrow">topic_skill <b>bf-topic-selection@v1</b> · writing_skill <b>bf-content-package@v1</b><span class="lk">🔒</span></div>
-  <div class="lockrow">delivery_spec <b>bf/default</b> — 6 圖 4:5 + 1 橫版 1.91:1 · required_sections 8<span class="lk">🔒</span></div>
+  <div class="lockrow">scoring_profile <b>bf/lead-first</b> — lead_time.direction = <b>prefer_early</b><span class="lk">🔒</span></div>
+  <div class="lockrow">delivery_spec <b>bf/default</b> — 6 × 4:5 + 1 × 1.91:1 · required_sections 8<span class="lk">🔒</span></div>
 </section>
 
 <div class="zone" style="margin-top:22px">
-  <div class="zone__t">進行中</div><div class="zone__n">3</div>
+  <div class="zone__t">In progress</div><div class="zone__n">3</div>
   <div class="zone__sp"></div>
-  <span class="dm-meta-label">已過 G1，<b>不受「換一批」影響</b></span>
+  <span class="dm-meta-label">Past G1 — <b>never touched by Reshuffle</b></span>
 </div>
 <section class="dm-card" style="margin-bottom:20px">
   <table class="dm-modern-table dm-modern-table--compact">
-    <thead><tr><th>選題</th><th>進度</th><th>採用人</th><th style="text-align:right">score</th></tr></thead>
+    <thead><tr><th>Topic</th><th>Progress</th><th>Adopted by</th><th style="text-align:right">Score</th></tr></thead>
     <tbody>
-      <tr><td><div class="dm-cell-main">英偉達財報前夕美股 AI 板塊震盪</div><div class="dm-cell-sub">4 來源（含 1 個原始資料）· 文稿已生成</div></td>
-          <td><span class="prog prog--wait"><i></i>文稿待確認</span></td><td>Kelvin</td><td style="text-align:right"><b>87</b></td></tr>
-      <tr><td><div class="dm-cell-main">人民幣中間價連續第三日走強</div><div class="dm-cell-sub">3 來源 · 出圖中</div></td>
-          <td><span class="prog prog--gen"><i></i>出圖中 4/6</span></td><td>Kelvin</td><td style="text-align:right"><b>81</b></td></tr>
-      <tr><td><div class="dm-cell-main">xAI 新一輪融資估值傳達 2000 億美元</div><div class="dm-cell-sub">4 來源 · 2 條 post 已拼裝</div></td>
-          <td><span class="prog prog--ready"><i></i>待發布</span></td><td>Amy</td><td style="text-align:right"><b>79</b></td></tr>
+      <tr><td><div class="dm-cell-main">英偉達財報前夕美股 AI 板塊震盪</div><div class="dm-cell-sub">4 sources (1 primary filing) · draft written</div></td>
+          <td><span class="prog prog--wait"><i></i>Draft awaiting G2</span></td><td>Kelvin</td><td style="text-align:right"><b>87</b></td></tr>
+      <tr><td><div class="dm-cell-main">人民幣中間價連續第三日走強</div><div class="dm-cell-sub">3 sources · images generating</div></td>
+          <td><span class="prog prog--gen"><i></i>Images 4/6</span></td><td>Kelvin</td><td style="text-align:right"><b>81</b></td></tr>
+      <tr><td><div class="dm-cell-main">xAI 新一輪融資估值傳達 2000 億美元</div><div class="dm-cell-sub">4 sources · 2 posts assembled</div></td>
+          <td><span class="prog prog--ready"><i></i>Ready to publish</span></td><td>Amy</td><td style="text-align:right"><b>79</b></td></tr>
     </tbody>
   </table>
-  <div class="foot-note">進度全部<b>派生</b>——由下游產物是否存在推出，不是誰去點了一個狀態。48h 未推進標 <code>stale</code>：<b>只標記，不刪不自動放行</b>。</div>
+  <div class="foot-note">Progress is <b>derived</b> — it is read off whether the downstream artifacts exist, not set by anyone clicking a status. No movement for 48h marks the item <code>stale</code>: <b>flagged only, never deleted and never auto-released</b>.</div>
 </section>
 
 <div class="zone">
-  <div class="zone__t">今日候選</div><div class="zone__n">20</div>
+  <div class="zone__t">Today's candidates</div><div class="zone__n">20</div>
   <div class="zone__sp"></div>
-  <button class="btn btn--secondary btn--sm">↻ 換一批（今日已換 1 次）</button>
+  <button class="btn btn--secondary btn--sm">↻ Reshuffle (1 today)</button>
 </div>
 <section class="dm-card">
-  <span class="dm-subtitle">點任一列在下方看來源、證據與文稿。<b>沒有「否決」按鈕</b>——不用的題什麼都不用做。<br>為什麼不做否決：該藏沒藏 = 你多花 5 秒認出「看過了」；不該藏藏了 = <b>漏掉一條真新聞，而且不會被發現</b>。單軌之下覆蓋面本來就是風險項，不該再疊一個靜默隱藏候選的機制。撞題防護在發布前的 Readiness Check（7 天近重複）——放那兒是「你要發重複的了」，放這兒是「我幫你藏了」。</span>
+  <span class="dm-subtitle">Click any row to see sources, evidence and the draft below. <b>There is no Reject button</b> — a topic you don't want needs no action.<br>Why no reject: hiding something that should have shown costs you five seconds of recognising "seen it"; hiding something that <b>shouldn't</b> have been hidden costs you a real story, and you never find out. With a single discovery track, coverage is already the risk — we are not adding a mechanism that silently removes candidates. Duplicate protection sits at the publish gate instead (7-day near-duplicate), where it reads "you're about to publish a repeat" rather than "I hid two things for you".</span>
   <table class="dm-modern-table dm-modern-table--compact">
-    <thead><tr><th>選題</th><th>驗證</th><th>來源</th><th>origin</th><th style="text-align:right">初評</th></tr></thead>
+    <thead><tr><th>Topic</th><th>Source check</th><th>Sources</th><th>Origin</th><th style="text-align:right">Provisional</th></tr></thead>
     <tbody>
-      <tr style="background:#F2F9FF"><td><div class="dm-cell-main">Momenta 擬港籌 10 億美元 · 自動駕駛 AI 新股</div><div class="dm-cell-sub">LLM 軌 · 已重搜驗證 ✓</div></td>
-          <td><span class="vfy vfy--ok">✓ 已驗證</span></td><td>4（含 tier3）</td><td>pool</td><td style="text-align:right"><b>87</b></td></tr>
-      <tr><td><div class="dm-cell-main">港樓按息連續兩月回落 · 供樓負擔比率</div><div class="dm-cell-sub">LLM 軌 · 已重搜驗證 ✓</div></td>
-          <td><span class="vfy vfy--ok">✓ 已驗證</span></td><td>3</td><td>pool</td><td style="text-align:right"><b>76</b></td></tr>
-      <tr><td><div class="dm-cell-main">最低工資檢討 · 商會與勞方分歧</div><div class="dm-cell-sub">未打開，尚未觸發驗證</div></td>
-          <td><span class="vfy vfy--no">未驗證</span></td><td>—</td><td>pool</td><td style="text-align:right">72</td></tr>
-      <tr><td><div class="dm-cell-main">加密幣投資平台監管諮詢期結束</div><div class="dm-cell-sub">模型給的兩條連結均查不到</div></td>
-          <td><span class="vfy vfy--bad">✕ 驗證失敗</span></td><td>0</td><td>pool</td><td style="text-align:right">68</td></tr>
-      <tr><td><div class="dm-cell-main">本地餐飲業結業數創三年新高</div><div class="dm-cell-sub">只搜到內容農場轉載，未達 ≥2 獨立來源</div></td>
-          <td><span class="vfy vfy--bad">✕ 驗證失敗</span></td><td>1</td><td>pool</td><td style="text-align:right">64</td></tr>
-      <tr><td><div class="dm-cell-main">中概股回港二次上市窗口</div><div class="dm-cell-sub">未打開，尚未觸發驗證</div></td>
-          <td><span class="vfy vfy--no">未驗證</span></td><td>—</td><td>pool</td><td style="text-align:right">61</td></tr>
-      <tr style="opacity:.75"><td><div class="dm-cell-main">聯儲局點陣圖與港息走向</div><div class="dm-cell-sub">Amy 在對話中建的題 · 待驗證</div></td>
-          <td><span class="vfy vfy--no">待驗證</span></td><td>—</td><td><span class="tg tg-p">chat · Amy</span></td><td style="text-align:right">—</td></tr>
+      <tr style="background:#F2F9FF"><td><div class="dm-cell-main">Momenta 擬港籌 10 億美元 · 自動駕駛 AI 新股</div><div class="dm-cell-sub">Figures confirmed on the cited pages</div></td>
+          <td><span class="vfy vfy--ok">✓ Checked</span></td><td>4 (1 primary)</td><td>pool</td><td style="text-align:right"><b>87</b></td></tr>
+      <tr><td><div class="dm-cell-main">港樓按息連續兩月回落 · 供樓負擔比率</div><div class="dm-cell-sub">Figures confirmed on the cited pages</div></td>
+          <td><span class="vfy vfy--ok">✓ Checked</span></td><td>3</td><td>pool</td><td style="text-align:right"><b>76</b></td></tr>
+      <tr><td><div class="dm-cell-main">最低工資檢討 · 商會與勞方分歧</div><div class="dm-cell-sub">Not opened yet — check not triggered</div></td>
+          <td><span class="vfy vfy--no">Not checked</span></td><td>2</td><td>pool</td><td style="text-align:right">72</td></tr>
+      <tr><td><div class="dm-cell-main">加密幣投資平台監管諮詢期結束</div><div class="dm-cell-sub">Both cited pages returned 404</div></td>
+          <td><span class="vfy vfy--bad">✕ Check failed</span></td><td>0 live</td><td>pool</td><td style="text-align:right">68</td></tr>
+      <tr><td><div class="dm-cell-main">本地餐飲業結業數創三年新高</div><div class="dm-cell-sub">All 4 links are reprints of one wire story</div></td>
+          <td><span class="vfy vfy--bad">✕ Not independent</span></td><td>1 effective</td><td>pool</td><td style="text-align:right">64</td></tr>
+      <tr><td><div class="dm-cell-main">中概股回港二次上市窗口</div><div class="dm-cell-sub">Not opened yet — check not triggered</div></td>
+          <td><span class="vfy vfy--no">Not checked</span></td><td>3</td><td>pool</td><td style="text-align:right">61</td></tr>
+      <tr style="opacity:.75"><td><div class="dm-cell-main">聯儲局點陣圖與港息走向</div><div class="dm-cell-sub">Created by Amy in chat · awaiting check</div></td>
+          <td><span class="vfy vfy--no">Awaiting check</span></td><td>—</td><td><span class="tg tg-p">chat · Amy</span></td><td style="text-align:right">—</td></tr>
     </tbody>
   </table>
-  <div class="foot-note">還有 13 條 · <span style="color:var(--dm-primary);font-weight:600">已換掉的批次（20）· 09:41 由 Kelvin 操作 ▸</span><br>換一批<b>只替換沒有下游產物的候選</b>——上面「進行中」那 3 條不受影響（不寫這條規則會出 bug：正在出圖的題被換掉）。不設次數上限，<b>但每次都記檔</b>：唯一的約束沒有了，至少要能事後看見發生了什麼。</div>
+  <div class="foot-note">13 more · <span style="color:var(--dm-primary);font-weight:600">Replaced batch (20) · 09:41 by Kelvin ▸</span><br>Reshuffle <b>only replaces candidates with no downstream artifacts</b> — the three items under "In progress" are untouched (without this rule you get the bug where a topic that is mid-generation disappears). No cap on reshuffles, <b>but every one is recorded</b>: the only constraint is gone, so at minimum you must be able to see afterwards what happened.</div>
 </section>
 
-<div class="zone" style="margin-top:22px"><div class="zone__t">詳情面 · S1 → S3</div><div class="zone__sp"></div><span class="dm-meta-label">master-detail：G1 與 G2 都在同一個對象上，所以必須同屏</span></div>
+<div class="zone" style="margin-top:22px"><div class="zone__t">Detail panel · S1 → S3</div><div class="zone__sp"></div><span class="dm-meta-label">Master-detail: G1 and G2 both act on the same object, so they must sit on the same screen</span></div>
 
 <div class="det">
   <div class="det__hd">
     <div class="det__ti">Momenta 擬港籌 10 億美元！中國自動駕駛 AI 新股光環背後 三年蝕逾 92 億問盈利何時到？
-      <div style="margin-top:6px"><span class="vfy vfy--ok">✓ 已驗證 · 4 來源</span> <span class="prog prog--wait"><i></i>文稿待確認</span> <span class="dm-meta-label">origin pool · found_by llm_prompt · 採用人 Kelvin</span></div>
+      <div style="margin-top:6px"><span class="vfy vfy--ok">✓ Checked · 4 sources</span> <span class="prog prog--wait"><i></i>Draft awaiting G2</span> <span class="dm-meta-label">origin pool · adopted by Kelvin</span></div>
     </div>
     <div class="det__sc"><div class="n">87</div><div class="l">SCORE</div></div>
   </div>
 
-  <div class="seg"><div class="seg__hd"><span class="seg__n">1</span>選題與來源</div><div class="seg__bd">
-    <div class="ev-row"><span class="lbl">為何入選</span><span class="val">財報日在即、有實數可核、港股有直接傳導、討論度高。</span></div>
-    <div class="ev-row"><span class="lbl">score 拆解</span><span class="val">即時性 23/25 · 影響 20/22 · 數據 17/18 · HK關聯 16/18 · 討論度 9/12 · 敘事 2/5</span></div>
-    <div style="margin-top:10px">
-      <div class="srcrow"><span class="t3">tier3</span>HKEXnews — 遞表文件（原始資料）<span style="margin-left:auto;color:var(--dm-slate-400)">08-24 09:12</span></div>
+  <div class="seg"><div class="seg__hd"><span class="seg__n">1</span>Topic &amp; sources</div><div class="seg__bd">
+    <div class="ev-row"><span class="lbl">Why selected</span><span class="val">A filing with hard numbers, a Hong Kong listing, and a valuation story that cuts against three years of losses.</span></div>
+    <div class="scorebd">
+      <div class="sd"><span class="sd__n">Brand Fit <em>shifts value distribution</em></span><span class="sd__rail"><span class="sd__fill" style="width:92%;background:#10B981"></span></span><span class="sd__v">23/25</span></div>
+      <div class="sd"><span class="sd__n">Lead Time <em>discussion not yet formed</em></span><span class="sd__rail"><span class="sd__fill" style="width:91%;background:#10B981"></span></span><span class="sd__v">20/22</span></div>
+      <div class="sd"><span class="sd__n">Data Verifiability <em>filing figures</em></span><span class="sd__rail"><span class="sd__fill" style="width:94%;background:#10B981"></span></span><span class="sd__v">17/18</span></div>
+      <div class="sd"><span class="sd__n">Topic History <em>"IPO / 自動駕駛" family</em></span><span class="sd__rail"><span class="sd__fill" style="width:80%;background:#3B82F6"></span></span><span class="sd__v">12/15</span></div>
+      <div class="sd"><span class="sd__n">Geo Relevance <em>HK listing</em></span><span class="sd__rail"><span class="sd__fill" style="width:87%;background:#3B82F6"></span></span><span class="sd__v">13/15</span></div>
+      <div class="sd"><span class="sd__n">Narrative <em>cause is thin</em></span><span class="sd__rail"><span class="sd__fill" style="width:40%;background:#F59E0B"></span></span><span class="sd__v">2/5</span></div>
+    </div>
+    <div class="invnote"><b>Lead Time is deliberately inverted for BusinessFocus.</b> A topic that is already widely discussed scores <b>lower</b>, not higher — the brand's position is to lead the discussion rather than arrive after it peaks. That is separate from <b>Topic History</b>, which asks whether this <i>kind</i> of story has historically performed on this page (computed from keyword-level engagement on the page's own posts). One is a timing signal, the other a forward-looking one; they point in opposite directions and must never be collapsed into a single "buzz" number.<br>Both the weights and <code>lead_time.direction</code> live in <code>topic_policy.scoring_profile</code> — a publication that <i>does</i> want to follow trends sets <code>prefer_trending</code>. Configuration, not a code branch.</div>
+    <div style="margin-top:12px">
+      <div class="srcrow"><span class="t3">primary</span>HKEXnews — listing application (source document)<span style="margin-left:auto;color:var(--dm-slate-400)">08-24 09:12</span></div>
       <div class="srcrow"><span class="t12">tier1</span>SCMP — Momenta files for Hong Kong listing<span style="margin-left:auto;color:var(--dm-slate-400)">08-24 07:40</span></div>
       <div class="srcrow"><span class="t12">tier1</span>信報 hkej.com — 自動駕駛新股招股在即<span style="margin-left:auto;color:var(--dm-slate-400)">08-24 08:05</span></div>
-      <div class="srcrow"><span class="t12">tier2</span>華爾街見聞 — 三年累虧細節<span style="margin-left:auto;color:var(--dm-slate-400)">08-24 08:33</span></div>
+      <div class="srcrow"><span class="t12">tier2</span>華爾街見聞 — three-year loss detail<span style="margin-left:auto;color:var(--dm-slate-400)">08-24 08:33</span></div>
     </div>
-    <div class="foot-note">模型初給的 2 條連結均不可用，<b>重搜後找到這 4 條真實報道</b>才進池。單軌之下這道驗證是唯一的質量防線——規則不許有 fallback 分支，湊不夠 20 條就進池少於 20 條。</div>
+    <div class="foot-note">Sources are echoed verbatim from the search tool, never composed by the model. At adopt time we opened all four pages and confirmed the figures used in the brief appear on them — <b>a URL the model produced is not evidence it read the page</b>.</div>
   </div></div>
 
-  <div class="seg"><div class="seg__hd"><span class="seg__n">2</span>證據（research pack）</div><div class="seg__bd">
-    <div class="ev-row"><span class="lbl">angle</span><span class="val">光環 vs 盈利——AI 新股的估值敘事與實際虧損之間的落差。</span></div>
-    <div class="ev-row"><span class="lbl">data points</span><span class="val">集資額約 10 億美元（HKEXnews）· 三年累虧 92.3 億人民幣（招股書）· 研發佔收入比 61%（招股書）</span></div>
-    <div class="ev-row"><span class="lbl">counter view</span><span class="val">Robotaxi 商業化時點若提前，虧損收窄速度可能快於市場預期。</span></div>
-    <div class="ev-row"><span class="lbl">missing</span><span class="val">基石投資者名單未公開；定價區間未定。</span></div>
+  <div class="seg"><div class="seg__hd"><span class="seg__n">2</span>Evidence (research pack)</div><div class="seg__bd">
+    <div class="ev-row"><span class="lbl">Angle</span><span class="val">The halo versus the P&amp;L — how an AI listing story is priced against three years of losses.</span></div>
+    <div class="ev-row"><span class="lbl">Data points</span><span class="val">Raise ≈ US$1.0bn (HKEXnews) · cumulative loss RMB 9.23bn over three years (prospectus) · R&amp;D 61% of revenue (prospectus)</span></div>
+    <div class="ev-row"><span class="lbl">Counter view</span><span class="val">If robotaxi commercialisation lands earlier than expected, losses narrow faster than the market is pricing.</span></div>
+    <div class="ev-row"><span class="lbl">Missing</span><span class="val">Cornerstone investors undisclosed; price range not set.</span></div>
   </div></div>
 
-  <div class="seg"><div class="seg__hd"><span class="seg__n">3</span>文稿（8 區段 · 可編輯）</div><div class="seg__bd">
-    <div class="art">
-      <span class="sl seg-s1">s1</span>Momenta擬港籌10億美元！中國自動駕駛AI新股光環背後 三年蝕逾92億問盈利何時到？【 @businessfocus.io 】【#BF社會熱話】<br><br>
-      <span class="sl seg-s2">s2</span>中國自動駕駛獨角獸 Momenta 已向港交所遞表，市場預期集資額約 10 億美元…<br><br>
-      <span class="sl seg-s3">s3</span><b>事件拆解</b>——遞表文件顯示…（兩個自然段）<br><br>
-      <span class="sl seg-s4">s4</span><b>痛點分析</b>——三年累虧 92.3 億人民幣…（兩個自然段）<br><br>
-      <span class="sl seg-s5">s5</span><b>解法重點</b>——Robotaxi 商業化路徑…（兩個自然段）<br><br>
-      <span class="sl seg-s6">s6</span>無小標題結尾段…<br><br>
-      <span class="sl seg-s7">s7</span>導流前綴行 · <span class="sl seg-s8">s8</span>固定文末聲明與品牌文字（逐字，只有 IG 版帶）
+  <div class="seg"><div class="seg__hd"><span class="seg__n">3</span>Draft</div><div class="seg__bd">
+    <div class="dfield">
+      <div class="dfield__l">TITLE <span class="req">fixed suffix locked</span></div>
+      <div class="tinput">
+        <input value="Momenta 擬港籌 10 億美元！中國自動駕駛 AI 新股光環背後 三年蝕逾 92 億問盈利何時到？">
+        <span class="sfx"><span class="lk">🔒</span>【 @businessfocus.io 】【#BF社會熱話】</span>
+      </div>
     </div>
-    <div class="action-row" style="padding-top:12px">
-      <button class="btn btn--primary">確認文稿並生成圖片 →</button>
-      <button class="btn btn--secondary">重寫某一段</button>
-      <span class="who"><b>G2 · 成本閘門</b>：確認後才會呼叫 6 次 image gen。文稿的可編輯入口只有這裏一處——caption 是從它切出來的，兩處可改必然漂移。</span>
+
+    <div class="dfield">
+      <div class="dfield__l">BODY <span class="req">rich text</span></div>
+      <div class="rte">
+        <div class="rte__tb">
+          <button style="font-weight:700">B</button><button style="font-style:italic">I</button><button>H2</button>
+          <span class="div"></span>
+          <button>🔗 Link</button><button>“ Quote</button><button>• List</button>
+          <button class="aiw">✨ AI Write</button>
+        </div>
+        <div class="rte__bd">
+          <p>中國自動駕駛獨角獸 Momenta 已向港交所遞表，市場預期集資額約 <strong>10 億美元</strong>，成為今年港股最受關注的 AI 新股之一。遞表文件見 <span class="shortlink">bit.ly/mmt-f1 <span class="arw">→</span> <span class="dest">hkexnews.hk</span></span>。</p>
+          <p><strong>事件拆解</strong>｜招股書顯示，公司過去三年累計虧損 <strong>92.3 億元人民幣</strong>，研發支出佔收入比重達 61%。這個比例在同業中屬偏高一端，也是市場對其盈利時點分歧的來源。</p>
+          <p>值得注意的是，這次遞表距離上一輪融資僅九個月，而估值區間尚未公開。<a class="lnk" href="#">信報早前報道</a>指基石投資者名單仍在洽談中。</p>
+          <p><strong>痛點分析</strong>｜自動駕駛的商業化路徑一直是估值爭議核心。Robotaxi 若能提前放量，虧損收窄速度可能快於市場預期；反之則要面對持續的研發投入壓力。</p>
+          <p>對港股投資者而言，這條新聞的意義不只是一家公司上市 —— 它會影響同類 AI 標的的定價參照。</p>
+        </div>
+        <div class="tagrow">
+          <span class="tagpill">#BusinessFocus</span><span class="tagpill">#BF</span><span class="tagpill">#Insight</span>
+          <span class="tagpill">#Momenta</span><span class="tagpill">#香港IPO</span><span class="tagpill">#自動駕駛</span>
+          <span class="tagpill">#Robotaxi</span><span class="tagpill">#AI新股</span>
+          <span class="tagpill men">@businessfocus.io</span>
+          <span class="tagcount"><span>Chars <b>2,104</b> / 2,200</span><span class="ok">Hashtags <b>8</b> / 30</span><span class="ok">Mentions <b>1</b> / 20</span></span>
+        </div>
+      </div>
+      <div class="foot-note">Section markers (<code>s1…s8</code>) are <b>not shown and never leave this system</b> — they are an assembly contract, not content, and other brands have no such structure. They live as <b>block metadata</b>, so editing rich text must preserve the block↔section mapping; if it can't, the editor is told the mapping needs re-confirming rather than silently producing a wrong split.<br>Character / hashtag / mention ceilings come from the platform (<code>igCaptionRules.js</code>: ≤2,200 / ≤30 / ≤20) and are <b>hard</b>. Brand style rules — "add 5 SEO hashtags" — live in the skill and are advisory only; the two must not be merged.</div>
+    </div>
+
+    <div class="action-row" style="padding-top:4px">
+      <button class="btn btn--primary">Confirm Draft &amp; Generate Images →</button>
+      <button class="btn btn--secondary">✨ AI Write</button>
+      <span class="who"><b>G2 · cost gate</b> — six image generations fire only after this. The draft has exactly one editing surface: captions are cut from it, so a second editable copy would drift.</span>
     </div>
   </div></div>
 
-  <div class="seg"><div class="seg__hd"><span class="seg__n">4</span>交付版本（S3）· 6 張圖並行生成</div><div class="seg__bd">
+  <div class="seg"><div class="seg__hd"><span class="seg__n">4</span>Delivery (S3) · 6 images in parallel</div><div class="seg__bd">
     <div class="grid6">
-      <div class="acell"><div class="acell__ph"><span class="acell__sq">02</span><span class="acell__rt">4:5 ✓</span>直版封面</div><div class="acell__bd"><div class="acell__nm">02_直版封面_4x5.png</div><div class="acell__ck">代碼層 <b>4/4 通過</b><br>圖內數字 <b>需你確認</b></div><div class="regenbox"><input placeholder="再亮一點…"><button>↻</button></div></div></div>
-      <div class="acell"><div class="acell__ph"><span class="acell__sq">03</span><span class="acell__rt">4:5 ✓</span>事件拆解</div><div class="acell__bd"><div class="acell__nm">03_資訊圖1_事件拆解.png</div><div class="acell__ck">代碼層 <b>4/4 通過</b><br>圖內數字 <b>已核對一致</b></div><div class="regenbox"><input placeholder="改一行指令…"><button>↻</button></div></div></div>
-      <div class="acell"><div class="acell__ph fail"><span class="acell__sq">04</span><span class="acell__rt">比例不符</span>重生中 (2)</div><div class="acell__bd"><div class="acell__nm">04_資訊圖2_痛點分析.png</div><div class="acell__ck" style="color:#B91C1C">outputRatio <b>1.02:1</b> ≠ 4:5<br>自動重生第 2 次</div><div class="regenbox"><input placeholder="數字用 Q2 的…"><button>↻</button></div></div></div>
-      <div class="acell"><div class="acell__ph gen"><span class="acell__sq">05</span><span class="acell__rt">generating</span>生成中…</div><div class="acell__bd"><div class="acell__nm">05_資訊圖3_解法重點.png</div><div class="acell__ck">已排隊 · 異步 worker 處理中</div><div class="regenbox"><input placeholder="（生成中）" disabled><button>↻</button></div></div></div>
-      <div class="acell"><div class="acell__ph gen"><span class="acell__sq">06</span><span class="acell__rt">queued</span>已排隊</div><div class="acell__bd"><div class="acell__nm">06_資訊圖4_CTA.png</div><div class="acell__ck">已排隊 · 不阻塞前面幾張</div><div class="regenbox"><input placeholder="（排隊中）" disabled><button>↻</button></div></div></div>
-      <div class="acell"><div class="acell__ph"><span class="acell__sq">07</span><span class="acell__rt">1.91:1 ✓</span>橫版 · 網站 hero</div><div class="acell__bd"><div class="acell__nm">07_橫版封面_1000x525.png</div><div class="acell__ck">代碼層 <b>3/4</b><br><b>像素 1024×536</b>（近似）</div><div class="regenbox"><input placeholder="改一行指令…"><button>↻</button></div></div></div>
+      <div class="acell"><div class="acell__ph"><span class="acell__sq">02</span><span class="acell__rt">4:5 ✓</span>Cover</div><div class="acell__bd"><div class="acell__nm">02_cover_4x5.png</div><div class="acell__ck">Code checks <b>4/4</b><br>In-image figures <b>needs your eye</b></div><div class="regenbox"><input placeholder="brighter…"><button>↻</button></div></div></div>
+      <div class="acell"><div class="acell__ph"><span class="acell__sq">03</span><span class="acell__rt">4:5 ✓</span>Breakdown</div><div class="acell__bd"><div class="acell__nm">03_info1_breakdown.png</div><div class="acell__ck">Code checks <b>4/4</b><br>Figures <b>match the draft</b></div><div class="regenbox"><input placeholder="one-line instruction…"><button>↻</button></div></div></div>
+      <div class="acell"><div class="acell__ph fail"><span class="acell__sq">04</span><span class="acell__rt">ratio off</span>Regen (2)</div><div class="acell__bd"><div class="acell__nm">04_info2_painpoint.png</div><div class="acell__ck" style="color:#B91C1C">outputRatio <b>1.02:1</b> ≠ 4:5<br>auto-regen attempt 2</div><div class="regenbox"><input placeholder="use Q2 figures…"><button>↻</button></div></div></div>
+      <div class="acell"><div class="acell__ph gen"><span class="acell__sq">05</span><span class="acell__rt">generating</span>Generating…</div><div class="acell__bd"><div class="acell__nm">05_info3_solution.png</div><div class="acell__ck">Queued · async worker running</div><div class="regenbox"><input placeholder="(generating)" disabled><button>↻</button></div></div></div>
+      <div class="acell"><div class="acell__ph gen"><span class="acell__sq">06</span><span class="acell__rt">queued</span>Queued</div><div class="acell__bd"><div class="acell__nm">06_info4_cta.png</div><div class="acell__ck">Queued · not blocking the others</div><div class="regenbox"><input placeholder="(queued)" disabled><button>↻</button></div></div></div>
+      <div class="acell"><div class="acell__ph"><span class="acell__sq">07</span><span class="acell__rt">1.91:1 ✓</span>Banner · site hero</div><div class="acell__bd"><div class="acell__nm">07_banner_1000x525.png</div><div class="acell__ck">Code checks <b>3/4</b><br><b>1024×536</b> (approx)</div><div class="regenbox"><input placeholder="one-line instruction…"><button>↻</button></div></div></div>
     </div>
 
-    <div class="ckbar"><span class="cnt">4 / 6</span>已自動核對比例、尺寸、齊全、命名 <b>4 項</b> · 圖內數字 <b>2 項需你確認</b>
-      <span style="margin-left:auto;font-weight:400;font-size:10.5px">檢查 agent 的作用是<b>縮小你要看的範圍，不是替你看</b>——所以這裏沒有綠勾</span></div>
+    <div class="ckbar"><span class="cnt">4 / 6</span>Ratio, dimensions, completeness and naming checked automatically — <b>2 items need your eye</b> (in-image figures)
+      <span style="margin-left:auto;font-weight:400;font-size:10.5px">The checking agent narrows <b>where you look — it does not look for you</b>. That is why there is no green tick here.</span></div>
 
-    <div class="foot-note"><b>並行</b>：過 G2 後 6 張一次全部 enqueue，異步 worker 並行處理，先完成的先顯示——不阻塞在最後一張。<b>逐張重生</b>：只重生這一張（一次 image gen，不是六次），複用同 <code>generationRequestId</code>、同 seq 遞增 version 保留歷史。<b>校驗比 outputRatio</b>（實際產出）不比請求值——比請求值等於沒校驗。<br>⚠ 07 橫版：<code>1.91:1</code> 在枚舉內沒問題，但 enqueue 只能請求<b>比例</b>不能請求<b>精確像素</b>，1000×525 需要生成後 resize/crop（待拍板 B27：接受近似，還是加這一步）。</div>
+    <div class="foot-note"><b>Parallel</b>: after G2 all six are enqueued at once and processed by async workers — nothing waits on the slowest one. <b>Per-image regeneration</b>: one image costs one generation, not six; the same <code>generationRequestId</code> is reused and each attempt increments <code>version</code> so history is kept. <b>Validation compares <code>outputRatio</code></b>, the ratio actually produced — comparing the requested value would validate nothing.<br>⚠ Image 07: <code>1.91:1</code> is a valid bucket, but enqueue can only request a <b>ratio</b>, not <b>exact pixels</b>. 1000×525 needs a resize/crop step after generation — open decision (B27): accept the approximation, or add the step.</div>
   </div></div>
 </div>
 
 <div class="dm-row">
   <section class="dm-card">
-    <div class="dm-title-card">來源驗證結果（本批已驗 8 條）<span class="dmode dmode-mock">MOCK</span></div>
-    <span class="dm-subtitle">單軌之下這張圖就是質量儀表盤。要盯的是<b>失敗率</b>——長期高於 30% 代表模型在編造來源，那才是啟動「補第二條軌」討論的信號。</span>
+    <div class="dm-title-card">Source check outcome (8 checked so far)<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">With one discovery track this is the quality dashboard. Watch the <b>failure rate</b> — sustained above 30% means the model is producing sources it cannot support, and that is the signal to add a second track.</span>
     <div class="dm-chart-area" data-chart="srcVerify"></div>
   </section>
   <section class="dm-card">
-    <div class="dm-title-card">池內 category 分佈 vs 頁面語料<span class="dmode dmode-mock">MOCK</span></div>
-    <span class="dm-subtitle">BusinessFocus 本身已有 72% Business &amp; Finance。選題池遵守「同 category 最多 2 條」，避免一天五條都在講同一個大盤故事。</span>
+    <div class="dm-title-card">Pool category mix vs page corpus<span class="dmode dmode-mock">MOCK</span></div>
+    <span class="dm-subtitle">BusinessFocus is already 72% Business &amp; Finance. The pool enforces "at most 2 per category" so a single market story doesn't take all five slots.</span>
     <div class="dm-chart-area" data-chart="poolCat"></div>
   </section>
 </div>
 
 <section class="ai-card">
-  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — 選題工作臺</div></div>
-  <div class="ai-card__sub">Grounded on run #34 · 20-topic pool · LLM-only discovery · Confidence: Medium</div>
-  <div class="ai-insight-item"><span class="ib ib-b">驗證</span><b>已驗 8 條，2 條被拒（25%）。</b>被拒的都是模型給的連結查不到或只有內容農場轉載。<b>這道驗證不能為了湊夠 20 條而放寬——單軌之下它是唯一擋住「編造報道」的東西。</b></div>
-  <div class="ai-insight-item warn"><span class="ib ib-a">並行收益</span><b>6 張串行約需 4–6 分鐘，並行後牆上時間 ≈ 最慢那一張。</b>04 這次比例不符自動重生了 2 次——串行時它會把後面 2 張一起拖住，並行時只有它自己在等。</div>
-  <div class="ai-insight-item alert"><span class="ib ib-r">前置未完成</span><b>模板圖還沒搬進 MediaLens <code>bf-templates/</code>。</b>沒有參照圖，<code>clone_creative</code> 錨不住模板、檢查 agent 也沒有對照物——<b>「生圖不穩定」這個痛點解不掉的一半原因在這裏</b>，而它從 v1 挂到現在。</div>
-  <div class="ai-card__ask"><input placeholder="Ask about the pool — e.g.「第 4 條為什麼驗證失敗？」"><button class="btn btn--primary btn--sm">Ask</button></div>
+  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Topic Workbench</div></div>
+  <div class="ai-card__sub">Grounded on run #34 · 20-candidate pool · llm_only discovery · Confidence: Medium</div>
+  <div class="ai-insight-item"><span class="ib ib-b">Scoring</span><b>Two of today's top five score high on Brand Fit but low on Lead Time</b> — the story is real and on-thesis, but the discussion has already formed. Under <code>prefer_early</code> they drop below topics with thinner coverage. <b>That is the profile working as intended, not a bug to tune away.</b></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">Coverage</span><b>13 of 20 candidates are Business &amp; Finance</b>, and the "at most 2 per category" rule has bound four times today. This is normal for this page (72% of its corpus), but it means the editor's real choice is narrower than the pool looks. <b>Widen it by changing the topic prompt, not by loosening the category cap.</b></div>
+  <div class="ai-insight-item alert"><span class="ib ib-r">Blocked</span><b>The template images are still not in MediaLens <code>bf-templates/</code>.</b> Without a reference image, <code>clone_creative</code> has nothing to anchor to and the template-check agent has nothing to compare against — <b>half of "unreliable image output" cannot be fixed until this lands</b>, and it has been outstanding since v1.</div>
+  <div class="ai-card__ask"><input placeholder="Ask about the pool — e.g. &quot;why did candidate 4 fail its source check?&quot;"><button class="btn btn--primary btn--sm">Ask</button></div>
 </section>
 
 <details class="arch" style="margin-top:20px">
-  <summary>架構：為什麼主線（Ryan）不用再建一套</summary>
+  <summary>Architecture — why the mainline does not need a second pipeline</summary>
   <div class="arch__bd">
-    <span class="dm-subtitle">四個 stage 用<b>通用對象</b>命名，BF 就退化成一份配置。品牌差異全部落三個對象，不 fork skill。</span>
+    <span class="dm-subtitle">The four stages are named after <b>objects</b>, so BusinessFocus becomes a configuration rather than a bespoke set of screens. Brand differences live in three objects; no skill is forked.</span>
     <table class="dm-modern-table dm-modern-table--compact">
-      <thead><tr><th>Stage</th><th>通用對象</th><th>BF 配置</th><th>主線配置（將來）</th></tr></thead>
+      <thead><tr><th>Stage</th><th>Object</th><th>BusinessFocus config</th><th>Mainline config (future)</th></tr></thead>
       <tbody>
-        <tr><td><b>S1 候選</b></td><td><code>Candidate</code></td><td>選題 20/天 · LLM 單軌 + 來源驗證 + 評分</td><td>brief / idea 池</td></tr>
-        <tr><td><b>S2 文稿</b></td><td><code>Draft</code></td><td>8 區段文章（錨點 s1..s8）</td><td>copy variants（N 條）</td></tr>
-        <tr><td><b>S3 交付版本</b></td><td><code>Delivery</code> + <code>Asset[]</code></td><td>01 文章 + 02–07 六圖，固定模板與比例</td><td>N creative，比例自由</td></tr>
-        <tr><td><b>S4 post</b></td><td><code>publishPost[]</code></td><td>FB image + IG carousel</td><td><b>完全一樣</b></td></tr>
+        <tr><td><b>S1 Candidate</b></td><td><code>Candidate</code></td><td>20 topics/day · single LLM track + source check + score</td><td>brief / idea pool</td></tr>
+        <tr><td><b>S2 Draft</b></td><td><code>Draft</code></td><td>8-section article (anchors s1..s8)</td><td>copy variants (N)</td></tr>
+        <tr><td><b>S3 Delivery</b></td><td><code>Delivery</code> + <code>Asset[]</code></td><td>article + 6 images, fixed template and ratios</td><td>N creatives, free ratios</td></tr>
+        <tr><td><b>S4 Post</b></td><td><code>publishPost[]</code></td><td>FB image + IG carousel</td><td><b>identical</b></td></tr>
       </tbody>
     </table>
-    <div class="foot-note"><code>brand_profile</code>（調性/品牌色/字體）· <code>topic_policy</code>（選題規則）· <code>delivery_spec</code>（S2 產出什麼結構 / S3 產幾件什麼比例 / S4 拼裝配方）。<br><b>S4 兩邊完全一樣</b>——所以它最該做扎實，也最不該寫 BF 專用邏輯。三對象簽名分層<b>現在改是零行為變化</b>；等第二個品牌進來再改，就要 fork 一份 skill。</div>
+    <div class="foot-note"><code>brand_profile</code> (voice, colours, type) · <code>topic_policy</code> (discovery rules, <b>scoring_profile</b>, <b>brand_thesis</b>) · <code>delivery_spec</code> (what S2 produces, how many assets and which ratios in S3, the S4 assembly recipe).<br><b>S4 is identical on both sides</b> — so it deserves the most care and the least brand-specific logic. Splitting the signature into three objects <b>costs nothing today</b> and is zero behaviour change; doing it after a second brand arrives means forking a skill.</div>
   </div>
 </details>
 
@@ -766,119 +840,118 @@ a{text-decoration:none;color:inherit}
 <div class="tab-panel" id="tab-lib">
 
 <div class="sec-head">
-  <div class="dm-title-section">發佈庫 — S4 · 拼裝好的成品在這裏 review、編輯、發布</div>
-  <span class="dm-subtitle">默認按<b>選題</b>分組——編輯的心智單位是「一個故事出兩條 post」。<b>by post</b> 是橫切視圖，用來做批量與回答「今天還有什麼沒發」。</span>
+  <div class="dm-title-section">Publish Library — S4 · review, edit and publish the assembled posts</div>
+  <span class="dm-subtitle">Grouped <b>by topic</b> by default — the editor's unit of thought is "one story, two posts". <b>By post</b> is the cross-cutting view, for bulk actions and for answering "what is still unpublished today".</span>
 </div>
 
 <div class="dm-kpi-row">
-  <div class="dm-kpi-card"><div class="kpi__label">待發布</div><div class="kpi__metric">2</div><div class="kpi__sub">1 個選題 · FB + IG</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">今日已發</div><div class="kpi__metric">4</div><div class="kpi__sub up">2 個選題</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">Readiness</div><div class="kpi__metric">0 fail</div><div class="kpi__sub up">1 warn（IG 字數餘量）</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">已手改</div><div class="kpi__metric">1</div><div class="kpi__sub">override · 不會被自動重切覆蓋</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">FB caption</div><div class="kpi__metric">1,709</div><div class="kpi__sub">字 · s1..s7</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">IG caption</div><div class="kpi__metric">1,923</div><div class="kpi__sub up">字 · s1..s8 · ≤2,200 ✓</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Ready to publish</div><div class="kpi__metric">2</div><div class="kpi__sub">1 topic · FB + IG</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Published today</div><div class="kpi__metric">4</div><div class="kpi__sub up">2 topics</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Readiness</div><div class="kpi__metric">0 fail</div><div class="kpi__sub up">1 warn (IG length headroom)</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Hand-edited</div><div class="kpi__metric">1</div><div class="kpi__sub">override · never silently overwritten</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">FB caption</div><div class="kpi__metric">1,709</div><div class="kpi__sub">chars</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">IG caption</div><div class="kpi__metric">1,923</div><div class="kpi__sub up">chars · ≤2,200 ✓</div></div>
 </div>
 
 <div class="subpill">
-  <button class="on">by 選題（默認）</button>
-  <button>by post</button>
+  <button class="on">By topic (default)</button>
+  <button>By post</button>
 </div>
 
 <div class="tprow">
   <div class="tprow__hd">
-    <span class="prog prog--ready"><i></i>待發布</span>
+    <span class="prog prog--ready"><i></i>Ready</span>
     <div class="tprow__t">xAI 新一輪融資估值傳達 2000 億美元</div>
-    <span class="dm-meta-label">2 條 post · 7/7 產物 · score 79</span>
+    <span class="dm-meta-label">2 posts · 7/7 assets · score 79</span>
     <span style="color:var(--dm-slate-400);font-size:12px">▾</span>
   </div>
   <div class="tprow__bd">
     <div class="pv">
-      <div class="pv__hd">Facebook · image feed <span class="tg tg-b">s1..s7</span><span style="margin-left:auto" class="tg tg-n">1,709 字</span></div>
+      <div class="pv__hd">Facebook · image feed<span style="margin-left:auto" class="tg tg-n">1,709 chars</span></div>
       <div class="pv__md"><div class="th">02</div></div>
       <div class="pv__cp">xAI 新一輪融資估值傳達 2000 億美元！馬斯克的 AI 帝國憑什麼撐起這個數字？【 @businessfocus.io 】【#BF社會熱話】 ⸺ 據多家外媒報道，xAI 正進行新一輪融資…</div>
-      <div class="pv__ft"><button class="btn btn--primary btn--sm">確認並發布</button><button class="btn btn--secondary btn--sm">編輯</button><span class="dm-meta-label" style="margin-left:auto">mediaItems [02]</span></div>
+      <div class="pv__ft"><button class="btn btn--primary btn--sm">Confirm &amp; Publish</button><button class="btn btn--secondary btn--sm">Edit</button><span class="dm-meta-label" style="margin-left:auto">mediaItems [02]</span></div>
     </div>
     <div class="pv">
-      <div class="pv__hd">Instagram · carousel <span class="tg tg-p">s1..s8</span><span style="margin-left:auto" class="tg tg-n">1,923 字</span></div>
+      <div class="pv__hd">Instagram · carousel<span style="margin-left:auto" class="tg tg-n">1,923 chars</span></div>
       <div class="pv__md"><div class="th">02</div><div class="th">03</div><div class="th">04</div><div class="th">05</div><div class="th">06</div></div>
-      <div class="pv__cp">同一篇文章按錨點切出，再加 s8 固定文末聲明與品牌文字。五張圖依序：02 直版封面 → 03 事件拆解 → 04 痛點分析 → 05 解法重點 → 06 CTA。</div>
-      <div class="pv__ft"><button class="btn btn--primary btn--sm">確認並發布</button><button class="btn btn--secondary btn--sm">編輯</button><span class="dm-meta-label" style="margin-left:auto">mediaItems [02–06] 有序</span></div>
+      <div class="pv__cp">Cut from the same draft, with the fixed closing statement appended for Instagram only. Five images in order: cover → breakdown → pain point → solution → CTA.</div>
+      <div class="pv__ft"><button class="btn btn--primary btn--sm">Confirm &amp; Publish</button><button class="btn btn--secondary btn--sm">Edit</button><span class="dm-meta-label" style="margin-left:auto">mediaItems [02–06] ordered</span></div>
     </div>
   </div>
 </div>
 
 <div class="tprow">
   <div class="tprow__hd">
-    <span class="prog prog--pub"><i></i>已發布</span>
+    <span class="prog prog--pub"><i></i>Published</span>
     <div class="tprow__t">人民幣中間價連續第三日走強</div>
-    <span class="ovr">caption 已手改</span>
-    <span class="dm-meta-label">2 條 post · 今日 11:24 / 11:26</span>
+    <span class="ovr">caption hand-edited</span>
+    <span class="dm-meta-label">2 posts · today 11:24 / 11:26</span>
     <span style="color:var(--dm-slate-400);font-size:12px">▸</span>
   </div>
 </div>
 
 <div class="tprow">
   <div class="tprow__hd">
-    <span class="prog prog--pub"><i></i>已發布</span>
+    <span class="prog prog--pub"><i></i>Published</span>
     <div class="tprow__t">港樓按息連續兩月回落 · 供樓負擔比率</div>
-    <span class="dm-meta-label">2 條 post · 今日 09:12 / 09:15</span>
+    <span class="dm-meta-label">2 posts · today 09:12 / 09:15</span>
     <span style="color:var(--dm-slate-400);font-size:12px">▸</span>
   </div>
 </div>
 
 <div class="callout callout--b">
-  <div class="callout__title">post 是交付版本的<b>投影</b>，不是快照 —— 這條規則決定了誰的修改會被吃掉</div>
-  <div class="callout__body">交付版本變了（比如你重生了第 4 張圖）就<b>重新拼裝</b>——<b>除了</b>帶 override 標記的部分。<br>caption 是從文章切出來的，所以「文章變了就自動重切 caption」看起來非常順手，<b>但它會靜默蓋掉編輯剛手改完的東西，而他不會馬上發現</b>。所以：手改過就置 <code>overrides.caption</code>，此後只提示「文章已更新，是否用新版重切？（會覆蓋你的修改）」，<b>默認不覆蓋</b>。換過/排過 media 同理走 <code>overrides.media</code>。<br>反過來做成一次性快照，你就得處理「v1 拼的 post 配 v2 的圖」這種髒狀態。</div>
-  <div class="callout__meta"><span>字段: <b>BFPost.overrides{caption,media}</b></span><span>默認: <b>不覆蓋</b></span><span>本頁 override: <b>1 條</b></span></div>
+  <div class="callout__title">A post is a <b>projection</b> of the delivery, not a snapshot — this rule decides whose work gets thrown away</div>
+  <div class="callout__body">When the delivery changes (you regenerate image 4, say) the posts are <b>re-assembled</b> — <b>except</b> for anything carrying an override.<br>Captions are cut from the draft, so "the draft changed, therefore re-cut the caption" is the obvious implementation. It is also the one that <b>silently discards an edit the editor just finished</b>, and they won't notice for a while. So: a hand edit sets <code>overrides.caption</code>, and from then on we only offer — "the draft has been updated, re-cut with the new version? (this replaces your edit)" — and <b>default to keeping their version</b>. Media reordering and swaps behave the same way via <code>overrides.media</code>.<br>Treating the post as a one-time snapshot instead leaves you maintaining the dirty state where "a post assembled from delivery v1 is showing v2's images".</div>
+  <div class="callout__meta"><span>Field: <b>BFPost.overrides{caption,media}</b></span><span>Default: <b>keep the human edit</b></span><span>Overrides here: <b>1</b></span></div>
 </div>
 
 <section class="dm-card">
-  <div class="dm-title-card">編輯：直接複用現有彈窗，BF 不新建編輯器<span class="dmode dmode-live">LIVE</span></div>
-  <span class="dm-subtitle">「編輯」按鈕挂的是 Content Publish 已在跑的那兩個彈窗。打開即置對應的 override 標記。</span>
+  <div class="dm-title-card">Editing reuses the existing modals — no new editor is built<span class="dmode dmode-live">LIVE</span></div>
+  <span class="dm-subtitle">The Edit button opens the two modals Content Publish already runs in production. Opening one sets the corresponding override flag.</span>
   <table class="dm-modern-table dm-modern-table--compact">
-    <thead><tr><th>平台</th><th>組件</th><th>已有能力</th></tr></thead>
+    <thead><tr><th>Platform</th><th>Component</th><th>Already provides</th></tr></thead>
     <tbody>
-      <tr><td>Facebook</td><td><code>publish/EditPostModal.vue</code><div class="dm-cell-sub">1,735 行</div></td>
-          <td>caption 編輯 · <b>MediaStrip</b>（增/刪/拖拽排序，index = 閱讀順序）· Assets 選取 · 本地上傳（逐個按選取順序）· 服務端逐字校驗提示</td></tr>
-      <tr><td>Instagram</td><td><code>publish/IgEditPostModal.vue</code><div class="dm-cell-sub">1,794 行</div></td>
-          <td>同上 + <b>caption 字數 / hashtag / mention 計數與上限</b>（igCaptionRules）· carousel readiness 提示（比例不一致 / carousel 只剩一張）</td></tr>
+      <tr><td>Facebook</td><td><code>publish/EditPostModal.vue</code><div class="dm-cell-sub">1,735 lines</div></td>
+          <td>caption editing · <b>MediaStrip</b> (add / remove / drag to reorder — index <i>is</i> reading order) · pick from Assets · local upload (one file at a time, preserving pick order) · verbatim server-side validation messages</td></tr>
+      <tr><td>Instagram</td><td><code>publish/IgEditPostModal.vue</code><div class="dm-cell-sub">1,794 lines</div></td>
+          <td>the above, plus <b>character / hashtag / mention counters against the platform ceilings</b> and carousel readiness warnings (mixed ratios, carousel down to one item)</td></tr>
     </tbody>
   </table>
-  <div class="foot-note">⚠ <b>hashtag 口徑纠正</b>：之前建議「不設硬上限只警告」是<b>錯的</b>——<code>IgEditPostModal</code> 已有 <code>captionCounts.hashtags / captionLimits.hashtags</code>，且 <code>canSave</code> 被 caption gate 卡住，<b>現有 app 已經是硬閘門</b>。BF 跟現有規則一致，不另立一套。此待拍板項關閉。</div>
+  <div class="foot-note">Ceilings come from Meta and are single-sourced in <code>utils/igCaptionRules.js</code>: <b>≤2,200 characters / ≤30 hashtags / ≤20 mentions</b>. That file's own comment draws the line we follow — those are <b>platform</b> limits, <b>not our style rules</b>; brand style ("add 5 SEO hashtags") lives in the skill and <i>must not be folded in</i>. So platform limits are a hard gate; brand style is advisory.</div>
 </section>
 
 <section class="dm-card">
-  <div class="dm-title-card">拼裝：不是要建，是要接<span class="dmode dmode-live">LIVE</span></div>
-  <span class="dm-subtitle">「手動拼接」這個痛點的答案——現成腳本已經支持我們需要的全部參數。BF 唯一要新寫的是 s1..s8 錨點切段。</span>
-  <div class="chk"><span class="ok">✓</span><b>full-post-gen/scripts/assemble_post_draft.py</b><span class="meta"><span class="tg tg-g">已具備</span></span></div>
+  <div class="dm-title-card">Assembly is wiring, not building<span class="dmode dmode-live">LIVE</span></div>
+  <span class="dm-subtitle">The answer to "manual assembly" — the existing script already accepts every parameter we need. The only new code is the section split.</span>
+  <div class="chk"><span class="ok">✓</span><b>full-post-gen/scripts/assemble_post_draft.py</b><span class="meta"><span class="tg tg-g">already available</span></span></div>
   <div style="font:400 11.5px/1.9 var(--font-body);color:var(--dm-slate-600);padding:8px 0 0 4px">
-    <code>--caption</code> 全文 · <code>--media-asset-ids</code>（複數 = carousel）· <code>--platform</code> · <code>--page-id</code> / <code>--ig-user-id</code> · <code>--created-via</code> · <code>--aspect-ratio</code>
+    <code>--caption</code> · <code>--media-asset-ids</code> (plural = carousel) · <code>--platform</code> · <code>--page-id</code> / <code>--ig-user-id</code> · <code>--created-via</code> · <code>--aspect-ratio</code>
   </div>
-  <div class="foot-note">BF 調它<b>兩次</b>：FB（<code>--platform facebook --media-asset-ids 02</code>）/ IG（<code>--platform instagram --media-asset-ids 02..06</code>），都帶 <code>--created-via bf_agent</code>。<br>⚠ <b>前置</b>：<code>bf_agent</code> 要先加進 <code>createdVia</code> 枚舉，而這<b>不是 1 行改動</b>——<code>constants/agentSources.js</code> 是權威源，另有兩份逐字鏡像（前端 <code>utils/agentSource.js</code> + ADK full-post-gen common），<b>parity 測試會挂</b>。ADD-ONLY，只能追加不能改名。<br>拼裝<b>禁止用 LLM 重寫</b>：可重現、零幻覺、失敗可定位。缺區段 / 圖不齊 / 比例錯 → 整條 post 不建立，交付標 failed 並回報是哪一項。</div>
+  <div class="foot-note">Called <b>twice</b>: Facebook (<code>--platform facebook --media-asset-ids 02</code>) and Instagram (<code>--platform instagram --media-asset-ids 02..06</code>), both with <code>--created-via bf_agent</code>.<br>⚠ <b>Prerequisite</b>: <code>bf_agent</code> must be added to the <code>createdVia</code> enum first, and that is <b>not a one-line change</b> — <code>constants/agentSources.js</code> is the authoritative registry with two verbatim mirrors (frontend <code>utils/agentSource.js</code> and the ADK full-post-gen common module). <b>Parity tests fail otherwise</b>, and the registry is add-only: append, never rename.<br>Assembly <b>must not use an LLM to rewrite</b> — plain splitting is reproducible, hallucination-free and every failure has an address. Missing section, incomplete image set or wrong ratio → <b>the post is not created at all</b>, the delivery is marked failed and reports which item broke.</div>
 </section>
 
 <div class="action-row">
-  <button class="btn btn--primary">確認並發布（2 條）</button>
-  <button class="btn btn--secondary">只發 FB</button>
-  <span class="who"><b>G3</b> · 走 Content Publish <b>已在用的同一條發布鏈路、同一條 publishPost 記錄</b>——不重建發布後端、不新增 Meta 依賴。權限 = <b>Page role</b>（admin / manager / editor 可發；analyst &amp; sales 不可 —— ⚠ 這條軸不是 Pause Ad 的 ad-account role 軸）。Readiness 有 fail 時按鈕禁用並列出原因；warn 可發但要顯式確認一次。<b>v2 不排期、不定時發</b>。</span>
+  <button class="btn btn--primary">Confirm &amp; Publish (2)</button>
+  <button class="btn btn--secondary">Facebook only</button>
+  <span class="who"><b>G3</b> — runs on the <b>same publish path and the same publishPost record</b> Content Publish already uses: no new publishing backend and no new Meta dependency. Permission is the <b>Page role</b> axis (admin / manager / editor may publish; analyst &amp; sales may not — ⚠ this is <i>not</i> the ad-account role axis used by Pause Ad). A Readiness fail disables the button and lists the reason; a warn publishes but asks for one explicit confirmation. <b>No scheduling, no timed publishing.</b></span>
 </div>
 
 <section class="ai-card">
-  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — 發佈庫</div></div>
-  <div class="ai-card__sub">Grounded on golden sample 契約 · 拼裝驗證日誌 · Readiness 規則 · Confidence: Medium</div>
-  <div class="ai-insight-item"><span class="ib ib-b">契約</span><b>錨點契約是整條流水線最便宜的保險。</b>8 個 sN 錨點讓拼裝零猜測，歷史驗證失敗全部可定位到具體區段或圖。<b>writing skill 升版時錨點 schema 不許動——它是 assemble 的輸入契約。</b></div>
-  <div class="ai-insight-item warn"><span class="ib ib-a">長度</span><b>IG caption 1,923 字距離 2,200 上限只有 277 字餘量</b>，而 s8 免責段約 180 字。文章任何一段加長都可能觸發截斷回報。<b>把段長上限寫進 writing skill 的生成約束，而不是事後截。</b></div>
-  <div class="ai-insight-item alert"><span class="ib ib-r">覆蓋</span><b>最容易吃掉編輯工作的地方就在這一頁。</b>「文章變了就重切 caption」是最順手的實現，也是最會出事的實現——它靜默、不可見、發現得晚。<b>override 默認不覆蓋這條規則，比任何校驗都重要。</b></div>
-  <div class="ai-card__ask"><input placeholder="Ask about assembly — e.g.「IG 超字數會怎麼處理？」"><button class="btn btn--primary btn--sm">Ask</button></div>
+  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Publish Library</div></div>
+  <div class="ai-card__sub">Grounded on the golden-sample contract · assembly validation log · Readiness rules · Confidence: Medium</div>
+  <div class="ai-insight-item"><span class="ib ib-b">Contract</span><b>The section contract is the cheapest insurance on this pipeline.</b> Anchors let assembly run without guessing, and every historical failure traces to a specific section or asset. <b>A writing-skill upgrade must not change the anchor schema — it is the assembler's input contract.</b></div>
+  <div class="ai-insight-item warn"><span class="ib ib-a">Length</span><b>The IG caption sits 277 characters below the 2,200 ceiling</b>, and the fixed closing statement alone is ~180. Any section growing longer can trigger a truncation report. <b>Put the per-section length ceiling into the writing skill's generation constraints rather than truncating afterwards.</b></div>
+  <div class="ai-insight-item alert"><span class="ib ib-r">Overwrite</span><b>This page is where the editor's work is most likely to be destroyed.</b> "The draft changed, so re-cut the caption" is the natural implementation and the dangerous one — it is silent, invisible and discovered late. <b>Defaulting overrides to "keep the human edit" matters more here than any validation rule.</b></div>
+  <div class="ai-card__ask"><input placeholder="Ask about assembly — e.g. &quot;what happens when the IG caption goes over?&quot;"><button class="btn btn--primary btn--sm">Ask</button></div>
 </section>
 
 </div>
 
 </div></main>
-<div class="proto-badge">PRODUCT PROTOTYPE v2.0 · BF</div>
+<div class="proto-badge">PRODUCT PROTOTYPE v2.1 · BF</div>
 
 <script>
-/* ── tabs ── */
 document.querySelectorAll('.dm-page-menu .menu-item').forEach(function(btn){
   btn.addEventListener('click',function(){
     document.querySelectorAll('.dm-page-menu .menu-item').forEach(function(b){b.classList.remove('is-active')});
@@ -888,14 +961,12 @@ document.querySelectorAll('.dm-page-menu .menu-item').forEach(function(btn){
     window.scrollTo(0,0);
   });
 });
-/* ── by 選題 / by post 子視圖 ── */
 document.querySelectorAll('.subpill button').forEach(function(b){
   b.addEventListener('click',function(){
     b.parentNode.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});
     b.classList.add('on');
   });
 });
-/* ── 選題條目展開 ── */
 document.querySelectorAll('.tprow__hd').forEach(function(h){
   h.addEventListener('click',function(){
     var bd=h.parentNode.querySelector('.tprow__bd');
@@ -904,7 +975,6 @@ document.querySelectorAll('.tprow__hd').forEach(function(h){
       bd.style.display=open?'none':'grid'; if(cv)cv.textContent=open?'\u25B8':'\u25BE'; }
   });
 });
-/* ── 詳情段落摺疊 ── */
 document.querySelectorAll('.seg__hd').forEach(function(h){
   h.addEventListener('click',function(){
     var bd=h.parentNode.querySelector('.seg__bd');
@@ -1082,15 +1152,14 @@ function hbar(id,cfg){
 var BLUE='#3B82F6',GREEN='#10B981',GREY='#CBD5E1',RED='#EF4444',AMBER='#F59E0B',PURPLE='#8B5CF6',TEAL='#14B8A6';
 
 donut('srcVerify',{data:[
-  {l:'通過（≥4 來源）',v:3,c:GREEN,tt:'重搜到 4 個或以上獨立真實報道'},
-  {l:'通過（2–3 來源）',v:3,c:BLUE,tt:'達到 ≥2 獨立來源門檻'},
-  {l:'失敗 · 來源查不到',v:1,c:RED,tt:'模型給的連結不存在或無法核實'},
-  {l:'失敗 · 只有單一來源',v:1,c:AMBER,tt:'只搜到內容農場轉載'},
-  {l:'尚未觸發驗證',v:12,c:GREY,tt:'懶驗證——編輯還沒打開這些候選'}]});
+  {l:'Passed — figures confirmed',v:6,c:GREEN,tt:'Cited pages opened; the figures used in the brief appear on them'},
+  {l:'Failed — page unreachable',v:1,c:RED,tt:'Cited URLs returned 404'},
+  {l:'Failed — not independent',v:1,c:AMBER,tt:'All links are reprints of one wire story'},
+  {l:'Not checked yet',v:12,c:GREY,tt:'Deferred — the editor has not opened these candidates'}]});
 
 chart('poolCat',{labels:['Business & Finance','News & Current Affairs','Tech & Innovation','Society & Culture','Lifestyle & P.D.'],yMax:80,yTitle:'%',tiltX:true,yFmt:function(v){return v+'%'},
-  legend:[{label:'今日池佔比 %',color:BLUE,round:true},{label:'頁面語料佔比 %（FB 90D）',color:GREY,round:true}],
-  layers:[{type:'bar',data:[45,20,15,10,10],color:BLUE,tt:['9 條','4 條','3 條','2 條','2 條']},
+  legend:[{label:"Today's pool %",color:BLUE,round:true},{label:'Page corpus % (FB 90D)',color:GREY,round:true}],
+  layers:[{type:'bar',data:[45,20,15,10,10],color:BLUE,tt:['9 items','4 items','3 items','2 items','2 items']},
           {type:'bar',data:[72.0,17.5,16.8,22.4,4.9],color:GREY,tt:['103 posts','25 posts','24 posts','32 posts','7 posts']}]});
 </script>
 </body></html>
