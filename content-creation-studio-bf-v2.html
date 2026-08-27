@@ -696,6 +696,56 @@ body.dd-page .dm-page-menu,
 body.dd-page .dm-controls-row{display:none!important}
 body.dd-page .ml-content{padding-top:18px}
 .dd__note{background:var(--brand-blue-tint);border-radius:8px;padding:9px 13px;margin-bottom:14px;font:400 11px/1.6 var(--font-body);color:var(--dm-accent)}
+
+/* ── v2.6: Topic Tool list + create topic dialog ── */
+.tthead{display:flex;align-items:center;gap:11px;margin-bottom:12px}
+.tthead__t{font:600 15px var(--font-heading);color:var(--dm-slate-800)}
+.tthead__n{background:var(--dm-slate-100);color:var(--dm-slate-600);border-radius:20px;padding:1px 9px;font:700 10.5px var(--font-body)}
+.chk3{display:inline-flex;align-items:center;gap:4px;font:600 10.5px var(--font-body);border-radius:5px;padding:2px 8px;white-space:nowrap}
+.chk3--ok{background:#ECFDF5;color:#047857}
+.chk3--no{background:var(--dm-slate-100);color:var(--dm-slate-500)}
+.chk3--bad{background:#FEF2F2;color:#B91C1C}
+.chk3--man{background:#FFF7ED;color:#B45309}
+.stt{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:2px 9px;font:600 10.5px var(--font-body);white-space:nowrap}
+.stt i{width:6px;height:6px;border-radius:50%}
+.stt--draft{background:var(--dm-slate-100);color:var(--dm-slate-600)}.stt--draft i{background:#94A3B8}
+.stt--conf{background:#ECFDF5;color:#047857}.stt--conf i{background:#10B981}
+.ctmodal{background:#fff;border-radius:14px;width:100%;max-width:620px;box-shadow:0 24px 60px rgba(15,23,42,.28);overflow:hidden}
+.ctmode{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.ctm{border:1px solid var(--dm-slate-300);border-radius:10px;padding:12px 14px;cursor:pointer;background:#fff}
+.ctm.on{border-color:var(--dm-primary);background:#F2F9FF}
+.ctm__t{font:600 12.5px var(--font-body);color:var(--dm-slate-800);margin-bottom:4px}
+.ctm__d{font:400 11px/1.55 var(--font-body);color:var(--dm-slate-500)}
+.ctin{width:100%;border:1px solid var(--dm-slate-300);border-radius:8px;padding:9px 11px;font:400 12px var(--font-body);color:var(--dm-slate-700);margin-bottom:10px}
+.ctta{width:100%;border:1px solid var(--dm-slate-300);border-radius:8px;padding:10px 12px;font:400 12px/1.75 var(--font-body);color:var(--dm-slate-700);min-height:110px;resize:none}
+.ctwarn{background:#FFF7ED;border:1px solid #F2D98C;border-radius:8px;padding:9px 12px;font:400 11px/1.6 var(--font-body);color:#7C4A03;margin-top:10px}
+
+/* ── v2.6: topic edit page (2 columns, minimal chrome) ── */
+.te{display:none}
+.te.on{display:block}
+.te__top{display:flex;align-items:center;gap:13px;padding:0 0 15px;border-bottom:1px solid var(--dm-border-light);margin-bottom:18px}
+.te__m{flex:1;min-width:0}
+.te__t{font:600 16px var(--font-heading);color:var(--dm-slate-800);line-height:1.4}
+.te__meta{display:flex;align-items:center;gap:9px;margin-top:6px;font:400 11.5px var(--font-body);color:var(--dm-slate-500);flex-wrap:wrap}
+.te__cols{display:grid;grid-template-columns:1fr 306px;gap:22px;align-items:start}
+.te__f{margin-bottom:16px}
+.te__l{font:700 9.5px var(--font-body);letter-spacing:.06em;color:var(--dm-slate-400);margin-bottom:6px}
+.te__src{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--dm-slate-100);font:400 11.5px var(--font-body);color:var(--dm-slate-600)}
+.te__src:last-child{border-bottom:none}
+.te__src a{color:var(--dm-primary);text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.te__src a:hover{text-decoration:underline}
+.te__sc{border:1px solid var(--dm-border-light);border-radius:12px;background:#fff;padding:16px 18px;position:sticky;top:88px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.te__tot{display:flex;align-items:baseline;gap:8px;padding-bottom:13px;border-bottom:1px solid var(--dm-slate-100);margin-bottom:13px}
+.te__tot b{font:700 32px var(--font-metric);color:var(--dm-primary);line-height:1;font-variant-numeric:tabular-nums}
+.te__tot span{font:600 10px var(--font-body);letter-spacing:.05em;color:var(--dm-slate-400)}
+.dim{margin-bottom:11px}
+.dim:last-of-type{margin-bottom:0}
+.dim__r{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px}
+.dim__n{font:600 11.5px var(--font-body);color:var(--dm-slate-700)}
+.dim__v{font:700 11px var(--font-metric);color:var(--dm-slate-600);font-variant-numeric:tabular-nums}
+.dim__rail{height:5px;border-radius:3px;background:var(--dm-slate-200);overflow:hidden}
+.dim__f{height:100%;border-radius:3px}
+.te__act{display:flex;flex-direction:column;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--dm-slate-100)}
 </style>
 <aside class="ml-sidebar">
   <div class="ml-sidebar__section">Intelligence</div>
@@ -728,7 +778,7 @@ body.dd-page .ml-content{padding-top:18px}
 <nav class="dm-page-menu"><div class="menu-list">
   <button class="menu-item is-active" data-tab="work">Topics</button>
   <button class="menu-item" data-tab="lib">Publish Library</button>
-  <span style="align-self:center;margin-left:10px;font:600 10px var(--font-body);color:var(--dm-slate-400);white-space:nowrap">Two tabs · a delivery opens as its own page · every delivery and post has a link</span>
+  <span style="align-self:center;margin-left:10px;font:600 10px var(--font-body);color:var(--dm-slate-400);white-space:nowrap">Two tabs · topic and delivery each open as their own page</span>
 </div></nav>
 
 <div class="dm-controls-row">
@@ -745,121 +795,435 @@ body.dd-page .ml-content{padding-top:18px}
 <div class="gates">
   <div class="gt on"><div class="gt__k">G1 · TOPIC DETAILS</div><div class="gt__q">Is this topic worth writing a draft for?</div><span class="gt__b">Adopt</span></div>
   <div class="gt on"><div class="gt__k">G2 · TOPIC DETAILS</div><div class="gt__q">Is this draft good to go? Confirming sends it straight to the Publish Library.</div><span class="gt__b">Confirm &amp; Send to Publish Library</span></div>
-  <div class="gt free"><div class="gt__k">AFTER G2 · NO GATE</div><div class="gt__q">Images generate in the background and the posts assemble themselves — both are reviewed in the Publish Library, in post context.</div><span class="gt__b">Automatic</span></div>
+  <div class="gt free"><div class="gt__k">AFTER G2 · NO GATE</div><div class="gt__q">Images generate in the background and the posts assemble themselves — both reviewed in the Publish Library, in post context.</div><span class="gt__b">Automatic</span></div>
+
+<div class="te" id="teScreen">
+  <div class="te__top">
+    <button class="dd__back" id="teBack">‹ Back</button>
+    <div class="te__m">
+      <div class="te__t">Momenta 擬港籌 10 億美元 · 自動駕駛 AI 新股</div>
+      <div class="te__meta">
+        <span class="chk3 chk3--ok">✓ Checked</span>
+        <span class="stt stt--draft"><i></i>Draft</span>
+        <span>pool · Kelvin · 2026-08-11</span>
+      </div>
+    </div>
+    <button class="lnkbtn" data-copy="share">Copy link</button>
+  </div>
+
+  <div class="te__cols">
+    <div>
+      <div class="te__f">
+        <div class="te__l">TITLE</div>
+        <div class="tinput">
+          <input value="Momenta 擬港籌 10 億美元！中國自動駕駛 AI 新股光環背後 三年蝕逾 92 億問盈利何時到？">
+          <span class="sfx"><span class="lk">🔒</span>【 @businessfocus.io 】【#BF社會熱話】</span>
+        </div>
+      </div>
+
+      <div class="te__f">
+        <div class="te__l">BODY</div>
+        <div class="rte">
+          <div class="rte__tb">
+            <button style="font-weight:700">B</button><button style="font-style:italic">I</button><button>H2</button>
+            <span class="div"></span><button>🔗 Link</button><button>“ Quote</button><button>• List</button>
+            <button class="aiw">✨ AI Write</button>
+          </div>
+          <div class="rte__bd" style="max-height:none">
+            <p>中國自動駕駛獨角獸 Momenta 已向港交所遞表，市場預期集資額約 <strong>10 億美元</strong>，成為今年港股最受關注的 AI 新股之一。遞表文件見 <span class="shortlink">bit.ly/mmt-f1 <span class="arw">→</span> <span class="dest">hkexnews.hk</span></span>。</p>
+            <p><strong>事件拆解</strong>｜招股書顯示，公司過去三年累計虧損 <strong>92.3 億元人民幣</strong>，研發支出佔收入比重達 61%。這個比例在同業中屬偏高一端，也是市場對其盈利時點分歧的來源。</p>
+            <p>值得注意的是，這次遞表距離上一輪融資僅九個月，而估值區間尚未公開。<a class="lnk" href="#">信報早前報道</a>指基石投資者名單仍在洽談中。</p>
+            <p><strong>痛點分析</strong>｜自動駕駛的商業化路徑一直是估值爭議核心。Robotaxi 若能提前放量，虧損收窄速度可能快於市場預期；反之則要面對持續的研發投入壓力。</p>
+            <p><strong>解法重點</strong>｜對港股投資者而言，這條新聞的意義不只是一家公司上市 —— 它會影響同類 AI 標的的定價參照。</p>
+          </div>
+          <div class="tagrow">
+            <span class="tagpill">#BusinessFocus</span><span class="tagpill">#BF</span><span class="tagpill">#Insight</span>
+            <span class="tagpill">#Momenta</span><span class="tagpill">#香港IPO</span><span class="tagpill">#自動駕駛</span>
+            <span class="tagpill">#Robotaxi</span><span class="tagpill">#AI新股</span>
+            <span class="tagpill men">@businessfocus.io</span>
+            <span class="tagcount"><span>2,104 / 2,200</span><span class="ok">8 / 30</span><span class="ok">1 / 20</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="te__f" style="margin-bottom:0">
+        <div class="te__l">SOURCES · 4</div>
+        <div class="te__src"><span class="t3">primary</span><a href="#">HKEXnews — listing application</a><span style="margin-left:auto;color:var(--dm-slate-400)">08-24 09:12</span></div>
+        <div class="te__src"><span class="t12">tier1</span><a href="#">SCMP — Momenta files for Hong Kong listing</a><span style="margin-left:auto;color:var(--dm-slate-400)">07:40</span></div>
+        <div class="te__src"><span class="t12">tier1</span><a href="#">信報 hkej.com — 自動駕駛新股招股在即</a><span style="margin-left:auto;color:var(--dm-slate-400)">08:05</span></div>
+        <div class="te__src"><span class="t12">tier2</span><a href="#">華爾街見聞 — three-year loss detail</a><span style="margin-left:auto;color:var(--dm-slate-400)">08:33</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="te__sc">
+        <div class="te__tot"><b>87</b><span>SCORE</span></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Brand Fit</span><span class="dim__v">23 / 25</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:92%;background:#10B981"></div></div></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Lead Time</span><span class="dim__v">20 / 22</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:91%;background:#10B981"></div></div></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Data Verifiability</span><span class="dim__v">17 / 18</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:94%;background:#10B981"></div></div></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Topic History</span><span class="dim__v">12 / 15</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:80%;background:#3B82F6"></div></div></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Geo Relevance</span><span class="dim__v">13 / 15</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:87%;background:#3B82F6"></div></div></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Narrative</span><span class="dim__v">2 / 5</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:40%;background:#F59E0B"></div></div></div>
+        <div class="te__act">
+          <button class="btn btn--primary">Confirm &amp; Send to Publish Library</button>
+          <button class="btn btn--secondary">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="fab" id="tfab"><span class="sp"></span>✨ Ask AI about this topic</button>
+</div>
+
 </div>
 
 <div class="dm-kpi-row">
-  <div class="dm-kpi-card is-filter on" data-filter="all"><div class="kpi__label">Today's candidates</div><div class="kpi__metric">20</div><div class="kpi__sub">run #34 · 10:00:12 HKT</div></div>
+  <div class="dm-kpi-card is-filter" data-filter="all"><div class="kpi__label">All topics</div><div class="kpi__metric">142</div><div class="kpi__sub">in the selected date period</div></div>
+  <div class="dm-kpi-card is-filter on" data-filter="today"><div class="kpi__label">Today's topic</div><div class="kpi__metric">20</div><div class="kpi__sub">by creation date · run #34</div></div>
   <div class="dm-kpi-card is-filter" data-filter="checked"><div class="kpi__label">Sources checked</div><div class="kpi__metric">6</div><div class="kpi__sub up">claims found on cited pages</div></div>
-  <div class="dm-kpi-card is-filter" data-filter="failed"><div class="kpi__label">Check failed</div><div class="kpi__metric">2</div><div class="kpi__sub down">unreachable / not independent</div></div>
-  <div class="dm-kpi-card is-filter" data-filter="progress"><div class="kpi__label">In progress</div><div class="kpi__metric">3</div><div class="kpi__sub">past G1 · not published</div></div>
-  <div class="dm-kpi-card is-filter" data-filter="awaiting"><div class="kpi__label">Awaiting G2</div><div class="kpi__metric">1</div><div class="kpi__sub">draft written, not confirmed</div></div>
-  <div class="dm-kpi-card is-filter" data-filter="reshuffle"><div class="kpi__label">Reshuffles today</div><div class="kpi__metric">1</div><div class="kpi__sub">previous batch on record</div></div>
+  <div class="dm-kpi-card is-filter" data-filter="failed"><div class="kpi__label">Sources check failed</div><div class="kpi__metric">4</div><div class="kpi__sub down">incl. manually created</div></div>
+  <div class="dm-kpi-card is-filter" data-filter="confirmed"><div class="kpi__label">Confirmed topic</div><div class="kpi__metric">3</div><div class="kpi__sub">moved to the next stage</div></div>
+  <div class="dm-kpi-card is-filter" data-filter="draft"><div class="kpi__label">Draft topic</div><div class="kpi__metric">17</div><div class="kpi__sub">not yet in the next stage</div></div>
+
+<div class="te" id="teScreen">
+  <div class="te__top">
+    <button class="dd__back" id="teBack">‹ Back</button>
+    <div class="te__m">
+      <div class="te__t">Momenta 擬港籌 10 億美元 · 自動駕駛 AI 新股</div>
+      <div class="te__meta">
+        <span class="chk3 chk3--ok">✓ Checked</span>
+        <span class="stt stt--draft"><i></i>Draft</span>
+        <span>pool · Kelvin · 2026-08-11</span>
+      </div>
+    </div>
+    <button class="lnkbtn" data-copy="share">Copy link</button>
+  </div>
+
+  <div class="te__cols">
+    <div>
+      <div class="te__f">
+        <div class="te__l">TITLE</div>
+        <div class="tinput">
+          <input value="Momenta 擬港籌 10 億美元！中國自動駕駛 AI 新股光環背後 三年蝕逾 92 億問盈利何時到？">
+          <span class="sfx"><span class="lk">🔒</span>【 @businessfocus.io 】【#BF社會熱話】</span>
+        </div>
+      </div>
+
+      <div class="te__f">
+        <div class="te__l">BODY</div>
+        <div class="rte">
+          <div class="rte__tb">
+            <button style="font-weight:700">B</button><button style="font-style:italic">I</button><button>H2</button>
+            <span class="div"></span><button>🔗 Link</button><button>“ Quote</button><button>• List</button>
+            <button class="aiw">✨ AI Write</button>
+          </div>
+          <div class="rte__bd" style="max-height:none">
+            <p>中國自動駕駛獨角獸 Momenta 已向港交所遞表，市場預期集資額約 <strong>10 億美元</strong>，成為今年港股最受關注的 AI 新股之一。遞表文件見 <span class="shortlink">bit.ly/mmt-f1 <span class="arw">→</span> <span class="dest">hkexnews.hk</span></span>。</p>
+            <p><strong>事件拆解</strong>｜招股書顯示，公司過去三年累計虧損 <strong>92.3 億元人民幣</strong>，研發支出佔收入比重達 61%。這個比例在同業中屬偏高一端，也是市場對其盈利時點分歧的來源。</p>
+            <p>值得注意的是，這次遞表距離上一輪融資僅九個月，而估值區間尚未公開。<a class="lnk" href="#">信報早前報道</a>指基石投資者名單仍在洽談中。</p>
+            <p><strong>痛點分析</strong>｜自動駕駛的商業化路徑一直是估值爭議核心。Robotaxi 若能提前放量，虧損收窄速度可能快於市場預期；反之則要面對持續的研發投入壓力。</p>
+            <p><strong>解法重點</strong>｜對港股投資者而言，這條新聞的意義不只是一家公司上市 —— 它會影響同類 AI 標的的定價參照。</p>
+          </div>
+          <div class="tagrow">
+            <span class="tagpill">#BusinessFocus</span><span class="tagpill">#BF</span><span class="tagpill">#Insight</span>
+            <span class="tagpill">#Momenta</span><span class="tagpill">#香港IPO</span><span class="tagpill">#自動駕駛</span>
+            <span class="tagpill">#Robotaxi</span><span class="tagpill">#AI新股</span>
+            <span class="tagpill men">@businessfocus.io</span>
+            <span class="tagcount"><span>2,104 / 2,200</span><span class="ok">8 / 30</span><span class="ok">1 / 20</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="te__f" style="margin-bottom:0">
+        <div class="te__l">SOURCES · 4</div>
+        <div class="te__src"><span class="t3">primary</span><a href="#">HKEXnews — listing application</a><span style="margin-left:auto;color:var(--dm-slate-400)">08-24 09:12</span></div>
+        <div class="te__src"><span class="t12">tier1</span><a href="#">SCMP — Momenta files for Hong Kong listing</a><span style="margin-left:auto;color:var(--dm-slate-400)">07:40</span></div>
+        <div class="te__src"><span class="t12">tier1</span><a href="#">信報 hkej.com — 自動駕駛新股招股在即</a><span style="margin-left:auto;color:var(--dm-slate-400)">08:05</span></div>
+        <div class="te__src"><span class="t12">tier2</span><a href="#">華爾街見聞 — three-year loss detail</a><span style="margin-left:auto;color:var(--dm-slate-400)">08:33</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="te__sc">
+        <div class="te__tot"><b>87</b><span>SCORE</span></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Brand Fit</span><span class="dim__v">23 / 25</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:92%;background:#10B981"></div></div></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Lead Time</span><span class="dim__v">20 / 22</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:91%;background:#10B981"></div></div></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Data Verifiability</span><span class="dim__v">17 / 18</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:94%;background:#10B981"></div></div></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Topic History</span><span class="dim__v">12 / 15</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:80%;background:#3B82F6"></div></div></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Geo Relevance</span><span class="dim__v">13 / 15</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:87%;background:#3B82F6"></div></div></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Narrative</span><span class="dim__v">2 / 5</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:40%;background:#F59E0B"></div></div></div>
+        <div class="te__act">
+          <button class="btn btn--primary">Confirm &amp; Send to Publish Library</button>
+          <button class="btn btn--secondary">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="fab" id="tfab"><span class="sp"></span>✨ Ask AI about this topic</button>
+</div>
+
 </div>
 
 <div class="filterbar" id="fbar" hidden><span>Filtered by <b id="fbarName">—</b></span><span class="dm-meta-label" id="fbarN"></span><span class="x" id="fbarX">Clear ✕</span></div>
 
-<div class="callout callout--a">
-  <div class="callout__title">Two things this page deliberately does not do</div>
-  <div class="callout__body"><b>No Reject button.</b> A topic you don't want needs no action. Hiding something that should have shown costs five seconds of recognising "seen it"; hiding something that <b>shouldn't</b> have been hidden costs a real story and you never find out. With one discovery track, coverage is already the risk. Duplicate protection sits at the publish gate instead, where it reads "you're about to publish a repeat".<br><b>No image grid.</b> Confirming a draft sends it straight to the Publish Library — images generate in the background and are reviewed <b>in post context</b>, which is where you can actually judge whether a cover works against its caption. The cost gate is unaffected: six generations still fire only for a confirmed topic.</div>
-  <div class="callout__meta"><span>Checked: <b>8 / 20</b></span><span>Passed: <b>6</b></span><span>Failed: <b>2</b></span><span>Added cost: <b>~8 page fetches</b></span></div>
+<section class="dm-card">
+  <div class="tthead">
+    <div class="tthead__t">Topic Tool</div>
+    <div class="tthead__n">20</div>
+    <span class="spacer" style="flex:1"></span>
+    <button class="btn btn--secondary btn--sm">↻ Reshuffle (1 today)</button>
+    <button class="btn btn--primary btn--sm" id="btnCreate">+ Create Topic</button>
+  </div>
+  <table class="dm-modern-table dm-modern-table--compact">
+    <thead><tr><th>Topic</th><th>Source check</th><th>Sources</th><th>Origin</th><th>Status</th><th style="text-align:right">Score</th><th></th></tr></thead>
+    <tbody>
+      <tr class="trow"><td><div class="dm-cell-main">英偉達財報前夕美股 AI 板塊震盪</div><div class="dm-cell-sub">Draft written · awaiting G2 · Kelvin</div></td>
+          <td><span class="chk3 chk3--ok">✓ Checked</span></td><td>4 (1 primary)</td><td>pool</td>
+          <td><span class="stt stt--conf"><i></i>Confirmed</span></td>
+          <td style="text-align:right"><b>87</b></td><td class="go">›</td></tr>
+      <tr class="trow"><td><div class="dm-cell-main">人民幣中間價連續第三日走強</div><div class="dm-cell-sub">Confirmed 11:02 · images generating · Kelvin</div></td>
+          <td><span class="chk3 chk3--ok">✓ Checked</span></td><td>3</td><td>pool</td>
+          <td><span class="stt stt--conf"><i></i>Confirmed</span></td>
+          <td style="text-align:right"><b>81</b></td><td class="go">›</td></tr>
+      <tr class="trow"><td><div class="dm-cell-main">xAI 新一輪融資估值傳達 2000 億美元</div><div class="dm-cell-sub">2 posts assembled · Amy</div></td>
+          <td><span class="chk3 chk3--ok">✓ Checked</span></td><td>4</td><td>pool</td>
+          <td><span class="stt stt--conf"><i></i>Confirmed</span></td>
+          <td style="text-align:right"><b>79</b></td><td class="go">›</td></tr>
+      <tr class="trow"><td><div class="dm-cell-main">Momenta 擬港籌 10 億美元 · 自動駕駛 AI 新股</div><div class="dm-cell-sub">Figures confirmed on the cited pages</div></td>
+          <td><span class="chk3 chk3--ok">✓ Checked</span></td><td>4 (1 primary)</td><td>pool</td>
+          <td><span class="stt stt--draft"><i></i>Draft</span></td>
+          <td style="text-align:right"><b>87</b></td><td class="go">›</td></tr>
+      <tr class="trow"><td><div class="dm-cell-main">港樓按息連續兩月回落 · 供樓負擔比率</div><div class="dm-cell-sub">Figures confirmed on the cited pages</div></td>
+          <td><span class="chk3 chk3--ok">✓ Checked</span></td><td>3</td><td>pool</td>
+          <td><span class="stt stt--draft"><i></i>Draft</span></td>
+          <td style="text-align:right"><b>76</b></td><td class="go">›</td></tr>
+      <tr class="trow"><td><div class="dm-cell-main">最低工資檢討 · 商會與勞方分歧</div><div class="dm-cell-sub">Not opened yet — check not triggered</div></td>
+          <td><span class="chk3 chk3--no">Not checked</span></td><td>2</td><td>pool</td>
+          <td><span class="stt stt--draft"><i></i>Draft</span></td>
+          <td style="text-align:right"><b>72</b></td><td class="go">›</td></tr>
+      <tr class="trow"><td><div class="dm-cell-main">加密幣投資平台監管諮詢期結束</div><div class="dm-cell-sub">Both cited pages returned 404 — cannot confirm</div></td>
+          <td><span class="chk3 chk3--bad">✕ Check failed</span></td><td>0 live</td><td>pool</td>
+          <td><span class="stt stt--draft"><i></i>Draft</span></td>
+          <td style="text-align:right"><b>68</b></td><td class="go">›</td></tr>
+      <tr class="trow"><td><div class="dm-cell-main">本地餐飲業結業數創三年新高</div><div class="dm-cell-sub">All 4 links reprint one wire story — cannot confirm</div></td>
+          <td><span class="chk3 chk3--bad">✕ Not independent</span></td><td>1 effective</td><td>pool</td>
+          <td><span class="stt stt--draft"><i></i>Draft</span></td>
+          <td style="text-align:right"><b>64</b></td><td class="go">›</td></tr>
+      <tr class="trow"><td><div class="dm-cell-main">聯儲局點陣圖與港息走向</div><div class="dm-cell-sub">Amy typed this in — you own the facts</div></td>
+          <td><span class="chk3 chk3--man">— Not verified · manual</span></td><td>—</td><td>manual_topic</td>
+          <td><span class="stt stt--draft"><i></i>Draft</span></td>
+          <td style="text-align:right"><b>—</b></td><td class="go">›</td></tr>
+      <tr class="trow" style="opacity:.72"><td><div class="dm-cell-main">中概股回港二次上市窗口 · 已貼全文</div><div class="dm-cell-sub">Pasted article · split into 8 sections · you own the facts</div></td>
+          <td><span class="chk3 chk3--man">— Not verified · manual</span></td><td>—</td><td>manual_article</td>
+          <td><span class="stt stt--draft"><i></i>Draft</span></td>
+          <td style="text-align:right"><b>—</b></td><td class="go">›</td></tr>
+    </tbody>
+  </table>
+  <div class="foot-note">10 of 20 shown · <span style="color:var(--dm-primary);font-weight:600">Replaced batch (20) · 09:41 by Kelvin ›</span><br>
+  <b>Source check has three outcomes, and two of them look similar but mean the opposite thing.</b> <span class="chk3 chk3--bad">✕ Check failed</span> means verification ran and failed — <b>Confirm is disabled</b> and the reason is shown. <span class="chk3 chk3--man">— Not verified · manual</span> means a person typed it in, so it was never verified by design — <b>Confirm is allowed</b> after one explicit acknowledgement that the facts are theirs.<br>
+  Reshuffle only replaces <b>Draft</b> rows. <b>Confirmed</b> rows are never touched.</div>
+</section>
+
+<div class="dm-row">
+  <section class="dm-card">
+    <div class="dm-title-card">Source check outcome<span class="dmode dmode-mock">MOCK</span></div>
+    <div class="dm-chart-area" data-chart="srcVerify"></div>
+  </section>
+  <section class="dm-card">
+    <div class="dm-title-card">Pool category mix vs page corpus<span class="dmode dmode-mock">MOCK</span></div>
+    <div class="dm-chart-area" data-chart="poolCat"></div>
+  </section>
+
+<div class="te" id="teScreen">
+  <div class="te__top">
+    <button class="dd__back" id="teBack">‹ Back</button>
+    <div class="te__m">
+      <div class="te__t">Momenta 擬港籌 10 億美元 · 自動駕駛 AI 新股</div>
+      <div class="te__meta">
+        <span class="chk3 chk3--ok">✓ Checked</span>
+        <span class="stt stt--draft"><i></i>Draft</span>
+        <span>pool · Kelvin · 2026-08-11</span>
+      </div>
+    </div>
+    <button class="lnkbtn" data-copy="share">Copy link</button>
+  </div>
+
+  <div class="te__cols">
+    <div>
+      <div class="te__f">
+        <div class="te__l">TITLE</div>
+        <div class="tinput">
+          <input value="Momenta 擬港籌 10 億美元！中國自動駕駛 AI 新股光環背後 三年蝕逾 92 億問盈利何時到？">
+          <span class="sfx"><span class="lk">🔒</span>【 @businessfocus.io 】【#BF社會熱話】</span>
+        </div>
+      </div>
+
+      <div class="te__f">
+        <div class="te__l">BODY</div>
+        <div class="rte">
+          <div class="rte__tb">
+            <button style="font-weight:700">B</button><button style="font-style:italic">I</button><button>H2</button>
+            <span class="div"></span><button>🔗 Link</button><button>“ Quote</button><button>• List</button>
+            <button class="aiw">✨ AI Write</button>
+          </div>
+          <div class="rte__bd" style="max-height:none">
+            <p>中國自動駕駛獨角獸 Momenta 已向港交所遞表，市場預期集資額約 <strong>10 億美元</strong>，成為今年港股最受關注的 AI 新股之一。遞表文件見 <span class="shortlink">bit.ly/mmt-f1 <span class="arw">→</span> <span class="dest">hkexnews.hk</span></span>。</p>
+            <p><strong>事件拆解</strong>｜招股書顯示，公司過去三年累計虧損 <strong>92.3 億元人民幣</strong>，研發支出佔收入比重達 61%。這個比例在同業中屬偏高一端，也是市場對其盈利時點分歧的來源。</p>
+            <p>值得注意的是，這次遞表距離上一輪融資僅九個月，而估值區間尚未公開。<a class="lnk" href="#">信報早前報道</a>指基石投資者名單仍在洽談中。</p>
+            <p><strong>痛點分析</strong>｜自動駕駛的商業化路徑一直是估值爭議核心。Robotaxi 若能提前放量，虧損收窄速度可能快於市場預期；反之則要面對持續的研發投入壓力。</p>
+            <p><strong>解法重點</strong>｜對港股投資者而言，這條新聞的意義不只是一家公司上市 —— 它會影響同類 AI 標的的定價參照。</p>
+          </div>
+          <div class="tagrow">
+            <span class="tagpill">#BusinessFocus</span><span class="tagpill">#BF</span><span class="tagpill">#Insight</span>
+            <span class="tagpill">#Momenta</span><span class="tagpill">#香港IPO</span><span class="tagpill">#自動駕駛</span>
+            <span class="tagpill">#Robotaxi</span><span class="tagpill">#AI新股</span>
+            <span class="tagpill men">@businessfocus.io</span>
+            <span class="tagcount"><span>2,104 / 2,200</span><span class="ok">8 / 30</span><span class="ok">1 / 20</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="te__f" style="margin-bottom:0">
+        <div class="te__l">SOURCES · 4</div>
+        <div class="te__src"><span class="t3">primary</span><a href="#">HKEXnews — listing application</a><span style="margin-left:auto;color:var(--dm-slate-400)">08-24 09:12</span></div>
+        <div class="te__src"><span class="t12">tier1</span><a href="#">SCMP — Momenta files for Hong Kong listing</a><span style="margin-left:auto;color:var(--dm-slate-400)">07:40</span></div>
+        <div class="te__src"><span class="t12">tier1</span><a href="#">信報 hkej.com — 自動駕駛新股招股在即</a><span style="margin-left:auto;color:var(--dm-slate-400)">08:05</span></div>
+        <div class="te__src"><span class="t12">tier2</span><a href="#">華爾街見聞 — three-year loss detail</a><span style="margin-left:auto;color:var(--dm-slate-400)">08:33</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="te__sc">
+        <div class="te__tot"><b>87</b><span>SCORE</span></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Brand Fit</span><span class="dim__v">23 / 25</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:92%;background:#10B981"></div></div></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Lead Time</span><span class="dim__v">20 / 22</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:91%;background:#10B981"></div></div></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Data Verifiability</span><span class="dim__v">17 / 18</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:94%;background:#10B981"></div></div></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Topic History</span><span class="dim__v">12 / 15</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:80%;background:#3B82F6"></div></div></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Geo Relevance</span><span class="dim__v">13 / 15</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:87%;background:#3B82F6"></div></div></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Narrative</span><span class="dim__v">2 / 5</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:40%;background:#F59E0B"></div></div></div>
+        <div class="te__act">
+          <button class="btn btn--primary">Confirm &amp; Send to Publish Library</button>
+          <button class="btn btn--secondary">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="fab" id="tfab"><span class="sp"></span>✨ Ask AI about this topic</button>
+</div>
+
 </div>
 
 <section class="dm-card">
   <div class="dm-title-card">Schedule &amp; rules (read-only)<span class="dmode dmode-live">LIVE</span></div>
-  <span class="dm-subtitle">No separate Autopilot page — the schedule and locked capability versions live here, read-only. <b>The daily discovery schedule stays</b>; what we are not building is <b>scheduled publishing</b>.</span>
   <div class="lockrow">run_time <b>10:00 · Asia/Hong_Kong</b> · daily_count <b>3</b> · pool_size <b>20</b> · discovery <b>llm_only</b><span class="lk">🔒</span></div>
   <div class="lockrow">scoring_profile <b>bf/lead-first</b> — lead_time.direction = <b>prefer_early</b><span class="lk">🔒</span></div>
   <div class="lockrow">delivery_spec <b>bf/default</b> — 6 × 4:5 + 1 × 1.91:1 · required_sections 8<span class="lk">🔒</span></div>
 </section>
 
-<div class="zone" style="margin-top:22px">
-  <div class="zone__t">In progress</div><div class="zone__n">3</div>
-  <div class="zone__sp"></div>
-  <span class="dm-meta-label">Past G1 — <b>never touched by Reshuffle</b></span>
-</div>
-<section class="dm-card" style="margin-bottom:20px">
-  <table class="dm-modern-table dm-modern-table--compact">
-    <thead><tr><th>Topic</th><th>Progress</th><th>Adopted by</th><th style="text-align:right">Score</th><th></th></tr></thead>
-    <tbody>
-      <tr class="trow" data-open="1"><td><div class="dm-cell-main">英偉達財報前夕美股 AI 板塊震盪</div><div class="dm-cell-sub">4 sources (1 primary filing) · draft written</div></td>
-          <td><span class="prog prog--wait"><i></i>Awaiting G2</span></td><td>Kelvin</td><td style="text-align:right"><b>87</b></td><td class="go">›</td></tr>
-      <tr class="trow"><td><div class="dm-cell-main">人民幣中間價連續第三日走強</div><div class="dm-cell-sub">3 sources · confirmed 11:02 · images generating</div></td>
-          <td><span class="prog prog--gen"><i></i>In Publish Library</span></td><td>Kelvin</td><td style="text-align:right"><b>81</b></td><td class="go">›</td></tr>
-      <tr class="trow"><td><div class="dm-cell-main">xAI 新一輪融資估值傳達 2000 億美元</div><div class="dm-cell-sub">4 sources · 2 posts assembled</div></td>
-          <td><span class="prog prog--ready"><i></i>Ready to publish</span></td><td>Amy</td><td style="text-align:right"><b>79</b></td><td class="go">›</td></tr>
-    </tbody>
-  </table>
-  <div class="foot-note">Progress is <b>derived</b> — read off whether the downstream artifacts exist, not set by anyone clicking a status. No movement for 48h marks the item <code>stale</code>: flagged only, never deleted and never auto-released.</div>
-</section>
 
-<div class="zone">
-  <div class="zone__t">Today's candidates</div><div class="zone__n">20</div>
-  <div class="zone__sp"></div>
-  <button class="btn btn--secondary btn--sm">↻ Reshuffle (1 today)</button>
-</div>
-<section class="dm-card">
-  <span class="dm-subtitle">Click any row to open its details. The list and the detail are separate surfaces — details open in a dialog, so the list keeps its scroll position and filter.</span>
-  <table class="dm-modern-table dm-modern-table--compact">
-    <thead><tr><th>Topic</th><th>Source check</th><th>Sources</th><th>Origin</th><th style="text-align:right">Provisional</th><th></th></tr></thead>
-    <tbody>
-      <tr class="trow" data-open="1" style="background:#F2F9FF"><td><div class="dm-cell-main">Momenta 擬港籌 10 億美元 · 自動駕駛 AI 新股</div><div class="dm-cell-sub">Figures confirmed on the cited pages</div></td>
-          <td><span class="vfy vfy--ok">✓ Checked</span></td><td>4 (1 primary)</td><td>pool</td><td style="text-align:right"><b>87</b></td><td class="go">›</td></tr>
-      <tr class="trow"><td><div class="dm-cell-main">港樓按息連續兩月回落 · 供樓負擔比率</div><div class="dm-cell-sub">Figures confirmed on the cited pages</div></td>
-          <td><span class="vfy vfy--ok">✓ Checked</span></td><td>3</td><td>pool</td><td style="text-align:right"><b>76</b></td><td class="go">›</td></tr>
-      <tr class="trow"><td><div class="dm-cell-main">最低工資檢討 · 商會與勞方分歧</div><div class="dm-cell-sub">Not opened yet — check not triggered</div></td>
-          <td><span class="vfy vfy--no">Not checked</span></td><td>2</td><td>pool</td><td style="text-align:right">72</td><td class="go">›</td></tr>
-      <tr class="trow"><td><div class="dm-cell-main">加密幣投資平台監管諮詢期結束</div><div class="dm-cell-sub">Both cited pages returned 404</div></td>
-          <td><span class="vfy vfy--bad">✕ Check failed</span></td><td>0 live</td><td>pool</td><td style="text-align:right">68</td><td class="go">›</td></tr>
-      <tr class="trow"><td><div class="dm-cell-main">本地餐飲業結業數創三年新高</div><div class="dm-cell-sub">All 4 links are reprints of one wire story</div></td>
-          <td><span class="vfy vfy--bad">✕ Not independent</span></td><td>1 effective</td><td>pool</td><td style="text-align:right">64</td><td class="go">›</td></tr>
-      <tr class="trow"><td><div class="dm-cell-main">中概股回港二次上市窗口</div><div class="dm-cell-sub">Not opened yet — check not triggered</div></td>
-          <td><span class="vfy vfy--no">Not checked</span></td><td>3</td><td>pool</td><td style="text-align:right">61</td><td class="go">›</td></tr>
-      <tr class="trow" style="opacity:.75"><td><div class="dm-cell-main">聯儲局點陣圖與港息走向</div><div class="dm-cell-sub">Created by Amy in chat · awaiting check</div></td>
-          <td><span class="vfy vfy--no">Awaiting check</span></td><td>—</td><td><span class="tg tg-p">chat · Amy</span></td><td style="text-align:right">—</td><td class="go">›</td></tr>
-    </tbody>
-  </table>
-  <div class="foot-note">13 more · <span style="color:var(--dm-primary);font-weight:600">Replaced batch (20) · 09:41 by Kelvin ▸</span><br>Reshuffle <b>only replaces candidates with no downstream artifacts</b> — the three items under "In progress" are untouched. No cap on reshuffles, <b>but every one is recorded</b>: the only constraint is gone, so at minimum you must be able to see afterwards what happened.</div>
-</section>
-
-<div class="dm-row">
-  <section class="dm-card">
-    <div class="dm-title-card">Source check outcome (8 checked so far)<span class="dmode dmode-mock">MOCK</span></div>
-    <span class="dm-subtitle">With one discovery track this is the quality dashboard. Watch the <b>failure rate</b> — sustained above 30% means the model is producing sources it cannot support, and that is the signal to add a second track.</span>
-    <div class="dm-chart-area" data-chart="srcVerify"></div>
-  </section>
-  <section class="dm-card">
-    <div class="dm-title-card">Pool category mix vs page corpus<span class="dmode dmode-mock">MOCK</span></div>
-    <span class="dm-subtitle">BusinessFocus is already 72% Business &amp; Finance. The pool enforces "at most 2 per category" so a single market story doesn't take all five slots.</span>
-    <div class="dm-chart-area" data-chart="poolCat"></div>
-  </section>
-</div>
-
-<section class="ai-card">
-  <div class="ai-card__head"><div class="ai-icon">◈</div><div class="ai-card__title">AI insights — Topics</div></div>
-  <div class="ai-card__sub">Grounded on run #34 · 20-candidate pool · llm_only discovery · Confidence: Medium</div>
-  <div class="ai-insight-item"><span class="ib ib-b">Scoring</span><b>Two of today's top five score high on Brand Fit but low on Lead Time</b> — real, on-thesis stories where the discussion has already formed. Under <code>prefer_early</code> they fall below topics with thinner coverage. <b>That is the profile working as intended, not something to tune away.</b></div>
-  <div class="ai-insight-item warn"><span class="ib ib-a">Coverage</span><b>13 of 20 candidates are Business &amp; Finance</b> and the "at most 2 per category" rule bound four times today. Normal for this page (72% of its corpus), but the editor's real choice is narrower than the pool looks. <b>Widen it via the topic prompt, not by loosening the category cap.</b></div>
-  <div class="ai-insight-item alert"><span class="ib ib-r">Blocked</span><b>Template images are still not in MediaLens <code>bf-templates/</code>.</b> Without a reference image <code>clone_creative</code> has nothing to anchor to and the check agent nothing to compare against — <b>half of "unreliable image output" cannot be fixed until this lands</b>, outstanding since v1.</div>
-  <div class="ai-card__ask"><input placeholder="Ask about the pool — e.g. &quot;why did the crypto item fail its source check?&quot;"><button class="btn btn--primary btn--sm">Ask</button></div>
-</section>
-
-<details class="arch" style="margin-top:20px">
-  <summary>Architecture — why the mainline does not need a second pipeline</summary>
-  <div class="arch__bd">
-    <span class="dm-subtitle">The stages are named after <b>objects</b>, so BusinessFocus is a configuration rather than a bespoke set of screens.</span>
-    <table class="dm-modern-table dm-modern-table--compact">
-      <thead><tr><th>Stage</th><th>Object</th><th>BusinessFocus config</th><th>Mainline config (future)</th></tr></thead>
-      <tbody>
-        <tr><td><b>S1 Candidate</b></td><td><code>Candidate</code></td><td>20 topics/day · single LLM track + source check + score</td><td>brief / idea pool</td></tr>
-        <tr><td><b>S2 Draft</b></td><td><code>Draft</code></td><td>title + body + cited sources</td><td>copy variants (N)</td></tr>
-        <tr><td><b>S3 Delivery</b></td><td><code>Delivery</code> + <code>Asset[]</code></td><td>6 images, fixed template — generated after G2, reviewed in post context</td><td>N creatives, free ratios</td></tr>
-        <tr><td><b>S4 Post</b></td><td><code>publishPost[]</code></td><td>FB image + IG carousel</td><td><b>identical</b></td></tr>
-      </tbody>
-    </table>
-    <div class="foot-note"><code>brand_profile</code> (voice, colours, type) · <code>topic_policy</code> (discovery rules, <b>scoring_profile</b>, <b>brand_thesis</b>) · <code>delivery_spec</code> (what S2 produces, S3's asset count and ratios, the S4 assembly recipe).<br><b>S4 is identical on both sides</b> — it deserves the most care and the least brand-specific logic. Splitting the signature into three objects <b>costs nothing today</b>; doing it after a second brand arrives means forking a skill.</div>
+<div class="te" id="teScreen">
+  <div class="te__top">
+    <button class="dd__back" id="teBack">‹ Back</button>
+    <div class="te__m">
+      <div class="te__t">Momenta 擬港籌 10 億美元 · 自動駕駛 AI 新股</div>
+      <div class="te__meta">
+        <span class="chk3 chk3--ok">✓ Checked</span>
+        <span class="stt stt--draft"><i></i>Draft</span>
+        <span>pool · Kelvin · 2026-08-11</span>
+      </div>
+    </div>
+    <button class="lnkbtn" data-copy="share">Copy link</button>
   </div>
-</details>
+
+  <div class="te__cols">
+    <div>
+      <div class="te__f">
+        <div class="te__l">TITLE</div>
+        <div class="tinput">
+          <input value="Momenta 擬港籌 10 億美元！中國自動駕駛 AI 新股光環背後 三年蝕逾 92 億問盈利何時到？">
+          <span class="sfx"><span class="lk">🔒</span>【 @businessfocus.io 】【#BF社會熱話】</span>
+        </div>
+      </div>
+
+      <div class="te__f">
+        <div class="te__l">BODY</div>
+        <div class="rte">
+          <div class="rte__tb">
+            <button style="font-weight:700">B</button><button style="font-style:italic">I</button><button>H2</button>
+            <span class="div"></span><button>🔗 Link</button><button>“ Quote</button><button>• List</button>
+            <button class="aiw">✨ AI Write</button>
+          </div>
+          <div class="rte__bd" style="max-height:none">
+            <p>中國自動駕駛獨角獸 Momenta 已向港交所遞表，市場預期集資額約 <strong>10 億美元</strong>，成為今年港股最受關注的 AI 新股之一。遞表文件見 <span class="shortlink">bit.ly/mmt-f1 <span class="arw">→</span> <span class="dest">hkexnews.hk</span></span>。</p>
+            <p><strong>事件拆解</strong>｜招股書顯示，公司過去三年累計虧損 <strong>92.3 億元人民幣</strong>，研發支出佔收入比重達 61%。這個比例在同業中屬偏高一端，也是市場對其盈利時點分歧的來源。</p>
+            <p>值得注意的是，這次遞表距離上一輪融資僅九個月，而估值區間尚未公開。<a class="lnk" href="#">信報早前報道</a>指基石投資者名單仍在洽談中。</p>
+            <p><strong>痛點分析</strong>｜自動駕駛的商業化路徑一直是估值爭議核心。Robotaxi 若能提前放量，虧損收窄速度可能快於市場預期；反之則要面對持續的研發投入壓力。</p>
+            <p><strong>解法重點</strong>｜對港股投資者而言，這條新聞的意義不只是一家公司上市 —— 它會影響同類 AI 標的的定價參照。</p>
+          </div>
+          <div class="tagrow">
+            <span class="tagpill">#BusinessFocus</span><span class="tagpill">#BF</span><span class="tagpill">#Insight</span>
+            <span class="tagpill">#Momenta</span><span class="tagpill">#香港IPO</span><span class="tagpill">#自動駕駛</span>
+            <span class="tagpill">#Robotaxi</span><span class="tagpill">#AI新股</span>
+            <span class="tagpill men">@businessfocus.io</span>
+            <span class="tagcount"><span>2,104 / 2,200</span><span class="ok">8 / 30</span><span class="ok">1 / 20</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="te__f" style="margin-bottom:0">
+        <div class="te__l">SOURCES · 4</div>
+        <div class="te__src"><span class="t3">primary</span><a href="#">HKEXnews — listing application</a><span style="margin-left:auto;color:var(--dm-slate-400)">08-24 09:12</span></div>
+        <div class="te__src"><span class="t12">tier1</span><a href="#">SCMP — Momenta files for Hong Kong listing</a><span style="margin-left:auto;color:var(--dm-slate-400)">07:40</span></div>
+        <div class="te__src"><span class="t12">tier1</span><a href="#">信報 hkej.com — 自動駕駛新股招股在即</a><span style="margin-left:auto;color:var(--dm-slate-400)">08:05</span></div>
+        <div class="te__src"><span class="t12">tier2</span><a href="#">華爾街見聞 — three-year loss detail</a><span style="margin-left:auto;color:var(--dm-slate-400)">08:33</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="te__sc">
+        <div class="te__tot"><b>87</b><span>SCORE</span></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Brand Fit</span><span class="dim__v">23 / 25</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:92%;background:#10B981"></div></div></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Lead Time</span><span class="dim__v">20 / 22</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:91%;background:#10B981"></div></div></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Data Verifiability</span><span class="dim__v">17 / 18</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:94%;background:#10B981"></div></div></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Topic History</span><span class="dim__v">12 / 15</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:80%;background:#3B82F6"></div></div></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Geo Relevance</span><span class="dim__v">13 / 15</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:87%;background:#3B82F6"></div></div></div>
+      <div class="dim"><div class="dim__r"><span class="dim__n">Narrative</span><span class="dim__v">2 / 5</span></div>
+        <div class="dim__rail"><div class="dim__f" style="width:40%;background:#F59E0B"></div></div></div>
+        <div class="te__act">
+          <button class="btn btn--primary">Confirm &amp; Send to Publish Library</button>
+          <button class="btn btn--secondary">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="fab" id="tfab"><span class="sp"></span>✨ Ask AI about this topic</button>
+</div>
 
 </div>
 
@@ -1127,95 +1491,30 @@ body.dd-page .ml-content{padding-top:18px}
 
 </div></main>
 
-<div class="mask" id="tmask" hidden>
-<div class="modal">
-  <div class="modal__hd">
-    <div class="modal__ti">Momenta 擬港籌 10 億美元！中國自動駕駛 AI 新股光環背後 三年蝕逾 92 億問盈利何時到？
-      <div style="margin-top:6px"><span class="vfy vfy--ok">✓ Checked · 4 sources</span> <span class="prog prog--wait"><i></i>Awaiting G2</span> <span class="dm-meta-label">origin pool · adopted by Kelvin · score 87</span></div>
+<div class="mask" id="cmask" hidden>
+<div class="ctmodal">
+  <div class="epm__hd"><div class="epm__ti">Create Topic</div><button class="modal__x" id="cmaskX">✕</button></div>
+  <div style="padding:18px 20px;max-height:calc(100vh - 240px);overflow-y:auto">
+    <div class="ctmode">
+      <div class="ctm on" data-cm="b"><div class="ctm__t">Give me a topic</div><div class="ctm__d">You supply a title or a one-line angle. The skill expands it and <b>still runs the evidence check</b>.</div></div>
+      <div class="ctm" data-cm="c"><div class="ctm__t">Paste a finished article</div><div class="ctm__d">Skips research and writing. The body is <b>split into sections</b> for you to confirm.</div></div>
     </div>
-    <button class="modal__x" id="tmaskX">✕</button>
+    <div id="cmB">
+      <input class="ctin" placeholder="Topic title or a one-line angle…">
+      <input class="ctin" placeholder="Reference URL (optional)">
+      <div class="ctwarn"><b>The evidence check still runs.</b> A topic you supplied has its figures verified the same way — being human-chosen does not exempt it from checking.</div>
+    </div>
+    <div id="cmC" hidden>
+      <input class="ctin" placeholder="Title (the fixed suffix is appended automatically)">
+      <textarea class="ctta" placeholder="Paste the full article…"></textarea>
+      <div class="ctwarn"><b>Two things happen on save.</b> The body is split into the required sections and you confirm the split — <b>nothing is stored without it</b>, because assembly depends on that mapping. And the topic is marked <b>not verified by the platform</b>: the facts are yours, not ours.</div>
+    </div>
   </div>
-
-  <div class="modal__bd">
-
-    <div class="dfield">
-      <div class="dfield__l">TITLE <span class="req">fixed suffix locked</span></div>
-      <div class="tinput">
-        <input value="Momenta 擬港籌 10 億美元！中國自動駕駛 AI 新股光環背後 三年蝕逾 92 億問盈利何時到？">
-        <span class="sfx"><span class="lk">🔒</span>【 @businessfocus.io 】【#BF社會熱話】</span>
-      </div>
-    </div>
-
-    <div class="dfield">
-      <div class="dfield__l">BODY <span class="req">rich text</span></div>
-      <div class="rte">
-        <div class="rte__tb">
-          <button style="font-weight:700">B</button><button style="font-style:italic">I</button><button>H2</button>
-          <span class="div"></span>
-          <button>🔗 Link</button><button>“ Quote</button><button>• List</button>
-          <button class="aiw">✨ AI Write</button>
-        </div>
-        <div class="rte__bd">
-          <p>中國自動駕駛獨角獸 Momenta 已向港交所遞表，市場預期集資額約 <strong>10 億美元</strong>，成為今年港股最受關注的 AI 新股之一。遞表文件見 <span class="shortlink">bit.ly/mmt-f1 <span class="arw">→</span> <span class="dest">hkexnews.hk</span></span>。</p>
-          <p><strong>事件拆解</strong>｜招股書顯示，公司過去三年累計虧損 <strong>92.3 億元人民幣</strong>，研發支出佔收入比重達 61%。這個比例在同業中屬偏高一端，也是市場對其盈利時點分歧的來源。</p>
-          <p>值得注意的是，這次遞表距離上一輪融資僅九個月，而估值區間尚未公開。<a class="lnk" href="#">信報早前報道</a>指基石投資者名單仍在洽談中。</p>
-          <p><strong>痛點分析</strong>｜自動駕駛的商業化路徑一直是估值爭議核心。Robotaxi 若能提前放量，虧損收窄速度可能快於市場預期；反之則要面對持續的研發投入壓力。</p>
-          <p>對港股投資者而言，這條新聞的意義不只是一家公司上市 —— 它會影響同類 AI 標的的定價參照。</p>
-        </div>
-        <div class="tagrow">
-          <span class="tagpill">#BusinessFocus</span><span class="tagpill">#BF</span><span class="tagpill">#Insight</span>
-          <span class="tagpill">#Momenta</span><span class="tagpill">#香港IPO</span><span class="tagpill">#自動駕駛</span>
-          <span class="tagpill">#Robotaxi</span><span class="tagpill">#AI新股</span>
-          <span class="tagpill men">@businessfocus.io</span>
-          <span class="tagcount"><span>Chars <b>2,104</b> / 2,200</span><span class="ok">Hashtags <b>8</b> / 30</span><span class="ok">Mentions <b>1</b> / 20</span></span>
-        </div>
-      </div>
-      <div class="foot-note">Section markers (<code>s1…s8</code>) are <b>not shown and never leave this system</b> — an assembly contract, not content, and other brands have no such structure. They live as <b>block metadata</b>, so rich-text editing must preserve the block↔section mapping; if it can't, the editor is told the mapping needs re-confirming rather than silently producing a wrong split.<br>Character / hashtag / mention ceilings come from the platform (<code>igCaptionRules.js</code>: ≤2,200 / ≤30 / ≤20) and are <b>hard</b>. Brand style rules — "add 5 SEO hashtags" — live in the skill and are advisory; the two must not be merged.</div>
-    </div>
-
-    <div class="dfield">
-      <div class="dfield__l">CITED SOURCES <span class="req">4 · opened and checked at adopt time</span></div>
-      <div class="srclink"><span class="t3">primary</span><a href="#">HKEXnews — listing application</a><span style="margin-left:auto;color:var(--dm-slate-400)">08-24 09:12</span></div>
-      <div class="srclink"><span class="t12">tier1</span><a href="#">SCMP — Momenta files for Hong Kong listing</a><span style="margin-left:auto;color:var(--dm-slate-400)">08-24 07:40</span></div>
-      <div class="srclink"><span class="t12">tier1</span><a href="#">信報 hkej.com — 自動駕駛新股招股在即</a><span style="margin-left:auto;color:var(--dm-slate-400)">08-24 08:05</span></div>
-      <div class="srclink"><span class="t12">tier2</span><a href="#">華爾街見聞 — three-year loss detail</a><span style="margin-left:auto;color:var(--dm-slate-400)">08-24 08:33</span></div>
-      <div class="foot-note">Sources are echoed verbatim from the search tool, never composed by the model. All four pages were opened at adopt time and the figures used in the body were confirmed to appear on them — <b>a URL the model produced is not evidence it read the page</b>.</div>
-    </div>
-
-    <div class="dfield" style="margin-bottom:0">
-      <div class="dfield__l">SCORE BREAKDOWN <span class="req">weights from topic_policy.scoring_profile</span></div>
-      <div class="scorebd">
-        <div class="sd"><span class="sd__n">Brand Fit <em>shifts value distribution</em></span><span class="sd__rail"><span class="sd__fill" style="width:92%;background:#10B981"></span></span><span class="sd__v">23/25</span></div>
-        <div class="sd"><span class="sd__n">Lead Time <em>discussion not yet formed</em></span><span class="sd__rail"><span class="sd__fill" style="width:91%;background:#10B981"></span></span><span class="sd__v">20/22</span></div>
-        <div class="sd"><span class="sd__n">Data Verifiability <em>filing figures</em></span><span class="sd__rail"><span class="sd__fill" style="width:94%;background:#10B981"></span></span><span class="sd__v">17/18</span></div>
-        <div class="sd"><span class="sd__n">Topic History <em>"IPO / 自動駕駛" family</em></span><span class="sd__rail"><span class="sd__fill" style="width:80%;background:#3B82F6"></span></span><span class="sd__v">12/15</span></div>
-        <div class="sd"><span class="sd__n">Geo Relevance <em>HK listing</em></span><span class="sd__rail"><span class="sd__fill" style="width:87%;background:#3B82F6"></span></span><span class="sd__v">13/15</span></div>
-        <div class="sd"><span class="sd__n">Narrative <em>cause is thin</em></span><span class="sd__rail"><span class="sd__fill" style="width:40%;background:#F59E0B"></span></span><span class="sd__v">2/5</span></div>
-      </div>
-      <div class="invnote"><b>Lead Time is deliberately inverted for BusinessFocus.</b> A topic already widely discussed scores <b>lower</b> — the brand's position is to lead the discussion, not arrive after it peaks. That is separate from <b>Topic History</b>, which asks whether this <i>kind</i> of story has historically performed on this page (keyword-level engagement on the page's own posts). One is a timing signal, the other forward-looking; they point in opposite directions and must never collapse into a single "buzz" number.<br>Weights and <code>lead_time.direction</code> live in <code>topic_policy.scoring_profile</code> — a publication that <i>does</i> follow trends sets <code>prefer_trending</code>. Configuration, not a code branch.</div>
-    </div>
-
-    <div class="injected">
-      <div class="injected__t">✨ WHAT THE AI BUBBLE INJECTS AS A REFERENCE</div>
-      <span class="injchip"><span class="k">candidate_id</span> cand_8f21</span>
-      <span class="injchip"><span class="k">title</span> Momenta 擬港籌 10 億美元…</span>
-      <span class="injchip"><span class="k">score</span> 87 + breakdown</span>
-      <span class="injchip"><span class="k">sources</span> 4 (url · outlet · tier)</span>
-      <span class="injchip"><span class="k">body</span> summary only</span>
-      <div class="foot-note" style="margin-top:6px">The reference payload is <b>bounded on purpose</b>. The house rule is "drop unbounded content, keep bounded references" — a full body would be silently dropped once it grows past the cap, leaving the agent editing half an article. When the agent actually needs the full text it reads it through a tool (<code>get_draft(candidate_id)</code>).<br>Reuses Buzz's wiring verbatim — <code>AiAssistantDrawer</code> + <code>CreativeStudioFab</code>, injected via the drawer's <code>addReferences()</code> proxy — with three values changed: <code>surface="bf-studio"</code> · <code>session-type="bf"</code> · <code>initial-agent="bf_agent"</code>.<br>⚠ Two prerequisites: references currently have exactly four dimensions (upload / asset / mypage / post), so <b><code>topic</code> needs to be added as a fifth</b> (the file's own rule: a dimension exists when the host surface owns that list plus its selection state — this one does); and <code>bf_agent</code> is <b>not in <code>KNOWN_AGENTS</code></b> yet.</div>
-    </div>
-
+  <div class="epm__ft">
+    <button class="btn btn--primary">Create</button>
+    <button class="btn btn--secondary" id="cmaskCancel">Cancel</button>
+    <span class="who" style="margin-left:auto">Does not consume the daily_count quota · admin / manager / editor only</span>
   </div>
-
-  <div class="modal__ft">
-    <button class="btn btn--primary">Confirm &amp; Send to Publish Library →</button>
-    <button class="btn btn--secondary">Save draft</button>
-    <span class="dirty">Unsaved changes are blocked from being discarded silently</span>
-    <span class="who" style="margin-left:auto"><b>G2</b> — six image generations fire after this, then the two posts assemble themselves.</span>
-  </div>
-
-  <button class="fab" id="tfab"><span class="sp"></span>✨ Ask AI about this topic</button>
-  <span class="fabnote">Same FAB as Buzz · injects this topic as a reference</span>
 </div>
 </div>
 
@@ -1303,22 +1602,27 @@ body.dd-page .ml-content{padding-top:18px}
 </div>
 
 <div class="toast" id="toast"></div>
-<div class="proto-badge">PRODUCT PROTOTYPE v2.5 · BF</div>
+<div class="proto-badge">PRODUCT PROTOTYPE v2.6 · BF</div>
 
 <script>
 function q(s){return document.querySelector(s)}
 function qa(s){return [].slice.call(document.querySelectorAll(s))}
 
-function leaveDeliveryPage(){
+function exitPages(){
   q('#ddScreen').classList.remove('on');
+  q('#teScreen').classList.remove('on');
   q('#libList').style.display='';
+  qa('#tab-work > *').forEach(function(el){ if(el.id!=='teScreen') el.style.display=''; });
   document.body.classList.remove('dd-page');
 }
-function enterDeliveryPage(){
-  q('#libList').style.display='none';
-  q('#ddScreen').classList.add('on');
-  document.body.classList.add('dd-page');
-  window.scrollTo(0,0);
+function enterDelivery(){
+  q('#libList').style.display='none'; q('#ddScreen').classList.add('on');
+  document.body.classList.add('dd-page'); window.scrollTo(0,0);
+}
+function enterTopicEdit(){
+  qa('#tab-work > *').forEach(function(el){ if(el.id!=='teScreen') el.style.display='none'; });
+  q('#teScreen').classList.add('on');
+  document.body.classList.add('dd-page'); window.scrollTo(0,0);
 }
 
 qa('.dm-page-menu .menu-item').forEach(function(btn){
@@ -1327,7 +1631,7 @@ qa('.dm-page-menu .menu-item').forEach(function(btn){
     btn.classList.add('is-active');
     qa('.tab-panel').forEach(function(p){p.classList.remove('active')});
     var el=document.getElementById('tab-'+btn.dataset.tab); if(el)el.classList.add('active');
-    leaveDeliveryPage(); window.scrollTo(0,0);
+    exitPages(); window.scrollTo(0,0);
   });
 });
 
@@ -1347,19 +1651,20 @@ function wireFilter(cardSel, barId, nameId, countId, clearId, names, counts){
       qa(cardSel).forEach(function(x){x.classList.remove('on')});
       c.classList.add('on');
       var f=c.dataset.f2||c.dataset.f3||c.dataset.filter;
-      if(f==='all'){ bar.hidden=true; return; }
+      if(f==='all'||f==='today'){ bar.hidden=true; return; }
       bar.hidden=false;
       document.getElementById(nameId).textContent=names[f]||f;
       document.getElementById(countId).textContent=counts[f]||'';
     });
   });
   document.getElementById(clearId).addEventListener('click',function(){
-    bar.hidden=true; qa(cardSel).forEach(function(x){x.classList.remove('on')}); qa(cardSel)[0].classList.add('on');
+    bar.hidden=true; qa(cardSel).forEach(function(x){x.classList.remove('on')});
+    var d=q(cardSel+'[data-filter="today"]')||qa(cardSel)[0]; d.classList.add('on');
   });
 }
 wireFilter('#tab-work .dm-kpi-card.is-filter','fbar','fbarName','fbarN','fbarX',
-  {checked:'Sources checked',failed:'Check failed',progress:'In progress',awaiting:'Awaiting G2',reshuffle:'Replaced batches'},
-  {checked:'6 shown',failed:'2 shown',progress:'3 shown',awaiting:'1 shown',reshuffle:'1 batch on record'});
+  {checked:'Sources checked',failed:'Sources check failed',confirmed:'Confirmed topic',draft:'Draft topic'},
+  {checked:'6 shown',failed:'4 shown',confirmed:'3 shown',draft:'17 shown'});
 wireFilter('.dm-kpi-card.is-filter2','fbar2','fbar2Name','fbar2N','fbar2X',
   {draft:'Draft','partial':'Partial published','all-pub':'Published all',fail:'Published fail',arch:'Archive'},
   {draft:'3 topics','partial':'2 topics','all-pub':'7 topics',fail:'1 topic',arch:'1 topic'});
@@ -1369,22 +1674,35 @@ wireFilter('.dm-kpi-card.is-filter3','fbar3','fbar3Name','fbar3N','fbar3X',
 
 function openMask(m){ m.hidden=false; document.body.style.overflow='hidden'; }
 function closeMask(m){ m.hidden=true; document.body.style.overflow=''; }
-var tmask=q('#tmask'), pmask=q('#pmask');
-qa('tr.trow').forEach(function(r){ r.addEventListener('click',function(){ openMask(tmask); }); });
-q('#tmaskX').addEventListener('click',function(){closeMask(tmask)});
+var pmask=q('#pmask'), cmask=q('#cmask');
+
+qa('tr.trow').forEach(function(r){ r.addEventListener('click',function(){ enterTopicEdit(); }); });
+q('#teBack').addEventListener('click',function(){ exitPages(); window.scrollTo(0,0); });
+
+q('#btnCreate').addEventListener('click',function(){ openMask(cmask); });
+q('#cmaskX').addEventListener('click',function(){closeMask(cmask)});
+q('#cmaskCancel').addEventListener('click',function(){closeMask(cmask)});
+qa('.ctm').forEach(function(m){
+  m.addEventListener('click',function(){
+    qa('.ctm').forEach(function(x){x.classList.remove('on')}); m.classList.add('on');
+    q('#cmB').hidden = m.dataset.cm!=='b';
+    q('#cmC').hidden = m.dataset.cm!=='c';
+  });
+});
+
 q('#pmaskX').addEventListener('click',function(){closeMask(pmask)});
 q('#pmaskCancel').addEventListener('click',function(){closeMask(pmask)});
-[tmask,pmask].forEach(function(m){ m.addEventListener('click',function(e){ if(e.target===m) closeMask(m); }); });
+[pmask,cmask].forEach(function(m){ m.addEventListener('click',function(e){ if(e.target===m) closeMask(m); }); });
 document.addEventListener('keydown',function(e){ if(e.key!=='Escape')return;
-  if(!pmask.hidden) closeMask(pmask); else if(!tmask.hidden) closeMask(tmask); });
+  if(!pmask.hidden) closeMask(pmask); else if(!cmask.hidden) closeMask(cmask); });
 
 qa('.plrow[data-topic]').forEach(function(r){
-  r.addEventListener('click',function(e){ if(e.target.closest('[data-copy]')) return; enterDeliveryPage(); });
+  r.addEventListener('click',function(e){ if(e.target.closest('[data-copy]')) return; enterDelivery(); });
 });
 qa('.plrow[data-post]').forEach(function(r){
   r.addEventListener('click',function(e){ if(e.target.closest('[data-copy]')) return; openMask(pmask); });
 });
-q('#ddBack').addEventListener('click',function(){ leaveDeliveryPage(); window.scrollTo(0,0); });
+q('#ddBack').addEventListener('click',function(){ exitPages(); window.scrollTo(0,0); });
 qa('.ddp__f .btn').forEach(function(b){ b.addEventListener('click',function(){ openMask(pmask); }); });
 
 var toast=q('#toast'), tt=null;
@@ -1394,19 +1712,22 @@ qa('[data-copy]').forEach(function(b){
   b.addEventListener('click',function(e){
     e.stopPropagation();
     if(b.dataset.copy==='deep'){
-      say('Deep link copied<em>Permanent link — opens for view <b>and edit</b>. Requires sign-in and a Page role (admin / manager / editor). A stranger with this URL cannot open it.</em>');
+      say('Deep link copied<em>Opens for view <b>and edit</b>. Requires sign-in and a Page role — a stranger with this URL cannot open it.</em>');
     } else {
-      say('Read-only share link copied<em>Tokenised and <b>expiring</b> — for showing a leader or an outsider. View only: it cannot edit and cannot publish. Reuses the existing Share Campaign link pattern.</em>');
+      say('Read-only share link copied<em>Tokenised and <b>expiring</b>. View only: cannot edit, cannot publish.</em>');
     }
   });
 });
 
-function flash(sel){ var n=q(sel); if(!n)return;
+q('#tfab').addEventListener('click',function(){
+  say('Topic injected into the AI Studio<em>Sent as a bounded reference: title, score breakdown and the source list. The agent reads the full body through a tool when it needs it.</em>');
+});
+q('#pfab').addEventListener('click',function(){
+  var n=q('#pmask .injected'); if(!n) return;
   n.scrollIntoView({behavior:'smooth',block:'center'});
   n.style.boxShadow='0 0 0 3px rgba(124,92,255,.35)';
-  setTimeout(function(){ n.style.boxShadow=''; },1400); }
-q('#tfab').addEventListener('click',function(){ flash('#tmask .injected'); });
-q('#pfab').addEventListener('click',function(){ flash('#pmask .injected'); });
+  setTimeout(function(){ n.style.boxShadow=''; },1400);
+});
 
 (function(){
   var dots=qa('#pmask .fpp__dots i'), cnt=q('#pmask .fpp__counter'), stage=q('#pmask .fpp');
@@ -1586,10 +1907,11 @@ function hbar(id,cfg){
 
 var BLUE='#3B82F6',GREEN='#10B981',GREY='#CBD5E1',RED='#EF4444',AMBER='#F59E0B';
 donut('srcVerify',{data:[
-  {l:'Passed — figures confirmed',v:6,c:GREEN,tt:'Cited pages opened; figures appear on them'},
-  {l:'Failed — page unreachable',v:1,c:RED,tt:'Cited URLs returned 404'},
-  {l:'Failed — not independent',v:1,c:AMBER,tt:'All links reprint one wire story'},
-  {l:'Not checked yet',v:12,c:GREY,tt:'Deferred — editor has not opened these'}]});
+  {l:'Checked',v:6,c:GREEN,tt:'Cited pages opened; figures appear on them'},
+  {l:'Check failed — unreachable',v:1,c:RED,tt:'Cited URLs returned 404'},
+  {l:'Check failed — not independent',v:1,c:AMBER,tt:'All links reprint one wire story'},
+  {l:'Not verified · manual',v:2,c:'#F59E0B',tt:'Human-entered — facts owned by the author'},
+  {l:'Not checked yet',v:10,c:GREY,tt:'Deferred — not opened yet'}]});
 chart('poolCat',{labels:['Business & Finance','News & Current Affairs','Tech & Innovation','Society & Culture','Lifestyle & P.D.'],yMax:80,yTitle:'%',tiltX:true,yFmt:function(v){return v+'%'},
   legend:[{label:"Today's pool %",color:BLUE,round:true},{label:'Page corpus % (FB 90D)',color:GREY,round:true}],
   layers:[{type:'bar',data:[45,20,15,10,10],color:BLUE,tt:['9 items','4 items','3 items','2 items','2 items']},
