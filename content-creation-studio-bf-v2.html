@@ -746,6 +746,17 @@ body.dd-page .ml-content{padding-top:18px}
 .dim__rail{height:5px;border-radius:3px;background:var(--dm-slate-200);overflow:hidden}
 .dim__f{height:100%;border-radius:3px}
 .te__act{display:flex;flex-direction:column;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--dm-slate-100)}
+
+/* ── v2.7: topic edit refinements ── */
+.te__actions{flex:0 0 auto;display:flex;align-items:center;gap:8px}
+.rte__bd--tall{max-height:none;min-height:430px}
+.te__src{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--dm-slate-100);font:400 11.5px var(--font-body);color:var(--dm-slate-600)}
+.te__src:last-child{border-bottom:none}
+.te__src a{flex:1;min-width:0;color:var(--dm-primary);text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.te__ts{flex:0 0 auto;color:var(--dm-slate-400);font:400 10px var(--font-metric)}
+.val{flex:0 0 auto;border-radius:5px;padding:1px 7px;font:700 9.5px var(--font-body);white-space:nowrap}
+.val--ok{background:#ECFDF5;color:#047857}
+.val--bad{background:#FEF2F2;color:#B91C1C}
 </style>
 <aside class="ml-sidebar">
   <div class="ml-sidebar__section">Intelligence</div>
@@ -885,7 +896,6 @@ body.dd-page .ml-content{padding-top:18px}
   <div class="lockrow">delivery_spec <b>bf/default</b> — 6 × 4:5 + 1 × 1.91:1 · required_sections 8<span class="lk">🔒</span></div>
 </section>
 
-
 <div class="te" id="teScreen">
   <div class="te__top">
     <button class="dd__back" id="teBack">‹ Back</button>
@@ -897,7 +907,11 @@ body.dd-page .ml-content{padding-top:18px}
         <span>pool · Kelvin · 2026-08-11</span>
       </div>
     </div>
-    <button class="lnkbtn" data-copy="share">Copy link</button>
+    <div class="te__actions">
+      <button class="lnkbtn" data-copy="share">Copy link</button>
+      <button class="btn btn--secondary btn--sm">Save</button>
+      <button class="btn btn--primary btn--sm">Confirm &amp; Send to Publish Library</button>
+    </div>
   </div>
 
   <div class="te__cols">
@@ -906,7 +920,6 @@ body.dd-page .ml-content{padding-top:18px}
         <div class="te__l">TITLE</div>
         <div class="tinput">
           <input value="Momenta 擬港籌 10 億美元！中國自動駕駛 AI 新股光環背後 三年蝕逾 92 億問盈利何時到？">
-          <span class="sfx"><span class="lk">🔒</span>【 @businessfocus.io 】【#BF社會熱話】</span>
         </div>
       </div>
 
@@ -918,12 +931,14 @@ body.dd-page .ml-content{padding-top:18px}
             <span class="div"></span><button>🔗 Link</button><button>“ Quote</button><button>• List</button>
             <button class="aiw">✨ AI Write</button>
           </div>
-          <div class="rte__bd" style="max-height:none">
+          <div class="rte__bd rte__bd--tall">
             <p>中國自動駕駛獨角獸 Momenta 已向港交所遞表，市場預期集資額約 <strong>10 億美元</strong>，成為今年港股最受關注的 AI 新股之一。遞表文件見 <span class="shortlink">bit.ly/mmt-f1 <span class="arw">→</span> <span class="dest">hkexnews.hk</span></span>。</p>
             <p><strong>事件拆解</strong>｜招股書顯示，公司過去三年累計虧損 <strong>92.3 億元人民幣</strong>，研發支出佔收入比重達 61%。這個比例在同業中屬偏高一端，也是市場對其盈利時點分歧的來源。</p>
             <p>值得注意的是，這次遞表距離上一輪融資僅九個月，而估值區間尚未公開。<a class="lnk" href="#">信報早前報道</a>指基石投資者名單仍在洽談中。</p>
             <p><strong>痛點分析</strong>｜自動駕駛的商業化路徑一直是估值爭議核心。Robotaxi 若能提前放量，虧損收窄速度可能快於市場預期；反之則要面對持續的研發投入壓力。</p>
-            <p><strong>解法重點</strong>｜對港股投資者而言，這條新聞的意義不只是一家公司上市 —— 它會影響同類 AI 標的的定價參照。</p>
+            <p>對比同期遞表的幾家 AI 標的，Momenta 的收入結構更依賴車企訂單，這讓它的增長曲線與整車銷量高度綁定 —— 好處是可預測，代價是天花板也被綁住。</p>
+            <p><strong>解法重點</strong>｜對港股投資者而言，這條新聞的意義不只是一家公司上市 —— 它會影響同類 AI 標的的定價參照。若 Momenta 的招股反應良好，後面排隊的自動駕駛公司估值錨點會被整體抬高。</p>
+            <p>市場現在真正在等兩個數字：基石投資者名單，以及最終定價區間落在估值的哪一端。</p>
           </div>
           <div class="tagrow">
             <span class="tagpill">#BusinessFocus</span><span class="tagpill">#BF</span><span class="tagpill">#Insight</span>
@@ -934,35 +949,31 @@ body.dd-page .ml-content{padding-top:18px}
           </div>
         </div>
       </div>
-
-      <div class="te__f" style="margin-bottom:0">
-        <div class="te__l">SOURCES · 4</div>
-        <div class="te__src"><span class="t3">primary</span><a href="#">HKEXnews — listing application</a><span style="margin-left:auto;color:var(--dm-slate-400)">08-24 09:12</span></div>
-        <div class="te__src"><span class="t12">tier1</span><a href="#">SCMP — Momenta files for Hong Kong listing</a><span style="margin-left:auto;color:var(--dm-slate-400)">07:40</span></div>
-        <div class="te__src"><span class="t12">tier1</span><a href="#">信報 hkej.com — 自動駕駛新股招股在即</a><span style="margin-left:auto;color:var(--dm-slate-400)">08:05</span></div>
-        <div class="te__src"><span class="t12">tier2</span><a href="#">華爾街見聞 — three-year loss detail</a><span style="margin-left:auto;color:var(--dm-slate-400)">08:33</span></div>
-      </div>
     </div>
 
     <div>
       <div class="te__sc">
         <div class="te__tot"><b>87</b><span>SCORE</span></div>
-      <div class="dim"><div class="dim__r"><span class="dim__n">Brand Fit</span><span class="dim__v">23 / 25</span></div>
-        <div class="dim__rail"><div class="dim__f" style="width:92%;background:#10B981"></div></div></div>
-      <div class="dim"><div class="dim__r"><span class="dim__n">Lead Time</span><span class="dim__v">20 / 22</span></div>
-        <div class="dim__rail"><div class="dim__f" style="width:91%;background:#10B981"></div></div></div>
-      <div class="dim"><div class="dim__r"><span class="dim__n">Data Verifiability</span><span class="dim__v">17 / 18</span></div>
-        <div class="dim__rail"><div class="dim__f" style="width:94%;background:#10B981"></div></div></div>
-      <div class="dim"><div class="dim__r"><span class="dim__n">Topic History</span><span class="dim__v">12 / 15</span></div>
-        <div class="dim__rail"><div class="dim__f" style="width:80%;background:#3B82F6"></div></div></div>
-      <div class="dim"><div class="dim__r"><span class="dim__n">Geo Relevance</span><span class="dim__v">13 / 15</span></div>
-        <div class="dim__rail"><div class="dim__f" style="width:87%;background:#3B82F6"></div></div></div>
-      <div class="dim"><div class="dim__r"><span class="dim__n">Narrative</span><span class="dim__v">2 / 5</span></div>
-        <div class="dim__rail"><div class="dim__f" style="width:40%;background:#F59E0B"></div></div></div>
-        <div class="te__act">
-          <button class="btn btn--primary">Confirm &amp; Send to Publish Library</button>
-          <button class="btn btn--secondary">Save</button>
-        </div>
+        <div class="dim"><div class="dim__r"><span class="dim__n">Brand Fit</span><span class="dim__v">23 / 25</span></div>
+          <div class="dim__rail"><div class="dim__f" style="width:92%;background:#10B981"></div></div></div>
+        <div class="dim"><div class="dim__r"><span class="dim__n">Lead Time</span><span class="dim__v">20 / 22</span></div>
+          <div class="dim__rail"><div class="dim__f" style="width:91%;background:#10B981"></div></div></div>
+        <div class="dim"><div class="dim__r"><span class="dim__n">Data Verifiability</span><span class="dim__v">17 / 18</span></div>
+          <div class="dim__rail"><div class="dim__f" style="width:94%;background:#10B981"></div></div></div>
+        <div class="dim"><div class="dim__r"><span class="dim__n">Topic History</span><span class="dim__v">12 / 15</span></div>
+          <div class="dim__rail"><div class="dim__f" style="width:80%;background:#3B82F6"></div></div></div>
+        <div class="dim"><div class="dim__r"><span class="dim__n">Geo Relevance</span><span class="dim__v">13 / 15</span></div>
+          <div class="dim__rail"><div class="dim__f" style="width:87%;background:#3B82F6"></div></div></div>
+        <div class="dim"><div class="dim__r"><span class="dim__n">Narrative</span><span class="dim__v">2 / 5</span></div>
+          <div class="dim__rail"><div class="dim__f" style="width:40%;background:#F59E0B"></div></div></div>
+      </div>
+
+      <div class="te__sc" style="margin-top:14px">
+        <div class="te__l" style="margin-bottom:10px">DATA SOURCES VALIDATION</div>
+        <div class="te__src"><span class="t3">primary</span><a href="#">HKEXnews — listing application</a><span class="val val--ok">✓ passed</span><span class="te__ts">08-24 09:12</span></div>
+        <div class="te__src"><span class="t12">tier1</span><a href="#">SCMP — Momenta files for HK listing</a><span class="val val--ok">✓ passed</span><span class="te__ts">07:40</span></div>
+        <div class="te__src"><span class="t12">tier1</span><a href="#">信報 hkej.com — 自動駕駛新股招股在即</a><span class="val val--ok">✓ passed</span><span class="te__ts">08:05</span></div>
+        <div class="te__src"><span class="t12">tier2</span><a href="#">華爾街見聞 — three-year loss detail</a><span class="val val--bad">✕ failed</span><span class="te__ts">08:33</span></div>
       </div>
     </div>
   </div>
@@ -1348,7 +1359,7 @@ body.dd-page .ml-content{padding-top:18px}
 </div>
 </div>
 <div class="toast" id="toast"></div>
-<div class="proto-badge">PRODUCT PROTOTYPE v2.6.3 · BF</div>
+<div class="proto-badge">PRODUCT PROTOTYPE v2.7 · BF</div>
 
 <script>
 function q(s){return document.querySelector(s)}
