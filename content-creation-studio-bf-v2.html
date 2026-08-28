@@ -777,6 +777,31 @@ body.dd-page .ml-content{padding-top:18px}
 .cfgw__t b{font-family:var(--font-metric);color:var(--dm-slate-800)}
 .swatch{width:22px;height:22px;border-radius:5px;border:1px solid var(--dm-slate-300)}
 .te__sc .dvlink{margin-left:auto;font:700 11px var(--font-metric);color:var(--dm-primary)}
+
+/* ── v2.9: thumbnails + autopilot ── */
+.thumb{flex:0 0 auto;width:38px;height:38px;border-radius:7px;background:linear-gradient(135deg,#EAF3FB,#DCE8F5);border:1px solid var(--dm-slate-200);display:flex;align-items:center;justify-content:center;font:700 11px var(--font-metric);color:var(--dm-accent);overflow:hidden}
+.thumb--ph{background:var(--dm-slate-100);color:var(--dm-slate-400);font-size:14px}
+.thumb--gen{background:linear-gradient(135deg,#EFF6FF,#DBEAFE);color:#1D4ED8;font-size:9px;font-weight:600}
+.apmix{display:flex;align-items:center;gap:11px}
+.apthree{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+.ap1{border:1px solid var(--dm-border-light);border-radius:11px;padding:13px 15px;background:#fff}
+.ap1__t{font:600 13px var(--font-heading);color:var(--dm-slate-800);margin-bottom:6px}
+.ap1__s{display:inline-block;border-radius:20px;padding:2px 9px;font:600 10px var(--font-body);margin-bottom:8px}
+.ap1__s--ok{background:#ECFDF5;color:#047857}
+.ap1__s--wait{background:var(--dm-slate-100);color:var(--dm-slate-600)}
+.ap1__s--gate{background:#FFF7ED;color:#B45309}
+.ap1__d{font:400 11.5px/1.6 var(--font-body);color:var(--dm-slate-600)}
+.ap1__n{font:400 10.5px/1.55 var(--font-body);color:var(--dm-slate-500);margin-top:7px;padding-top:7px;border-top:1px dashed var(--dm-slate-200)}
+.apwarn{background:#FFF7ED;border:1px solid #F2D98C;border-radius:9px;padding:11px 14px;font:400 11px/1.7 var(--font-body);color:#7C4A03}
+.apwarn b{color:#5C3702}
+.pe{border-radius:5px;padding:1px 7px;font:600 10px var(--font-body);white-space:nowrap}
+.pe--na{background:var(--dm-slate-100);color:var(--dm-slate-500)}
+.pe--weak{background:#FFF7ED;color:#B45309}
+.pe--ok{background:#ECFDF5;color:#047857}
+.rdy{border-radius:20px;padding:2px 9px;font:600 10.5px var(--font-body)}
+.rdy--ok{background:#ECFDF5;color:#047857}
+.rdy--bad{background:#FEF2F2;color:#B91C1C}
+.nosc{font:600 10px var(--font-body);color:var(--dm-slate-400)}
 </style>
 <aside class="ml-sidebar">
   <div class="ml-sidebar__section">Intelligence</div>
@@ -809,7 +834,8 @@ body.dd-page .ml-content{padding-top:18px}
 <nav class="dm-page-menu"><div class="menu-list">
   <button class="menu-item is-active" data-tab="work">Topics</button>
   <button class="menu-item" data-tab="lib">Publish Library</button>
-  <span style="align-self:center;margin-left:10px;font:600 10px var(--font-body);color:var(--dm-slate-400);white-space:nowrap">Two tabs · topic and delivery each open as their own page</span>
+  <button class="menu-item" data-tab="auto">Autopilot</button>
+  <span style="align-self:center;margin-left:10px;font:600 10px var(--font-body);color:var(--dm-slate-400);white-space:nowrap">Three tabs · topic and delivery each open as their own page</span>
 </div></nav>
 
 <div class="dm-controls-row">
@@ -1157,7 +1183,7 @@ body.dd-page .ml-content{padding-top:18px}
   <div class="filterbar" id="fbar3" hidden><span>Filtered by <b id="fbar3Name">—</b></span><span class="dm-meta-label" id="fbar3N"></span><span class="x" id="fbar3X">Clear ✕</span></div>
 
   <div class="plrow" data-post="1">
-    <div class="plrow__ic">🌐</div>
+    <div class="thumb thumb--ph">🔗</div>
     <div class="plrow__m">
       <div class="plrow__t">Website Article — Momenta 擬香港 IPO<span class="st st--draft">Draft</span><span class="org org--pipe">Pipeline</span></div>
       <div class="plrow__s">From topic “Momenta 擬香港 IPO” · businessfocus.io/article/…</div>
@@ -1168,7 +1194,7 @@ body.dd-page .ml-content{padding-top:18px}
     <span class="plrow__go">Edit ›</span>
   </div>
   <div class="plrow" data-post="1">
-    <div class="plrow__ic">📘</div>
+    <div class="thumb thumb--ph">🔗</div>
     <div class="plrow__m">
       <div class="plrow__t">Facebook · link post — Momenta 擬香港 IPO<span class="st st--draft">Draft</span><span class="org org--pipe">Pipeline</span></div>
       <div class="plrow__s">From topic “Momenta 擬香港 IPO” · short_link · preview by Meta</div>
@@ -1179,7 +1205,7 @@ body.dd-page .ml-content{padding-top:18px}
     <span class="plrow__go">Edit ›</span>
   </div>
   <div class="plrow" data-post="1">
-    <div class="plrow__ic">📸</div>
+    <div class="thumb">02</div>
     <div class="plrow__m">
       <div class="plrow__t">Instagram · carousel — Momenta 擬香港 IPO<span class="st st--draft">Draft</span><span class="org org--pipe">Pipeline</span><span class="ovr">caption hand-edited</span></div>
       <div class="plrow__s">From topic “Momenta 擬香港 IPO” · mediaItems [02–06] · 1 image generating</div>
@@ -1190,7 +1216,7 @@ body.dd-page .ml-content{padding-top:18px}
     <span class="plrow__go">Edit ›</span>
   </div>
   <div class="plrow" data-post="1">
-    <div class="plrow__ic">📘</div>
+    <div class="thumb">02</div>
     <div class="plrow__m">
       <div class="plrow__t">Facebook · image feed — 港股午後急挫<span class="st st--all">Published</span><span class="org org--pipe">Pipeline</span></div>
       <div class="plrow__s">From topic “港股午後急挫” · published yesterday 11:24</div>
@@ -1201,7 +1227,7 @@ body.dd-page .ml-content{padding-top:18px}
     <span class="plrow__go">Edit ›</span>
   </div>
   <div class="plrow" data-post="1">
-    <div class="plrow__ic">📸</div>
+    <div class="thumb">02</div>
     <div class="plrow__m">
       <div class="plrow__t">Instagram · carousel — 人民幣中間價連續第三日走強<span class="st st--fail">Publish fail</span><span class="org org--pipe">Pipeline</span></div>
       <div class="plrow__s">From topic “人民幣中間價…” · Meta rejected: carousel ratios must match</div>
@@ -1212,7 +1238,7 @@ body.dd-page .ml-content{padding-top:18px}
     <span class="plrow__go">Edit ›</span>
   </div>
   <div class="plrow" data-post="1">
-    <div class="plrow__ic">📸</div>
+    <div class="thumb thumb--gen">gen</div>
     <div class="plrow__m">
       <div class="plrow__t">Instagram · carousel — 中秋月餅市場速覽<span class="st st--draft">Draft</span><span class="org org--studio">AI Studio</span></div>
       <div class="plrow__s">Created in AI Creative Studio by Amy · createdVia post_agent · no delivery</div>
@@ -1223,7 +1249,7 @@ body.dd-page .ml-content{padding-top:18px}
     <span class="plrow__go">Edit ›</span>
   </div>
   <div class="plrow" data-post="1">
-    <div class="plrow__ic">📘</div>
+    <div class="thumb">02</div>
     <div class="plrow__m">
       <div class="plrow__t">Facebook · image feed — 港人北上消費三個變化<span class="st st--all">Published</span><span class="org org--studio">AI Studio</span></div>
       <div class="plrow__s">Created in AI Creative Studio by Kelvin · createdVia image_gen_agent</div>
@@ -1327,6 +1353,127 @@ body.dd-page .ml-content{padding-top:18px}
     <button class="btn btn--primary btn--sm">Confirm &amp; Publish</button>
   </div>
 </div>
+
+</div>
+
+<div class="tab-panel" id="tab-auto">
+
+<div class="sec-head">
+  <div class="dm-title-section">Autopilot — pre-flight scoring</div>
+  <span class="dm-subtitle">Every post before it goes out, with its three scores kept <b>separate</b>. The gate is still the Readiness check; these numbers inform the decision, they do not make it.</span>
+</div>
+
+<div class="dm-kpi-row">
+  <div class="dm-kpi-card"><div class="kpi__label">Awaiting review</div><div class="kpi__metric">9</div><div class="kpi__sub">not published</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Readiness pass</div><div class="kpi__metric">8</div><div class="kpi__sub up">hard checks cleared</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Readiness fail</div><div class="kpi__metric">1</div><div class="kpi__sub down">publish disabled</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Topic Score</div><div class="kpi__metric">81</div><div class="kpi__sub">median · pipeline posts only</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Post Score</div><div class="kpi__metric">—</div><div class="kpi__sub">formula pending</div></div>
+  <div class="dm-kpi-card"><div class="kpi__label">Predicted effect</div><div class="kpi__metric">n/a</div><div class="kpi__sub down">not calibrated</div></div>
+</div>
+
+<section class="dm-card">
+  <div class="dm-title-card">Three scores, deliberately not combined</div>
+  <div class="apthree">
+    <div class="ap1">
+      <div class="ap1__t">Topic Score</div>
+      <div class="ap1__s ap1__s--ok">Defined</div>
+      <div class="ap1__d">Is the <b>topic</b> worth doing. Six components computed from the candidate (Brand Fit, Lead Time, Data Verifiability, Topic History, Geo, Narrative).</div>
+      <div class="ap1__n">AI Studio posts have no candidate, so they never get this one.</div>
+    </div>
+    <div class="ap1">
+      <div class="ap1__t">Post Score</div>
+      <div class="ap1__s ap1__s--wait">Formula pending</div>
+      <div class="ap1__d">Is <b>this post</b> any good — its own copy, visuals and length. Independent of whether a candidate exists.</div>
+      <div class="ap1__n">Once defined, <b>both</b> pipeline and AI Studio posts will carry one.</div>
+    </div>
+    <div class="ap1">
+      <div class="ap1__t">Predicted effect</div>
+      <div class="ap1__s ap1__s--gate">Not calibrated</div>
+      <div class="ap1__d">Roughly how much engagement this will get. A <b>statistical prediction</b>, not a rule.</div>
+      <div class="ap1__n">Gated: no number until n ≥ 150 and r ≥ 0.4. See below.</div>
+    </div>
+  </div>
+  <div class="apwarn">
+    <b>Why these are never added into one total.</b> Two of them are computed from rules and one is a regression on a small sample — their reliability differs by orders of magnitude. Averaging them lets the least reliable number quietly drive the decision.<br>
+    <b>And why the gate is the Readiness check, not the scores.</b> A high score does not mean the eight section anchors are present or that the carousel ratios match. Scores inform; hard checks decide.
+  </div>
+</section>
+
+<section class="dm-card">
+  <div class="dm-title-card">Posts awaiting review<span class="dmode dmode-mock">MOCK</span></div>
+  <table class="dm-modern-table dm-modern-table--compact">
+    <thead><tr><th>Post</th><th>Platform</th><th style="text-align:right">Topic Score</th><th style="text-align:right">Post Score</th><th>Predicted effect</th><th>Readiness</th></tr></thead>
+    <tbody>
+  <tr>
+    <td><div class="apmix"><span class="thumb ">02</span><div><div class="dm-cell-main">Instagram · carousel — Momenta 擬香港 IPO</div><div class="dm-cell-sub">Pipeline · from topic “Momenta 擬香港 IPO”</div></div></div></td>
+    <td>IG</td>
+    <td style="text-align:right"><b>87</b></td>
+    <td style="text-align:right">—</td>
+    <td><span class="pe pe--na">Not calibrated</span></td>
+    <td><span class="rdy rdy--ok">Pass</span></td>
+  </tr>
+  <tr>
+    <td><div class="apmix"><span class="thumb ">02</span><div><div class="dm-cell-main">Facebook · image feed — Momenta 擬香港 IPO</div><div class="dm-cell-sub">Pipeline · from topic “Momenta 擬香港 IPO”</div></div></div></td>
+    <td>FB</td>
+    <td style="text-align:right"><b>87</b></td>
+    <td style="text-align:right">—</td>
+    <td><span class="pe pe--na">Not calibrated</span></td>
+    <td><span class="rdy rdy--ok">Pass</span></td>
+  </tr>
+  <tr>
+    <td><div class="apmix"><span class="thumb thumb--ph">🔗</span><div><div class="dm-cell-main">Facebook · link post — Momenta 擬香港 IPO</div><div class="dm-cell-sub">Pipeline · link post, no image of its own</div></div></div></td>
+    <td>FB</td>
+    <td style="text-align:right"><b>87</b></td>
+    <td style="text-align:right">—</td>
+    <td><span class="pe pe--na">Not calibrated</span></td>
+    <td><span class="rdy rdy--ok">Pass</span></td>
+  </tr>
+  <tr>
+    <td><div class="apmix"><span class="thumb ">02</span><div><div class="dm-cell-main">Instagram · carousel — 人民幣中間價連續第三日走強</div><div class="dm-cell-sub">Pipeline · Meta rejected: carousel ratios must match</div></div></div></td>
+    <td>IG</td>
+    <td style="text-align:right"><b>81</b></td>
+    <td style="text-align:right">—</td>
+    <td><span class="pe pe--na">Not calibrated</span></td>
+    <td><span class="rdy rdy--bad">Fail</span></td>
+  </tr>
+  <tr>
+    <td><div class="apmix"><span class="thumb thumb--ph">▦</span><div><div class="dm-cell-main">Instagram · carousel — 中秋月餅市場速覽</div><div class="dm-cell-sub">AI Studio · created by Amy · no candidate</div></div></div></td>
+    <td>IG</td>
+    <td style="text-align:right"><span class="nosc">No topic</span></td>
+    <td style="text-align:right">—</td>
+    <td><span class="pe pe--na">Not calibrated</span></td>
+    <td><span class="rdy rdy--ok">Pass</span></td>
+  </tr>
+  <tr>
+    <td><div class="apmix"><span class="thumb ">02</span><div><div class="dm-cell-main">Facebook · image feed — 港人北上消費三個變化</div><div class="dm-cell-sub">AI Studio · created by Kelvin</div></div></div></td>
+    <td>FB</td>
+    <td style="text-align:right"><span class="nosc">No topic</span></td>
+    <td style="text-align:right">—</td>
+    <td><span class="pe pe--na">Not calibrated</span></td>
+    <td><span class="rdy rdy--ok">Pass</span></td>
+  </tr>
+    </tbody>
+  </table>
+  <div class="foot-note">Readiness <b>Fail</b> disables publishing and names the failing item — here the carousel has one image at 1.02:1 against 4:5, which Meta rejects for the whole carousel, not just that image.</div>
+</section>
+
+<section class="dm-card">
+  <div class="dm-title-card">Predicted effect — why it shows no number yet</div>
+  <table class="dm-modern-table dm-modern-table--compact">
+    <thead><tr><th>State</th><th>Condition</th><th>What the editor sees</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pe pe--na">Not calibrated</span></td><td>fewer than 150 comparable posts</td><td><b>No number at all</b>, plus how many more are needed</td></tr>
+      <tr><td><span class="pe pe--weak">Direction only</span></td><td>n ≥ 150 but r &lt; 0.4</td><td>A range and a direction — "above the 30-day median" — <b>no point estimate</b></td></tr>
+      <tr><td><span class="pe pe--ok">Estimate</span></td><td>n ≥ 150 and r ≥ 0.4</td><td>Point estimate <b>with its interval</b>, plus n and r</td></tr>
+    </tbody>
+  </table>
+  <div class="apwarn">
+    <b>A bare number would be read as a fact.</b> At this page's volume — roughly 90 posts a month, an IG window of 50 — a prediction interval is wide enough that a single centred figure would be actively misleading. So: <b>never a point estimate without its interval</b>, and no number at all until the sample supports one.<br>
+    Current state: <b>IG n = 50, FB n = 136</b> — both below the bar. The number appears when the data earns it.<br>
+    ⚠ And <b>predicted effect must not gate auto-publish</b> until it is calibrated, or an uncalibrated model ends up deciding what goes on the brand's page.
+  </div>
+</section>
 
 </div>
 
@@ -1442,7 +1589,7 @@ body.dd-page .ml-content{padding-top:18px}
 </div>
 </div>
 <div class="toast" id="toast"></div>
-<div class="proto-badge">PRODUCT PROTOTYPE v2.8.1 · BF</div>
+<div class="proto-badge">PRODUCT PROTOTYPE v2.9 · BF</div>
 
 <script>
 function q(s){return document.querySelector(s)}
