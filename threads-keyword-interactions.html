@@ -1,0 +1,1816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MediaLens - Threads Keyword Interactions</title>
+  <style>
+    :root {
+      --blue: #2fa8f8;
+      --blue-dark: #168fe2;
+      --text: #222a35;
+      --muted: #708090;
+      --soft: #f6f9fc;
+      --line: #d7e0ea;
+      --card: #ffffff;
+      --shadow: 0 8px 24px rgba(31, 54, 77, 0.08);
+      --xhs: #ff3758;
+      --threads: #111827;
+      --facebook: #2ea9f3;
+      --instagram: #bb67df;
+      --lihkg: #eadc0d;
+      --baby: #02aaa8;
+      --hk: #2fa8f8;
+      font-family: Inter, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #edf4fa;
+      color: var(--text);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .prototype-switcher {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      height: 58px;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #dbe4ee;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+    }
+
+    .switcher-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .switcher-title {
+      font-size: 15px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .version-tabs {
+      display: flex;
+      align-items: center;
+      height: 36px;
+      padding: 3px;
+      border: 1px solid #d8e3ef;
+      border-radius: 8px;
+      background: #f6f9fc;
+    }
+
+    .version-tabs button {
+      height: 28px;
+      padding: 0 14px;
+      border-radius: 6px;
+      color: #617082;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .version-tabs button.active {
+      color: #0d48a8;
+      background: #e8eefc;
+    }
+
+    .switcher-note {
+      color: #708090;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .app-shell {
+      min-height: calc(100vh - 58px);
+      display: grid;
+      grid-template-columns: 310px minmax(960px, 1fr);
+      background: #f5f8fb;
+    }
+
+    .side {
+      background: #fff;
+      border-right: 1px solid #e3eaf2;
+      box-shadow: 5px 0 18px rgba(40, 55, 74, 0.05);
+    }
+
+    .brand {
+      height: 88px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 0 34px;
+      border-bottom: 1px solid #eef2f6;
+    }
+
+    .hamburger {
+      width: 22px;
+      height: 16px;
+      display: grid;
+      gap: 5px;
+    }
+
+    .hamburger span {
+      background: #b7c0ca;
+      border-radius: 99px;
+    }
+
+    .logo {
+      color: #29a8f7;
+      font-size: 23px;
+      font-weight: 800;
+      letter-spacing: 4px;
+    }
+
+    .org {
+      padding: 38px 28px 28px;
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 56px;
+      height: 56px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #55bdf5;
+      background: #edfaff;
+      font-size: 25px;
+      font-weight: 800;
+    }
+
+    .org-title {
+      font-size: 19px;
+      font-weight: 800;
+    }
+
+    .org-meta {
+      margin-top: 4px;
+      color: #666;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .nav {
+      margin: 18px 28px;
+      padding-top: 24px;
+      border-top: 1px solid #eef2f6;
+    }
+
+    .nav-item {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: #666d75;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .nav-item.active {
+      color: #209cf2;
+      position: relative;
+    }
+
+    .nav-item.active::before {
+      content: "";
+      position: absolute;
+      left: -28px;
+      width: 4px;
+      height: 56px;
+      background: #209cf2;
+    }
+
+    .nav-icon {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      color: #a5adb5;
+      border: 2px solid currentColor;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .nav-item.active .nav-icon {
+      color: #209cf2;
+      border-radius: 50%;
+    }
+
+    .main {
+      min-width: 0;
+      padding: 54px 84px 80px;
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .tabs {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .tabs button {
+      height: 36px;
+      padding: 0 16px;
+      border-radius: 18px;
+      color: #999;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .tabs button.active {
+      color: #0a2c92;
+      background: #e4e9f6;
+    }
+
+    .date-range {
+      color: #708090;
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .query-strip {
+      margin-top: 78px;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      min-height: 48px;
+    }
+
+    .query-item {
+      min-width: 220px;
+      height: 48px;
+      padding-right: 24px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      border-right: 1px solid #cdd6df;
+      font-size: 26px;
+      font-weight: 800;
+      color: #111;
+    }
+
+    .query-item .dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--blue-dark);
+      flex: 0 0 auto;
+    }
+
+    .query-item .remove {
+      margin-left: auto;
+      color: #b6bdc4;
+      font-size: 20px;
+    }
+
+    .query-item.orange .dot {
+      background: #ff9d00;
+    }
+
+    .query-item.threads .dot {
+      background: var(--threads);
+    }
+
+    .query-item.xhs .dot {
+      background: var(--xhs);
+    }
+
+    .action-row {
+      margin-top: 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #bfcbd8;
+    }
+
+    .quick-actions {
+      height: 54px;
+      display: flex;
+      align-items: center;
+      gap: 34px;
+      position: relative;
+    }
+
+    .text-button {
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #459cff;
+      font-size: 17px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .saved-keywords {
+      height: 54px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 17px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .filter-bar {
+      position: relative;
+      border-bottom: 1px solid #dfe6ee;
+    }
+
+    .filter-main {
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .filter-options {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 22px;
+      min-width: 0;
+    }
+
+    .filter-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #768697;
+      font-size: 16px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .filter-btn.active {
+      color: #233143;
+    }
+
+    .filter-btn .badge {
+      height: 18px;
+      min-width: 18px;
+      padding: 0 6px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 9px;
+      background: #2fa8f8;
+      color: #fff;
+      font-size: 11px;
+    }
+
+    .platform-switches {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex: 0 0 auto;
+    }
+
+    .switch-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #2da5f7;
+      font-weight: 800;
+    }
+
+    .toggle {
+      width: 48px;
+      height: 26px;
+      padding: 3px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      background: #d9dee8;
+      transition: background 0.2s ease;
+    }
+
+    .toggle::after {
+      content: "";
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(19, 38, 60, 0.18);
+      transition: transform 0.2s ease;
+    }
+
+    .toggle.on {
+      background: #4aa7ff;
+    }
+
+    .toggle.on::after {
+      transform: translateX(22px);
+    }
+
+    .chip-row {
+      min-height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid #bfcbd8;
+    }
+
+    .chips {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      height: 33px;
+      padding: 0 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 7px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .chip .x {
+      opacity: 0.9;
+      font-size: 16px;
+    }
+
+    .chip.hk {
+      background: var(--hk);
+    }
+
+    .chip.facebook {
+      background: var(--facebook);
+    }
+
+    .chip.instagram {
+      background: var(--instagram);
+    }
+
+    .chip.lihkg {
+      background: var(--lihkg);
+    }
+
+    .chip.baby {
+      background: var(--baby);
+    }
+
+    .chip.xhs {
+      background: var(--xhs);
+    }
+
+    .chip.threads {
+      background: var(--threads);
+    }
+
+    .row-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 0 0 auto;
+    }
+
+    .outline-btn,
+    .primary-btn {
+      height: 42px;
+      padding: 0 22px;
+      border-radius: 9px;
+      font-size: 14px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .outline-btn {
+      color: #2fa8f8;
+      border: 1px solid #75c3ff;
+      background: #fff;
+    }
+
+    .primary-btn {
+      color: #fff;
+      background: #28a8f8;
+    }
+
+    .primary-btn:disabled {
+      cursor: default;
+      opacity: 0.45;
+    }
+
+    .panel {
+      position: absolute;
+      z-index: 8;
+      width: 390px;
+      padding: 20px;
+      border: 1px solid #e4ebf2;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 16px 34px rgba(24, 45, 66, 0.11);
+    }
+
+    .panel.right {
+      top: 50px;
+      right: 90px;
+    }
+
+    .panel.left {
+      top: 44px;
+      left: 0;
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      top: -8px;
+      width: 14px;
+      height: 14px;
+      background: #fff;
+      border-left: 1px solid #e4ebf2;
+      border-top: 1px solid #e4ebf2;
+      transform: rotate(45deg);
+    }
+
+    .panel.right::before {
+      right: 72px;
+    }
+
+    .panel.left::before {
+      left: 145px;
+    }
+
+    .panel.hidden {
+      display: none;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .panel-title {
+      font-size: 16px;
+      font-weight: 850;
+    }
+
+    .panel-meta {
+      color: #8995a3;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .search {
+      position: relative;
+      margin-bottom: 10px;
+    }
+
+    .search input {
+      width: 100%;
+      height: 44px;
+      padding: 0 42px 0 14px;
+      border: 1px solid #dfe8f0;
+      border-radius: 8px;
+      color: #657384;
+      outline: none;
+    }
+
+    .search span {
+      position: absolute;
+      right: 14px;
+      top: 11px;
+      color: #b3bdc8;
+    }
+
+    .keyword-list {
+      max-height: 356px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .keyword-option {
+      min-height: 74px;
+      display: grid;
+      grid-template-columns: 24px 1fr;
+      gap: 8px;
+      align-items: start;
+      padding: 10px 0;
+      color: #2d3744;
+    }
+
+    .keyword-option input {
+      width: 17px;
+      height: 17px;
+      margin: 1px 0 0;
+      accent-color: #4aa7ff;
+    }
+
+    .keyword-main {
+      font-size: 15px;
+      font-weight: 850;
+      line-height: 19px;
+    }
+
+    .keyword-sub {
+      margin-top: 10px;
+      color: #8a949f;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .panel-footer {
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .helper-text {
+      color: #8b96a3;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 18px;
+    }
+
+    .source-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .source-tabs button {
+      height: 30px;
+      padding: 0 11px;
+      border: 1px solid #dbe5ef;
+      border-radius: 15px;
+      color: #68778a;
+      background: #fff;
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .source-tabs button.active.xhs {
+      color: #fff;
+      border-color: var(--xhs);
+      background: var(--xhs);
+    }
+
+    .source-tabs button.active.threads {
+      color: #fff;
+      border-color: var(--threads);
+      background: var(--threads);
+    }
+
+    .dashboard {
+      margin-top: 44px;
+    }
+
+    .dashboard h1 {
+      margin: 0 0 18px;
+      color: #697a8d;
+      font-size: 24px;
+      line-height: 32px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .metric-card {
+      min-height: 136px;
+      padding: 20px;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .metric-title {
+      color: #697a8d;
+      font-size: 18px;
+      font-weight: 850;
+    }
+
+    .metric-line {
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #617084;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .metric-line .value {
+      margin-left: auto;
+      color: #657384;
+    }
+
+    .small-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--blue-dark);
+      flex: 0 0 auto;
+    }
+
+    .small-dot.orange {
+      background: #ff9d00;
+    }
+
+    .small-dot.threads {
+      background: var(--threads);
+    }
+
+    .chart {
+      margin-top: 24px;
+      min-height: 310px;
+      padding: 24px;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .chart-title {
+      color: #697a8d;
+      font-size: 20px;
+      font-weight: 850;
+    }
+
+    .bars {
+      height: 235px;
+      display: flex;
+      align-items: end;
+      gap: 54px;
+      padding: 28px 70px 0;
+      border-left: 1px solid #edf1f5;
+      border-bottom: 1px solid #edf1f5;
+    }
+
+    .bar {
+      width: 48px;
+      border-radius: 3px 3px 0 0;
+      background: #2fa8f8;
+    }
+
+    .bar.orange {
+      background: #ffb333;
+    }
+
+    .bar.threads {
+      background: var(--threads);
+    }
+
+    .active-keyword-strip {
+      min-height: 46px;
+      padding: 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid #dfe6ee;
+      color: #6d7d90;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .active-keyword-strip strong {
+      color: #172233;
+      font-size: 14px;
+    }
+
+    .active-rule {
+      color: #8b97a5;
+      font-size: 12px;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .conflict-note {
+      min-height: 40px;
+      margin: 0 0 12px;
+      padding: 9px 12px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid #ffd5a8;
+      border-radius: 8px;
+      background: #fff8ef;
+      color: #7a4a13;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 18px;
+    }
+
+    .conflict-note.visible {
+      display: flex;
+    }
+
+    .replace-tag {
+      margin-top: 8px;
+      display: inline-flex;
+      align-items: center;
+      height: 20px;
+      padding: 0 7px;
+      border-radius: 10px;
+      background: #fff1df;
+      color: #aa6416;
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .keyword-option.with-platforms {
+      grid-template-columns: 24px minmax(0, 1fr) auto;
+    }
+
+    .keyword-platforms {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding-top: 2px;
+    }
+
+    .platform-mini-badge {
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 8px;
+      border-radius: 11px;
+      color: #fff;
+      background: var(--threads);
+      font-size: 11px;
+      font-weight: 850;
+      line-height: 22px;
+    }
+
+    .platform-mini-badge.xhs {
+      background: var(--xhs);
+    }
+
+    .keyword-option.current {
+      color: #147dcc;
+    }
+
+    .keyword-option.conflict {
+      border-color: #f1d1aa;
+      background: #fffaf3;
+    }
+
+    .option-b .query-strip {
+      margin-top: 58px;
+    }
+
+    .option-b .action-row {
+      margin-top: 26px;
+    }
+
+    .keyword-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 36px;
+      padding: 0 12px;
+      border: 1px solid #dbe6f0;
+      border-radius: 7px;
+      color: #657384;
+      background: #fff;
+      font-size: 14px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .keyword-control.active {
+      color: #172233;
+      border-color: #a9d9ff;
+      background: #f0f8ff;
+    }
+
+    .keyword-control .badge {
+      height: 18px;
+      min-width: 18px;
+      padding: 0 6px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 9px;
+      background: #2fa8f8;
+      color: #fff;
+      font-size: 11px;
+    }
+
+    .platform-panel {
+      width: 520px;
+      right: 88px;
+      top: 48px;
+    }
+
+    .selected-platform-keywords {
+      min-height: 32px;
+      margin: 10px 0 14px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: #8b96a3;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .selected-platform-chip {
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 10px;
+      border-radius: 13px;
+      color: #fff;
+      background: var(--threads);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .selected-platform-chip.xhs {
+      background: var(--xhs);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 1180px) {
+      .app-shell {
+        grid-template-columns: 92px minmax(760px, 1fr);
+      }
+
+      .logo,
+      .org-copy,
+      .nav-label {
+        display: none;
+      }
+
+      .brand,
+      .org {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      .nav {
+        margin: 16px 0;
+        display: grid;
+        justify-items: center;
+      }
+
+      .nav-item.active::before {
+        left: 0;
+      }
+
+      .main {
+        padding-left: 42px;
+        padding-right: 42px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="prototype-switcher">
+    <div class="switcher-left">
+      <div class="switcher-title">Threads Social Listening Interaction</div>
+      <div class="version-tabs" aria-label="Prototype versions">
+        <button class="active" data-version="a">Version A</button>
+        <button data-version="b">Version B</button>
+      </div>
+    </div>
+    <div class="switcher-note" id="versionNote">A: follows current XHS switch behavior</div>
+  </header>
+
+  <div class="app-shell">
+    <aside class="side">
+      <div class="brand">
+        <div class="hamburger" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="logo">MEDIA LENS</div>
+      </div>
+      <div class="org">
+        <div class="avatar">P</div>
+        <div class="org-copy">
+          <div class="org-title">PL - Hong Kong</div>
+          <div class="org-meta">Admin - Julie Li</div>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Main navigation">
+        <div class="nav-item"><span class="nav-icon">D</span><span class="nav-label">Dashboard</span></div>
+        <div class="nav-item"><span class="nav-icon">M</span><span class="nav-label">My Pages</span></div>
+        <div class="nav-item"><span class="nav-icon">C</span><span class="nav-label">Competitor Analysis</span></div>
+        <div class="nav-item"><span class="nav-icon">B</span><span class="nav-label">Buzz (Market Insights)</span></div>
+        <div class="nav-item active"><span class="nav-icon">S</span><span class="nav-label">Social Listening</span></div>
+        <div class="nav-item"><span class="nav-icon">A</span><span class="nav-label">Ad Intelligence</span></div>
+        <div class="nav-item"><span class="nav-icon">AI</span><span class="nav-label">AI Chat</span></div>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <div class="top-row">
+        <div class="tabs">
+          <button class="active">Overview</button>
+          <button>Platforms</button>
+          <button>Profiles</button>
+          <button>Posts</button>
+          <button>Content Library</button>
+          <button>Keywords</button>
+        </div>
+        <div class="date-range">▣ &nbsp; 2026-08-14 &nbsp; to &nbsp; 2026-08-20 &nbsp; ⓘ</div>
+      </div>
+
+      <section class="option-a" data-screen="a">
+        <div class="query-strip" id="queryStripA">
+          <div class="query-item">
+            <span class="dot"></span>
+            <span>維特健靈</span>
+            <button class="remove" aria-label="Remove query">×</button>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <div class="quick-actions">
+            <button class="text-button" id="comparisonA">⊕ Comparison</button>
+            <button class="text-button">▱ Save Keyword</button>
+
+            <div class="panel left hidden" id="comparisonPanelA">
+              <div class="panel-head">
+                <div>
+                  <div class="panel-title">Add comparison</div>
+                  <div class="panel-meta">Choose from the selected platform keyword list</div>
+                </div>
+              </div>
+              <div class="source-tabs">
+                <button class="active threads" data-source-tab="threads">Threads</button>
+                <button data-source-tab="xhs">XHS</button>
+              </div>
+              <div class="search"><input placeholder="Search fixed keywords" /><span>⌕</span></div>
+              <div class="conflict-note" id="comparisonConflictNoteA"></div>
+              <div class="keyword-list" data-comparison-list="threads"></div>
+              <div class="panel-footer">
+                <div class="helper-text">Only platform-approved keywords can be added.</div>
+                <button class="primary-btn" id="addComparisonA">Add</button>
+              </div>
+            </div>
+          </div>
+          <button class="saved-keywords">☷ Saved Keywords</button>
+        </div>
+
+        <div class="filter-bar">
+          <div class="filter-main">
+            <div class="filter-options">
+              <button class="filter-btn">▽</button>
+              <button class="filter-btn">⌖ Regions</button>
+              <button class="filter-btn">⚑ Platforms</button>
+              <button class="filter-btn">▤ Post Types</button>
+              <button class="filter-btn">◇ Page Types</button>
+              <button class="filter-btn">⊖ Exclude</button>
+              <button class="filter-btn">⌕ Keyword</button>
+              <button class="filter-btn">☻ Sentiment</button>
+              <button class="filter-btn">AI AI category <span class="badge">✦</span></button>
+              <button class="filter-btn">▧ Image</button>
+            </div>
+            <div class="platform-switches">
+              <button class="switch-label" data-platform-trigger="xhs">XHS <span class="toggle" id="xhsToggleA"></span></button>
+              <button class="switch-label" data-platform-trigger="threads">Threads <span class="toggle" id="threadsToggleA"></span></button>
+            </div>
+          </div>
+
+          <div class="panel right hidden" id="platformPanelA">
+            <div class="panel-head">
+              <div>
+                <div class="panel-title" id="platformPanelTitleA">Threads keywords</div>
+                <div class="panel-meta">Fixed keyword list</div>
+              </div>
+            </div>
+            <div class="search"><input id="platformSearchA" placeholder="Search keywords" /><span>⌕</span></div>
+            <div class="conflict-note" id="conflictNoteA"></div>
+            <div class="keyword-list" id="platformKeywordListA"></div>
+            <div class="panel-footer">
+              <div class="helper-text" id="platformHelperA">Turning on Threads adds the platform and uses selected Threads keywords.</div>
+              <button class="primary-btn" id="confirmPlatformA">Confirm</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="active-keyword-strip">
+          <div>Active keyword: <strong id="activeKeywordA">維特健靈</strong></div>
+          <div class="active-rule">XHS / Threads must match this keyword. Choosing another one replaces it.</div>
+        </div>
+
+        <div class="chip-row">
+          <div class="chips" id="chipsA">
+            <span class="chip hk">⌖ Hong Kong and Macau <span class="x">×</span></span>
+            <span class="chip facebook">f Facebook <span class="x">×</span></span>
+            <span class="chip instagram">◎ Instagram <span class="x">×</span></span>
+            <span class="chip lihkg">☻ LIHKG <span class="x">×</span></span>
+            <span class="chip baby">♧ Baby-Kingdom <span class="x">×</span></span>
+          </div>
+          <div class="row-actions">
+            <button class="outline-btn">Clear All</button>
+            <button class="primary-btn">Apply</button>
+          </div>
+        </div>
+
+        <section class="dashboard">
+          <h1>Dashboard</h1>
+          <div class="cards" id="cardsA"></div>
+          <div class="chart">
+            <div class="chart-title">Posts</div>
+            <div class="bars" id="barsA"></div>
+          </div>
+        </section>
+      </section>
+
+      <section class="option-b hidden" data-screen="b">
+        <div class="query-strip" id="queryStripB">
+          <div class="query-item">
+            <span class="dot"></span>
+            <span>維特健靈</span>
+            <button class="remove" aria-label="Remove query">×</button>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <div class="quick-actions">
+            <button class="text-button" id="comparisonB">⊕ Comparison</button>
+            <button class="text-button">▱ Save Keyword</button>
+
+            <div class="panel left hidden" id="comparisonPanelB">
+              <div class="panel-head">
+                <div>
+                  <div class="panel-title">Add platform keyword</div>
+                  <div class="panel-meta">XHS and Threads each use a fixed list</div>
+                </div>
+              </div>
+              <div class="source-tabs">
+                <button class="active threads" data-b-comparison-source="threads">Threads</button>
+                <button data-b-comparison-source="xhs">XHS</button>
+              </div>
+              <div class="search"><input placeholder="Search fixed keywords" /><span>⌕</span></div>
+              <div class="conflict-note" id="comparisonConflictNoteB"></div>
+              <div class="keyword-list" id="comparisonListB"></div>
+              <div class="panel-footer">
+                <div class="helper-text">The added comparison keeps its platform source.</div>
+                <button class="primary-btn" id="addComparisonB">Add</button>
+              </div>
+            </div>
+          </div>
+          <button class="saved-keywords">☷ Saved Keywords</button>
+        </div>
+
+        <div class="filter-bar">
+          <div class="filter-main">
+            <div class="filter-options">
+              <button class="filter-btn">▽</button>
+              <button class="filter-btn">⌖ Regions</button>
+              <button class="filter-btn">⚑ Platforms</button>
+              <button class="filter-btn">▤ Post Types</button>
+              <button class="filter-btn">◇ Page Types</button>
+              <button class="filter-btn">⊖ Exclude</button>
+              <button class="filter-btn">⌕ Keyword</button>
+              <button class="filter-btn">☻ Sentiment</button>
+              <button class="filter-btn">AI AI category <span class="badge">✦</span></button>
+              <button class="filter-btn">▧ Image</button>
+            </div>
+
+            <button class="keyword-control" id="platformKeywordControlB">
+              + Platforms <span class="badge hidden" id="platformKeywordCountB">0</span>
+            </button>
+          </div>
+
+          <div class="panel platform-panel hidden" id="platformPanelB">
+            <div class="panel-head">
+              <div>
+                <div class="panel-title">Add platform keyword</div>
+                <div class="panel-meta">XHS and Threads each use a fixed list</div>
+              </div>
+            </div>
+            <div class="selected-platform-keywords" id="selectedPlatformKeywordsB">
+              No platform keyword selected
+            </div>
+            <div class="source-tabs">
+              <button class="active threads" data-b-platform-source="threads">Threads</button>
+              <button data-b-platform-source="xhs">XHS</button>
+            </div>
+            <div class="search"><input id="platformSearchB" placeholder="Search fixed keywords" /><span>⌕</span></div>
+            <div class="keyword-list" id="platformKeywordListB"></div>
+            <div class="panel-footer">
+              <div class="helper-text">The added platform keyword keeps its platform source.</div>
+              <button class="primary-btn" id="confirmPlatformB">Add</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="active-keyword-strip">
+          <div>Active keyword: <strong id="activeKeywordB">維特健靈</strong></div>
+          <div class="active-rule">One keyword set controls all selected platforms. Mismatched platform keywords replace the current set.</div>
+        </div>
+
+        <div class="chip-row">
+          <div class="chips" id="chipsB">
+            <span class="chip hk">⌖ Hong Kong and Macau <span class="x">×</span></span>
+            <span class="chip facebook">f Facebook <span class="x">×</span></span>
+            <span class="chip instagram">◎ Instagram <span class="x">×</span></span>
+            <span class="chip lihkg">☻ LIHKG <span class="x">×</span></span>
+            <span class="chip baby">♧ Baby-Kingdom <span class="x">×</span></span>
+          </div>
+          <div class="row-actions">
+            <button class="outline-btn">Clear All</button>
+            <button class="primary-btn">Apply</button>
+          </div>
+        </div>
+
+        <section class="dashboard">
+          <h1>Dashboard</h1>
+          <div class="cards" id="cardsB"></div>
+          <div class="chart">
+            <div class="chart-title">Posts</div>
+            <div class="bars" id="barsB"></div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const fixedKeywords = {
+      xhs: [
+        ["維特健靈", "維特健靈"],
+        ["香港李錦記", "香港李錦記"],
+        ["香港莎莎", "香港莎莎"],
+        ["香港太興", "香港太興"],
+        ["香港寬頻", "香港寬頻"],
+        ["香港國泰", "香港國泰"],
+        ["香港TVB", "香港TVB"],
+        ["聯繫匯率", "聯繫匯率"]
+      ],
+      threads: [
+        ["維特健靈", "Wai Yuen Tong / WYT"],
+        ["位元堂", "Wai Yuen Tong"],
+        ["京都念慈菴", "Nin Jiom"],
+        ["保濟丸", "Po Chai Pills"],
+        ["幸福傷風素", "Fortune Pharmacal"],
+        ["白花油", "White Flower"],
+        ["余仁生", "Eu Yan Sang"],
+        ["萬寧", "Mannings"]
+      ]
+    };
+
+    const stateA = {
+      activeKeyword: "維特健靈",
+      activePlatform: "threads",
+      selected: { xhs: new Set(), threads: new Set(["維特健靈"]) },
+      applied: { xhs: new Set(), threads: new Set() },
+      comparisonSource: "threads",
+      pendingReplacement: null
+    };
+
+    const stateB = {
+      activeKeyword: "維特健靈",
+      activePlatformSource: "threads",
+      selected: { xhs: new Set(), threads: new Set() },
+      applied: { xhs: new Set(), threads: new Set() },
+      comparisonSource: "threads",
+      pendingReplacement: null
+    };
+
+    function $(selector) {
+      return document.querySelector(selector);
+    }
+
+    function $all(selector) {
+      return [...document.querySelectorAll(selector)];
+    }
+
+    function getOtherSource(source) {
+      return source === "xhs" ? "threads" : "xhs";
+    }
+
+    function sourceLabel(source) {
+      return source === "xhs" ? "XHS" : "Threads";
+    }
+
+    function hasKeywordConflict(state, source, keyword) {
+      const otherSource = getOtherSource(source);
+      return keyword !== state.activeKeyword || (
+        state.selected[otherSource].size > 0 && !state.selected[otherSource].has(keyword)
+      );
+    }
+
+    function showConflict(noteSelector, message) {
+      const note = $(noteSelector);
+      if (!note) return;
+      note.textContent = message || "";
+      note.classList.toggle("visible", Boolean(message));
+    }
+
+    function selectPlatformKeyword(state, source, keyword, checked, noteSelector, afterChange) {
+      if (!checked) {
+        state.selected[source].delete(keyword);
+        if (state.applied[source].has(keyword)) {
+          state.applied[source].delete(keyword);
+        }
+        state.pendingReplacement = null;
+        showConflict(noteSelector, "");
+        afterChange?.();
+        return;
+      }
+
+      const otherSource = getOtherSource(source);
+      const isConflict = hasKeywordConflict(state, source, keyword);
+      state.selected[source] = new Set([keyword]);
+
+      if (isConflict) {
+        state.pendingReplacement = { source, keyword, previousKeyword: state.activeKeyword };
+        showConflict(
+          noteSelector,
+          `Selecting ${sourceLabel(source)} · ${keyword} will replace ${state.activeKeyword} and remove mismatched ${sourceLabel(otherSource)} keyword.`
+        );
+      } else {
+        state.pendingReplacement = null;
+        showConflict(noteSelector, "");
+      }
+      afterChange?.();
+    }
+
+    function selectPlatformKeywordDirect(state, source, keyword, checked, noteSelector, afterChange) {
+      const otherSource = getOtherSource(source);
+
+      if (!checked) {
+        state.selected[source].delete(keyword);
+        state.pendingReplacement = null;
+        showConflict(noteSelector, "");
+        afterChange?.();
+        return;
+      }
+
+      const isConflict = hasKeywordConflict(state, source, keyword);
+      state.selected[source] = new Set([keyword]);
+
+      if (isConflict) {
+        state.selected[otherSource].clear();
+        state.pendingReplacement = { source, keyword, previousKeyword: state.activeKeyword };
+        showConflict(noteSelector, "");
+      } else {
+        state.pendingReplacement = null;
+        showConflict(noteSelector, "");
+      }
+      afterChange?.();
+    }
+
+    function getMergedPlatformKeywords() {
+      const byKeyword = new Map();
+      Object.entries(fixedKeywords).forEach(([source, rows]) => {
+        rows.forEach(([main, sub]) => {
+          if (!byKeyword.has(main)) {
+            byKeyword.set(main, { keyword: main, subBySource: {}, platforms: [] });
+          }
+          const entry = byKeyword.get(main);
+          entry.subBySource[source] = sub;
+          if (!entry.platforms.includes(source)) entry.platforms.push(source);
+        });
+      });
+      return [...byKeyword.values()];
+    }
+
+    function selectMergedPlatformKeywordB(keyword, source, checked) {
+      const otherSource = getOtherSource(source);
+
+      if (!checked) {
+        stateB.selected[source].delete(keyword);
+        stateB.pendingReplacement = null;
+        return;
+      }
+
+      const otherHasSelections = stateB.selected[otherSource].size > 0;
+      const otherHasKeyword = stateB.selected[otherSource].has(keyword);
+
+      if (otherHasSelections && !otherHasKeyword) {
+        stateB.selected.threads.clear();
+        stateB.selected.xhs.clear();
+        stateB.pendingReplacement = {
+          source,
+          keyword,
+          previousKeyword: stateB.activeKeyword
+        };
+        stateB.selected[source] = new Set([keyword]);
+        return;
+      }
+
+      if (otherHasKeyword) {
+        stateB.selected[source] = new Set([keyword]);
+        stateB.selected[otherSource] = new Set([keyword]);
+        stateB.pendingReplacement = null;
+        return;
+      }
+
+      stateB.selected[source].add(keyword);
+      if (!stateB.activeKeyword || stateB.activeKeyword !== keyword) {
+        stateB.activeKeyword = keyword;
+      }
+      stateB.pendingReplacement = null;
+    }
+
+    function getLastSelectedKeyword(state) {
+      const selected = [
+        ...state.selected.threads,
+        ...state.selected.xhs
+      ];
+      return selected[selected.length - 1] || state.activeKeyword;
+    }
+
+    function applyAllPlatformSelections(state) {
+      const selectedKeywords = [
+        ...[...state.selected.threads].map(keyword => ({ source: "threads", keyword })),
+        ...[...state.selected.xhs].map(keyword => ({ source: "xhs", keyword }))
+      ];
+      if (!selectedKeywords.length) {
+        state.applied.threads.clear();
+        state.applied.xhs.clear();
+        state.pendingReplacement = null;
+        return;
+      }
+
+      if (state.pendingReplacement) {
+        state.activeKeyword = state.pendingReplacement.keyword;
+      } else {
+        state.activeKeyword = getLastSelectedKeyword(state);
+      }
+
+      state.applied.threads = new Set(state.selected.threads);
+      state.applied.xhs = new Set(state.selected.xhs);
+      state.pendingReplacement = null;
+    }
+
+    function applyPlatformSelection(state, source) {
+      const keyword = [...state.selected[source]][0];
+      if (!keyword) {
+        state.applied[source].clear();
+        return;
+      }
+
+      const otherSource = getOtherSource(source);
+      if (keyword !== state.activeKeyword) {
+        state.activeKeyword = keyword;
+        state.selected[otherSource].clear();
+        state.applied[otherSource].clear();
+      } else if (state.applied[otherSource].size > 0 && !state.applied[otherSource].has(keyword)) {
+        state.selected[otherSource].clear();
+        state.applied[otherSource].clear();
+      }
+
+      state.applied[source] = new Set([keyword]);
+      state.pendingReplacement = null;
+    }
+
+    function createKeywordList(container, source, selectedSet, onChange, compact = false, state = null) {
+      container.innerHTML = "";
+      fixedKeywords[source].forEach(([main, sub]) => {
+        const label = document.createElement("label");
+        label.className = compact ? "mini-keyword" : "keyword-option";
+        if (state && main === state.activeKeyword) label.classList.add("current");
+        if (state && hasKeywordConflict(state, source, main)) label.classList.add("conflict");
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.checked = selectedSet.has(main);
+        input.addEventListener("change", () => onChange(main, input.checked));
+        const text = document.createElement("span");
+        if (compact) {
+          text.textContent = main;
+        } else {
+          const conflictTag = state && hasKeywordConflict(state, source, main)
+            ? `<div class="replace-tag">Replace current keyword</div>`
+            : "";
+          text.innerHTML = `<div class="keyword-main">${main}</div><div class="keyword-sub">${sub}</div>${conflictTag}`;
+        }
+        label.append(input, text);
+        container.appendChild(label);
+      });
+    }
+
+    function renderMetrics(targetId, includeThreads, activeKeyword = "維特健靈") {
+      const cards = [
+        ["Pages", "6", "597", "18"],
+        ["Engagements", "5,493", "809,425", "42,801"],
+        ["Avg. Engagements", "40", "594", "218"],
+        ["Video Views", "212,457", "28,348,354", "681,390"],
+        ["Comments", "769", "33,000", "1,204"],
+        ["Ad Value", "HK$0", "HK$6,142,794", "HK$329,118"]
+      ];
+      const container = $(targetId);
+      container.innerHTML = cards.map(([title, first, second, threads]) => `
+        <div class="metric-card">
+          <div class="metric-title">${title}</div>
+          <div class="metric-line"><span class="small-dot"></span><span>${activeKeyword}</span><span class="value">${first}</span></div>
+          <div class="metric-line"><span class="small-dot orange"></span><span>香港迪士尼</span><span class="value">${second}</span></div>
+          ${includeThreads ? `<div class="metric-line"><span class="small-dot threads"></span><span>Threads · ${activeKeyword}</span><span class="value">${threads}</span></div>` : ""}
+        </div>
+      `).join("");
+    }
+
+    function renderBars(targetId, includeThreads) {
+      $(targetId).innerHTML = `
+        <div class="bar" style="height: 176px"></div>
+        <div class="bar orange" style="height: 82px"></div>
+        ${includeThreads ? `<div class="bar threads" style="height: 122px"></div>` : ""}
+      `;
+    }
+
+    function updateQueryStrip(stripId, applied, mode, activeKeyword) {
+      const strip = $(stripId);
+      const base = `
+        <div class="query-item">
+          <span class="dot"></span>
+          <span>${activeKeyword}</span>
+          <button class="remove" aria-label="Remove query">×</button>
+        </div>
+      `;
+      strip.innerHTML = base;
+    }
+
+    function updateChipsA() {
+      const chips = $("#chipsA");
+      const dynamic = [];
+      if (stateA.applied.xhs.size) {
+        dynamic.push(`<span class="chip xhs">小红书 XHS · ${[...stateA.applied.xhs].join(", ")} <span class="x">×</span></span>`);
+      }
+      if (stateA.applied.threads.size) {
+        dynamic.push(`<span class="chip threads">Threads · ${[...stateA.applied.threads].join(", ")} <span class="x">×</span></span>`);
+      }
+      chips.querySelectorAll("[data-dynamic]").forEach(node => node.remove());
+      chips.insertAdjacentHTML("beforeend", dynamic.map(html => html.replace("class=\"chip", "data-dynamic class=\"chip")).join(""));
+      $("#xhsToggleA").classList.toggle("on", stateA.applied.xhs.size > 0);
+      $("#threadsToggleA").classList.toggle("on", stateA.applied.threads.size > 0);
+      const hasThreads = stateA.applied.threads.size > 0;
+      $("#activeKeywordA").textContent = stateA.activeKeyword;
+      renderMetrics("#cardsA", hasThreads, stateA.activeKeyword);
+      renderBars("#barsA", hasThreads);
+      updateQueryStrip("#queryStripA", stateA.applied, "a", stateA.activeKeyword);
+    }
+
+    function openPlatformPanelA(source) {
+      stateA.activePlatform = source;
+      $("#platformPanelTitleA").textContent = source === "threads" ? "Threads keywords" : "XHS keywords";
+      $("#platformHelperA").textContent = source === "threads"
+        ? "Choose the same keyword to combine with XHS. A different keyword replaces the current search."
+        : "Choose the same keyword to combine with Threads. A different keyword replaces the current search.";
+      createKeywordList($("#platformKeywordListA"), source, stateA.selected[source], (keyword, checked) => {
+        selectPlatformKeyword(stateA, source, keyword, checked, "#conflictNoteA", () => {
+          openPlatformPanelA(source);
+          if (stateA.pendingReplacement) {
+            $("#confirmPlatformA").textContent = "Replace & Confirm";
+          }
+        });
+      }, false, stateA);
+      $("#confirmPlatformA").textContent = stateA.pendingReplacement ? "Replace & Confirm" : "Confirm";
+      $("#platformPanelA").classList.remove("hidden");
+      $("#comparisonPanelA").classList.add("hidden");
+    }
+
+    function updateComparisonListA() {
+      createKeywordList($("[data-comparison-list='threads']"), stateA.comparisonSource, stateA.selected[stateA.comparisonSource], (keyword, checked) => {
+        selectPlatformKeyword(stateA, stateA.comparisonSource, keyword, checked, "#comparisonConflictNoteA", updateComparisonListA);
+      }, false, stateA);
+      $("#addComparisonA").textContent = stateA.pendingReplacement ? "Replace & Add" : "Add";
+    }
+
+    function setupA() {
+      renderMetrics("#cardsA", false);
+      renderBars("#barsA", false);
+      $all("[data-platform-trigger]").forEach(button => {
+        button.addEventListener("click", () => openPlatformPanelA(button.dataset.platformTrigger));
+      });
+      $("#confirmPlatformA").addEventListener("click", () => {
+        const source = stateA.activePlatform;
+        applyPlatformSelection(stateA, source);
+        $("#platformPanelA").classList.add("hidden");
+        showConflict("#conflictNoteA", "");
+        updateChipsA();
+      });
+      $("#comparisonA").addEventListener("click", () => {
+        $("#comparisonPanelA").classList.toggle("hidden");
+        $("#platformPanelA").classList.add("hidden");
+        updateComparisonListA();
+      });
+      $all("[data-source-tab]").forEach(tab => {
+        tab.addEventListener("click", () => {
+          stateA.comparisonSource = tab.dataset.sourceTab;
+          $all("[data-source-tab]").forEach(item => item.className = "");
+          tab.className = `active ${stateA.comparisonSource}`;
+          updateComparisonListA();
+        });
+      });
+      $("#addComparisonA").addEventListener("click", () => {
+        const source = stateA.comparisonSource;
+        applyPlatformSelection(stateA, source);
+        $("#comparisonPanelA").classList.add("hidden");
+        showConflict("#comparisonConflictNoteA", "");
+        updateChipsA();
+      });
+      updateChipsA();
+    }
+
+    function updateChipsB() {
+      const chips = $("#chipsB");
+      const dynamic = [];
+      [...stateB.applied.threads].forEach(keyword => {
+        dynamic.push(`<span class="chip threads">Threads · ${keyword} <span class="x">×</span></span>`);
+      });
+      [...stateB.applied.xhs].forEach(keyword => {
+        dynamic.push(`<span class="chip xhs">XHS · ${keyword} <span class="x">×</span></span>`);
+      });
+      chips.querySelectorAll("[data-dynamic]").forEach(node => node.remove());
+      chips.insertAdjacentHTML("beforeend", dynamic.map(html => html.replace("class=\"chip", "data-dynamic class=\"chip")).join(""));
+      const count = stateB.applied.threads.size + stateB.applied.xhs.size;
+      $("#platformKeywordCountB").textContent = count;
+      $("#platformKeywordCountB").classList.toggle("hidden", count === 0);
+      $("#platformKeywordControlB").classList.toggle("active", count > 0);
+      const hasThreads = stateB.applied.threads.size > 0;
+      $("#activeKeywordB").textContent = stateB.activeKeyword;
+      renderMetrics("#cardsB", hasThreads, stateB.activeKeyword);
+      renderBars("#barsB", hasThreads);
+      updateQueryStrip("#queryStripB", stateB.applied, "b", stateB.activeKeyword);
+    }
+
+    function updateSelectedPlatformKeywordsB() {
+      const selected = [
+        ...[...stateB.selected.threads].map(keyword => ({ source: "threads", keyword })),
+        ...[...stateB.selected.xhs].map(keyword => ({ source: "xhs", keyword }))
+      ];
+      const container = $("#selectedPlatformKeywordsB");
+      if (!selected.length) {
+        container.textContent = "No platform keyword selected";
+        return;
+      }
+      container.innerHTML = selected.map(({ source, keyword }) => (
+        `<span class="selected-platform-chip ${source}">${sourceLabel(source)} · ${keyword}</span>`
+      )).join("");
+    }
+
+    function renderPlatformKeywordListB() {
+      const source = stateB.activePlatformSource;
+      const container = $("#platformKeywordListB");
+      container.innerHTML = "";
+      getMergedPlatformKeywords()
+        .filter(item => item.platforms.includes(source))
+        .forEach(item => {
+          const otherSource = getOtherSource(source);
+          const isChecked = stateB.selected[source].has(item.keyword);
+          const willReplace = stateB.selected[otherSource].size > 0 && !stateB.selected[otherSource].has(item.keyword);
+          const label = document.createElement("label");
+          label.className = "keyword-option with-platforms";
+          if (isChecked) label.classList.add("current");
+          if (willReplace) label.classList.add("conflict");
+
+          const input = document.createElement("input");
+          input.type = "checkbox";
+          input.checked = isChecked;
+          input.addEventListener("change", () => {
+            selectMergedPlatformKeywordB(item.keyword, source, input.checked);
+            renderPlatformKeywordListB();
+            updateSelectedPlatformKeywordsB();
+          });
+
+          const text = document.createElement("span");
+          const sub = item.subBySource[source] || Object.values(item.subBySource)[0];
+          const conflictTag = willReplace
+            ? `<div class="replace-tag">Replace current keyword</div>`
+            : "";
+          text.innerHTML = `<div class="keyword-main">${item.keyword}</div><div class="keyword-sub">${sub}</div>${conflictTag}`;
+
+          const platformBadges = document.createElement("span");
+          platformBadges.className = "keyword-platforms";
+          platformBadges.innerHTML = item.platforms.map(platform => (
+            `<span class="platform-mini-badge ${platform}">${sourceLabel(platform)}</span>`
+          )).join("");
+
+          label.append(input, text, platformBadges);
+          container.appendChild(label);
+        });
+      $all("[data-b-platform-source]").forEach(tab => {
+        const isActive = tab.dataset.bPlatformSource === source;
+        tab.className = isActive ? `active ${source}` : "";
+      });
+      updateSelectedPlatformKeywordsB();
+      $("#confirmPlatformB").textContent = stateB.pendingReplacement ? "Replace & Add" : "Add";
+    }
+
+    function updateComparisonListB() {
+      createKeywordList($("#comparisonListB"), stateB.comparisonSource, stateB.selected[stateB.comparisonSource], (keyword, checked) => {
+        selectPlatformKeyword(stateB, stateB.comparisonSource, keyword, checked, "#comparisonConflictNoteB", updateComparisonListB);
+      }, false, stateB);
+      $("#addComparisonB").textContent = stateB.pendingReplacement ? "Replace & Add" : "Add";
+    }
+
+    function setupB() {
+      renderMetrics("#cardsB", false);
+      renderBars("#barsB", false);
+      renderPlatformKeywordListB();
+      $("#platformKeywordControlB").addEventListener("click", () => {
+        $("#platformPanelB").classList.toggle("hidden");
+        $("#comparisonPanelB").classList.add("hidden");
+        renderPlatformKeywordListB();
+      });
+      $all("[data-b-platform-source]").forEach(tab => {
+        tab.addEventListener("click", () => {
+          stateB.activePlatformSource = tab.dataset.bPlatformSource;
+          showConflict("#conflictNoteB", "");
+          renderPlatformKeywordListB();
+        });
+      });
+      $("#confirmPlatformB").addEventListener("click", () => {
+        applyAllPlatformSelections(stateB);
+        $("#platformPanelB").classList.add("hidden");
+        showConflict("#conflictNoteB", "");
+        updateChipsB();
+      });
+      $("#comparisonB").addEventListener("click", () => {
+        $("#comparisonPanelB").classList.toggle("hidden");
+        $("#platformPanelB").classList.add("hidden");
+        updateComparisonListB();
+      });
+      $all("[data-b-comparison-source]").forEach(tab => {
+        tab.addEventListener("click", () => {
+          stateB.comparisonSource = tab.dataset.bComparisonSource;
+          $all("[data-b-comparison-source]").forEach(item => item.className = "");
+          tab.className = `active ${stateB.comparisonSource}`;
+          updateComparisonListB();
+        });
+      });
+      $("#addComparisonB").addEventListener("click", () => {
+        applyPlatformSelection(stateB, stateB.comparisonSource);
+        $("#comparisonPanelB").classList.add("hidden");
+        showConflict("#comparisonConflictNoteB", "");
+        updateChipsB();
+      });
+      updateChipsB();
+    }
+
+    $all(".version-tabs button").forEach(button => {
+      button.addEventListener("click", () => {
+        const version = button.dataset.version;
+        $all(".version-tabs button").forEach(item => item.classList.remove("active"));
+        button.classList.add("active");
+        $("[data-screen='a']").classList.toggle("hidden", version !== "a");
+        $("[data-screen='b']").classList.toggle("hidden", version !== "b");
+        $("#versionNote").textContent = version === "a"
+          ? "A: follows current XHS switch behavior"
+          : "B: combines XHS and Threads in one platform keyword control";
+      });
+    });
+
+    document.addEventListener("click", event => {
+      const panelSelectors = ["#platformPanelA", "#comparisonPanelA", "#platformPanelB", "#comparisonPanelB"];
+      const triggerSelectors = ["[data-platform-trigger]", "#comparisonA", "#platformKeywordControlB", "#comparisonB"];
+      const insidePanel = panelSelectors.some(selector => $(selector).contains(event.target));
+      const onTrigger = triggerSelectors.some(selector => event.target.closest(selector));
+      if (!insidePanel && !onTrigger) {
+        panelSelectors.forEach(selector => $(selector).classList.add("hidden"));
+      }
+    });
+
+    setupA();
+    setupB();
+  </script>
+</body>
+</html>
