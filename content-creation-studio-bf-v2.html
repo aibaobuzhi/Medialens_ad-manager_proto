@@ -911,7 +911,7 @@ body.dd-page .ml-content{padding-top:18px}
   <span class="dm-ctl-label" style="margin-left:8px">AGENT</span>
   <div class="dm-select-lite">bf_agent v2<span class="cv">▾</span></div>
   <span class="spacer"></span>
-  <span class="dm-meta-label">Aug 2026 · FB 136 &amp; IG 50 posts · run #34 · 10:00 HKT daily</span>
+  <span class="dm-meta-label">Aug 2026 · FB 136 &amp; IG 50 posts · run #34 · 09:00 HKT daily</span>
 </div>
 
 <div class="tab-panel active" id="tab-work">
@@ -1053,10 +1053,15 @@ body.dd-page .ml-content{padding-top:18px}
       <div class="cfgsec__h">Reference sources</div>
       <div class="cfghint" style="padding:0 0 10px">High-confidence outlets the topic agent reads first. A source listed here is trusted for tier assignment; anything found elsewhere still has to pass the ≥2 independent sources bar.</div>
       <div class="srcrows" id="srcList">
-        <div class="srcr"><input value="hkexnews.hk"><select><option>Tier 3 · primary</option><option>Tier 2</option><option>Tier 1</option></select><button class="x" title="Remove">✕</button></div>
+        <div class="srcr"><input value="wallstreetcn.com"><select><option>Tier 2</option><option>Tier 3 · primary</option><option>Tier 1</option></select><button class="x" title="Remove">✕</button></div>
+        <div class="srcr"><input value="hk.finance.yahoo.com"><select><option>Tier 2</option><option>Tier 3 · primary</option><option>Tier 1</option></select><button class="x" title="Remove">✕</button></div>
         <div class="srcr"><input value="hkej.com"><select><option>Tier 2</option><option>Tier 3 · primary</option><option>Tier 1</option></select><button class="x" title="Remove">✕</button></div>
+        <div class="srcr"><input value="hket.com"><select><option>Tier 2</option><option>Tier 3 · primary</option><option>Tier 1</option></select><button class="x" title="Remove">✕</button></div>
+        <div class="srcr"><input value="finance.now.com"><select><option>Tier 2</option><option>Tier 3 · primary</option><option>Tier 1</option></select><button class="x" title="Remove">✕</button></div>
+        <div class="srcr"><input value="futunn.com"><select><option>Tier 1</option><option>Tier 3 · primary</option><option>Tier 2</option></select><button class="x" title="Remove">✕</button></div>
         <div class="srcr"><input value="reuters.com"><select><option>Tier 2</option><option>Tier 3 · primary</option><option>Tier 1</option></select><button class="x" title="Remove">✕</button></div>
         <div class="srcr"><input value="bloomberg.com"><select><option>Tier 2</option><option>Tier 3 · primary</option><option>Tier 1</option></select><button class="x" title="Remove">✕</button></div>
+        <div class="srcr"><input value="hkexnews.hk"><select><option>Tier 3 · primary</option><option>Tier 2</option><option>Tier 1</option></select><button class="x" title="Remove">✕</button></div>
         <div class="srcr"><input value="info.gov.hk"><select><option>Tier 3 · primary</option><option>Tier 2</option><option>Tier 1</option></select><button class="x" title="Remove">✕</button></div>
       </div>
       <div class="srcadd">
@@ -1068,19 +1073,31 @@ body.dd-page .ml-content{padding-top:18px}
     <section class="cfgsec">
       <div class="cfgsec__h">Topic selection prompt</div>
       <div class="cfghint" style="padding:0 0 9px">What the agent looks for when it builds the daily candidate pool. This is the brand thesis in its own words — it feeds Brand Fit, the heaviest component of Topic Score.</div>
-      <textarea class="ctta" id="topicPrompt" style="min-height:132px">You are selecting daily topics for BusinessFocus, a Hong Kong business and capital-markets publication.
+      <textarea class="ctta" id="topicPrompt" style="min-height:132px">目標讀者是香港人：你是替財經網站揀題，所以第一優先不是「全球最大新聞」，而是香港讀者會關心、會點、而且值得報道的新聞。
 
-Look for news that could shift, or is shifting, how value is distributed in capital or business markets — IPO filings, funding rounds, regulatory changes, earnings surprises, policy that moves cost structures.
+【每日量級】每日整理約 20 條財經新聞。
 
-Prefer stories that are early: a topic already widely covered scores lower. Prefer stories with a hard number that can be checked against a primary document (a prospectus, a filing, an official release).
+【來源要綜合，不單看一家】包括 華爾街見聞 / Wall Street CN、Yahoo Finance HK、信報、HKET、Now Finance、富途，再搭配主要外媒及原始資料。
 
-Skip: celebrity news, lifestyle, sport, anything without a business consequence you can name in one sentence.</textarea>
+【揀題核心排序】優先選擇有即時性、重大影響、實質數據、香港關聯、高討論度 / 高點擊潛力的題材。
+
+【重點財經範圍】港股及大型上市公司、業績；香港樓市、按揭、銀行存款及利率；IPO / 新股 / 配股 / 集資；中國宏觀政策及內地市場對香港的影響；美股、聯儲局及全球市場，但要以對香港投資者有直接影響為主；科技、AI、晶片、新能源車；黃金、加密貨幣；香港本地經濟數據、政策及監管。
+
+【新聞價值不只看市場升跌】涉及金融市場、大企業、重大政策變化，以及有鮮明人物、衝突或故事線的題目，價值較高。
+
+【要剔除的題目】純粹股價日常波動、一般市場噪音、重複新聞、缺乏實質內容、影響有限，以及與香港讀者關聯太弱的消息。
+
+【揀中之後才做深】不是照抄單一媒體，而是再搜集多來源、最新數據、背景、原因及市場影響，把它發展成完整題目。
+
+【週末另有一套偏好】減少高變數、很快過時的突發題，例如交通事故、即時政情、中東突發等；優先可以延伸成懶人包、觀點、生活化內容、週末仍有討論度的題材，例如 AI 日常應用、科技趨勢、投資主題等。
+
+【突發財經題的判斷角度】最好能很快回答「發生咩事 → 資金 / 市場點解咁走 → 關鍵技術位 / 風險係邊」，單純「某股升 X%」通常不足以成為主題。</textarea>
       <div class="cfgcount" id="tpCount">— characters</div>
     </section>
 
     <section class="cfgsec">
       <div class="cfgsec__h">Schedule</div>
-      <div class="cfgrow"><label>Run time</label><input class="ctin" value="10:00" style="max-width:110px;margin:0"><select class="epm__sel"><option>Asia/Hong_Kong</option></select></div>
+      <div class="cfgrow"><label>Run time</label><input class="ctin" value="09:00" style="max-width:110px;margin:0"><select class="epm__sel"><option>Asia/Hong_Kong</option></select></div>
       <div class="cfgrow"><label>Topics per run</label><input class="ctin" value="3" style="max-width:80px;margin:0"><span class="cfghint">how many get adopted per day</span></div>
       <div class="cfgrow"><label>Pool size</label><input class="ctin" value="20" style="max-width:80px;margin:0"><span class="cfghint">candidates generated per run</span></div>
       <div class="cfgrow"><label>Max per category</label><input class="ctin" value="2" style="max-width:80px;margin:0"></div>
