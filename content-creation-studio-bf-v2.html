@@ -1042,6 +1042,7 @@ body.dd-page .ml-content{padding-top:18px}
 
   <div class="cfgtabs">
     <button class="on" data-cfg="topic">Topic Setting</button>
+    <button data-cfg="write">Article Writing</button>
     <button data-cfg="brand">Brandlines Setting</button>
     <button data-cfg="image">Image Setting</button>
     <button data-cfg="deliv">Auto Delivery</button>
@@ -1121,6 +1122,93 @@ body.dd-page .ml-content{padding-top:18px}
   </div>
 
   <!-- ══ Brandlines Setting ══ -->
+  <!-- ══ Article Writing ══ -->
+  <div class="cfgpane" id="cfgpane-write">
+    <section class="cfgsec">
+      <div class="cfgsec__h">Article writing prompt</div>
+      <div class="cfghint" style="padding:0 0 8px">How the agent writes the article once a topic is adopted. This is the <b>only</b> place the writing behaviour is configured — the writing skill reads this field rather than carrying BF's rules in its own code, which is what lets a second brand write in a different voice without forking the skill.</div>
+      <textarea class="ctta" id="writePrompt" style="min-height:260px">你是面向香港讀者的財經新聞及分析報道助手，服務 BusinessFocus。你的產物是一篇可直接發布、或只需輕度編修即可發布的完整繁體中文財經分析報道 —— 不是資訊卡片、不是摘要、不是大綱、不是貼文草稿。
+
+【報道角度】以香港商業媒體的編採寫法為準：sharp、緊湊、有新聞張力、有分析力度。要指得出事件背後的利益分配、權力角力、市場情緒、估值風險、監管訊號或策略動機。不要寫成平鋪直敘的資料摘要，也不要停留在空泛評論。
+
+【核心目標】讀者看完除了知道發生什麼，更會思考誰得益、誰受壓、背後動機是什麼、風險是否被低估。優先聚焦最具爭議、最值得討論、最可能牽動市場情緒或利益分配的部分。可帶出視角觀點，必要時可加入少量懷疑性推演或利益博弈角度，但必須建立在已知事實、合理脈絡或市場爭議之上，不可無根據杜撰陰謀。
+
+【固定文章結構】除非明確要求改格式，全文固定八個區段，逐段落錨點 s1–s8：
+
+s1 爆點標題 — 概括全文最值得關注的矛盾、利益衝突、市場風險或爭議核心。要短、狠、醒目，適合拆成四行。避免平鋪直敘的摘要式標題。標題後固定加上【 @businessfocus.io 】【#BF社會熱話】，與標題主體同一行，不可省略、不可改字、不可改順序、不可改括號樣式。
+s2 導言 — 有爆款感，第一時間點出全文核心重點；交代新聞事件本身，以及為何市場不能只看表面。不可過長，但要有力度。
+s3 第一大段 — 交代事件核心、最新發展、關鍵數字與市場表面解讀。必須有一個清晰有力的小標題，正文固定分兩個自然段落。
+s4 第二大段 — 拆解最具爭議之處、利益博弈、潛在動機、被忽略的訊號。同樣一個小標題 + 兩個自然段落。
+s5 第三大段 — 分析市場影響、投資者情緒、估值邏輯、後續風險或局勢演變。同樣一個小標題 + 兩個自然段落。
+s6 結尾段 — 無小標題。把全文收束到投資者、市場、企業或監管層面真正需要面對的後果、風險或判斷。不要重複前文，要把分析推前一步。
+s7 Hashtag 行 — 先輸出 #BusinessFocus #BF #Insight，然後在同一行後面直接接上與該篇主題最相關的 hashtag。不要獨立拆成一節，不要加「關鍵詞標籤」小標，不要在 #BusinessFocus 之前加任何前置文字。
+s8 固定文末聲明與品牌文字 — 品牌署名、免責聲明、follow 行。逐字固定，一個字都不可改寫。
+
+【語言與香港風格】
+- 必須繁體中文，用香港讀者熟悉的財經語感與書面說法。
+- 嚴禁明顯偏向內地或台灣的用語、句式或詞彙。
+- 可用香港財經報道常見表述：市場憂慮、股價受壓、資金流向、估值、抽水、托市、放風、炒作、水位、落鑊位。整體保持書面、專業，不要口語化。
+- 避免大量使用「這、那、這些、那些、我們、此類」等空泛代詞，改用精確名詞。
+- 避免內地公文式、官樣式、教科書式行文。
+
+【股票代碼與金額格式】
+- 首次提及任何股票、ETF 或上市公司股票，名稱後必須按市場格式補代碼。
+- 港股只寫四位數：騰訊（0700）。
+- A股固定寫「A股：代碼」：綠的諧波（A股：688017）。
+- 其他市場寫明市場再加代碼：英偉達（美股：NVDA）、台積電（美股：TSM）。
+- 同一篇內首次出現必須完整標示；其後語意清楚可不重複，但相隔較遠或多隻股票比較時要再標清楚。
+- 非上市實體、無法對應單一代碼的公司，不要硬加代碼。
+- 估值、融資額、市值、交易額、投資額、賠償額、收購價、目標價等非股價金額，若原幣種不是港元，後方補「（約合港元）」。
+- 股價本身不加「約合港元」，只需寫清原幣種：135元人民幣、135美元、18.6港元。
+
+【多來源與資訊不足】
+- 多條連結：先整合共通主線，再判斷聚焦單一核心事件還是寫成主題式分析。
+- 資訊互相矛盾：指出矛盾來源，不要強行拼成單一敘事。
+- 證據不足以支持強判斷：改寫成市場猜測、外界質疑、值得留意的訊號，不要當成定論。
+- 連結內容不完整、無法讀取或受限：先清楚指出資訊缺口，再基於現有材料完成可支持的分析，不要假裝已看到未取得的內容。
+
+【底線】
+- 不捏造新聞事實、引述、數字、股價、來源、監管動作或市場反應。
+- 不把未經證實的傳聞寫成事實。可以分析爭議與可疑訊號，但必須清楚區分事實、推論與懷疑。
+- 不寫成投資建議、買賣指示或確定性預測。
+- 內容若主要屬宣傳、放風、單一消息來源或證據薄弱，必須直接指出可信度限制。
+- 資料不足以完成高質量報道時，坦白說明哪些關鍵資訊仍未明朗，並在可支持範圍內完成內容。</textarea>
+      <div class="cfgcount" id="wpCount">— characters</div>
+    </section>
+
+    <section class="cfgsec">
+      <div class="cfgsec__h">Section anchors <span class="tg tg-b">s1 – s8</span></div>
+      <div class="cfghint" style="padding:0 0 10px">The prompt above produces these eight anchored sections. <b>Everything downstream reads the anchors, not the prose</b> — captions are sliced by them (FB = s1–s7, IG = s1–s8), Readiness checks 1 and 3–6 test them, and each info card is generated from the段 it maps to.</div>
+      <div class="dm-table-scroll"><table class="dm-modern-table dm-modern-table--compact">
+        <thead><tr><th>Anchor</th><th>Section</th><th>Shape</th><th>Feeds</th></tr></thead>
+        <tbody>
+          <tr><td>s1</td><td>爆點標題</td><td>單行 + 固定尾綴</td><td>Readiness #2 · 全部圖的標題來源</td></tr>
+          <tr><td>s2</td><td>導言</td><td>一段</td><td>caption 開頭</td></tr>
+          <tr><td>s3</td><td>第一大段 · 事件核心</td><td>小標題 + 2 自然段</td><td><b>資訊圖 03 事件拆解</b></td></tr>
+          <tr><td>s4</td><td>第二大段 · 爭議與動機</td><td>小標題 + 2 自然段</td><td><b>資訊圖 04 痛點分析</b></td></tr>
+          <tr><td>s5</td><td>第三大段 · 市場影響與風險</td><td>小標題 + 2 自然段</td><td><b>資訊圖 05 解法重點</b></td></tr>
+          <tr><td>s6</td><td>結尾段</td><td><b>無</b>小標題</td><td><b>資訊圖 06 CTA</b> · Readiness #4</td></tr>
+          <tr><td>s7</td><td>Hashtag 行</td><td>單行，#BusinessFocus 打頭</td><td>FB caption 結尾 · Readiness #5</td></tr>
+          <tr><td>s8</td><td>文末聲明與品牌文字</td><td>逐字固定</td><td><b>僅 IG</b> caption · Readiness #6</td></tr>
+        </tbody>
+      </table></div>
+      <div class="cfghint" style="padding:10px 0 0">區段數由 <b>Auto Delivery</b> tab 的 <code>required_sections</code> 決定，<b>不是寫死 8</b>。沒有固定結構的品牌設 0，正文就是純富文本、無錨點。</div>
+    </section>
+
+    <section class="cfgsec">
+      <div class="cfgsec__h">⚠ 這份 prompt 不管的三件事</div>
+      <div class="dm-table-scroll"><table class="dm-modern-table dm-modern-table--compact">
+        <thead><tr><th>不歸它管</th><th>歸誰管</th><th>為什麼要分開</th></tr></thead>
+        <tbody>
+          <tr><td>揀咩題</td><td><b>Topic Setting</b> 的 selection_prompt</td><td>揀題與寫文是兩個 gate 之間的兩件事，混在一起就無法「否掉選題但保留寫作規則」</td></tr>
+          <tr><td>文案聽起來像邊個</td><td><b>Brandlines</b> 的 Brand Vibe &amp; Tone</td><td>換品牌時 voice 要能單獨換，唔使重寫整份結構規則</td></tr>
+          <tr><td>圖點樣生成</td><td><b>Image Setting</b> 的 generation prompt</td><td>圖由文章衍生，但生圖規格（模板、比例、版面）同寫作規則是兩套約束</td></tr>
+        </tbody>
+      </table></div>
+      <div class="cfghint" style="padding:10px 0 0"><b>原 agent 規格裡的 Google Drive 上傳與 Notion 歸檔兩節冇搬過嚟。</b>v3 的產物一律落 MediaLens 平台（交付 + post），不寫 Drive、不寫 Notion —— 呢個係已定的範圍，唔係漏抄。</div>
+    </section>
+  </div>
+
   <div class="cfgpane" id="cfgpane-brand">
     <section class="cfgsec">
       <div class="cfgsec__h">Brand Logo <span class="lk" style="background:var(--dm-slate-100);color:var(--dm-slate-500)">optional · multiple</span></div>
@@ -1181,13 +1269,72 @@ body.dd-page .ml-content{padding-top:18px}
         <button class="tchip" data-tpl="@info">@info</button>
         <button class="tchip" data-tpl="@banner">@banner</button>
       </div>
-      <textarea class="ctta" id="imgPrompt" style="min-height:150px;margin-top:10px">Slot 02 (cover): follow @cover exactly — same grid, same title block position, same lower-third band. Replace only the headline text and the key figure.
+      <textarea class="ctta" id="imgPrompt" style="min-height:260px">【全部圖片都由已完成的文章衍生，不是獨立創作】
+六張圖一律根據**同一篇已完成的文章正文與標題**提煉，不可脫離文章自由發揮，也不可在文章未完成前開始做圖。每張圖要處理文章的哪一部分，見下面逐 slot 說明。
 
-Slots 03–06 (info cards): follow @info. One statistic per card, set in the same weight and position as the template. Numbers must match the article body verbatim — never round, never invent.
+【數據核實 — 適用於每一張圖】
+圖上所有可核對數字（股價、跌幅、升幅、股票代號、日期、金額、百分比、估值、排名）必須能在文章正文裡找到出處，且與正文逐字一致 —— 不許四捨五入、不許自行估算、不許補齊、不許腦補。核不到的數字寧願不放。
 
-Slot 07 (banner): follow @banner at 1.91:1. Headline only, no body copy.
+【人物 — 適用於封面與橫版】
+人物必須按文章核心人物選取，不可為吸睛加入與主線不相干的人物。使用前必須先核實真實身份、職稱與事件的直接關聯；核實不清楚時，寧願不用人物。人物、公司標識與場景要互相扣連。身份牌文字格式固定為「職稱 姓名」（例：美國總統 特朗普），不要只寫姓名，不要寫錯職稱。
 
-Across all slots: Traditional Chinese, no watermark, no stock-photo faces, high contrast for mobile feed viewing.</textarea>
+【共通視覺】
+繁體中文。主色科技感藍 #184c83，點綴與關鍵文字用檸檬黃 #fefb09；黃色與底色太接近時加藍色描邊或投影提升辨識度。要有爆款衝擊力、財經媒體感與真實感，不要有明顯 AI 感、塑膠感、過度幻想感或卡通感。無水印，不用圖庫人臉，移動端信息流下要有高對比。
+
+────────────────────────────────
+
+【Slot 02 · 直版封面 4:5】嚴格 follow @cover
+
+從文章核心提煉一個最具衝擊力的封面概念。版面骨架逐項對照 @cover，做到幾乎完全一樣 —— 畫面分區、文字位置、字級比例、留白、裝飾線、標語帶、人物位置、身份牌、底部收尾區都優先模仿模板，不可自行簡化、重組或替換。
+
+模板骨架（必要元素，不可省略）：最上方 BusinessFocus 標頭區與頂部白線框裝飾 → 其下三段式高密度標題區 → 中間一條黃色橫幅標語帶 → 中下部左人右景主視覺 → 最底部一整條深藍色大字收尾區。
+
+- 標題必須直接入題，緊扣文章的核心事件、核心公司、核心爭議、核心風險、核心市場反應或核心利益衝突，讓讀者一眼知道這篇在講什麼。不要為故作懸念而避開重點，不要寫成太空泛看不出落點的包裝句。
+- 從文章的核心爭議、利益衝突、風險訊號或市場情緒切入。事件若涉及資本操作、估值泡沫、監管風險、抽水、業績爆雷、放風或權力角力，優先把最具張力的一點變成封面主軸。
+- 標題行數、字位、大小與分段一律模仿模板實際版面，不要套用「固定四行」這類獨立規則。
+- 保留模板那種飽和、壓迫、資訊量高的媒體封面節奏，不要用「畫面保持乾淨簡約」去弱化它。
+- 背景以淺白融合為主，白天場景；可加入與文章內容相關的陰影圖案、金融圖表、城市商業輪廓、公司象徵物、交易屏幕感元素或事件關鍵符號，但要克制不要雜亂。
+- 事件明確涉及上市公司、品牌或機構時，可加入相關標識加強新聞指向性；文章核心不依賴人物或品牌辨識時，不必強行加入。
+- 底部不放額外 logo，但保留模板式的整條深藍色大字收尾區。
+
+────────────────────────────────
+
+【Slot 03–06 · 資訊圖 4:5 ×4】嚴格 follow @info
+
+同一篇文章延伸出四張，內容分工固定，不可調換：
+- 03 事件拆解 — 快速交代發生什麼、涉及誰、核心數字或衝突點（對應文章 s3）
+- 04 痛點分析 — 痛點、爭議點、盲點，或可轉化成讀者可吸收的乾貨教學（對應文章 s4）
+- 05 解法重點 — 解決方案、圖表化重點、路徑拆解、影響機制或結構性比較（對應文章 s5）
+- 06 CTA — 結尾收束，用強而有力的 Call-to-action 或思考引導。不要寫成「獲取資訊」「追蹤了解更多」之類低質導流字句（對應文章 s6）
+
+版式對照 @info 做到幾乎一模一樣，只替換當次內容：
+- 上半部保留大標題區，中部保留核心數據或重點模塊，下半部保留多欄資訊區與引語或總結區的節奏。
+- 底部必須有和模板一樣的深藍色分割底色帶，並置中放 BusinessFocus logo，位置、比例與視覺功能對齊模板。底部分割底色與 logo 是必要元素，不可省略、不可改成其他顏色邏輯。
+- 保留模板式的白底主畫面、藍黃點綴、高對比數字模塊、卡片式分欄、引語區塊與資訊圖示配置。
+- 整體要對齊模板的高密度財經資訊圖感，不可改成簡約卡片風或其他社交媒體版式。
+- 不要加頁數標籤。各區塊內容可以換，但版面骨架、資訊密度、底部 logo 區與分割底色要跟模板一致。
+
+────────────────────────────────
+
+【Slot 07 · 橫版封面 1.91:1 → 1000×525】嚴格 follow @banner
+
+從同一篇文章生成。版式對照 @banner 做到幾乎完全一樣 —— 上方標題位置、人物大小與位置、中部數據牌、紅色箭咀、右側拼貼場景、右上 logo、底部整條藍區、兩行獨立標題、字距與留白比例都優先模仿模板。
+
+模板骨架（必要元素）：上方大標題區 → 左側大人物主體 → 中部核心數據牌與紅色箭咀 → 右側城市／產業／事件拼貼場景 → 右上角 BusinessFocus logo → 底部深藍色大字收尾區。
+
+三句標題必須各不相同，不可重複改寫同一句：
+- 頂部白字句 = 電梯句／思考句，快速拋出判斷、懸念、反問或市場情緒。不是主標題也不是副標題。必須是一整條完整標題句，位置固定在上邊緣，字量不能太少。
+- 底部第一行 = 主標題，整張圖的核心爆點句。文字用檸檬黃，放在藍底加白色箭頭覆蓋的結構上（不要把箭頭區做成獨立白底塊）。第一行最右側的白色箭頭必須頂住最右邊界，不可懸空縮在中間。
+- 底部第二行 = 副標題，補充主標題的背景、衝擊範圍、受影響對象或結果。沒有白色箭頭，作為獨立第二行收尾訊息。
+
+底部藍區規格（最容易做錯的一段）：
+- 它是橫跨全畫面底部的一整條深藍色帶，不是局部小框，也不是漂浮標題條。寬度貼齊畫面左右邊界，高度比例接近模板。
+- 兩行標題必須完整坐落在藍色帶內、垂直置中分布，不能上浮到主畫面，也不能壓出藍色區域外。
+- 兩行都要有足夠字量撐滿藍區，令視覺密度接近模板；不要只放幾個字令底部顯得空洞。標題較長時透過兩行分配、字距與字級微調去填滿，不要縮小標題框或把它移出模板位置。
+- 兩行必須是各自獨立表述的兩個短句或兩個訊息點，不可把同一句話機械式拆成上下兩行。兩行在語意上都要直接服務當篇文章主題，不可只用空泛口號或與主題距離太遠的概念句。
+- 兩行在樣式上必須明確區分，不能做成兩行完全一樣的文字條。
+
+右側場景按文章主題替換為相應的城市、樓市、公司、產業或事件場景，但保持模板式的拼貼構圖與新聞感。整體保留模板那種高密度、強衝擊的財經新聞封面感，不要做成普通橫幅廣告或極簡 hero banner。</textarea>
       <div class="cfgcount" id="ipCount">— characters</div>
     </section>
 
@@ -1811,6 +1958,11 @@ q('#btnSettings').addEventListener('click', enterCfg);
 q('#cfgBack').addEventListener('click',function(){ exitPages(); window.scrollTo(0,0); });
 
 /* settings sub-tabs */
+(function(){
+  var wp=q('#writePrompt'), wc=q('#wpCount');
+  if(wp&&wc){ var f=function(){ wc.textContent=wp.value.length+' characters'; }; wp.addEventListener('input',f); f(); }
+})();
+
 qa('.cfgtabs button').forEach(function(b){
   b.addEventListener('click',function(){
     qa('.cfgtabs button').forEach(function(x){x.classList.remove('on')});
