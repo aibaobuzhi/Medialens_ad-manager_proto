@@ -776,9 +776,70 @@ body.dd-page .ml-content{padding-top:18px}
 .cfgw__t{margin-top:7px;padding-top:7px;border-top:1px solid var(--dm-slate-200);font:600 11px var(--font-body);color:var(--dm-slate-600);text-align:right}
 .cfgw__t b{font-family:var(--font-metric);color:var(--dm-slate-800)}
 .swatch{width:22px;height:22px;border-radius:5px;border:1px solid var(--dm-slate-300)}
+
+/* ── v3.0 Settings: identity header + sub-tabs + upload + source rows ── */
+.cfgid{border:1px solid var(--dm-border-light);border-radius:12px;background:#fff;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04);margin-bottom:14px}
+.cfgid__g{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:18px}
+@media(max-width:900px){.cfgid__g{grid-template-columns:1fr}}
+.cfgid__l{font:700 9.5px var(--font-body);letter-spacing:.06em;color:var(--dm-slate-400);margin-bottom:6px}
+.cfgid .ctin{margin-bottom:0;font:600 14px var(--font-heading);color:var(--dm-slate-800)}
+.acct{display:flex;align-items:center;gap:9px;border:1px solid var(--dm-slate-200);border-radius:9px;padding:8px 11px;background:var(--dm-slate-50);margin-bottom:7px}
+.acct:last-child{margin-bottom:0}
+.acct__av{width:26px;height:26px;border-radius:7px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font:700 12px var(--font-body);color:#fff}
+.acct__av--fb{background:#1877F2}.acct__av--ig{background:linear-gradient(135deg,#F58529,#DD2A7B,#8134AF)}
+.acct__n{flex:1;min-width:0;font:600 12px var(--font-body);color:var(--dm-slate-800)}
+.acct__n em{display:block;font-style:normal;font-weight:400;font-size:10.5px;color:var(--dm-slate-500);margin-top:1px}
+.acct__st{flex:0 0 auto;background:#ECFDF5;color:#047857;border-radius:5px;padding:2px 8px;font:700 9.5px var(--font-body)}
+
+.cfgtabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.cfgtabs button{border:1px solid var(--dm-slate-300);background:#fff;color:var(--dm-slate-600);border-radius:20px;padding:6px 16px;font:600 12px var(--font-body);cursor:pointer;transition:all .15s}
+.cfgtabs button:hover{border-color:var(--dm-primary);color:var(--dm-primary)}
+.cfgtabs button.on{background:var(--dm-primary);border-color:var(--dm-primary);color:#fff}
+.cfgpane{display:none}
+.cfgpane.on{display:grid;gap:14px}
+
+.upz{border:1.5px dashed var(--dm-slate-300);border-radius:10px;background:var(--dm-slate-50);padding:18px;text-align:center;cursor:pointer;transition:all .15s}
+.upz:hover{border-color:var(--dm-primary);background:#F2F9FF}
+.upz__i{font-size:22px;margin-bottom:5px}
+.upz__t{font:600 12px var(--font-body);color:var(--dm-slate-700);margin-bottom:3px}
+.upz__r{font:400 10.5px/1.6 var(--font-body);color:var(--dm-slate-500)}
+.upz__r b{color:var(--dm-slate-700)}
+.upgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:9px;margin-top:11px}
+.upgrid:empty{display:none}
+.upcell{position:relative;border:1px solid var(--dm-slate-200);border-radius:8px;overflow:hidden;background:#fff}
+.upcell__ph{height:66px;display:flex;align-items:center;justify-content:center;font:700 10px var(--font-body);color:var(--dm-slate-500);background:linear-gradient(135deg,#F1F5F9,#E2E8F0)}
+.upcell__nm{padding:5px 7px;font:600 9.5px var(--font-body);color:var(--dm-slate-600);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.upcell__x{position:absolute;top:4px;right:4px;width:17px;height:17px;border-radius:50%;border:none;background:rgba(15,23,42,.7);color:#fff;font:700 9px/17px var(--font-body);cursor:pointer;padding:0}
+.upcell__ref{position:absolute;bottom:26px;left:4px;background:rgba(255,255,255,.92);color:#6D28D9;border-radius:4px;padding:1px 5px;font:700 8.5px var(--font-body)}
+
+.srcrows{border:1px solid var(--dm-slate-200);border-radius:9px;overflow:hidden}
+.srcr{display:flex;align-items:center;gap:8px;padding:8px 11px;border-bottom:1px solid var(--dm-slate-100);background:#fff}
+.srcr:last-child{border-bottom:none}
+.srcr input{flex:1;min-width:0;border:none;outline:none;font:400 11.5px var(--font-metric);color:var(--dm-slate-700);background:none}
+.srcr select{flex:0 0 auto;border:1px solid var(--dm-slate-200);border-radius:5px;padding:2px 6px;font:600 10px var(--font-body);color:var(--dm-slate-600);background:#fff}
+.srcr .x{flex:0 0 auto;border:none;background:none;color:var(--dm-slate-400);font-size:13px;cursor:pointer;padding:0 3px;line-height:1}
+.srcr .x:hover{color:var(--r)}
+.srcadd{display:flex;gap:7px;margin-top:9px}
+.srcadd input{flex:1;min-width:0;border:1px solid var(--dm-slate-300);border-radius:7px;padding:7px 10px;font:400 11.5px var(--font-body);color:var(--dm-slate-700)}
+.srcadd button{flex:0 0 auto;border:1px solid var(--dm-primary);background:var(--dm-primary);color:#fff;border-radius:7px;padding:7px 14px;font:600 11.5px var(--font-body);cursor:pointer}
+
+.chipbar{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;align-items:center}
+.chipbar .lb{font:700 9.5px var(--font-body);letter-spacing:.05em;color:var(--dm-slate-400);margin-right:3px}
+.tchip{background:#F5F3FF;color:#6D28D9;border:1px solid #DDD6FE;border-radius:20px;padding:3px 10px;font:600 10.5px var(--font-metric);cursor:pointer}
+.tchip:hover{background:#EDE9FE}
+.cfgcount{font:600 10px var(--font-metric);color:var(--dm-slate-400);text-align:right;margin-top:4px}
+.cfgcount.over{color:var(--r)}
+.delrow{display:flex;align-items:center;gap:11px;border:1px solid var(--dm-slate-200);border-radius:10px;padding:11px 13px;background:#fff;margin-bottom:9px}
+.delrow:last-child{margin-bottom:0}
+.delrow__ic{width:30px;height:30px;border-radius:8px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:14px;background:var(--dm-slate-100)}
+.delrow__m{flex:1;min-width:0}
+.delrow__t{font:600 12px var(--font-body);color:var(--dm-slate-800)}
+.delrow__s{font:400 10.5px/1.5 var(--font-body);color:var(--dm-slate-500);margin-top:2px}
+.softnote{background:#FFF7ED;border:1px solid #F2D98C;border-radius:9px;padding:9px 12px;font:400 10.5px/1.65 var(--font-body);color:#7C4A03}
+.softnote b{color:#5C3702}
 .te__sc .dvlink{margin-left:auto;font:700 11px var(--font-metric);color:var(--dm-primary)}
 
-/* ── v2.9: thumbnails + autopilot ── */
+/* ── v2.9: thumbnails ── */
 .thumb{flex:0 0 auto;width:38px;height:38px;border-radius:7px;background:linear-gradient(135deg,#EAF3FB,#DCE8F5);border:1px solid var(--dm-slate-200);display:flex;align-items:center;justify-content:center;font:700 11px var(--font-metric);color:var(--dm-accent);overflow:hidden}
 .thumb--ph{background:var(--dm-slate-100);color:var(--dm-slate-400);font-size:14px}
 .thumb--gen{background:linear-gradient(135deg,#EFF6FF,#DBEAFE);color:#1D4ED8;font-size:9px;font-weight:600}
@@ -816,7 +877,7 @@ body.dd-page .ml-content{padding-top:18px}
   <div class="ml-sidebar__item"><span class="dot" style="background:#f97316"></span>Ad Intelligence</div>
   <div class="ml-sidebar__section">Creation</div>
   <div class="ml-sidebar__item"><span class="dot" style="background:#23A9F6"></span>Content Publish</div>
-  <div class="ml-sidebar__item is-sub is-active">Creation &amp; Autopilot Studio<span class="ml-sidebar__new">BF</span></div>
+  <div class="ml-sidebar__item is-sub is-active">Creation Studio<span class="ml-sidebar__new">BF</span></div>
   <div class="ml-sidebar__item"><span class="dot" style="background:#8B5CF6"></span>AI Assets</div>
   <div class="ml-sidebar__section">Tools</div>
   <div class="ml-sidebar__item"><span class="dot" style="background:#94A3B8"></span>Report Scheduler</div>
@@ -834,8 +895,7 @@ body.dd-page .ml-content{padding-top:18px}
 <nav class="dm-page-menu"><div class="menu-list">
   <button class="menu-item is-active" data-tab="work">Topics</button>
   <button class="menu-item" data-tab="lib">Publish Library</button>
-  <button class="menu-item" data-tab="auto">Autopilot</button>
-  <span style="align-self:center;margin-left:10px;font:600 10px var(--font-body);color:var(--dm-slate-400);white-space:nowrap">Three tabs · topic and delivery each open as their own page</span>
+  <span style="align-self:center;margin-left:10px;font:600 10px var(--font-body);color:var(--dm-slate-400);white-space:nowrap">Two tabs · topic and delivery each open as their own page</span>
 </div></nav>
 
 <div class="dm-controls-row">
@@ -942,7 +1002,7 @@ body.dd-page .ml-content{padding-top:18px}
   <div class="te__top">
     <button class="dd__back" id="cfgBack">‹ Back</button>
     <div class="te__m">
-      <div class="te__t">Settings — BusinessFocus</div>
+      <div class="te__t">Settings</div>
       <div class="te__meta"><span>Everything a new brand needs to configure. No skill is forked.</span></div>
     </div>
     <div class="te__actions">
@@ -951,47 +1011,199 @@ body.dd-page .ml-content{padding-top:18px}
     </div>
   </div>
 
-  <div class="cfg">
+  <div class="cfgid">
+    <div class="cfgid__g">
+      <div>
+        <div class="cfgid__l">NAME</div>
+        <input class="ctin" id="cfgName" value="BusinessFocus">
+        <div class="cfghint" style="padding:6px 0 0">The brand this configuration belongs to. Everything below is scoped to this name.</div>
+      </div>
+      <div>
+        <div class="cfgid__l">LINKED ACCOUNTS</div>
+        <div class="acct">
+          <div class="acct__av acct__av--fb">f</div>
+          <div class="acct__n">BusinessFocus Facebook account<em>fb_page_635680996587830 · 952,236 followers</em></div>
+          <span class="acct__st">Connected</span>
+        </div>
+        <div class="acct">
+          <div class="acct__av acct__av--ig">◎</div>
+          <div class="acct__n">BusinessFocus IG account<em>4840127002 · 289K followers</em></div>
+          <span class="acct__st">Connected</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cfgtabs">
+    <button class="on" data-cfg="topic">Topic Setting</button>
+    <button data-cfg="brand">Brandlines Setting</button>
+    <button data-cfg="image">Image Setting</button>
+    <button data-cfg="deliv">Auto Delivery</button>
+  </div>
+
+  <!-- ══ Topic Setting ══ -->
+  <div class="cfgpane on" id="cfgpane-topic">
+    <section class="cfgsec">
+      <div class="cfgsec__h">Reference sources</div>
+      <div class="cfghint" style="padding:0 0 10px">High-confidence outlets the topic agent reads first. A source listed here is trusted for tier assignment; anything found elsewhere still has to pass the ≥2 independent sources bar.</div>
+      <div class="srcrows" id="srcList">
+        <div class="srcr"><input value="hkexnews.hk"><select><option>Tier 3 · primary</option><option>Tier 2</option><option>Tier 1</option></select><button class="x" title="Remove">✕</button></div>
+        <div class="srcr"><input value="hkej.com"><select><option>Tier 2</option><option>Tier 3 · primary</option><option>Tier 1</option></select><button class="x" title="Remove">✕</button></div>
+        <div class="srcr"><input value="reuters.com"><select><option>Tier 2</option><option>Tier 3 · primary</option><option>Tier 1</option></select><button class="x" title="Remove">✕</button></div>
+        <div class="srcr"><input value="bloomberg.com"><select><option>Tier 2</option><option>Tier 3 · primary</option><option>Tier 1</option></select><button class="x" title="Remove">✕</button></div>
+        <div class="srcr"><input value="info.gov.hk"><select><option>Tier 3 · primary</option><option>Tier 2</option><option>Tier 1</option></select><button class="x" title="Remove">✕</button></div>
+      </div>
+      <div class="srcadd">
+        <input id="srcInput" placeholder="Add a domain, e.g. sc.com or scmp.com — press Enter">
+        <button id="srcAdd">Add source</button>
+      </div>
+    </section>
+
+    <section class="cfgsec">
+      <div class="cfgsec__h">Topic selection prompt</div>
+      <div class="cfghint" style="padding:0 0 9px">What the agent looks for when it builds the daily candidate pool. This is the brand thesis in its own words — it feeds Brand Fit, the heaviest component of Topic Score.</div>
+      <textarea class="ctta" id="topicPrompt" style="min-height:132px">You are selecting daily topics for BusinessFocus, a Hong Kong business and capital-markets publication.
+
+Look for news that could shift, or is shifting, how value is distributed in capital or business markets — IPO filings, funding rounds, regulatory changes, earnings surprises, policy that moves cost structures.
+
+Prefer stories that are early: a topic already widely covered scores lower. Prefer stories with a hard number that can be checked against a primary document (a prospectus, a filing, an official release).
+
+Skip: celebrity news, lifestyle, sport, anything without a business consequence you can name in one sentence.</textarea>
+      <div class="cfgcount" id="tpCount">— characters</div>
+    </section>
+
     <section class="cfgsec">
       <div class="cfgsec__h">Schedule</div>
       <div class="cfgrow"><label>Run time</label><input class="ctin" value="10:00" style="max-width:110px;margin:0"><select class="epm__sel"><option>Asia/Hong_Kong</option></select></div>
       <div class="cfgrow"><label>Topics per run</label><input class="ctin" value="3" style="max-width:80px;margin:0"><span class="cfghint">how many get adopted per day</span></div>
       <div class="cfgrow"><label>Pool size</label><input class="ctin" value="20" style="max-width:80px;margin:0"><span class="cfghint">candidates generated per run</span></div>
+      <div class="cfgrow"><label>Max per category</label><input class="ctin" value="2" style="max-width:80px;margin:0"></div>
       <div class="cfgrow"><label>Enabled</label><span class="tg tg-g">On</span></div>
     </section>
 
     <section class="cfgsec">
-      <div class="cfgsec__h">topic_policy</div>
-      <div class="cfgrow"><label>Discovery</label>
-        <div class="pill-row" style="margin:0"><button class="pill is-active">llm_only</button><button class="pill" style="opacity:.45">trends_first</button><button class="pill" style="opacity:.45">cross_check</button></div></div>
-      <div class="cfgrow"><label>Brand thesis</label><textarea class="ctta" style="min-height:56px">News that could shift, or is shifting, how value is distributed in capital or business markets.</textarea></div>
-      <div class="cfgrow"><label>Max per category</label><input class="ctin" value="2" style="max-width:80px;margin:0"></div>
-
-      <div class="cfgsub">scoring_profile</div>
+      <div class="cfgsec__h">Topic Score — what the number means</div>
+      <div class="cfghint" style="padding:0 0 9px">The <b>Score</b> column in the topic list and the <b>SCORE</b> on every Publish Library row are the same number: this weighted total out of 100. It answers <b>“is this topic worth writing”</b> — nothing about how good the finished post is.</div>
       <div class="cfgrow"><label>Lead time direction</label>
         <div class="pill-row" style="margin:0"><button class="pill is-active">prefer_early</button><button class="pill">prefer_trending</button></div>
         <span class="cfghint"><b>This is the switch.</b> BusinessFocus leads the discussion, so a topic already widely covered scores lower. A publication that follows trends flips this.</span></div>
-      <div class="cfgw"><div class="cfgw__r"><span>Brand Fit</span><input class="ctin" value="25" style="max-width:64px;margin:0"></div>
-        <div class="cfgw__r"><span>Lead Time</span><input class="ctin" value="22" style="max-width:64px;margin:0"></div>
-        <div class="cfgw__r"><span>Data Verifiability</span><input class="ctin" value="18" style="max-width:64px;margin:0"></div>
-        <div class="cfgw__r"><span>Topic History</span><input class="ctin" value="15" style="max-width:64px;margin:0"></div>
-        <div class="cfgw__r"><span>Geo Relevance</span><input class="ctin" value="15" style="max-width:64px;margin:0"></div>
-        <div class="cfgw__r"><span>Narrative</span><input class="ctin" value="5" style="max-width:64px;margin:0"></div>
+      <div class="cfgw"><div class="cfgw__r"><span>Brand Fit <em style="font-style:normal;color:var(--dm-slate-400);font-weight:400">— does it match the prompt above</em></span><input class="ctin" value="25" style="max-width:64px;margin:0"></div>
+        <div class="cfgw__r"><span>Lead Time <em style="font-style:normal;color:var(--dm-slate-400);font-weight:400">— how much head start is left</em></span><input class="ctin" value="22" style="max-width:64px;margin:0"></div>
+        <div class="cfgw__r"><span>Data Verifiability <em style="font-style:normal;color:var(--dm-slate-400);font-weight:400">— is there a hard number to check</em></span><input class="ctin" value="18" style="max-width:64px;margin:0"></div>
+        <div class="cfgw__r"><span>Topic History <em style="font-style:normal;color:var(--dm-slate-400);font-weight:400">— how this keyword family performed</em></span><input class="ctin" value="15" style="max-width:64px;margin:0"></div>
+        <div class="cfgw__r"><span>Geo Relevance <em style="font-style:normal;color:var(--dm-slate-400);font-weight:400">— Hong Kong connection</em></span><input class="ctin" value="15" style="max-width:64px;margin:0"></div>
+        <div class="cfgw__r"><span>Narrative <em style="font-style:normal;color:var(--dm-slate-400);font-weight:400">— can it be told with a cause</em></span><input class="ctin" value="5" style="max-width:64px;margin:0"></div>
         <div class="cfgw__t">Total <b>100</b></div></div>
     </section>
+  </div>
 
+  <!-- ══ Brandlines Setting ══ -->
+  <div class="cfgpane" id="cfgpane-brand">
     <section class="cfgsec">
-      <div class="cfgsec__h">delivery_spec</div>
-      <div class="cfgrow"><label>Required sections</label><input class="ctin" value="8" style="max-width:80px;margin:0"><span class="cfghint">a brand with no fixed structure sets this to 0 — then the body is plain rich text with no anchors</span></div>
-      <div class="cfgrow"><label>Assets</label><span class="tg tg-n">6 × 4:5</span><span class="tg tg-n">1 × 1.91:1</span><button class="lnkbtn">Edit list</button></div>
-      <div class="cfgrow"><label>Assembly recipe</label><span class="cfghint">Facebook = sections 1–7 + cover · Instagram = sections 1–8 + 5 images</span><button class="lnkbtn">Edit</button></div>
+      <div class="cfgsec__h">Brand Logo <span class="lk" style="background:var(--dm-slate-100);color:var(--dm-slate-500)">optional · multiple</span></div>
+      <div class="upz" id="logoUp">
+        <div class="upz__i">🖼</div>
+        <div class="upz__t">Upload logo files</div>
+        <div class="upz__r">Up to <b>10 files</b> · <b>≤50MB</b> each · jpeg / png / webp / heic / heif · <b>SVG not supported</b></div>
+      </div>
+      <div class="upgrid" id="logoGrid"></div>
+      <div class="softnote" style="margin-top:11px">⚠ <b>A visual reference is not a composited element.</b> Logos go into <code>referenceImageUrls</code> so the model can see the brand's style — they do <b>not</b> appear in the finished image unless the prompt explicitly asks for placement.</div>
     </section>
 
     <section class="cfgsec">
-      <div class="cfgsec__h">brand_profile</div>
-      <div class="cfgrow"><label>Fixed title suffix</label><input class="ctin" value="【 @businessfocus.io 】【#BF社會熱話】" style="margin:0"></div>
-      <div class="cfgrow"><label>Brand colours</label><span class="swatch" style="background:#184c83"></span><span class="swatch" style="background:#fefb09"></span><button class="lnkbtn">Edit</button></div>
-      <div class="cfgrow"><label>Template images</label><span class="tg tg-a">Not uploaded</span><button class="lnkbtn">Upload</button><span class="cfghint">required before images can be generated</span></div>
+      <div class="cfgsec__h">Brand Vibe &amp; Tone <span class="lk" style="background:var(--dm-slate-100);color:var(--dm-slate-500)">optional</span></div>
+      <div class="cfghint" style="padding:0 0 9px">Outside the six scoring components, this is the only field that decides <b>who the copy sounds like</b>. It is passed to the writing skill as the brand voice.</div>
+      <textarea class="ctta" id="vibeText" style="min-height:104px" placeholder="e.g. Direct and numerate. Explains a business consequence without jargon. Sceptical of hype but never cynical. Short sentences; one idea per paragraph."></textarea>
+      <div class="cfgcount" id="vibeCount">0 / 500 characters</div>
+    </section>
+
+    <section class="cfgsec">
+      <div class="cfgsec__h">Brand Colors <span class="lk" style="background:var(--dm-slate-100);color:var(--dm-slate-500)">optional · soft constraint</span></div>
+      <div class="cfgrow"><label>Primary</label><span class="swatch" style="background:#184c83"></span><input class="ctin" value="#184c83" style="max-width:110px;margin:0;font-family:var(--font-metric)"></div>
+      <div class="cfgrow"><label>Accent</label><span class="swatch" style="background:#fefb09"></span><input class="ctin" value="#fefb09" style="max-width:110px;margin:0;font-family:var(--font-metric)"><button class="lnkbtn" id="accentAdd">+ Add accent</button><span class="cfghint">1 Primary + up to 5 Accents recommended</span></div>
+      <div id="accentExtra"></div>
+      <div class="softnote" style="margin-top:6px">⚠ <b>Soft constraint means a leaning in the prompt, not a validator.</b> Colours influence how images are generated; do not build a “are the colours right” check against this field — there is nothing deterministic to check.</div>
+    </section>
+
+    <section class="cfgsec">
+      <div class="cfgsec__h">Fixed title suffix</div>
+      <div class="cfgrow"><label>Suffix</label><input class="ctin" value="【 @businessfocus.io 】【#BF社會熱話】" style="margin:0"></div>
+      <div class="cfghint" style="padding-left:0">Locked onto every generated title. Readiness check #2 fails without it.</div>
+    </section>
+  </div>
+
+  <!-- ══ Image Setting ══ -->
+  <div class="cfgpane" id="cfgpane-image">
+    <section class="cfgsec">
+      <div class="cfgsec__h">Template images</div>
+      <div class="cfghint" style="padding:0 0 10px">This is the fix for unstable image quality. Templates are passed as <code>referenceImageUrls</code> with <code>mode=clone_creative</code>, so every generation is anchored to a layout that already works instead of starting from a blank prompt.</div>
+      <div class="upz" id="tplUp">
+        <div class="upz__i">🎨</div>
+        <div class="upz__t">Upload template images</div>
+        <div class="upz__r">Up to <b>10 files</b> · <b>≤50MB</b> each · jpeg / png / webp / heic / heif · <b>SVG not supported</b></div>
+      </div>
+      <div class="upgrid" id="tplGrid">
+        <div class="upcell"><div class="upcell__ph">COVER</div><span class="upcell__ref">@cover</span><button class="upcell__x">✕</button><div class="upcell__nm">bf_cover_4x5.png</div></div>
+        <div class="upcell"><div class="upcell__ph">INFO</div><span class="upcell__ref">@info</span><button class="upcell__x">✕</button><div class="upcell__nm">bf_info_4x5.png</div></div>
+        <div class="upcell"><div class="upcell__ph">BANNER</div><span class="upcell__ref">@banner</span><button class="upcell__x">✕</button><div class="upcell__nm">bf_banner_191.png</div></div>
+      </div>
+    </section>
+
+    <section class="cfgsec">
+      <div class="cfgsec__h">Generation prompt</div>
+      <div class="cfghint" style="padding:0 0 8px">Click a template chip to reference it in the prompt. A referenced template is sent as the style anchor for that slot.</div>
+      <div class="chipbar">
+        <span class="lb">TEMPLATES</span>
+        <button class="tchip" data-tpl="@cover">@cover</button>
+        <button class="tchip" data-tpl="@info">@info</button>
+        <button class="tchip" data-tpl="@banner">@banner</button>
+      </div>
+      <textarea class="ctta" id="imgPrompt" style="min-height:150px;margin-top:10px">Slot 02 (cover): follow @cover exactly — same grid, same title block position, same lower-third band. Replace only the headline text and the key figure.
+
+Slots 03–06 (info cards): follow @info. One statistic per card, set in the same weight and position as the template. Numbers must match the article body verbatim — never round, never invent.
+
+Slot 07 (banner): follow @banner at 1.91:1. Headline only, no body copy.
+
+Across all slots: Traditional Chinese, no watermark, no stock-photo faces, high contrast for mobile feed viewing.</textarea>
+      <div class="cfgcount" id="ipCount">— characters</div>
+    </section>
+
+    <section class="cfgsec">
+      <div class="cfgsec__h">Output specification</div>
+      <div class="cfgrow"><label>Assets per delivery</label><span class="tg tg-n">02–06 · 5 × 4:5</span><span class="tg tg-n">07 · 1 × 1.91:1</span></div>
+      <div class="cfgrow"><label>Generation</label><span class="tg tg-b">6 in parallel</span><span class="cfghint">all six enqueue at once after G2 — the queue is fire-and-forget, so wall-clock is one image, not six</span></div>
+      <div class="cfgrow"><label>Ratio check</label><span class="cfgval">compares outputRatio</span><span class="cfghint">the ratio actually produced, not the one requested — a request that silently fell back would otherwise pass</span></div>
+      <div class="cfgrow"><label>Retry unit</label><span class="cfgval">single slot</span><span class="cfghint">one bad image regenerates on its own, reusing the same generationRequestId — the other five are untouched</span></div>
+    </section>
+  </div>
+
+  <!-- ══ Auto Delivery ══ -->
+  <div class="cfgpane" id="cfgpane-deliv">
+    <section class="cfgsec">
+      <div class="cfgsec__h">What gets assembled from every confirmed draft</div>
+      <div class="cfghint" style="padding:0 0 11px">Assembly runs with no gate — it is plain Python and costs nothing, so there is nothing to approve. Both posts land in the Publish Library as drafts and wait for G3.</div>
+      <div class="delrow">
+        <div class="delrow__ic">📘</div>
+        <div class="delrow__m">
+          <div class="delrow__t">Facebook · Image feed post</div>
+          <div class="delrow__s">Caption = sections 1–7 · media = slot 02 cover (4:5) · posts to <b>BusinessFocus Facebook account</b></div>
+        </div>
+        <span class="tg tg-g">On</span>
+      </div>
+      <div class="delrow">
+        <div class="delrow__ic">📷</div>
+        <div class="delrow__m">
+          <div class="delrow__t">Instagram · Carousel post</div>
+          <div class="delrow__s">Caption = sections 1–8, ≤2200 chars · media = slots 02–06 in order (5 × 4:5) · posts to <b>BusinessFocus IG account</b></div>
+        </div>
+        <span class="tg tg-g">On</span>
+      </div>
+      <div class="cfghint" style="padding:11px 0 0">Two posts per topic for now. More formats get added here rather than in the skill.</div>
+    </section>
+
+    <section class="cfgsec">
+      <div class="cfgsec__h">Required sections</div>
+      <div class="cfgrow"><label>Section count</label><input class="ctin" value="8" style="max-width:80px;margin:0"><span class="cfghint">a brand with no fixed structure sets this to 0 — then the body is plain rich text with no anchors, and the assembly recipe falls back to the whole body</span></div>
     </section>
 
     <section class="cfgsec cfgsec--locked">
@@ -1179,6 +1391,8 @@ body.dd-page .ml-content{padding-top:18px}
     <div class="dm-kpi-card is-filter3" data-f3="draft"><div class="kpi__label">Draft</div><div class="kpi__metric">9</div><div class="kpi__sub">not published</div></div>
     <div class="dm-kpi-card is-filter3" data-f3="pub"><div class="kpi__label">Published</div><div class="kpi__metric">24</div><div class="kpi__sub up">live on Meta</div></div>
     <div class="dm-kpi-card is-filter3" data-f3="fail"><div class="kpi__label">Publish fail</div><div class="kpi__metric">1</div><div class="kpi__sub down">subStatus = failed</div></div>
+    <div class="dm-kpi-card is-filter3" data-f3="pipe"><div class="kpi__label">From pipeline</div><div class="kpi__metric">28</div><div class="kpi__sub">has a parent topic</div></div>
+    <div class="dm-kpi-card is-filter3" data-f3="agent"><div class="kpi__label">From AI agent</div><div class="kpi__metric">6</div><div class="kpi__sub">arrived as Draft</div></div>
   </div>
   <div class="filterbar" id="fbar3" hidden><span>Filtered by <b id="fbar3Name">—</b></span><span class="dm-meta-label" id="fbar3N"></span><span class="x" id="fbar3X">Clear ✕</span></div>
 
@@ -1188,7 +1402,7 @@ body.dd-page .ml-content{padding-top:18px}
       <div class="plrow__t">Website Article — Momenta 擬香港 IPO<span class="st st--draft">Draft</span><span class="org org--pipe">Pipeline</span></div>
       <div class="plrow__s">From topic “Momenta 擬香港 IPO” · businessfocus.io/article/…</div>
     </div>
-    <div class="sc sc--pend"><div class="sc__n">—</div><div class="sc__l">SCORE</div></div>
+    <div class="sc"><div class="sc__n">87</div><div class="sc__l">TOPIC SCORE</div></div>
     <div class="plrow__thumbs"><i></i></div>
     <button class="lnkbtn" data-copy="deep">Copy link</button>
     <span class="plrow__go">Edit ›</span>
@@ -1199,7 +1413,7 @@ body.dd-page .ml-content{padding-top:18px}
       <div class="plrow__t">Facebook · link post — Momenta 擬香港 IPO<span class="st st--draft">Draft</span><span class="org org--pipe">Pipeline</span></div>
       <div class="plrow__s">From topic “Momenta 擬香港 IPO” · short_link · preview by Meta</div>
     </div>
-    <div class="sc sc--pend"><div class="sc__n">—</div><div class="sc__l">SCORE</div></div>
+    <div class="sc"><div class="sc__n">87</div><div class="sc__l">TOPIC SCORE</div></div>
     <div class="plrow__thumbs"><i></i></div>
     <button class="lnkbtn" data-copy="deep">Copy link</button>
     <span class="plrow__go">Edit ›</span>
@@ -1210,7 +1424,7 @@ body.dd-page .ml-content{padding-top:18px}
       <div class="plrow__t">Instagram · carousel — Momenta 擬香港 IPO<span class="st st--draft">Draft</span><span class="org org--pipe">Pipeline</span><span class="ovr">caption hand-edited</span></div>
       <div class="plrow__s">From topic “Momenta 擬香港 IPO” · mediaItems [02–06] · 1 image generating</div>
     </div>
-    <div class="sc sc--pend"><div class="sc__n">—</div><div class="sc__l">SCORE</div></div>
+    <div class="sc"><div class="sc__n">87</div><div class="sc__l">TOPIC SCORE</div></div>
     <div class="plrow__thumbs"><i></i><i></i><i></i><i></i><i></i></div>
     <button class="lnkbtn" data-copy="deep">Copy link</button>
     <span class="plrow__go">Edit ›</span>
@@ -1221,7 +1435,7 @@ body.dd-page .ml-content{padding-top:18px}
       <div class="plrow__t">Facebook · image feed — 港股午後急挫<span class="st st--all">Published</span><span class="org org--pipe">Pipeline</span></div>
       <div class="plrow__s">From topic “港股午後急挫” · published yesterday 11:24</div>
     </div>
-    <div class="sc sc--pend"><div class="sc__n">—</div><div class="sc__l">SCORE</div></div>
+    <div class="sc"><div class="sc__n">76</div><div class="sc__l">TOPIC SCORE</div></div>
     <div class="plrow__thumbs"><i></i></div>
     <button class="lnkbtn" data-copy="deep">Copy link</button>
     <span class="plrow__go">Edit ›</span>
@@ -1232,7 +1446,7 @@ body.dd-page .ml-content{padding-top:18px}
       <div class="plrow__t">Instagram · carousel — 人民幣中間價連續第三日走強<span class="st st--fail">Publish fail</span><span class="org org--pipe">Pipeline</span></div>
       <div class="plrow__s">From topic “人民幣中間價…” · Meta rejected: carousel ratios must match</div>
     </div>
-    <div class="sc sc--pend"><div class="sc__n">—</div><div class="sc__l">SCORE</div></div>
+    <div class="sc"><div class="sc__n">81</div><div class="sc__l">TOPIC SCORE</div></div>
     <div class="plrow__thumbs"><i></i><i></i><i></i><i></i><i></i></div>
     <button class="lnkbtn" data-copy="deep">Copy link</button>
     <span class="plrow__go">Edit ›</span>
@@ -1240,8 +1454,8 @@ body.dd-page .ml-content{padding-top:18px}
   <div class="plrow" data-post="1">
     <div class="thumb thumb--gen">gen</div>
     <div class="plrow__m">
-      <div class="plrow__t">Instagram · carousel — 中秋月餅市場速覽<span class="st st--draft">Draft</span><span class="org org--studio">AI Studio</span></div>
-      <div class="plrow__s">Created in AI Creative Studio by Amy · createdVia post_agent · no delivery</div>
+      <div class="plrow__t">Instagram · carousel — 中秋月餅市場速覽<span class="st st--draft">Draft</span><span class="org org--studio">AI agent</span></div>
+      <div class="plrow__s">Generated by AI agent (Amy) · createdVia post_agent · landed here automatically as Draft</div>
     </div>
     <div class="sc sc--none"><div class="sc__n">No score</div><div class="sc__l">NO TOPIC</div></div>
     <div class="plrow__thumbs"><i></i><i></i><i></i><i></i></div>
@@ -1251,8 +1465,8 @@ body.dd-page .ml-content{padding-top:18px}
   <div class="plrow" data-post="1">
     <div class="thumb">02</div>
     <div class="plrow__m">
-      <div class="plrow__t">Facebook · image feed — 港人北上消費三個變化<span class="st st--all">Published</span><span class="org org--studio">AI Studio</span></div>
-      <div class="plrow__s">Created in AI Creative Studio by Kelvin · createdVia image_gen_agent</div>
+      <div class="plrow__t">Facebook · image feed — 港人北上消費三個變化<span class="st st--all">Published</span><span class="org org--studio">AI agent</span></div>
+      <div class="plrow__s">Generated by AI agent (Kelvin) · createdVia image_gen_agent · published from here</div>
     </div>
     <div class="sc sc--none"><div class="sc__n">No score</div><div class="sc__l">NO TOPIC</div></div>
     <div class="plrow__thumbs"><i></i></div>
@@ -1261,7 +1475,9 @@ body.dd-page .ml-content{padding-top:18px}
   </div>
 </div>
 
-  <div class="foot-note"><b>Two sources of posts.</b> <span class="org org--pipe">Pipeline</span> posts came through the topic flow (Candidate → Draft → Delivery), so they carry a topic and its score. <span class="org org--studio">AI Studio</span> posts were generated ad-hoc in the Creative Studio — <b>no candidate, therefore no topic score</b>. That is structural, not a gap waiting to be filled: the six components (Brand Fit, Lead Time, …) are all properties of a candidate.<br>Once the <b>post-level</b> score formula lands, <b>both</b> kinds will carry one — it measures the post itself and does not need a candidate. Origin is derived from whether the post has a parent delivery, so no extra field is required.<br>⚠ AI Studio posts also have no verified sources, no research pack and no section anchors, so fewer Readiness checks apply to them. The publish gate shows this honestly rather than making both look equally vetted.</div>
+  <div class="foot-note"><b>Two sources of posts, one library.</b> <span class="org org--pipe">Pipeline</span> posts came through the topic flow (Candidate → Draft → Delivery), so they carry a topic and its Topic Score. <span class="org org--studio">AI agent</span> posts were generated ad-hoc by an agent — <b>no candidate, therefore no Topic Score</b>. That is structural, not a gap waiting to be filled: the six components (Brand Fit, Lead Time, …) are all properties of a candidate.<br>
+<b>An AI-agent post lands here on its own.</b> The moment the agent finishes generating, the post is written into this library with <b>Draft</b> status and tagged <span class="org org--studio">AI agent</span> — nobody moves it by hand, and it is never auto-published. It waits at G3 exactly like a pipeline post.<br>
+⚠ AI-agent posts also have no verified sources, no research pack and no section anchors, so fewer Readiness checks apply to them. The publish gate shows this honestly rather than making both look equally vetted.</div>
 
 </div>
 
@@ -1353,127 +1569,6 @@ body.dd-page .ml-content{padding-top:18px}
     <button class="btn btn--primary btn--sm">Confirm &amp; Publish</button>
   </div>
 </div>
-
-</div>
-
-<div class="tab-panel" id="tab-auto">
-
-<div class="sec-head">
-  <div class="dm-title-section">Autopilot — pre-flight scoring</div>
-  <span class="dm-subtitle">Every post before it goes out, with its three scores kept <b>separate</b>. The gate is still the Readiness check; these numbers inform the decision, they do not make it.</span>
-</div>
-
-<div class="dm-kpi-row">
-  <div class="dm-kpi-card"><div class="kpi__label">Awaiting review</div><div class="kpi__metric">9</div><div class="kpi__sub">not published</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">Readiness pass</div><div class="kpi__metric">8</div><div class="kpi__sub up">hard checks cleared</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">Readiness fail</div><div class="kpi__metric">1</div><div class="kpi__sub down">publish disabled</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">Topic Score</div><div class="kpi__metric">81</div><div class="kpi__sub">median · pipeline posts only</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">Post Score</div><div class="kpi__metric">—</div><div class="kpi__sub">formula pending</div></div>
-  <div class="dm-kpi-card"><div class="kpi__label">Predicted effect</div><div class="kpi__metric">n/a</div><div class="kpi__sub down">not calibrated</div></div>
-</div>
-
-<section class="dm-card">
-  <div class="dm-title-card">Three scores, deliberately not combined</div>
-  <div class="apthree">
-    <div class="ap1">
-      <div class="ap1__t">Topic Score</div>
-      <div class="ap1__s ap1__s--ok">Defined</div>
-      <div class="ap1__d">Is the <b>topic</b> worth doing. Six components computed from the candidate (Brand Fit, Lead Time, Data Verifiability, Topic History, Geo, Narrative).</div>
-      <div class="ap1__n">AI Studio posts have no candidate, so they never get this one.</div>
-    </div>
-    <div class="ap1">
-      <div class="ap1__t">Post Score</div>
-      <div class="ap1__s ap1__s--wait">Formula pending</div>
-      <div class="ap1__d">Is <b>this post</b> any good — its own copy, visuals and length. Independent of whether a candidate exists.</div>
-      <div class="ap1__n">Once defined, <b>both</b> pipeline and AI Studio posts will carry one.</div>
-    </div>
-    <div class="ap1">
-      <div class="ap1__t">Predicted effect</div>
-      <div class="ap1__s ap1__s--gate">Not calibrated</div>
-      <div class="ap1__d">Roughly how much engagement this will get. A <b>statistical prediction</b>, not a rule.</div>
-      <div class="ap1__n">Gated: no number until n ≥ 150 and r ≥ 0.4. See below.</div>
-    </div>
-  </div>
-  <div class="apwarn">
-    <b>Why these are never added into one total.</b> Two of them are computed from rules and one is a regression on a small sample — their reliability differs by orders of magnitude. Averaging them lets the least reliable number quietly drive the decision.<br>
-    <b>And why the gate is the Readiness check, not the scores.</b> A high score does not mean the eight section anchors are present or that the carousel ratios match. Scores inform; hard checks decide.
-  </div>
-</section>
-
-<section class="dm-card">
-  <div class="dm-title-card">Posts awaiting review<span class="dmode dmode-mock">MOCK</span></div>
-  <table class="dm-modern-table dm-modern-table--compact">
-    <thead><tr><th>Post</th><th>Platform</th><th style="text-align:right">Topic Score</th><th style="text-align:right">Post Score</th><th>Predicted effect</th><th>Readiness</th></tr></thead>
-    <tbody>
-  <tr>
-    <td><div class="apmix"><span class="thumb ">02</span><div><div class="dm-cell-main">Instagram · carousel — Momenta 擬香港 IPO</div><div class="dm-cell-sub">Pipeline · from topic “Momenta 擬香港 IPO”</div></div></div></td>
-    <td>IG</td>
-    <td style="text-align:right"><b>87</b></td>
-    <td style="text-align:right">—</td>
-    <td><span class="pe pe--na">Not calibrated</span></td>
-    <td><span class="rdy rdy--ok">Pass</span></td>
-  </tr>
-  <tr>
-    <td><div class="apmix"><span class="thumb ">02</span><div><div class="dm-cell-main">Facebook · image feed — Momenta 擬香港 IPO</div><div class="dm-cell-sub">Pipeline · from topic “Momenta 擬香港 IPO”</div></div></div></td>
-    <td>FB</td>
-    <td style="text-align:right"><b>87</b></td>
-    <td style="text-align:right">—</td>
-    <td><span class="pe pe--na">Not calibrated</span></td>
-    <td><span class="rdy rdy--ok">Pass</span></td>
-  </tr>
-  <tr>
-    <td><div class="apmix"><span class="thumb thumb--ph">🔗</span><div><div class="dm-cell-main">Facebook · link post — Momenta 擬香港 IPO</div><div class="dm-cell-sub">Pipeline · link post, no image of its own</div></div></div></td>
-    <td>FB</td>
-    <td style="text-align:right"><b>87</b></td>
-    <td style="text-align:right">—</td>
-    <td><span class="pe pe--na">Not calibrated</span></td>
-    <td><span class="rdy rdy--ok">Pass</span></td>
-  </tr>
-  <tr>
-    <td><div class="apmix"><span class="thumb ">02</span><div><div class="dm-cell-main">Instagram · carousel — 人民幣中間價連續第三日走強</div><div class="dm-cell-sub">Pipeline · Meta rejected: carousel ratios must match</div></div></div></td>
-    <td>IG</td>
-    <td style="text-align:right"><b>81</b></td>
-    <td style="text-align:right">—</td>
-    <td><span class="pe pe--na">Not calibrated</span></td>
-    <td><span class="rdy rdy--bad">Fail</span></td>
-  </tr>
-  <tr>
-    <td><div class="apmix"><span class="thumb thumb--ph">▦</span><div><div class="dm-cell-main">Instagram · carousel — 中秋月餅市場速覽</div><div class="dm-cell-sub">AI Studio · created by Amy · no candidate</div></div></div></td>
-    <td>IG</td>
-    <td style="text-align:right"><span class="nosc">No topic</span></td>
-    <td style="text-align:right">—</td>
-    <td><span class="pe pe--na">Not calibrated</span></td>
-    <td><span class="rdy rdy--ok">Pass</span></td>
-  </tr>
-  <tr>
-    <td><div class="apmix"><span class="thumb ">02</span><div><div class="dm-cell-main">Facebook · image feed — 港人北上消費三個變化</div><div class="dm-cell-sub">AI Studio · created by Kelvin</div></div></div></td>
-    <td>FB</td>
-    <td style="text-align:right"><span class="nosc">No topic</span></td>
-    <td style="text-align:right">—</td>
-    <td><span class="pe pe--na">Not calibrated</span></td>
-    <td><span class="rdy rdy--ok">Pass</span></td>
-  </tr>
-    </tbody>
-  </table>
-  <div class="foot-note">Readiness <b>Fail</b> disables publishing and names the failing item — here the carousel has one image at 1.02:1 against 4:5, which Meta rejects for the whole carousel, not just that image.</div>
-</section>
-
-<section class="dm-card">
-  <div class="dm-title-card">Predicted effect — why it shows no number yet</div>
-  <table class="dm-modern-table dm-modern-table--compact">
-    <thead><tr><th>State</th><th>Condition</th><th>What the editor sees</th></tr></thead>
-    <tbody>
-      <tr><td><span class="pe pe--na">Not calibrated</span></td><td>fewer than 150 comparable posts</td><td><b>No number at all</b>, plus how many more are needed</td></tr>
-      <tr><td><span class="pe pe--weak">Direction only</span></td><td>n ≥ 150 but r &lt; 0.4</td><td>A range and a direction — "above the 30-day median" — <b>no point estimate</b></td></tr>
-      <tr><td><span class="pe pe--ok">Estimate</span></td><td>n ≥ 150 and r ≥ 0.4</td><td>Point estimate <b>with its interval</b>, plus n and r</td></tr>
-    </tbody>
-  </table>
-  <div class="apwarn">
-    <b>A bare number would be read as a fact.</b> At this page's volume — roughly 90 posts a month, an IG window of 50 — a prediction interval is wide enough that a single centred figure would be actively misleading. So: <b>never a point estimate without its interval</b>, and no number at all until the sample supports one.<br>
-    Current state: <b>IG n = 50, FB n = 136</b> — both below the bar. The number appears when the data earns it.<br>
-    ⚠ And <b>predicted effect must not gate auto-publish</b> until it is calibrated, or an uncalibrated model ends up deciding what goes on the brand's page.
-  </div>
-</section>
 
 </div>
 
@@ -1589,7 +1684,7 @@ body.dd-page .ml-content{padding-top:18px}
 </div>
 </div>
 <div class="toast" id="toast"></div>
-<div class="proto-badge">PRODUCT PROTOTYPE v2.9 · BF</div>
+<div class="proto-badge">PRODUCT PROTOTYPE v3.0 · BF</div>
 
 <script>
 function q(s){return document.querySelector(s)}
@@ -1679,6 +1774,92 @@ function enterCfg(){
 }
 q('#btnSettings').addEventListener('click', enterCfg);
 q('#cfgBack').addEventListener('click',function(){ exitPages(); window.scrollTo(0,0); });
+
+/* settings sub-tabs */
+qa('.cfgtabs button').forEach(function(b){
+  b.addEventListener('click',function(){
+    qa('.cfgtabs button').forEach(function(x){x.classList.remove('on')});
+    b.classList.add('on');
+    qa('.cfgpane').forEach(function(p){p.classList.remove('on')});
+    var el=document.getElementById('cfgpane-'+b.dataset.cfg); if(el) el.classList.add('on');
+    window.scrollTo(0,0);
+  });
+});
+
+/* reference sources: add / remove */
+function addSrc(v){
+  var row=document.createElement('div'); row.className='srcr';
+  row.innerHTML='<input><select><option>Tier 2</option><option>Tier 3 · primary</option><option>Tier 1</option></select><button class="x" title="Remove">✕</button>';
+  row.querySelector('input').value=v;
+  q('#srcList').appendChild(row);
+}
+q('#srcAdd').addEventListener('click',function(){
+  var i=q('#srcInput'), v=i.value.trim();
+  if(!v){ say('Enter a domain first<em>e.g. <b>scmp.com</b> — the agent reads listed sources before anything else.</em>'); return; }
+  addSrc(v); i.value=''; say('Source added<em><b>'+v+'</b> is now a trusted reference source. It still has to clear the ≥2 independent sources bar per topic.</em>');
+});
+q('#srcInput').addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); q('#srcAdd').click(); } });
+q('#srcList').addEventListener('click',function(e){
+  var x=e.target.closest('.x'); if(!x) return;
+  var row=x.closest('.srcr'), name=row.querySelector('input').value;
+  row.remove(); say('Source removed<em><b>'+name+'</b> is no longer read first. Existing topics that already cite it keep their sources.</em>');
+});
+
+/* character counters */
+function bindCount(taSel,outSel,max){
+  var ta=q(taSel), out=q(outSel); if(!ta||!out) return;
+  function upd(){
+    var n=ta.value.length;
+    out.textContent = max ? (n+' / '+max+' characters') : (n+' characters');
+    out.classList.toggle('over', !!max && n>max);
+  }
+  ta.addEventListener('input',upd); upd();
+}
+bindCount('#topicPrompt','#tpCount',null);
+bindCount('#imgPrompt','#ipCount',null);
+bindCount('#vibeText','#vibeCount',500);
+
+/* logo + template upload (mock file picker) */
+function mockUpload(gridSel,label,ref){
+  var grid=q(gridSel); if(!grid) return;
+  if(grid.children.length>=10){ say('Limit reached<em>Up to <b>10 files</b>. Remove one before adding another.</em>'); return; }
+  var n=grid.children.length+1;
+  var cell=document.createElement('div'); cell.className='upcell';
+  cell.innerHTML='<div class="upcell__ph">'+label+'</div>'+(ref?'<span class="upcell__ref">@'+label.toLowerCase()+n+'</span>':'')+'<button class="upcell__x">✕</button><div class="upcell__nm">'+label.toLowerCase()+'_'+n+'.png</div>';
+  grid.appendChild(cell);
+}
+q('#logoUp').addEventListener('click',function(){
+  mockUpload('#logoGrid','LOGO',false);
+  say('Logo added<em>Stored as a <b>visual reference</b> — it goes into <code>referenceImageUrls</code> so the model can see the style. It will not be composited into the image unless the prompt asks for placement.</em>');
+});
+q('#tplUp').addEventListener('click',function(){
+  mockUpload('#tplGrid','TPL',true);
+  say('Template added<em>Referenceable from the generation prompt below. Templates are the anchor that keeps image output consistent between runs.</em>');
+});
+document.addEventListener('click',function(e){
+  var x=e.target.closest('.upcell__x'); if(!x) return;
+  x.closest('.upcell').remove();
+});
+
+/* template chips insert into the prompt */
+qa('.tchip').forEach(function(c){
+  c.addEventListener('click',function(){
+    var ta=q('#imgPrompt'), t=c.dataset.tpl;
+    var s=ta.selectionStart||ta.value.length;
+    ta.value = ta.value.slice(0,s)+t+ta.value.slice(s);
+    ta.focus(); ta.selectionStart=ta.selectionEnd=s+t.length;
+    ta.dispatchEvent(new Event('input'));
+  });
+});
+
+/* extra accent colours */
+q('#accentAdd').addEventListener('click',function(){
+  var box=q('#accentExtra');
+  if(box.children.length>=4){ say('Six is the recommended ceiling<em>1 Primary + 5 Accents. More than that and the prompt leaning stops being legible to the model.</em>'); return; }
+  var row=document.createElement('div'); row.className='cfgrow';
+  row.innerHTML='<label>Accent</label><span class="swatch" style="background:#94A3B8"></span><input class="ctin" value="#94A3B8" style="max-width:110px;margin:0;font-family:var(--font-metric)">';
+  box.appendChild(row);
+});
 
 /* per-topic reshuffle — different scope from the list-level one, and it overwrites */
 q('#teReshuffle').addEventListener('click',function(){
