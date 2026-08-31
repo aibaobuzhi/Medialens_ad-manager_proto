@@ -690,6 +690,10 @@ a{text-decoration:none;color:inherit}
 .org--studio{background:#F5F3FF;color:#6D28D9}
 .sc--none .sc__n{font:600 10px var(--font-body);color:var(--dm-slate-400);letter-spacing:0}
 .sc--none .sc__l{color:var(--dm-slate-300)}
+.pagehead{display:flex;align-items:flex-start;gap:16px;margin:6px 0 4px}
+.pagehead .dm-title-page{flex:1;min-width:0;margin:0}
+.pagehead #btnSettings{flex:0 0 auto;margin-top:2px}
+body.dd-page .pagehead,
 body.dd-page .dm-title-page,
 body.dd-page .dm-page-sub,
 body.dd-page .dm-page-menu,
@@ -888,7 +892,10 @@ body.dd-page .ml-content{padding-top:18px}
 
 <main class="ml-main"><div class="ml-content">
 
-<div class="dm-title-page">Creation Studio — BusinessFocus</div>
+<div class="pagehead">
+  <div class="dm-title-page">Creation Studio — BusinessFocus</div>
+  <button class="btn btn--secondary btn--sm" id="btnSettings">⚙ Settings</button>
+</div>
 <div class="dm-page-sub">One production line, three gates: <b>daily topic discovery</b> → <b>G1 Adopt</b> → draft written → <b>G2 Confirm Draft</b> → <b>6 images generated in parallel</b> → 2 posts assembled automatically → <b>G3 Confirm &amp; Publish</b>.<br>Stages are named after objects (S1 Candidate / S2 Draft / S3 Delivery / S4 Post) and every brand difference lives in <code>brand_profile</code> / <code>topic_policy</code> / <code>delivery_spec</code> — so the mainline reuses this pipeline instead of rebuilding it.</div>
 
 
@@ -932,7 +939,6 @@ body.dd-page .ml-content{padding-top:18px}
     <div class="tthead__n">20</div>
     <span class="spacer" style="flex:1"></span>
     <button class="btn btn--secondary btn--sm">↻ Reshuffle (1 today)</button>
-    <button class="lnkbtn" id="btnSettings">⚙ Settings</button>
     <button class="btn btn--primary btn--sm" id="btnCreate">+ Create Topic</button>
   </div>
   <table class="dm-modern-table dm-modern-table--compact">
@@ -1768,6 +1774,18 @@ q('#btnCreate').addEventListener('click',function(){ openMask(cmask); });
 
 /* settings config page */
 function enterCfg(){
+  /* Settings now lives in the page head, so it is reachable from either tab.
+     cfgScreen is a child of #tab-work — activate that panel first, or the
+     panel's own display:none would swallow it. */
+  qa('.dm-page-menu .menu-item').forEach(function(b){b.classList.remove('is-active')});
+  var wt=document.querySelector('.dm-page-menu .menu-item[data-tab="work"]');
+  if(wt) wt.classList.add('is-active');
+  qa('.tab-panel').forEach(function(p){p.classList.remove('active')});
+  q('#tab-work').classList.add('active');
+  q('#libList').style.display='';
+  q('#ddScreen').classList.remove('on');
+  q('#teScreen').classList.remove('on');
+
   qa('#tab-work > *').forEach(function(el){ if(el.id!=='cfgScreen') el.style.display='none'; });
   q('#cfgScreen').classList.add('on');
   document.body.classList.add('dd-page'); window.scrollTo(0,0);
