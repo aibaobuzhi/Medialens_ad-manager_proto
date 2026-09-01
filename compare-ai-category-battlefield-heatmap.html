@@ -120,7 +120,7 @@
 .bfhm-td{border-radius:4px;color:#4a4a4a;font-family:"Roboto",sans-serif;font-feature-settings:"tnum";font-variant-numeric:tabular-nums;padding:10px 12px;text-align:center;transition:background-color .15s;white-space:nowrap;cursor:default}
 .bfhm-td-label{background:transparent!important;color:#1e293b;font-family:"Lato",sans-serif;font-size:13px;font-weight:500;text-align:left}
 .bfhm-td.is-winner{box-shadow:inset 0 0 0 1.5px rgba(14,116,182,.55);color:#0b4f75;font-weight:700}
-.bfhm-star{font-size:11px;margin-left:4px;vertical-align:1px}
+.bfhm-star{font-size:12px;margin-left:4px;vertical-align:0}
 .bfhm-td.is-muted{color:#b8c2cc;font-family:"Lato",sans-serif;font-size:11px}
 .bfhm-legend{align-items:center;color:var(--ac-secondary,#828282);display:flex;flex-wrap:wrap;font-family:"Lato",sans-serif;font-size:11.5px;gap:8px;margin-top:14px}
 .bfhm-legend .bfhm-grad{background:linear-gradient(90deg,#f0f9ff,#e0f2fe,#bae6fd,#7dd3fc,#38bdf8);border-radius:3px;display:inline-block;height:10px;width:120px}
@@ -132,19 +132,19 @@
 .bfhm-note ul{margin:6px 0 0;padding-left:18px}
 .bfhm-note li{margin-bottom:5px}
 .bfhm-note code{background:#fef3c7;border-radius:4px;font-size:11.5px;padding:1px 5px}
-</style><div data-v-8c9a538a class="bfhm-card" id="bfhm-card"><div class="bfhm-hd"><div class="bfhm-title">Category Battlefield — Content category</div></div> <div class="bfhm-sub">Each cell is a page&#39;s Avg Engagement for that content category, shown as an index — <b>Index 100 = the channel average Avg Engagement</b> across all pages and categories. Darker = stronger. Cells with fewer than 5 posts are greyed out and excluded from the row winner (&#11088;).</div> <div class="bfhm-fmt-group" id="bfhm-fmt-group"></div> <div class="bfhm-wrap"><table class="bfhm-table"><thead><tr id="bfhm-thead"></tr></thead><tbody id="bfhm-tbody"></tbody></table></div> <div class="bfhm-legend"><span>Weaker</span><span class="bfhm-grad"></span><span>Stronger</span><span style="margin-left:14px">&#11088; = category winner (n &#8805; 5)</span><span style="margin-left:14px;color:#b8c2cc">n &lt; 5 = greyed</span></div> <div class="bfhm-pagepill" id="bfhm-pagepill"></div>
+</style><div data-v-8c9a538a class="bfhm-card" id="bfhm-card"><div class="bfhm-hd"><div class="bfhm-title">Category Battlefield — Content category</div></div> <div class="bfhm-sub">Each cell is a page&#39;s Avg Engagement for that content category, shown as an index — <b>Index 100 = the channel average Avg Engagement</b> across all pages and categories. Darker = stronger. Cells with fewer than 5 posts are greyed out and excluded from the row winner (&#9733;).</div> <div class="bfhm-fmt-group" id="bfhm-fmt-group"></div> <div class="bfhm-wrap"><table class="bfhm-table"><thead><tr id="bfhm-thead"></tr></thead><tbody id="bfhm-tbody"></tbody></table></div> <div class="bfhm-legend"><span>Weaker</span><span class="bfhm-grad"></span><span>Stronger</span><span style="margin-left:14px"><span style="color:#4a5b66">&#9733;</span> = category winner (n &#8805; 5), star colour = winning page</span><span style="margin-left:14px;color:#b8c2cc">n &lt; 5 = greyed</span></div> <div class="bfhm-pagepill" id="bfhm-pagepill"></div>
 <div class="bfhm-note"><h4>本卡片改版说明：为什么改、Index 怎么算、哪些旧字段被舍弃</h4>
 <b>改版理由。</b>旧版是 6 列表格（Best page / Best page n / 两列 Avg Engagement / vs Best），一次只能把一个选中的 page 和各类目最佳 page 做对比，读者要逐行扫过 6 列才能拼出全貌。Stakeholder 反馈 My Page &#183; AI Category 上的 &#8220;Which format wins in each category&#8221; 热力图更清爽，因此本卡直接复用该卡片的版式：一行一个 content category、一列一个 page、颜色深浅 = 强弱，三个 page 同屏，谁占据哪个题材一眼可见。
 <ul>
-<li><b>Index（新增参数）</b> — <code>Index = 该 page 在该类目的 Avg Engagement &#247; 全渠道平均 Avg Engagement &#215; 100</code>。全渠道平均 = 当前 format tab 下、所有已选 page &#215; 所有类目的按帖数加权平均，因此每个格子都在同一把尺上：100 = 恰好等于平均，150 = 平均的 1.5 倍。口径与 My Page 的 &#8220;Which format wins&#8221; 卡完全一致。</li>
+<li><b>Index（新增参数）</b> — <code>Index = 该 page 在该类目的 Avg Engagement &#247; 全渠道平均 Avg Engagement &#215; 100</code>。全渠道平均 = 当前 format tab 下、所有已选 page &#215; 所有类目的按帖数加权平均，因此每个格子都在同一把尺上，100 = 恰好等于平均。以表中实际数值为例（All tab）：全渠道平均 &#8776; 347，BusinessFocus 在 Society &amp; Culture 的 Avg Engagement = 455，Index = 455 &#247; 347 &#215; 100 &#8776; <b>131</b>，即平均的 1.31 倍。口径与 My Page 的 &#8220;Which format wins&#8221; 卡完全一致。</li>
 <li><b>Avg Engagement</b> — 口径不变：该 page &#215; 类目（选中 format tab 时再 &#215; format）的总互动 &#247; 帖数。</li>
 <li><b>n &#8805; 5 门槛</b> — 沿用旧卡：某 page 在该类目帖数不足 5 时显示灰色 &#8220;n &lt; 5&#8221;，不上色、也不参与该行胜者判定。</li>
-<li><b>&#11088; 胜者标记</b> — 每行 Index 最高且满足 n &#8805; 5 的格子标 &#11088;（并加描边），替代旧版的 Best page 列。</li>
+<li><b>&#9733; 胜者标记</b> — 每行 Index 最高且满足 n &#8805; 5 的格子标 &#9733;（并加描边），星标颜色跟随获胜 page 的图例色，与 &#8220;Category Vs Avg Engagement&#8221; 等卡片的 &#9733; 惯例一致；替代旧版的 Best page 列。</li>
 </ul>
 <b>为什么部分旧字段不再单独显示：</b>
 <ul>
-<li><b>Best page / Best page n 两列</b> — 胜者已由 &#11088; 直接标在格子上，单独一列是冗余；帖数 n 移入格子的 hover 提示（page &#183; 类目 &#183; Avg Engagement &#183; n &#183; Index），需要时可查、不需要时不占版面。</li>
-<li><b>vs Best（差距 %）列</b> — 热力图里三个 page 的 Index 本身就在同一尺度上并排（如 131 vs 112），差距直接读数即可，不必再维护一列相对百分比；且旧公式以&#8220;先选基准页&#8221;为前提（以选中 page 为分母），基准页选择器取消后该列自然失效。</li>
+<li><b>Best page / Best page n 两列</b> — 胜者已由 &#9733; 直接标在格子上，单独一列是冗余；帖数 n 移入格子的 hover 提示（page &#183; 类目 &#183; Avg Engagement &#183; n &#183; Index），需要时可查、不需要时不占版面。</li>
+<li><b>vs Best（差距 %）列</b> — 热力图里三个 page 的 Index 本身就在同一尺度上并排——如 News &amp; Current Affairs 行：香港01 <b>129</b> &#9733; vs BusinessFocus <b>110</b>，19 个 index 点的差距直接读数即可，不必再维护一列相对百分比；且旧公式以&#8220;先选基准页&#8221;为前提（以选中 page 为分母），基准页选择器取消后该列自然失效。</li>
 <li><b>Benchmark page 下拉</b> — 旧表一次只能呈现&#8220;选中 page vs 最佳 page&#8221;两方；热力图所有 page 同列展示，选择器失去存在意义。</li>
 <li><b>环比趋势三角（&#9650;/&#9660; %）</b> — 与 Index 属于两个口径：趋势始终按 Avg Engagement 环比计算、且不随 format tab 切分。塞进同一格会破坏&#8220;一格一个数&#8221;的可读性（这正是旧表显得拥挤的原因之一），故本卡不承载趋势；趋势对比仍可在 Compare 页其他卡片查看。</li>
 </ul></div>
@@ -190,7 +190,7 @@ function render(){
   return '<tr><td class="bfhm-td bfhm-td-label">'+r.c+'</td>'+r.v.map(function(x,i){
    if(x==null)return '<td class="bfhm-td is-muted" title="'+PAGES[i].name+' \u00b7 '+r.c+' \u00b7 n = '+r.n[i]+' (below the 5-post floor)">n &lt; 5</td>';
    var idx=Math.round(x/base*100);
-   return '<td class="bfhm-td'+(i===bi?' is-winner':'')+'" style="background-color:'+shade(idx)+'" title="'+PAGES[i].name+' \u00b7 '+r.c+' \u00b7 Avg Engagement '+x+' \u00b7 n = '+r.n[i]+' \u00b7 Index '+idx+(i===bi?' \u00b7 Category winner':'')+'">'+idx+(i===bi?' <span class="bfhm-star">\u2B50</span>':'')+'</td>';
+   return '<td class="bfhm-td'+(i===bi?' is-winner':'')+'" style="background-color:'+shade(idx)+'" title="'+PAGES[i].name+' \u00b7 '+r.c+' \u00b7 Avg Engagement '+x+' \u00b7 n = '+r.n[i]+' \u00b7 Index '+idx+(i===bi?' \u00b7 Category winner':'')+'">'+idx+(i===bi?' <span class="bfhm-star" style="color:'+PAGES[i].color+'">\u2605</span>':'')+'</td>';
   }).join('')+'</tr>';
  }).join('');
 }
