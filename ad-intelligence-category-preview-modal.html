@@ -840,26 +840,12 @@ body{background:#F7F7F7!important;padding:40px!important;min-height:100vh;box-si
 <div id="ml-cat-overlay" onclick="if(event.target===this) mlCloseCategoryModal()">
   <div class="ml-cat-modal">
     <div class="ml-cat-header">
-      <button class="ml-cat-demo-toggle" onclick="mlToggleDemoState()" title="Prototype only: switch between published / unpublished state">demo: toggle state</button>
       <button class="ml-cat-close" onclick="mlCloseCategoryModal()">&#10005;</button>
       <div class="ml-cat-title-row" id="ml-cat-title">#Jewellery, Watches &amp; Luxury Products</div>
       <div class="ml-cat-live-bar">
         <span id="ml-cat-live-text" style="display:none;">This category report is live on demo.medialens.io site.</span>
         <a class="ml-cat-linkbtn" id="ml-cat-view-site" style="display:none;" href="../demo%20site%20-category%20report(used%20ad%20proto).html" target="_blank" rel="noopener">&#127760; View Site</a>
         <button class="ml-cat-linkbtn" onclick="mlOpenShareModal(event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> Share Settings</button>
-      </div>
-    </div>
-    <div class="ml-cat-filter-bar">
-      <div class="ml-cat-filter-group">
-        <span class="ml-cat-filter-label">Fixed</span>
-        <span class="ml-cat-chip locked">&#128274; Region: Hong Kong &amp; Macau</span>
-        <span class="ml-cat-chip locked">&#128274; Ad Type: Branded Content + Paid Content</span>
-      </div>
-      <span class="ml-cat-filter-sep"></span>
-      <div class="ml-cat-filter-group">
-        <span class="ml-cat-filter-label">Inherited</span>
-        <span class="ml-cat-chip inherited" id="ml-cat-chip-category">Category: Jewellery, Watches &amp; Luxury Products</span>
-        <span class="ml-cat-chip inherited" id="ml-cat-chip-date">Date Range: 2026-07-08 to 2026-07-14</span>
       </div>
     </div>
     <div class="ml-cat-body" id="ml-cat-body">
@@ -1018,8 +1004,6 @@ function mlApplyAiSummary(){
 function mlSyncCategoryModal(){
   var sel = mlCurrentSelection();
   document.getElementById('ml-cat-title').innerHTML = '#' + sel.category;
-  document.getElementById('ml-cat-chip-category').textContent = 'Category: ' + sel.category;
-  document.getElementById('ml-cat-chip-date').textContent = 'Date Range: ' + sel.dateRange;
   // Published: live banner + View Site. Unpublished: Share Settings only.
   document.getElementById('ml-cat-live-text').style.display = mlIsPublished ? '' : 'none';
   document.getElementById('ml-cat-view-site').style.display = mlIsPublished ? '' : 'none';
@@ -1037,12 +1021,6 @@ function mlOpenCategoryModal(e){
 }
 function mlCloseCategoryModal(){
   document.getElementById('ml-cat-overlay').classList.remove('open');
-}
-function mlToggleDemoState(){
-  // Prototype affordance only - lets a reviewer see both header states.
-  mlIsPublished = !mlIsPublished;
-  mlLastPublished = mlIsPublished ? mlCurrentSelection() : null;
-  mlSyncCategoryModal();
 }
 // Keep the category modal header in sync with whatever the Share modal does.
 var _mlOpenShareModal = mlOpenShareModal;
