@@ -207,3 +207,13 @@
   }, true);
 })();
 </script>
+
+<style id="tsp-fix4">
+/* 覆盖首个样式块遗留的 align-items:center —— 竖排时会把选项水平居中 */
+.tsp-radio-group{align-items:flex-start!important;justify-content:flex-start!important;}
+.tsp-radio{align-self:flex-start;}
+/* Edit Keyword 弹窗：X 移回弹窗内部右上角 */
+#kwdlg{overflow-x:hidden;padding-top:28px;}
+#kwdlg-close{position:absolute;top:14px;right:16px;width:32px;height:32px;background:transparent;border:0;color:#909399;font-size:26px;line-height:32px;padding:0;border-radius:4px;cursor:pointer;transition:background-color .15s,color .15s;}
+#kwdlg-close:hover{background:#eef1f5;color:#409eff;}
+</style>
