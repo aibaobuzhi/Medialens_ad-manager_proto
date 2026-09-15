@@ -129,7 +129,6 @@
 .proto-tab:hover{color:#23a9f6}
 .proto-tab.active{color:#23a9f6;border-bottom-color:#23a9f6}
 .proto-tab-hint{margin-left:auto;font-family:Poppins,sans-serif;font-size:12px;color:#8a98a3;padding-right:4px}
-body[data-mode=crawler] #kw-icon-threads{display:none!important}
 .el-form-item:not(.is-error)>.el-form-item__content>.el-form-item__error{display:none}
 .proto-tag{display:inline-flex;align-items:center;gap:6px;background:#eaf6fe;color:#1b7fb8;border-radius:6px;padding:2px 8px;margin:2px 4px 2px 0;font-size:13px;font-family:Poppins,sans-serif;line-height:20px}
 .proto-tag-x{cursor:pointer;color:#7fa9c2;font-size:14px;line-height:1}
@@ -162,7 +161,7 @@ body[data-mode=crawler] #kw-icon-threads{display:none!important}
   var THREADS_KW = ["Smartone", "數碼通", "meituan", "美團", "Keeta", "希慎", "Hysan", "壓力脫髮", "脫髮", "甩頭髮", "甩頭毛", "M字額", "頭髮稀疏", "白頭髮", "蘇丹紅", "Medicube", "THOME", "美容儀", "THOME The Glow PRO", "McDonald's", "Blue Cross", "藍十字", "BUPA", "AIA", "Cigna", "IWC", "Cartier", "Jaeger-LeCoultre", "Vacheron Constantin", "Omega", "Longines", "Bulgari", "Tissot", "Blancpain", "Breguet", "Hublot", "TAG Heuer", "Zenith", "Tudor", "Rolex", "Patek Philippe", "Audemars Piguet", "Oriental Watch", "Chanel Watch", "開箱", "入手", "保值", "二手錶", "Watches and Wonders", "手錶發布", "拍賣", "數量有限", "專門店", "試戴", "Ulike", "脫毛", "脫毛儀", "藍寶石冰點脫毛儀", "家用脫毛儀", "ulikeair2max", "ulikeair10", "威士忌", "Whisky", "Johnnie Walker", "Macallan", "香港Party", "cocktail", "調酒", "廣東歌PARTY", "派對", "clubbing", "酒", "啤酒", "手工啤", "1010", "Asia world expo", "亞博", "亞洲博覽館", "AWE", "CSL", "綠帽男", "星際", "旺角", "消防", "Zhong shan Whampoa Acdemy", "中黃書院", "黃錦輝", "SOW", "Famesing", "蜚聲", "WKF", "馬百良", "敖雞精", "JOMOO", "harrow", "little lion harrow", "藍十字（亞太）保險", "藍十字保險", "Blue Cross (Asia-Pacific) Insurance", "蓝十字（亚太）保险", "3日2夜", "週末快閃", "打卡熱點", "維他", "領展", "保安局", "鄧炳強", "直資學校", "Outback", "慢煮牛肉", "血水", "生牛扒", "太生", "Sony", "PlayStation", "PS5", "Watson's Wine", "屈臣氏酒窖", "Circle K", "OK便利店", "Circle-K", "Alzheimer’s", "阿茲海默症", "Diabetes", "糖尿病", "Psoriasis", "Pso", "尋常性乾癬", "Psoriatic Arthritis", "PsA", "乾癬性關節炎", "Macular Degeneration", "黃斑病變", "lab grown diamond", "lab-grown diamond", "lab diamond", "synthetic diamond", "cultured diamond", "培育鑽", "培育鑽石", "人造鑽石", "合成鑽石", "實驗室鑽", "CVD diamond", "HPHT diamond", "LabGrownDiamond", "LGD diamond", "莫桑石", "鑽石自由", "De Beers", "DeBeers", "戴比爾斯", "Forevermark永恆印記", "A Diamond is Forever", "blood diamond", "血鑽", "natural diamond", "天然鑽石", "天然鑽", "鑽石原石", "鑽石戒指", "diamond ring", "鑽石恆久遠", "Moissanite", "彩鑽", "裸鑽", "碎鑽", "玉子將軍漢堡", "foodpanda", "aws", "alicloud", "google cloud", "國泰", "淘寶", "Taobao", "klookhk", "klook 呃人", "klook", "銀行", "開戶", "信用卡", "優惠", "中小企", "定期", "存款", "渣打", "花旗", "星展", "施政報告", "立法會", "禁毒", "take嘢", "Webull", "啟德", "Kai Tak", "FWD", "富衛", "瘦瘦針", "Novo Nordisk", "美心西餅", "東海堂", "元氣", "千兩", "丼丼屋", "魚尚", "燒肉Like", "Yakiniku Like", "膚敏適", "華人藥業", "WholeLove", "樂道", "美中鴨子", "潮江春", "潮庭", "北京樓", "翠園", "美心皇宮", "城中鴨子", "MoneyHero", "JC Fit City", "jcfitcity", "賽馬會好動城市", "賽馬會好動城市計劃", "茶木", "TeaWood", "太興", "亞參雞飯", "敏華冰廳", "錦麗", "天然鑽石戒指", "鑽石", "DeBeers天然鑽石", "實驗室培育鑽石", "LGD", "人做鑽石", "珠寶", "瑕疵品", "natural diamonds", "diamonds", "lab grown diamonds", "跌價", "實驗室鑽石", "養殖鑽石", "4C 標準", "GIA 證書", "IGI 證書", "戒指", "中信銀行", "CNCBI", "HKT Enterprise Solutions", "浪琴香港國際賽事", "百週年紀念短途盃", "女皇銀禧紀念盃", "花旗銀行香港金盃", "香港經典盃", "寶馬香港打吡大賽", "富衛保險冠軍賽馬日", "渣打冠軍暨遮打盃", "香港共慶回歸賽馬日", "跑馬地煞科夜", "沙田煞科日", "莎莎婦女銀袋日", "時尚賽馬日", "香港經典一哩賽", "主席短途獎", "富衛保險冠軍一哩賽", "富衛保險女皇盃", "賽馬會", "投注", "六合彩", "賭波", "死馬", "墮馬", "退役馬", "墜馬", "騎師", "馬房", "練馬師", "馬主", "潘頓", "布文", "何澤堯", "霍宏聲", "艾兆禮", "田泰安", "希威森", "周俊樂", "巴度", "麥道朗", "黃智弘", "梁家俊", "奧爾民", "班德禮", "潘明輝", "蔡明紹", "紀仁安", "艾道拿", "楊明綸", "鍾易禮", "黃寶妮", "金誠剛", "巫顯東", "麥文堅", "潘大衛", "杜苑欣", "莫雷拉", "莫雅", "布宜學", "董明朗", "韋紀力", "巴米高", "李寶利", "金美琪", "杜滿樂", "橫山和生", "蘇銘倫", "李慕華", "馬昆", "貝知仁", "三浦皇成", "莫艾誠", "廖康銘", "大衛希斯", "方嘉柏", "沈集成", "文家良", "呂健威", "蔡約翰", "巫偉傑", "姚本輝", "羅富全", "游達榮", "蘇偉賢", "告東尼", "伍鵬志", "賀賢", "徐雨石", "桂福特", "韋達", "黎昭昇", "鄭俊偉", "葉楚航", "丁冠豪", "費伯華", "上村洋行", "布銘球", "池江泰壽", "葛威法", "岳本賢", "游孝廉", "田中博康", "岳伯仁", "包義定", "侯耀誠", "森一誠", "堀宣行", "武井亮", "巴伯樂", "鹿戶雄一", "嘉應高昇", "遨遊氣泡", "錶之銀河", "合夥奔馳", "精算暴雪", "越駿歡欣", "直線力山", "美麗同享", "禪勝輝煌", "包裝天將", "美麗第一", "智取神駒", "風雲武士", "康樂高球", "勁速威龍", "笑傲江湖", "顏色之皇", "永遠美麗", "健康愉快", "睿盛人生", "華麗再勝", "大浪圖田", "自強不息", "舞林密碼", "綠族無限", "風再起時", "新意馬", "天將龍駒", "輝煌精英", "愛馬善", "昇瀧駒", "太陽勇士", "遨遊武士", "燈胆將軍", "小霸王", "美麗星晨", "年少多好", "水晶酒杯", "春風萬里", "嘉應傳承", "仁心星", "競駿輝煌", "晨曦儷人", "駿跑得", "膨才", "潮州精神", "占士德", "喜尊龍", "同樣美麗", "銀進", "英雄豪傑", "金鎗六十", "Alipay", "Capital Group", "eatigo", "shopback", "CITIC", "中信銀行國際", "inMotion", "信銀國際Motion卡", "中信", "麥當勞", "保險經紀", "cathaypacific", "cathaypacificairways", "McDonalds", "一田", "中國建設銀行(亞洲)", "建行(亞洲)", "建行開戶口", "建行分行", "建行信用卡", "建行貸款", "建行公司開戶口", "建行私人銀行", "建行電子銀行", "長橋證券", "Glam D", "Aprilskin", "中國移動", "支移動", "CMHK", "中移動"];
   var XHS_KW = ["香港海洋公園","海港城","渣打","花旗","星展","莎莎","Sasa","香港迪士尼","太古城","K11","apm","Mira Place"];
   var HINT = {meta:'Threads data via Meta API — keywords shared with Facebook / Instagram; @mentions optional.',
-              crawler:'Threads data via crawler — Threads keywords are required and limited to the backend keyword pool.'};
+              crawler:'Threads via crawler is offered as “Enhanced Threads” — its keywords are required and limited to the backend pool; “Threads” keeps the Meta API editor.'};
   var $ = function(sel,root){return (root||document).querySelector(sel);};
   var $$ = function(sel,root){return Array.prototype.slice.call((root||document).querySelectorAll(sel));};
 
@@ -178,6 +177,14 @@ body[data-mode=crawler] #kw-icon-threads{display:none!important}
     var lab=$$('#fi-platform .el-checkbox').filter(function(l){return l.querySelector('.el-checkbox__label').textContent.trim()===name;})[0];
     return !!(lab && lab.classList.contains('is-checked'));
   }
+  (function(){
+    var thW=$$('#fi-platform .oc-checkbox-wrapper').filter(function(w){return w.textContent.trim()==='Threads';})[0];
+    var enhW=thW.cloneNode(true); enhW.id='plat-enh-threads'; enhW.style.display='none';
+    enhW.querySelector('.el-checkbox').classList.remove('is-checked'); enhW.querySelector('.el-checkbox__input').classList.remove('is-checked');
+    var box=enhW.querySelector('input[type=checkbox]'); if(box) box.checked=false;
+    enhW.querySelector('.el-checkbox__label').textContent='Enhanced Threads';
+    thW.parentNode.insertBefore(enhW, thW.nextSibling);
+  })();
   $$('#fi-platform .el-checkbox').forEach(function(lab){
     lab.addEventListener('click',function(e){
       e.preventDefault();
@@ -253,11 +260,14 @@ body[data-mode=crawler] #kw-icon-threads{display:none!important}
   var xhsSel = makeMultiSelect({wrapper:$('#fi-xhs .oc-multi-select-wrapper'), options:XHS_KW, placeholder:'Select Keywords', footNote:'XHS pool', onChange:function(){setError('#fi-xhs',null);}});
 
   // Threads keywords (crawler mode): build a sibling selector inside #fi-threads
-  var thContent=$('#fi-threads .el-form-item__content');
+  var fiThMeta=$('#fi-threads'); var fiThKw=document.createElement('div'); fiThKw.id='fi-threads-kw'; fiThKw.setAttribute('data-v-38e12212',''); fiThKw.setAttribute('data-v-45d476b1',''); fiThKw.className='el-form-item full-width is-required'; fiThKw.style.display='none';
+  fiThKw.innerHTML='<label id=lbl-threads-kw for=threadsKeywords class=el-form-item__label>Threads Keywords<span id=enh-note class=proto-enh-note><span class=chk>✓</span>Enhanced Listening is Enabled.</span></label><div class=el-form-item__content></div>';
+  fiThMeta.parentNode.insertBefore(fiThKw, fiThMeta.nextSibling);
+  var thContent=fiThKw.querySelector('.el-form-item__content');
   var thWrap=document.createElement('div'); thWrap.id='threads-kw-select'; thWrap.setAttribute('data-v-68ea5057',''); thWrap.className='oc-multi-select-wrapper'; thWrap.style.display='none';
   thWrap.innerHTML='<div data-v-68ea5057 class=oc-multi-select-trigger><div data-v-68ea5057 class=trigger-content></div><i data-v-68ea5057 class=trigger-icon><svg data-v-68ea5057 width=12 height=8 viewBox="0 0 12 8" fill=none xmlns=http://www.w3.org/2000/svg><path d="M1 1.5L6 6.5L11 1.5" stroke=currentColor stroke-width=1.5 stroke-linecap=round stroke-linejoin=round></path></svg></i></div>';
   thContent.appendChild(thWrap);
-  var thSel = makeMultiSelect({wrapper:thWrap, options:THREADS_KW, placeholder:'Select Threads keywords', footNote:'backend pool, no free text', onChange:function(){setError('#fi-threads',null);}});
+  var thSel = makeMultiSelect({wrapper:thWrap, options:THREADS_KW, placeholder:'Select Threads keywords', footNote:'backend pool, no free text', onChange:function(){setError('#fi-threads-kw',null);}});
   var thMentionsSelector=$('#fi-threads .threads-mentions-selector');
   // mentions (meta mode) stays a static display; clicking just hints
   $('#threads-mentions-display').addEventListener('click',function(){ toast('Threads @mention picker — unchanged from current product (Meta API mode).'); });
@@ -278,20 +288,17 @@ body[data-mode=crawler] #kw-icon-threads{display:none!important}
     document.body.setAttribute('data-mode',mode);
     $$('.proto-tab').forEach(function(b){var on=b.dataset.mode===mode; b.classList.toggle('active',on); b.setAttribute('aria-selected',on?'true':'false');});
     $('#proto-tab-hint').textContent=HINT[mode];
-    var fiTh=$('#fi-threads'), lbl=$('#lbl-threads');
     var threadsOn=platformChecked('Threads'), xhsOn=platformChecked('XHS');
-    fiTh.style.display=threadsOn?'':'none';
+    $('#plat-enh-threads').style.display=(mode==='crawler')?'':'none';
+    var enhOn=(mode==='crawler')&&platformChecked('Enhanced Threads');
+    /* Threads  -> Meta API editor (Threads Mentions, optional; Threads icon joins shared Keywords) */
+    $('#fi-threads').style.display=threadsOn?'':'none';
+    $('#kw-icon-threads').style.display=threadsOn?'':'none';
+    /* Enhanced Threads -> crawler editor (Threads Keywords, required, backend pool) */
+    $('#fi-threads-kw').style.display=enhOn?'':'none';
+    thWrap.style.display=enhOn?'':'none';
     $('#fi-xhs').style.display=xhsOn?'':'none';
-    if(mode==='crawler'){
-      lbl.textContent='Threads Keywords'; lbl.setAttribute('for','threadsKeywords'); var en=document.createElement('span'); en.id='enh-note'; en.className='proto-enh-note'; en.innerHTML='<span class=chk>✓</span>Enhanced Listening is Enabled.'; lbl.appendChild(en);
-      fiTh.classList.add('is-required');
-      thMentionsSelector.style.display='none'; thWrap.style.display='';
-    } else {
-      lbl.textContent='Threads Mentions'; lbl.setAttribute('for','threadsAccountMentions');
-      fiTh.classList.remove('is-required');
-      thMentionsSelector.style.display=''; thWrap.style.display='none';
-    }
-    setError('#fi-threads',null);
+    setError('#fi-threads-kw',null);
     closeAll();
   }
   $$('.proto-tab').forEach(function(b){ b.addEventListener('click',function(){ mode=b.dataset.mode; applyMode(); }); });
@@ -307,14 +314,15 @@ body[data-mode=crawler] #kw-icon-threads{display:none!important}
     var errors=[];
     var fb=platformChecked('Facebook'), ig=platformChecked('Instagram'), th=platformChecked('Threads'), xhs=platformChecked('XHS'), li=platformChecked('LIHKG'), bk=platformChecked('Baby-Kingdom');
     if(!(fb||ig||th||xhs||li||bk)){ setError('#fi-platform','Please select at least one platform.'); errors.push('#fi-platform'); } else setError('#fi-platform',null);
-    var needKw = fb||ig||li||bk||(mode==='meta'&&th);
+    var enh=(mode==='crawler')&&platformChecked('Enhanced Threads');
+    var needKw = fb||ig||li||bk||th;
     if(needKw && !keywordTags().length){ setError('#fi-keywords','Keywords Input is required.'); errors.push('#fi-keywords'); } else setError('#fi-keywords',null);
-    if(mode==='crawler' && th && !thSel.get().length){ setError('#fi-threads','Threads Keywords is required.'); errors.push('#fi-threads'); } else setError('#fi-threads',null);
+    if(enh && !thSel.get().length){ setError('#fi-threads-kw','Threads Keywords is required.'); errors.push('#fi-threads-kw'); } else setError('#fi-threads-kw',null);
     if(xhs && !xhsSel.get().length){ setError('#fi-xhs','XHS Keywords is required.'); errors.push('#fi-xhs'); } else setError('#fi-xhs',null);
     if(errors.length){ var first=$(errors[0]); first.scrollIntoView({behavior:'smooth',block:'center'}); toast('Please complete the required fields ('+errors.length+').',true); return; }
-    var payload={source:mode, platforms:{facebook:fb,instagram:ig,threads:th,xhs:xhs,lihkg:li,babyKingdom:bk}, keywords:keywordTags(), threadsKeywords:mode==='crawler'?thSel.get():undefined, xhsKeywords:xhs?xhsSel.get():undefined};
+    var payload={source:mode, platforms:{facebook:fb,instagram:ig,threads:th,xhs:xhs,lihkg:li,babyKingdom:bk}, keywords:keywordTags(), enhancedThreads:enh, threadsKeywords:enh?thSel.get():undefined, xhsKeywords:xhs?xhsSel.get():undefined};
     console.log('[proto] create payload',payload); setTimeout(function(){ if(window.protoShowHistory) window.protoShowHistory(payload); },900);
-    toast('Task created · source = '+(mode==='meta'?'Meta API':'Crawler')+' · '+keywordTags().length+' keywords'+(mode==='crawler'&&th?' · '+thSel.get().length+' Threads keywords':'')+(xhs?' · '+xhsSel.get().length+' XHS keywords':''));
+    toast('Task created · source = '+(mode==='meta'?'Meta API':'Crawler')+' · '+keywordTags().length+' keywords'+(enh?' · '+thSel.get().length+' Threads keywords':'')+(xhs?' · '+xhsSel.get().length+' XHS keywords':''));
   });
 
   applyMode();
@@ -372,16 +380,17 @@ body[data-mode=crawler] #kw-icon-threads{display:none!important}
   var $=function(q,r){return (r||document).querySelector(q);}; var $$=function(q,r){return Array.prototype.slice.call((r||document).querySelectorAll(q));};
   var createSec=$('section.create-task'); var hist=$('#proto-history');
   function isChecked(name){var l=$$('#fi-platform .el-checkbox').filter(function(x){return x.querySelector('.el-checkbox__label').textContent.trim()===name;})[0]; return !!(l&&l.classList.contains('is-checked'));}
-  var ICON={'Facebook':'icon icon-fb','Instagram':'icon icon-ig','LIHKG':'icon icon-lihkg','Baby-Kingdom':'icon icon-bk','Threads':'icon icon-threads','XHS':'icon icon-xhs icon-xhs2'};
+  var ICON={'Facebook':'icon icon-fb','Instagram':'icon icon-ig','LIHKG':'icon icon-lihkg','Baby-Kingdom':'icon icon-bk','Threads':'icon icon-threads','Enhanced Threads':'icon icon-threads','XHS':'icon icon-xhs icon-xhs2'};
   function chips(el,items){ el.innerHTML=''; items.forEach(function(it){var c=document.createElement('span'); c.className='ph-chip'+(it.cls?' '+it.cls:''); c.textContent=it.text; el.appendChild(c);}); if(!items.length){var e=document.createElement('span'); e.className='ph-chip'; e.style.opacity='.5'; e.textContent='—'; el.appendChild(e);} }
   function render(payload){
     var mode=document.body.getAttribute('data-mode')||'meta';
-    var plats=['Facebook','Instagram','LIHKG','Baby-Kingdom','Threads','XHS'].filter(isChecked);
+    var enhOn=(mode==='crawler')&&isChecked('Enhanced Threads');
+    var plats=['Facebook','Instagram','LIHKG','Baby-Kingdom','Threads','XHS'].filter(isChecked); if(enhOn&&plats.indexOf('Threads')<0) plats.splice(plats.indexOf('XHS')>-1?plats.indexOf('XHS'):plats.length,0,'Threads');
     var pl=$('#ph-platforms'); pl.innerHTML='';
     plats.forEach(function(n){var i=document.createElement('i'); i.setAttribute('data-v-38e12212',''); i.setAttribute('aria-hidden','true'); i.className=ICON[n]; i.title=n; pl.appendChild(i);});
-    $('#ph-enh-note').style.display=(mode==='crawler'&&isChecked('Threads'))?'':'none';
+    $('#ph-enh-note').style.display=enhOn?'':'none';
     var kw=$$('#fi-keywords li.proto-tag').map(function(t){return {text:t.dataset.value};});
-    var th=(mode==='crawler'&&isChecked('Threads'))?$$('#threads-kw-select .proto-tag-text').map(function(e){return {text:e.textContent,cls:'th'};}):[];
+    var th=enhOn?$$('#threads-kw-select .proto-tag-text').map(function(e){return {text:e.textContent,cls:'th'};}):[];
     var xhs=isChecked('XHS')?$$('#fi-xhs .proto-tag-text').map(function(e){return {text:e.textContent,cls:'xhs'};}):[];
     var all=kw.concat(th,xhs);
     chips($('#ph-keywords'),all); chips($('#ph-row-keywords'),all);
