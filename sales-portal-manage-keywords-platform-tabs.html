@@ -67,7 +67,7 @@
     <div class=bd>
       <div class=proto-fi><label for=f-keyword>Keyword</label><div class=ct><input type=text id=f-keyword autocomplete=off><div class=proto-err id=e-keyword style=display:none></div></div></div>
       <div class=proto-fi><label for=f-alias>Alias</label><div class=ct><input type=text id=f-alias autocomplete=off></div></div>
-      <div class=proto-fi><label for=f-platform>Platform</label><div class=ct><select id=f-platform><option value=XHS>XHS</option><option value=Threads>Threads</option></select><div class=proto-err id=e-platform style=display:none></div></div></div>
+      
       <div class=proto-fi><label for=f-count>Count</label><div class=ct><span class=proto-num><button type=button data-step=-1 data-target=f-count>&minus;</button><input type=text id=f-count value=0><button type=button data-step=1 data-target=f-count>+</button></span></div></div>
       <div class=proto-fi><label for=f-status>Status</label><div class=ct><select id=f-status><option value=active>Active</option><option value=inactive>Inactive</option></select></div></div>
       <div class=proto-fi><label for=f-frequency>Frequency</label><div class=ct><select id=f-frequency><option value=hourly>Hourly</option><option value=daily>Daily</option><option value=weekly>Weekly</option><option value=monthly>Monthly</option></select></div></div>
@@ -209,17 +209,16 @@
   function openModal(id){
     editingId=id||null;
     var d = id ? DATA.filter(function(x){return x.id===id;})[0] : null;
-    $('#kw-modal-title').textContent = id ? 'Edit Keyword' : 'Add Keyword';
+    $('#kw-modal-title').textContent = (id ? 'Edit ' : 'Add ') + platform + ' Keywords';
     $('#f-keyword').value = d?d.keyword:'';
     $('#f-alias').value = d?d.alias:'';
-    $('#f-platform').value = d?d.platform:platform;
     setNum('f-count', d?d.count:0);
     $('#f-status').value = d?d.status:'active';
     $('#f-frequency').value = d?d.frequency:'daily';
     setNum('f-scheduling', d?d.schedulingTime:1);
     setSwitch(d?!!d.isCommentEnabled:false);
     setNum('f-comment-count', d?d.commentCount:0);
-    fieldErr('keyword',null); fieldErr('platform',null);
+    fieldErr('keyword',null);
     $('#kw-mask').classList.add('open');
     setTimeout(function(){ $('#f-keyword').focus(); },30);
   }
@@ -241,7 +240,7 @@
 
   $('#kw-save').addEventListener('click',function(){
     var kw=$('#f-keyword').value.trim();
-    var pf=$('#f-platform').value;
+    var pf=platform;
     if(!kw){ fieldErr('keyword','Keyword is required.'); $('#f-keyword').focus(); return; }
     fieldErr('keyword',null);
     var dup=DATA.some(function(d){ return d.platform===pf && d.keyword.toLowerCase()===kw.toLowerCase() && d.id!==editingId; });
@@ -252,21 +251,13 @@
       isCommentEnabled:on, commentCount:on?getNum('f-comment-count'):0 };
     if(editingId){
       var d=DATA.filter(function(x){return x.id===editingId;})[0];
-      var moved = d.platform!==pf;
       Object.keys(patch).forEach(function(k){ d[k]=patch[k]; });
-      closeModal();
-      if(moved){ platform=pf; page=1;
-        $$('.proto-tab').forEach(function(x){ var on2=x.dataset.platform===pf; x.classList.toggle('active',on2); x.setAttribute('aria-selected',on2?'true':'false'); });
-        render(); toast('Update keyword success — moved to '+pf+' tab');
-      } else { render(); toast('Update keyword success'); }
+      closeModal(); render(); toast('Update keyword success');
     } else {
       patch.id='kw'+(seq++);
       patch.createdAt=fmtNow(); patch.lastCrawledAt=null;
       DATA.push(patch);
       closeModal();
-      if(platform!==pf){ platform=pf;
-        $$('.proto-tab').forEach(function(x){ var on3=x.dataset.platform===pf; x.classList.toggle('active',on3); x.setAttribute('aria-selected',on3?'true':'false'); });
-      }
       page=Math.max(1,Math.ceil(rows().length/perPage));
       render(); toast('Add keyword success');
     }
