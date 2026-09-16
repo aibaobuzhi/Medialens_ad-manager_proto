@@ -209,6 +209,15 @@
     +'<div id=threads-free-input data-v-38e12212 class=component-oc-tags-input separators=",,，" placeholder="Enter Threads keywords" value style=display:none><div data-v-61d92e31 class=vue-tags-input><div data-v-61d92e31 class=ti-input><ul data-v-61d92e31 class=ti-tags><li data-v-61d92e31 class=ti-new-tag-input-wrapper><input data-v-61d92e31 placeholder="Enter Threads keywords (press Enter)" type=text size=1 class="ti-new-tag-input ti-valid" value></li></ul></div></div><div class=suffix-slot></div></div>'
     +'</div>';
   fiThMeta.parentNode.insertBefore(fiThKw, fiThMeta.nextSibling);
+  /* ---------- Threads Mentions (crawler mode, Enhanced OFF) ---------- */
+  var fiThMenCrawler=fiThMeta.cloneNode(true);
+  fiThMenCrawler.id='fi-threads-mentions-crawler';
+  fiThMenCrawler.style.display='none';
+  (function(n){
+    var l=n.querySelector('#lbl-threads'); if(l) l.id='lbl-threads-crawler';
+    var d=n.querySelector('#threads-mentions-display'); if(d) d.id='threads-mentions-display-crawler';
+  })(fiThMenCrawler);
+  fiThKw.parentNode.insertBefore(fiThMenCrawler, fiThKw.nextSibling);
   $('#enh-toggle').addEventListener('click',function(){ enhOn=!enhOn; this.setAttribute('aria-checked',enhOn?'true':'false'); this.querySelector('.proto-switch').classList.toggle('on',enhOn); setError('#fi-threads-kw',null); applyMode(); });
   function freeThreadsTags(){ return $$('#threads-free-input li.proto-tag').map(function(t){return t.dataset.value;}); }
 
@@ -283,6 +292,7 @@
   var thMentionsSelector=$('#fi-threads .threads-mentions-selector');
   // mentions (meta mode) stays a static display; clicking just hints
   $('#threads-mentions-display').addEventListener('click',function(){ toast('Threads @mention picker — unchanged from current product (Meta API mode).'); });
+  $('#threads-mentions-display-crawler').addEventListener('click',function(){ toast('Threads @mention picker — monitors posts that @mention your connected Threads account.'); });
 
   /* ---------- errors ---------- */
   function setError(sel,msg){
@@ -310,6 +320,7 @@
     $('#fi-threads-kw').style.display=crawlerTh?'':'none';
     thWrap.style.display=(crawlerTh&&enhOn)?'':'none';
     $('#threads-free-input').style.display=(crawlerTh&&!enhOn)?'':'none';
+    $('#fi-threads-mentions-crawler').style.display=(crawlerTh&&!enhOn)?'':'none';
     $('#enh-note').style.display=enhOn?'':'none';
     $('#fi-xhs').style.display=xhsOn?'':'none';
     setError('#fi-threads-kw',null);
