@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Threads Social Listening &amp; Analytics (2026) | MediaLens</title>
+<meta name="description" content="MediaLens tracks Threads keywords, mentions and reply-level sentiment — and measures your own Threads account.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* =========================================================================
+   MediaLens · Platform Landing Page — THREADS  (designer demo build)
+   -------------------------------------------------------------------------
+   Sections in this demo:  Header · Hero · Section intro · 5 Feature rows
+   NOT in this demo (reuse the existing site modules as-is):
+       "View More Platform" strip  ·  "Book a Demo" form section
+   -------------------------------------------------------------------------
+   Every image below is a PLACEHOLDER borrowed from the existing
+   Instagram / Xiaohongshu / LIHKG platform pages (same Wix media CDN the
+   live site uses). Swap each <img src> for the Threads screenshot listed in
+   its data-shot attribute. Nothing else needs to change.
+   ========================================================================= */
+
+:root{
+  /* Palette sampled from the live medialens.io platform pages */
+  --ink:#102532;          /* headings                     */
+  --body:#526079;         /* body copy                    */
+  --line:#CBDCE9;         /* hairlines / card borders     */
+  --tint:#F4F8FC;         /* section wash                 */
+  --blue:#1A6AFF;         /* primary action               */
+  --sky:#23A9F6;          /* secondary accent             */
+  --amber:#FFBA33;        /* highlight accent             */
+  --thread:#101010;       /* Threads platform black       */
+  --paper:#FFFFFF;
+  --radius:20px;
+  --shadow:0 24px 60px -28px rgba(16,37,50,.34);
+  --maxw:1180px;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--paper);color:var(--body);
+  font-family:'Poppins',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-size:16px;line-height:1.72;font-weight:300;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+.wrap{width:100%;max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+h1,h2,h3{color:var(--ink);font-weight:500;margin:0;letter-spacing:-.01em}
+h1{font-size:clamp(34px,4.4vw,56px);line-height:1.14}
+h2{font-size:clamp(26px,2.9vw,38px);line-height:1.24}
+.eyebrow{
+  font-size:12px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--body);opacity:.72;margin:0 0 18px;
+}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:14px 30px;border-radius:999px;border:1px solid transparent;
+  font-size:14px;font-weight:500;cursor:pointer;
+  font-family:inherit;transition:transform .18s ease,box-shadow .18s ease,background .18s ease,color .18s ease;
+}
+.btn-primary{background:var(--blue);color:#fff;box-shadow:0 12px 26px -14px rgba(26,106,255,.9)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 18px 32px -14px rgba(26,106,255,.95)}
+.btn-ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn-ghost:hover{background:var(--tint);transform:translateY(-2px)}
+.btn-text{padding:0;background:none;color:var(--blue);font-weight:500;border:0}
+.btn-text .arrow{transition:transform .2s ease}
+.btn-text:hover .arrow{transform:translateX(4px)}
+
+/* ---------- header ---------- */
+header{
+  position:sticky;top:0;z-index:40;background:rgba(255,255,255,.82);
+  backdrop-filter:blur(14px);border-bottom:1px solid transparent;transition:border-color .25s ease,box-shadow .25s ease;
+}
+header.stuck{border-color:var(--line);box-shadow:0 10px 30px -26px rgba(16,37,50,.6)}
+.headbar{display:flex;align-items:center;justify-content:space-between;height:74px;gap:24px}
+.logo{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--ink);font-size:19px;letter-spacing:-.02em}
+.logo .dot{width:11px;height:11px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 4px rgba(26,106,255,.16)}
+.headnav{display:flex;gap:28px;font-size:14px}
+.headnav a{color:var(--body);transition:color .18s ease}
+.headnav a:hover,.headnav a.on{color:var(--ink)}
+.headcta{display:flex;align-items:center;gap:12px}
+@media(max-width:900px){.headnav{display:none}}
+
+/* ---------- hero ---------- */
+.hero{padding:76px 0 8px;position:relative;overflow:hidden}
+.hero::before{
+  content:"";position:absolute;inset:-160px -20% auto -20%;height:520px;z-index:-1;
+  background:radial-gradient(60% 70% at 30% 40%,rgba(35,169,246,.16),transparent 70%),
+             radial-gradient(50% 60% at 78% 20%,rgba(255,186,51,.18),transparent 72%);
+}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.hero p.lede{font-size:17px;margin:22px 0 32px;max-width:520px}
+.hero .actions{display:flex;gap:14px;flex-wrap:wrap}
+.chip{
+  display:inline-flex;align-items:center;gap:8px;padding:6px 14px 6px 6px;
+  border:1px solid var(--line);border-radius:999px;font-size:12px;font-weight:500;color:var(--ink);
+  background:#fff;margin-bottom:20px;
+}
+.chip .mark{
+  width:24px;height:24px;border-radius:50%;background:var(--thread);
+  display:grid;place-items:center;color:#fff;
+}
+.hero-art{position:relative}
+.hero-art img{
+  border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line);background:#fff;
+}
+.hero-badge{
+  position:absolute;left:-18px;bottom:26px;background:#fff;border:1px solid var(--line);
+  border-radius:16px;padding:12px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;
+}
+.hero-badge b{display:block;color:var(--ink);font-size:15px;font-weight:600;line-height:1.2}
+.hero-badge span{font-size:11px;letter-spacing:.04em}
+.pulse{width:9px;height:9px;border-radius:50%;background:#22C08A;position:relative}
+.pulse::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid rgba(34,192,138,.45);animation:ring 2s ease-out infinite}
+@keyframes ring{0%{transform:scale(.6);opacity:1}100%{transform:scale(1.5);opacity:0}}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr;gap:34px}.hero{padding-top:44px}.hero-badge{left:8px}}
+
+/* ---------- hero orbit (replaces the raster hero image) ---------- */
+.orbit{
+  position:relative;aspect-ratio:1/1;width:100%;
+  border-radius:var(--radius);border:1px solid var(--line);background:#fff;
+  box-shadow:var(--shadow);overflow:hidden;
+}
+.orbit::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(52% 52% at 50% 50%,rgba(255,214,232,.55),transparent 68%),
+             radial-gradient(60% 60% at 74% 26%,rgba(214,231,255,.5),transparent 70%);
+}
+.orbit-rings{position:absolute;inset:0;width:100%;height:100%}
+.orbit-rings circle{fill:none;stroke:rgba(236,176,201,.38);stroke-width:1}
+.orbit-mark{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:26%;aspect-ratio:1/1;border-radius:26%;
+  background:var(--thread);color:#fff;display:grid;place-items:center;
+  box-shadow:0 22px 44px -18px rgba(16,16,16,.6);
+}
+.orbit-mark svg{width:58%;height:58%}
+.orbit-tag{
+  position:absolute;left:var(--x);top:var(--y);
+  display:inline-flex;align-items:center;gap:9px;white-space:nowrap;
+  padding:11px 20px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(252,238,246,.97),rgba(241,237,251,.97));
+  color:#8E93B5;font-size:clamp(11px,1.35vw,15px);font-weight:500;
+  box-shadow:0 12px 26px -16px rgba(16,37,50,.45);
+  animation:drift 6s ease-in-out infinite;
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+.orbit-tag svg{width:18px;height:18px;flex:none;fill:none;stroke:var(--sky);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.orbit-tag:hover{transform:translateY(-3px);box-shadow:0 18px 32px -16px rgba(16,37,50,.5)}
+.t-pulse{animation-delay:-2s}
+.t-pages{animation-delay:-4s}
+.t-pages svg{stroke:var(--amber)}
+@keyframes drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@media(prefers-reduced-motion:reduce){.orbit-tag{animation:none}}
+@media(max-width:440px){.orbit-tag{padding:8px 13px;gap:6px}.orbit-tag svg{width:14px;height:14px}}
+
+/* ---------- section intro ---------- */
+.intro{padding:88px 0 12px;text-align:center}
+.intro h2{max-width:760px;margin:0 auto;font-weight:400}
+.intro .rule{width:56px;height:3px;border-radius:3px;background:var(--amber);margin:26px auto 0}
+
+/* ---------- feature rows ---------- */
+.features{padding:36px 0 96px}
+.feature{
+  display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;
+  padding:52px 0;
+}
+.feature:nth-child(even) .feature-art{order:-1}
+.feature-copy h2{margin-bottom:16px}
+.feature-copy p{margin:0 0 26px;max-width:520px}
+.feature-num{
+  display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;
+  background:var(--tint);color:var(--ink);font-size:13px;font-weight:600;margin-bottom:18px;border:1px solid var(--line);
+}
+.feature-art{position:relative}
+.feature-art img{border-radius:var(--radius);border:1px solid var(--line);box-shadow:var(--shadow);background:#fff}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 26px}
+.tags span{
+  font-size:11.5px;font-weight:500;color:var(--ink);background:var(--tint);
+  border:1px solid var(--line);border-radius:999px;padding:5px 12px;
+}
+@media(max-width:900px){
+  .feature{grid-template-columns:1fr;gap:28px;padding:38px 0}
+  .feature:nth-child(even) .feature-art{order:0}
+}
+
+/* ---------- scroll reveal ---------- */
+[data-reveal]{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
+[data-reveal].in{opacity:1;transform:none}
+
+/* ---------- designer spec overlay (toggle in header) ---------- */
+.spec-toggle{
+  display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--body);
+  border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;background:#fff;
+  font-family:inherit;
+}
+.spec-toggle .sw{width:28px;height:16px;border-radius:999px;background:var(--line);position:relative;transition:background .2s}
+.spec-toggle .sw::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:#fff;transition:transform .2s}
+body.spec .spec-toggle .sw{background:var(--blue)}
+body.spec .spec-toggle .sw::after{transform:translateX(12px)}
+.note{display:none}
+body.spec .note{
+  display:block;margin-top:14px;font-size:12px;line-height:1.7;color:#7A4B00;
+  background:#FFF8E8;border:1px dashed #F0C874;border-radius:12px;padding:12px 14px;
+}
+body.spec .note b{color:#6A3F00}
+body.spec [data-shot]{outline:2px dashed var(--sky);outline-offset:6px}
+
+footer{border-top:1px solid var(--line);padding:30px 0;font-size:12.5px;color:var(--body)}
+.footrow{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<!-- ============================ HEADER ============================ -->
+<header id="head">
+  <div class="wrap headbar">
+    <div class="logo"><span class="dot"></span>MediaLens</div>
+    <nav class="headnav">
+      <a href="#f1">Sentiment</a>
+      <a href="#f2">Monitoring</a>
+      <a href="#f3">Alerts</a>
+      <a href="#f4">My Account</a>
+    </nav>
+    <div class="headcta">
+      <button class="spec-toggle" id="specBtn" aria-pressed="false">
+        <span class="sw" aria-hidden="true"></span> Spec notes
+      </button>
+      <a class="btn btn-primary" href="#top">Book a Demo</a>
+    </div>
+  </div>
+</header>
+
+<!-- ============================= HERO =============================
+     Final image: MediaLens · Social Listening → Overview, feed filtered
+     so Threads post cards are visible. Same 3/4 device-frame treatment
+     as the Instagram hero banner.
+     Placeholder below = the live Instagram page hero banner.
+================================================================== -->
+<section class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div data-reveal>
+      <p class="eyebrow">Platform — Threads</p>
+      <div class="chip">
+        <span class="mark" aria-hidden="true">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 21c-5 0-8-3.4-8-9s3-9 8-9c3.7 0 6.2 1.8 7.2 4.6"/><path d="M8.8 14.4c.6 1.6 2 2.4 3.6 2.4 2 0 3.3-1.1 3.3-2.6 0-1.9-1.9-2.8-4.7-2.8-2.4 0-4 1-4 2.6"/></svg>
+        </span>
+        Now covering Threads
+      </div>
+      <h1>Turn Threads Conversations Into Marketing Decisions</h1>
+      <p class="lede">Threads is where public opinions, brand reactions, and cultural moments move quickly through short-form discussion. MediaLens helps marketing and PR teams watch the keywords that matter, read the sentiment underneath them, and measure their own Threads account — in one workspace.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#top">Book a Demo</a>
+        <a class="btn btn-ghost" href="#top">Start for free</a>
+      </div>
+      <div class="note"><b>Hero copy note.</b> H1 and lede are locked. Eyebrow follows the existing convention (<code>PLATFORM — THREADS</code>). Both CTAs reuse the site's existing buttons.</div>
+    </div>
+
+    <div class="hero-art" data-reveal>
+      <!-- ===== Hero orbit — rebuilt in SVG/CSS so it can be edited directly =====
+           Replaces the Instagram raster from the other platform pages.
+           Centre mark: THREADS. Tags: only the three modules Threads supports.
+           Designer: drop the official Threads SVG into .orbit-mark (the glyph
+           below is an approximation), and reposition tags with the --x/--y
+           custom properties on each .orbit-tag. -->
+      <div class="orbit" role="img" aria-label="MediaLens modules available for Threads: Social Listening, Social Pulse, My Pages">
+        <svg class="orbit-rings" viewBox="0 0 400 400" aria-hidden="true">
+          <circle cx="200" cy="200" r="182" />
+          <circle cx="200" cy="200" r="140" />
+          <circle cx="200" cy="200" r="96" />
+        </svg>
+
+        <div class="orbit-mark">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12.2 22C6.5 22 3 18.3 3 12S6.6 2 12.2 2c4.1 0 7 1.9 8.4 5.2"
+                  fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>
+            <path d="M8.6 14.6c.4 1.7 1.9 2.7 3.8 2.7 2.2 0 3.7-1.2 3.7-2.9 0-2.2-2.2-3.2-5-3.2-2.1 0-3.6.7-4.3 1.9"
+                  fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>
+            <path d="M12.4 11.2c2.6 0 4.6.8 5.6 2.2"
+                  fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <div class="orbit-tag t-listening" style="--x:50%;--y:15%">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M15.8 15.8 21 21"/><path d="M8.4 11.6h5.2"/></svg>
+          <span>Social Listening</span>
+        </div>
+
+        <div class="orbit-tag t-pulse" style="--x:3%;--y:53%">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="13" rx="2.5"/><path d="M6 11.5h3l2-3.5 2.4 7 1.8-3.5H18"/><path d="M9 20.5h6"/></svg>
+          <span>Social Pulse</span>
+        </div>
+
+        <div class="orbit-tag t-pages" style="--x:58%;--y:71%">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="17.5" r="2.4"/><circle cx="12" cy="11" r="2.4"/><circle cx="19" cy="5.5" r="2.4"/><path d="M6.9 15.8 10.2 12.7"/><path d="M13.9 9.3 17.1 7"/></svg>
+          <span>My Pages</span>
+        </div>
+      </div>
+      <div class="hero-badge">
+        <span class="pulse" aria-hidden="true"></span>
+        <div><b>Listening live</b><span>Keywords · Mentions · Replies</span></div>
+      </div>
+      <div class="note"><b>Image swap.</b> Placeholder = Instagram page hero banner. Replace with a Social Listening overview screen where Threads post cards are clearly visible; keep the same rounded frame and drop shadow.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================= SECTION INTRO ========================= -->
+<section class="intro">
+  <div class="wrap" data-reveal>
+    <h2>Built for marketers who need to hear Threads before it trends.</h2>
+    <div class="rule"></div>
+  </div>
+</section>
+
+<!-- =========================== FEATURES =========================== -->
+<div class="features wrap">
+
+  <!-- ---------- 01 ---------- -->
+  <section class="feature" id="f1">
+    <div class="feature-copy" data-reveal>
+      <span class="feature-num">01</span>
+      <h2>Understand What People Really Mean</h2>
+      <p>Know how people actually feel about your brand—and what is driving it. See whether the conversation is praise, doubt or complaint, which words keep coming up, and whether it is growing, so you can adjust your messaging while it still matters.</p>
+      <div class="tags"><span>How they feel</span><span>What they keep saying</span><span>Is it growing</span></div>
+      <a class="btn btn-text" href="#top">Book a Demo <span class="arrow">→</span></a>
+      <div class="note"><b>Mechanism.</b> Social Listening dashboard (live, now includes Threads): volume by day, sentiment split, top keywords, post list and profiles. Plus the Social Pulse daily report, which ranks the top 10 posts by engagement, and up to 100 replies per post fed to the sentiment model. <b>Do not</b> claim themes or audience language — there is no topic clustering and no phrase extraction. Replies are stored as comments on the parent post, with no metrics and no verdict of their own, so never imply per-reply scoring.</div>
+    </div>
+    <div class="feature-art" data-reveal>
+      <img src="https://static.wixstatic.com/media/7a1cbc_743c4e126fe142e298f8eb2a692b56f0~mv2.png"
+           alt="Social Listening overview with sentiment split, top keywords and volume trend"
+           data-shot="Social Listening → Overview — sentiment split + volume by day + top keywords + post list, platform filter including Threads">
+      <div class="note"><b>Image swap.</b> Placeholder = Xiaohongshu “Make Sense of Sentiment”. Replace with the Social Listening overview: sentiment split and the volume curve both in frame. A Threads post modal with a long reply chain can be overlaid as an inset.</div>
+    </div>
+  </section>
+
+  <!-- ---------- 02 ---------- -->
+  <section class="feature" id="f2">
+    <div class="feature-copy" data-reveal>
+      <span class="feature-num">02</span>
+      <h2>Catch the Conversation as It Starts</h2>
+      <p>Monitor any keyword, brand, product or campaign across Threads. Spot volume climbing and sentiment shifting early, so you can act while a topic is still taking shape.</p>
+      <div class="tags"><span>Keyword tracking</span><span>Volume surges</span><span>Highlighted matches</span></div>
+      <a class="btn btn-text" href="#top">Book a Demo <span class="arrow">→</span></a>
+      <div class="note"><b>Mechanism.</b> Social Pulse keyword task + the official Threads keyword search (<code>threads_keyword_search</code>) + hit highlighting. This is keyword-level, not topic-level: do not write “topics” or “velocity”.</div>
+    </div>
+    <div class="feature-art" data-reveal>
+      <img src="https://static.wixstatic.com/media/7a1cbc_5216f7f72acc4aef81b50d60118ea3b1~mv2.png"
+           alt="Threads keyword results with matched terms highlighted"
+           data-shot="Social Pulses → task result list, platform = Threads, keyword highlight visible">
+      <div class="note"><b>Image swap.</b> Placeholder = Xiaohongshu “Catch Micro-Trends Early”. Replace with a Threads keyword result list where the highlighted keyword is legible.</div>
+    </div>
+  </section>
+
+  <!-- ---------- 03 ---------- -->
+  <section class="feature" id="f3">
+    <div class="feature-copy" data-reveal>
+      <span class="feature-num">03</span>
+      <h2>Never Miss a Mention</h2>
+      <p>Add your Threads accounts and MediaLens tracks every post that mentions them. Set alerts on mentions and campaign keywords so your PR and comms team is notified the moment attention spikes.</p>
+      <div class="tags"><span>@mention monitoring</span><span>Email alerts</span><span>Daily digest</span></div>
+      <a class="btn btn-text" href="#top">Book a Demo <span class="arrow">→</span></a>
+      <div class="note"><b>Mechanism.</b> Threads Mentions selector (<code>threads_manage_mentions</code>) + alert mail and daily report mail. This is Threads-only — no other platform page has it.</div>
+    </div>
+    <div class="feature-art" data-reveal>
+      <img src="https://static.wixstatic.com/media/7a1cbc_e1d27150116345feb0252e805787c189~mv2.png"
+           alt="Social Pulse task with Threads selected and mention accounts added"
+           data-shot="Social Pulse task editor — Platform row with Threads ticked + Threads Mentions selector showing @account chips">
+      <div class="note"><b>Image swap.</b> Placeholder = LIHKG “Stay Alert to Risks”. Replace with the task editor; the Threads checkbox and the @mention chips are the two things that must read clearly.</div>
+    </div>
+  </section>
+
+  <!-- ---------- 04 ---------- -->
+  <section class="feature" id="f4">
+    <div class="feature-copy" data-reveal>
+      <span class="feature-num">04</span>
+      <h2>See What Your Content Earns</h2>
+      <p>Find out what your own Threads content is actually earning you. See which posts start real conversation, how quickly your following is growing, and what your audience responds to, so you can plan your next post on evidence instead of instinct.</p>
+      <div class="tags"><span>What starts conversation</span><span>Audience growth</span><span>When to post</span></div>
+      <a class="btn btn-text" href="#top">Book a Demo <span class="arrow">→</span></a>
+      <div class="note"><b>Mechanism.</b> Threads My Page (Overview / Posts / Top Posts / Followers / Calendar / Tags / Hashtags) + Compare across your own connected accounts. Own accounts only — Threads has no competitor analysis, so never imply it.</div>
+    </div>
+    <div class="feature-art" data-reveal>
+      <img src="https://static.wixstatic.com/media/7a1cbc_a1dc6e8de61a42eabbcce3260b4fded6~mv2.png"
+           alt="Threads My Page overview dashboard"
+           data-shot="Threads → My Pages → Overview (metric tiles + engagement heatmap + follower growth)">
+      <div class="note"><b>Image swap.</b> Placeholder = Instagram “See Your Impact”. Replace with the Threads My Page overview; make sure at least one Threads-only metric (Reposts or Quotes) is visible in the crop.</div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap footrow">
+    <span>MediaLens — Threads platform page · designer demo build</span>
+    <span>Excluded from this demo: “View More Platform” strip and the “Book a Demo” form section (reuse existing site modules).</span>
+  </div>
+</footer>
+
+<script>
+/* header shadow on scroll */
+const head = document.getElementById('head');
+const onScroll = () => head.classList.toggle('stuck', window.scrollY > 8);
+onScroll(); window.addEventListener('scroll', onScroll, {passive:true});
+
+/* scroll reveal */
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+}, {threshold:.15, rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
+
+/* spec-notes overlay toggle — lets the designer see image + copy briefs inline */
+const specBtn = document.getElementById('specBtn');
+specBtn.addEventListener('click', () => {
+  const on = document.body.classList.toggle('spec');
+  specBtn.setAttribute('aria-pressed', String(on));
+});
+
+/* nav active state */
+const links = Array.from(document.querySelectorAll('.headnav a'));
+const navIo = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    links.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id));
+  });
+}, {threshold:.4});
+document.querySelectorAll('.feature[id]').forEach(s => navIo.observe(s));
+</script>
+</body>
+</html>
