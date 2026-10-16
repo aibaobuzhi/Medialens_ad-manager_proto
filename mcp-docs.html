@@ -706,7 +706,7 @@ claude mcp add --transport http medialens <span class="tk-s">&lt;YOUR_MEDIALENS_
       '<div class="tool__name"><h2 style="font-family:var(--mono);font-size:clamp(18px,2vw,24px);font-weight:500;letter-spacing:-0.01em;margin:0;word-break:break-all">' + esc(t.name) + '</h2><button class="copy" data-copy-text="' + esc(t.name) + '">Copy name</button></div>' +
       '<p class="lead" style="font-size:16px">' + inlineCode(t.desc) + '</p>' +
       '<div class="stack">' +
-        '<div class="fact"><div class="fact__k">Module</div><div class="fact__v">' + esc(mod.label) + ' · <code>' + esc(mod.prefix) + '</code></div></div>' +
+        '<div class="fact"><div class="fact__k">Module</div><div class="fact__v">' + esc(mod.label) + '</div></div>' +
         '<div class="fact' + (t.write ? ' fact--write' : '') + '"><div class="fact__k">Access</div><div class="fact__v">' + (t.write ? '<b>Writes data</b> · Your AI assistant asks you to confirm before it runs.' : '<b>Read-only</b> · This tool only reads data.') + '</div></div>' +
         '<div class="fact"><div class="fact__k">Output data limit</div><div class="fact__v' + (t.limit ? '' : ' none') + '">' + (t.limit ? '<code>' + esc(t.limit) + '</code>' : 'Returns one result') + '</div></div>' +
         quota +
