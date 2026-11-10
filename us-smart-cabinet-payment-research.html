@@ -538,8 +538,9 @@
           ><a href="#architecture">02｜正确比较框架</a
           ><a href="#comparison">03｜候选方案</a
           ><a href="#pricing">04｜价格结论</a><a href="#network">05｜网络方案</a
-          ><a href="#tco">06｜成本结论</a><a href="#vendors">07｜逐家结论</a
-          ><a href="#risk">08｜$20→$200</a><a href="#poc">09｜POC 与决策 Gate</a
+          ><a href="#tco">06｜Cost & Compliance</a
+          ><a href="#vendors">07｜逐家结论</a><a href="#risk">08｜$20→$200</a
+          ><a href="#poc">09｜POC 与决策 Gate</a
           ><a href="#sources">10｜证据索引</a>
         </nav>
         <div class="scope">
@@ -995,14 +996,42 @@
           </section>
           <section id="tco" class="section">
             <div class="head">
-              <h2>06｜成本结论与三年 TCO</h2>
-              <p>单柜、每月 600 单；不含我方柜体/CV/运维</p>
+              <h2>06｜Cost & Compliance</h2>
+              <p>TCO、PCI DSS、PCI PTS、美国商户开户及责任划分</p>
             </div>
             <div class="answer">
-              <b>结论：</b>以最可能的 $12 客单看，Stripe 三年约 $8.6k，明显低于
-              Cantaloupe 约 $16.1k；Nayax 只有拿到接近 2.5%
-              的低档正式报价才有成本竞争力。Adyen
-              的最终商业结论必须等正式报价，不能继续用能力评分代替价格。
+              <b>结论：</b>成本上，$12 客单的当前基准是 Stripe 三年约
+              $8.6k；合规上，优先采用 <b>PCI PTS 批准终端 + PCI-listed P2PE</b>
+              并由供应商管理密钥和终端，但这只能缩小、不能消除我方 PCI DSS
+              责任。美国商户 KYC、MCC 和银行账户审核必须与 POC 在第 1
+              周并行启动， 否则它比技术集成更可能成为上线关键路径。
+            </div>
+            <div class="grid g3">
+              <div class="card decision">
+                <h3>PCI DSS｜我方仍是责任主体</h3>
+                <p>
+                  即使支付全部外包，我方仍须确认供应商合规、签署责任条款、每年监控，
+                  并完成适用的 SAQ/验证。P2PE 可以显著缩小范围，但不能写成“免
+                  PCI”。
+                </p>
+              </div>
+              <div class="card decision">
+                <h3>PCI PTS｜证明设备安全，不等于系统合规</h3>
+                <p>
+                  PTS
+                  是终端硬件/固件的安全批准。供应商负责取得并维持批准；我方负责
+                  采购有效型号、核对批准状态、做防拆巡检和安全退役。
+                </p>
+              </div>
+              <div class="card decision">
+                <h3>美国商户开户｜现在就启动</h3>
+                <p>
+                  准备美国实体、EIN/TIN、受益所有人/控制人、代表人
+                  SSN/证件、美国银行账户、
+                  MCC、业务网站和交易预测。最终材料及审批结果以各收单方 KYC
+                  为准。
+                </p>
+              </div>
             </div>
             <div class="card">
               <h3>$12 客单 · 单柜三年 TCO 横向图</h3>
@@ -1112,6 +1141,121 @@
                 更合理。只有在小规模、低客单、团队不愿维护支付终端联网时，打包平台的便利性才可能覆盖费率差。Adyen
                 必须拿到正式报价后，才能与 Stripe 做最终经济性排序。
               </p>
+            </div>
+            <div class="tablebox" style="margin-top: 12px">
+              <table>
+                <thead>
+                  <tr>
+                    <th>责任项</th>
+                    <th>支付供应商 / 终端商</th>
+                    <th>我方（柜体制造与运营）</th>
+                    <th>签约 / 验收证据</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>PTS / P2PE</td>
+                    <td>维持终端 PTS 批准；明确 P2PE solution/provider 状态</td>
+                    <td>
+                      核对 PCI 官方列表、型号、固件和有效期，不使用失效组合
+                    </td>
+                    <td>PCI listing、AoC、适用范围与版本</td>
+                  </tr>
+                  <tr>
+                    <td>卡数据与密钥</td>
+                    <td>加密、注钥、收单处理；不得把敏感卡数据暴露给柜控</td>
+                    <td>
+                      订单仅保存 token/交易引用；禁止日志、CV 或客服系统落卡号
+                    </td>
+                    <td>数据流图、密钥责任、日志字段清单</td>
+                  </tr>
+                  <tr>
+                    <td>终端与 TMS</td>
+                    <td>签名固件、远程更新、漏洞通知、RMA 与证书生命周期</td>
+                    <td>资产台账、批准更新窗口、隔离异常终端</td>
+                    <td>SLA、EOL 通知期、补丁与 RMA 时限</td>
+                  </tr>
+                  <tr>
+                    <td>现场与网络</td>
+                    <td>提供安全配置、连接域名/IP、远程访问要求</td>
+                    <td>防拆巡检、VLAN/防火墙、路由器与 SIM、远程访问 MFA</td>
+                    <td>巡检 SOP、网络图、配置基线</td>
+                  </tr>
+                  <tr>
+                    <td>PCI DSS 验证</td>
+                    <td>提供有效 AoC、责任矩阵和合规变更通知</td>
+                    <td>确认适用 SAQ/ROC、年度验证、供应商监督与书面协议</td>
+                    <td>签署的责任矩阵、年度合规包</td>
+                  </tr>
+                  <tr>
+                    <td>交易与争议</td>
+                    <td>授权、capture、退款、拒付接口与收单记录</td>
+                    <td>定价、收据、退款政策、订单证据、客服和拒付响应</td>
+                    <td>资金路径、结算对账、拒付 SLA</td>
+                  </tr>
+                  <tr>
+                    <td>事故响应</td>
+                    <td>支付侧检测、密钥/终端事件通知和配合取证</td>
+                    <td>停柜、隔离、保存证据、通知供应商及适用监管/客户</td>
+                    <td>共同响应手册、通知时限、演练记录</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="tablebox" style="margin-top: 12px">
+              <table>
+                <thead>
+                  <tr>
+                    <th>美国商户开户材料</th>
+                    <th>本项目应准备的内容</th>
+                    <th>直接结论</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>公司与税务</td>
+                    <td>美国法律实体、DBA、注册地址、EIN/TIN、成立文件</td>
+                    <td>
+                      缺一项都可能触发补件；由美国实体作为 merchant of record
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>所有人与代表人</td>
+                    <td>
+                      受益所有人/控制人、授权代表；SSN 后四位或完整
+                      SSN、身份证件按要求提供
+                    </td>
+                    <td>先确认谁能签约并完成身份验证</td>
+                  </tr>
+                  <tr>
+                    <td>结算账户</td>
+                    <td>美国银行账户、账户所有权/对账单、结算币种</td>
+                    <td>账户名称必须能与法律实体对应</td>
+                  </tr>
+                  <tr>
+                    <td>业务与风险</td>
+                    <td>
+                      网站、柜体照片、商品、无人零售流程、MCC、州/场地、退款和客服政策
+                    </td>
+                    <td>要求供应商书面确认 MCC 和 unattended use case</td>
+                  </tr>
+                  <tr>
+                    <td>交易预测</td>
+                    <td>
+                      月 GMV、客单、峰值、卡种、预授权 $20→最高
+                      $200、退款/拒付预测
+                    </td>
+                    <td>额度与风控必须按 $200 最终金额审批，不能只报 $20</td>
+                  </tr>
+                  <tr>
+                    <td>PCI 文件</td>
+                    <td>
+                      数据流图、终端清单、P2PE/PTS 证据、适用 SAQ 与责任矩阵
+                    </td>
+                    <td>在量产 Gate 前由合规负责人签字归档</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </section>
           <section id="vendors" class="section">
@@ -1321,6 +1465,7 @@
                 <ul>
                   <li>向 Adyen/Stripe/Nayax/Cantaloupe 发同一 RFP</li>
                   <li>锁定 MCC、卡种、费率、硬件与 API</li>
+                  <li>并行提交美国商户 KYC、银行账户与 PCI 责任材料</li>
                   <li>未书面确认调额能力的方案降级</li>
                 </ul>
               </div>
@@ -1445,6 +1590,30 @@
                 href="https://djnnwndagrfti.cloudfront.net/resources/Shared/Elevate/WI-SA-0333-Customer-Onboarding-Process.pdf"
                 target="_blank"
                 ><b>Cantaloupe 合作方</b> · $9.95/month + 5.95% disclosure</a
+              ><a
+                href="https://www.pcisecuritystandards.org/merchants/process/"
+                target="_blank"
+                ><b>PCI SSC 官方</b> · 商户 PCI DSS 流程与 PTS 设备要求</a
+              ><a
+                href="https://www.pcisecuritystandards.org/standards/pts-point-of-interaction-poi/"
+                target="_blank"
+                ><b>PCI SSC 官方</b> · PTS Point of Interaction 标准</a
+              ><a
+                href="https://www.pcisecuritystandards.org/faqs/1301/"
+                target="_blank"
+                ><b>PCI SSC 官方</b> · 终端、P2PE 与商户 PCI DSS 责任</a
+              ><a
+                href="https://www.pcisecuritystandards.org/faqs/does-pci-dss-apply-to-merchants-who-outsource-all-payment-processing-operations-and-never-store-process-or-transmit-cardholder-data/"
+                target="_blank"
+                ><b>PCI SSC 官方</b> · 支付外包后商户仍承担的责任</a
+              ><a
+                href="https://docs.adyen.com/platforms/verification-requirements/onboarding-guidelines"
+                target="_blank"
+                ><b>Adyen 官方</b> · 美国商户 KYC 与银行账户验证材料</a
+              ><a
+                href="https://docs.adyen.com/business-accounts/verification-requirements"
+                target="_blank"
+                ><b>Adyen 官方</b> · 美国 CIP、税号与身份验证要求</a
               ><a
                 href="https://www.vendingplaybook.com/vending-payment-processors"
                 target="_blank"
