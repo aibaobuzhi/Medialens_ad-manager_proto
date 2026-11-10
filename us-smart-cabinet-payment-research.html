@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="美国 AI 智能柜支付方案市场调研与 POC 决策 Dashboard">
+  <title>美国 AI 智能柜支付方案｜Leader 决策 Dashboard</title>
+  <style>
+    :root{--ink:#102532;--muted:#62727c;--line:#dce6ea;--bg:#f4f8fa;--card:#fff;--blue:#23a9f6;--navy:#09283a;--mint:#16a085;--amber:#e59b19;--red:#d95757;--purple:#7568d9;--shadow:0 14px 36px rgba(9,40,58,.08)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.65 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+    a{color:#087fbd;text-decoration:none}a:hover{text-decoration:underline}.shell{display:grid;grid-template-columns:255px minmax(0,1fr);min-height:100vh}.side{position:sticky;top:0;height:100vh;padding:28px 20px;background:var(--navy);color:#fff;overflow:auto}.brand{font-size:19px;font-weight:800;letter-spacing:-.3px}.brand span{font-weight:400;color:#8bd6ff}.side .eyebrow{margin:5px 0 28px;color:#8ca8b7;font-size:11px;letter-spacing:.12em;text-transform:uppercase}.side nav{display:grid;gap:4px}.side nav a{padding:9px 11px;border-radius:8px;color:#b9cad3;font-size:12px}.side nav a:hover{background:#15384b;color:#fff;text-decoration:none}.side .stamp{margin-top:26px;padding:12px;border:1px solid #24495b;border-radius:10px;color:#90abba;font-size:11px}.main{min-width:0}.hero{padding:52px clamp(22px,5vw,72px);background:linear-gradient(125deg,#0b3145,#104e6b 66%,#157cab);color:#fff}.hero-inner,.content{max-width:1240px;margin:auto}.kicker{font-size:12px;font-weight:700;letter-spacing:.16em;color:#83d6ff;text-transform:uppercase}.hero h1{max-width:900px;margin:12px 0;font-size:clamp(28px,4vw,48px);line-height:1.16;letter-spacing:-1.5px}.hero p{max-width:780px;margin:0;color:#c4dce7;font-size:15px}.hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}.pill{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);font-size:11px}.content{padding:30px clamp(18px,4vw,48px) 80px}.section{scroll-margin-top:20px;margin:0 0 28px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin:38px 0 15px}.section h2{margin:0;font-size:23px;letter-spacing:-.45px}.section-head p{margin:0;color:var(--muted);font-size:12px}.grid{display:grid;gap:14px}.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:0 2px 8px rgba(9,40,58,.025)}.card h3{margin:0 0 7px;font-size:16px}.card p{margin:5px 0;color:var(--muted)}.metric{font-size:28px;font-weight:800;letter-spacing:-1px}.metric small{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:0}.tag{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;font-size:10px;font-weight:700}.good{background:#e9f8f3;color:#08765f}.watch{background:#fff4dc;color:#9a6300}.risk{background:#fdecec;color:#a93d3d}.info{background:#eaf5fc;color:#0874aa}.decision{border-left:5px solid var(--mint);background:linear-gradient(135deg,#fff,#f3fbf8)}.decision h3{font-size:20px}.decision strong{color:#08765f}.callout{padding:16px 18px;border-radius:12px;background:#fff8e9;border:1px solid #f0d49d;color:#6d4b08}.callout b{color:#8b5b00}.table-wrap{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}table{width:100%;border-collapse:collapse;min-width:980px}th,td{padding:13px 14px;text-align:left;vertical-align:top;border-bottom:1px solid #e8eef1}th{position:sticky;top:0;background:#eef5f8;color:#365363;font-size:11px;letter-spacing:.04em}td{font-size:12px}tr:last-child td{border-bottom:0}.vendor{font-size:15px;font-weight:800}.score{font-weight:800;font-size:15px}.bar{width:90px;height:6px;margin-top:5px;background:#e4ebee;border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--blue)}ul{margin:7px 0 0;padding-left:18px}li{margin:4px 0;color:#40545f}.pro li::marker{color:var(--mint)}.con li::marker{color:var(--red)}.vendor-card{position:relative;overflow:hidden}.vendor-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--blue)}.vendor-card h3{font-size:20px}.vendor-card .sub{font-size:11px;color:#78909d}.split{display:grid;grid-template-columns:1fr 1fr;gap:12px}.mini{padding:12px;border-radius:10px;background:#f7fafb}.mini h4{margin:0 0 5px;font-size:12px}.flow{display:grid;grid-template-columns:repeat(7,1fr);gap:9px;align-items:stretch}.step{position:relative;padding:15px 12px;background:#fff;border:1px solid var(--line);border-radius:12px;min-height:120px}.step:not(:last-child):after{content:"→";position:absolute;right:-9px;top:45%;z-index:2;color:var(--blue);font-weight:900}.step b{display:block;margin-bottom:6px}.step .n{display:inline-grid;place-items:center;width:22px;height:22px;margin-bottom:8px;border-radius:50%;background:#e9f6fd;color:#087bb5;font-size:11px;font-weight:800}.step.danger{border-color:#efb9b9;background:#fff7f7}.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.phase{padding:17px;background:#fff;border:1px solid var(--line);border-radius:13px}.phase .week{color:var(--blue);font-size:11px;font-weight:800;text-transform:uppercase}.phase h3{margin:4px 0}.checklist{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 20px}.check{padding:9px 0;border-bottom:1px dashed #dce5e9}.check:before{content:"□";margin-right:8px;color:var(--blue);font-weight:800}.source-list{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.source-list a{display:block;padding:11px 13px;background:#fff;border:1px solid var(--line);border-radius:10px;font-size:12px}.foot{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);color:#748791;font-size:11px}.only-mobile{display:none}
+    @media(max-width:1050px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:1fr 1fr}.flow{grid-template-columns:repeat(4,1fr)}.step:after{display:none}.timeline{grid-template-columns:1fr 1fr}}
+    @media(max-width:760px){.shell{display:block}.side{position:relative;height:auto;padding:18px}.side nav,.side .stamp{display:none}.main{width:100%}.hero{padding:38px 20px}.content{padding:18px 14px 55px}.g4,.g3,.g2,.split,.checklist,.source-list{grid-template-columns:1fr}.flow{grid-template-columns:1fr 1fr}.timeline{grid-template-columns:1fr}.section-head{display:block}.section-head p{margin-top:4px}.only-mobile{display:block}}
+    @media print{.side{display:none}.shell{display:block}.hero{padding:28px;background:#143c50!important;-webkit-print-color-adjust:exact}.content{padding:20px}.card,.table-wrap{box-shadow:none}.section{break-inside:avoid}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <div class="brand">Media<span>Lens</span></div><div class="eyebrow">Strategy Research</div>
+    <nav>
+      <a href="#summary">01｜执行摘要</a><a href="#comparison">02｜五方案横向对比</a><a href="#vendors">03｜方案逐一拆解</a><a href="#pricing">04｜报价与合规</a><a href="#exception">05｜$20 → $200 异常流</a><a href="#prd">06｜PRD 核心范围</a><a href="#poc">07｜POC 计划</a><a href="#decision">08｜决策建议</a><a href="#sources">09｜官方资料索引</a>
+    </nav>
+    <div class="stamp">版本 1.0<br>调研日期：2026-11-10<br>范围：美国市场 / AI 智能柜<br><br>价格均需以正式报价为准。</div>
+  </aside>
+  <main class="main">
+    <header class="hero"><div class="hero-inner">
+      <div class="kicker">Leader Decision Dashboard · US Market</div>
+      <h1>美国 AI 智能柜支付方案<br>市场调研与 POC 决策</h1>
+      <p>目标：为“刷卡预授权开门 → AI 识别取货 → 调整授权 → 自动扣款”的无人智能柜选择可落地、可扩展且合规的美国支付路径。</p>
+      <div class="hero-meta"><span class="pill">5 家方案对比</span><span class="pill">重点验证 $20 → $200</span><span class="pill">PCI / EMV / 州税 / 隐私</span><span class="pill">建议 6 周双轨 POC</span></div>
+    </div></header>
+    <div class="content">
+      <section id="summary" class="section">
+        <div class="section-head"><h2>01｜执行摘要</h2><p>先给结论，再看证据</p></div>
+        <div class="grid g4">
+          <div class="card"><span class="tag good">首选</span><div class="metric">Adyen</div><p>官方明确覆盖 autonomous store、预授权、授权调额、手动捕获与失败追款。</p></div>
+          <div class="card"><span class="tag info">最快商用</span><div class="metric">365 / Nayax</div><p>柜体、支付、设备与运营后台更完整，适合先验证商业模型，定制自由度较低。</p></div>
+          <div class="card"><span class="tag watch">开发者备选</span><div class="metric">Stripe</div><p>API 体验强，UX700 支持美国无人场景；但本用例的增量授权资格需书面确认。</p></div>
+          <div class="card"><span class="tag risk">核心风险</span><div class="metric">10×</div><p>$20 预授权扩到 $200 不是“补扣必成”；发卡行、卡种、MCC 与网络规则都可能拒绝。</p></div>
+        </div>
+        <div class="card decision" style="margin-top:14px"><h3>建议：<strong>Adyen 主轨 + 365/Nayax 商业备援</strong></h3><p>用 Adyen 做可控支付底座 POC，保留自研 AI 识别、订单与设备编排；同时向 365/Nayax 索取整套设备报价与 SLA，作为缩短上市周期的对照组。不要把“捕获超过原授权额”设计成确定性能力。</p></div>
+        <div class="callout" style="margin-top:14px"><b>Go / No-Go 前置条件：</b>收单方必须书面确认美国无人零售 MCC、目标卡种、UX/终端型号、预授权、incremental authorization、tokenized card-on-file 补款、退款/争议与断网策略。任一项只靠销售口头承诺，均不进入量产。</div>
+      </section>
+
+      <section id="comparison" class="section">
+        <div class="section-head"><h2>02｜五方案横向对比</h2><p>评分为本项目适配度，不代表供应商整体能力</p></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>方案</th><th>定位 / 典型集成</th><th>预授权与调额</th><th>无人硬件</th><th>运营 / IoT</th><th>报价透明度</th><th>适配分</th><th>结论</th></tr></thead>
+          <tbody>
+            <tr><td><div class="vendor">Adyen</div></td><td>企业级 PSP；Terminal API + 自研柜控/订单</td><td><span class="tag good">官方完整路径</span><br>PreAuth → adjustment → capture；失败后可 token 追款</td><td>S1U2 / UX300 / P400 Plus 等无人终端</td><td>支付设备管理强；柜体、库存、AI 自建</td><td>处理费公开框架；终端与企业费需报价</td><td><div class="score">9.1 / 10</div><div class="bar"><i style="width:91%"></i></div></td><td><b>主 POC</b><br>控制力与文档证据最佳</td></tr>
+            <tr><td><div class="vendor">Nayax</div></td><td>无人零售支付 + 遥测 + 运营 SaaS</td><td>支持 multi-vend / 预授权；具体增额上限需合同确认</td><td>VPOS Touch / Media 系列，面向自助设备</td><td><span class="tag good">强</span> 设备、销售、库存、遥测一体</td><td>部分硬件/月费/费率公开</td><td><div class="score">8.2 / 10</div><div class="bar"><i style="width:82%"></i></div></td><td><b>快速落地备选</b><br>需验证开放 API 与数据归属</td></tr>
+            <tr><td><div class="vendor">Stripe</div></td><td>开发者 PSP；Terminal server-driven + 自研系统</td><td>平台有 incremental auth；智能柜/MCC/卡种适用性需确认</td><td>美国无人场景仅 UX700</td><td>支付与设备管理好；零售运营层自建</td><td><span class="tag good">高</span> 美国卡 2.7% + 5¢（标准价）</td><td><div class="score">7.7 / 10</div><div class="bar"><i style="width:77%"></i></div></td><td><b>技术备选</b><br>先过能力与供货门槛</td></tr>
+            <tr><td><div class="vendor">Cantaloupe</div></td><td>无人零售全栈：Smart Store + Seed 平台</td><td>随整套产品交付；底层支付编排开放度有限</td><td>Smart Store / cashless readers</td><td><span class="tag good">很强</span> 商品、补货、销售、路线运营</td><td><span class="tag watch">询价制</span></td><td><div class="score">7.5 / 10</div><div class="bar"><i style="width:75%"></i></div></td><td><b>成品方案对照</b><br>适合运营商，不适合深度自研</td></tr>
+            <tr><td><div class="vendor">365 Retail Markets</div></td><td>微市场 / 智能柜全栈；PicoCooler Vision</td><td>官方说明 pre-auth + 超额时尝试 incremental auth</td><td>AI 视觉柜 + 支付 + 锁控一体</td><td><span class="tag good">很强</span> ADM / 365Ops / VMS</td><td><span class="tag watch">询价制</span></td><td><div class="score">8.0 / 10</div><div class="bar"><i style="width:80%"></i></div></td><td><b>最快验证体验</b><br>产品差异化与数据控制较弱</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <section id="vendors" class="section">
+        <div class="section-head"><h2>03｜方案逐一拆解</h2><p>准备工作、技术路径、优缺点与官方 use case</p></div>
+        <div class="grid g2">
+          <article class="card vendor-card"><h3>Adyen</h3><div class="sub">Enterprise PSP · 推荐主轨</div><div class="split"><div class="mini"><h4>Pros</h4><ul class="pro"><li>官方 Autonomous Stores 直接命中用例</li><li>预授权、同步/异步调额、捕获、webhook 完整</li><li>可 token 化后追收差额</li><li>多国扩展与统一对账能力强</li></ul></div><div class="mini"><h4>Cons</h4><ul class="con"><li>企业准入与商务周期可能较长</li><li>终端、MCC、卡种限制需逐项配置</li><li>柜控、CV、库存、客服均需自建</li></ul></div></div><h4>准备工作</h4><ul><li>美国实体、银行账户、KYC/UBO、业务模型与交易预测</li><li>申请 Terminal API、manual capture、smart pre-auth、authorization adjustment、webhooks</li><li>选无人终端并完成远程联网、EMV/接触式/非接触式测试</li></ul><p><b>官方 use case：</b><a href="https://docs.adyen.com/point-of-sale/autonomous-stores/" target="_blank" rel="noopener">Autonomous stores</a> 明确说明刷卡进店、调额、捕获及失败补款。</p></article>
+          <article class="card vendor-card"><h3>Nayax</h3><div class="sub">Unattended retail full stack · 快速落地备选</div><div class="split"><div class="mini"><h4>Pros</h4><ul class="pro"><li>支付、4G、遥测、设备与库存一体</li><li>无人设备经验成熟，安装路径短</li><li>美国在线商店可见硬件与部分费率</li><li>Selfly Store 有智能冰箱全球扩张案例</li></ul></div><div class="mini"><h4>Cons</h4><ul class="con"><li>交易费可能高于直接收单</li><li>API、数据导出、支付编排自由度需核实</li><li>合同、设备订阅与平台锁定</li></ul></div></div><h4>准备工作</h4><ul><li>确认 VPOS 型号、MDB/脉冲/串口接口与柜控兼容</li><li>索取 API、webhook、multi-vend、预授权上限和 sandbox</li><li>核对 SIM 覆盖、远程升级、RMA、结算周期与数据出口</li></ul><p><b>官方 use case：</b><a href="https://www.nayax.com/blog/selfly-store-boosts-global-growth-for-its-smart-fridges-with-nayaxs-oem-cashless-solutions/" target="_blank" rel="noopener">Selfly Store × Nayax OEM</a>。</p></article>
+          <article class="card vendor-card"><h3>Stripe</h3><div class="sub">Developer-first PSP · 技术备选</div><div class="split"><div class="mini"><h4>Pros</h4><ul class="pro"><li>API、sandbox、事件模型与开发体验成熟</li><li>标准费率透明，无长期平台包袱</li><li>Terminal 与线上 token/PaymentIntent 体系统一</li><li>Connect 适合未来多商户平台化</li></ul></div><div class="mini"><h4>Cons</h4><ul class="con"><li>美国无人场景硬件当前集中于 UX700</li><li>incremental auth 并非所有交易都适用</li><li>IoT、库存、订单异常与客服工具自建</li><li>必须向销售确认供货与 unattended 资格</li></ul></div></div><h4>准备工作</h4><ul><li>联系 Stripe Sales 申请 UX700 与 unattended retail</li><li>用真实 MCC/卡种验证 manual capture、incremental authorization 与 card-on-file</li><li>建立 PaymentIntent、reader action、webhook 幂等与离线降级</li></ul><p><b>官方说明：</b><a href="https://support.stripe.com/questions/using-terminal-in-attended-semi-attended-and-unattended-retail-environments" target="_blank" rel="noopener">美国无人终端 UX700</a>；正式 POC 前要求书面 capability matrix。</p></article>
+          <article class="card vendor-card"><h3>Cantaloupe</h3><div class="sub">Smart retail operator platform · 成品方案对照</div><div class="split"><div class="mini"><h4>Pros</h4><ul class="pro"><li>Smart Store、支付、Seed 管理平台一体</li><li>补货、路线、库存与销售运营成熟</li><li>官方案例披露销售提升与低 shrink</li><li>适合多点位规模运营</li></ul></div><div class="mini"><h4>Cons</h4><ul class="con"><li>价格与 API 公开度有限</li><li>自研 CV/柜体能力可能与成品栈重叠</li><li>支付数据与体验定制受平台边界约束</li><li>迁移成本高</li></ul></div></div><h4>准备工作</h4><ul><li>按点位数、SKU、温控、尺寸与补货模型索取方案</li><li>要求展示 API、原始交易/库存导出、告警与 SSO</li><li>谈清硬件所有权、SaaS、处理费、安装、RMA 与解约迁移</li></ul><p><b>官方 use case：</b><a href="https://www.cantaloupe.com/articles/casestudy/canteen-of-northern-california-sees-its-sales-explode-with-smart-stores/" target="_blank" rel="noopener">Canteen of Northern California</a> 披露单点周销售从 $450–600 到 $1,600。</p></article>
+          <article class="card vendor-card"><h3>365 Retail Markets</h3><div class="sub">PicoCooler Vision full stack · 最快体验验证</div><div class="split"><div class="mini"><h4>Pros</h4><ul class="pro"><li>AI 视觉、锁控、支付、柜体与后台现成</li><li>官方清楚描述 pre-auth 与超额增量授权</li><li>365Ops / ADM 支持库存与 planogram</li><li>适合快速部署真实点位验证</li></ul></div><div class="mini"><h4>Cons</h4><ul class="con"><li>硬件与软件形态固定</li><li>自有 AI 与数据资产差异化空间较小</li><li>报价、支付费率和 API 需销售获取</li><li>增额仍受发卡行与支付方式限制</li></ul></div></div><h4>准备工作</h4><ul><li>索取 PicoCooler Vision demo、SKU 限制、识别指标与安装手册</li><li>确认 pre-auth 默认额、incremental cap、失败追款与消费者收据</li><li>验证原始图像/事件/订单数据出口与第三方系统 API</li></ul><p><b>官方说明：</b><a href="https://365retailmarkets.com/blog/picocooler-vision-frequently-asked-questions" target="_blank" rel="noopener">PicoCooler Vision FAQ</a> 明确说明超额时会尝试 incremental authorization，但结果依赖发卡行、支付类型及 cap。</p></article>
+        </div>
+      </section>
+
+      <section id="pricing" class="section">
+        <div class="section-head"><h2>04｜报价与合规</h2><p>公开价只用于预算锚点，最终以美国正式合同为准</p></div>
+        <div class="grid g3">
+          <div class="card"><h3>公开价格锚点</h3><ul><li><b>Stripe：</b>美国线下国内卡标准价 2.7% + 5¢；UX700 需联系销售</li><li><b>Adyen：</b>固定处理费 + payment method fee；美国终端/企业报价需询价</li><li><b>Nayax：</b>美国商店示例 VPOS Touch $399（批量可降）；月费及 2.5%–5.95% 示例区间依方案计算</li><li><b>Cantaloupe / 365：</b>整套方案询价</li></ul></div>
+          <div class="card"><h3>要求供应商拆分的 TCO</h3><ul><li>终端/柜体采购或租赁、安装与物流</li><li>SaaS、SIM/流量、设备管理、API 费</li><li>收单、网关、授权、调额、退款、拒付费</li><li>最低承诺量、月最低费、跨境卡与钱包附加费</li><li>备件、RMA、现场维护、提前解约与数据迁移</li></ul></div>
+          <div class="card"><h3>合规责任矩阵</h3><ul><li><b>PCI DSS：</b>使用 P2PE/认证终端缩小范围；不得保存敏感认证数据</li><li><b>EMV / PCI PTS：</b>只选认证终端与受支持固件</li><li><b>卡组织规则：</b>预授权文案、有效期、增额与及时捕获</li><li><b>美国税务：</b>按部署州/城市处理 sales tax 与免税商品</li><li><b>隐私：</b>摄像头告知、最小化留存、CCPA/州隐私法评估</li><li><b>消费者：</b>清晰展示 hold、最终扣款、数字收据与申诉渠道</li></ul></div>
+        </div>
+        <div class="callout" style="margin-top:14px"><b>报价基线建议：</b>向五家发同一份 RFP：100 / 1,000 / 10,000 台三档；月均 600 笔/台；客单 $12；退款 1%；争议 0.3%；美国境内卡 90%；要求同时给出一次性、经常性、处理费、SLA 与五年退出成本。</div>
+      </section>
+
+      <section id="exception" class="section">
+        <div class="section-head"><h2>05｜预授权 $20 → 最终 $200 异常流程</h2><p>把“调额失败”设计为常态分支，而不是边缘异常</p></div>
+        <div class="flow">
+          <div class="step"><span class="n">1</span><b>$20 PreAuth</b>读卡、风险检查、记录 PSP reference / token；失败则不开门。</div>
+          <div class="step"><span class="n">2</span><b>开门购物</b>建立 session，绑定柜、卡别名、时间与 CV 事件。</div>
+          <div class="step"><span class="n">3</span><b>关门结算</b>AI 生成 $200 篮子；订单先进入 calculating，禁止立即展示“支付成功”。</div>
+          <div class="step danger"><span class="n">4</span><b>调额至 $200</b>请求 authorization adjustment / incremental auth；最多有限重试，不拆单撞库。</div>
+          <div class="step"><span class="n">5A</span><b>成功：捕获 $200</b>等待 capture webhook，再出最终收据、释放 session。</div>
+          <div class="step danger"><span class="n">5B</span><b>失败：先保全 $20</b>按 PSP 规则捕获原授权额；差额 $180 进入应收账。</div>
+          <div class="step"><span class="n">6</span><b>合规追款</b>用已同意的 token/MIT 追收或发 payment link；失败则风控拦截下次开柜并转客服。</div>
+        </div>
+        <div class="grid g3" style="margin-top:14px">
+          <div class="card"><h3>不能做</h3><ul class="con"><li>不能直接 capture $200 并假设网络会接受</li><li>不能无限次重复授权同一张卡</li><li>不能在 webhook 未确认时写“已付款”</li><li>不能因支付失败远程锁住已在柜外的商品或威胁消费者</li></ul></div>
+          <div class="card"><h3>产品防线</h3><ul><li>将预授权额动态设为 SKU 风险、用户历史与库存价值的函数</li><li>高价值柜使用 $50/$100 或逐级补授权</li><li>支付卡种不支持调额时限制可取商品总额</li><li>门上展示 hold 金额、释放时间与最终收费机制</li></ul></div>
+          <div class="card"><h3>账务状态机</h3><p><code>preauth_pending → authorized → shopping → amount_calculated → adjusting → captured / partially_recovered / collection_pending / written_off</code></p><p>所有状态由 PSP webhook 驱动、幂等写入；CV 订单与支付账本分离但可审计关联。</p></div>
+        </div>
+      </section>
+
+      <section id="prd" class="section">
+        <div class="section-head"><h2>06｜PRD 核心范围</h2><p>POC 只做能决定方案成败的能力</p></div>
+        <div class="grid g2">
+          <div class="card"><h3>用户故事与验收</h3><ul><li>用户刷卡/钱包，3 秒目标内得到开门或明确拒绝</li><li>关门后收到商品明细、hold 说明与最终电子收据</li><li>错识别可在订单页提交申诉，后台保留事件证据</li><li>调额失败时不误报成功，客服可见授权、捕获、差额与追款状态</li><li>运营可远程查看终端、门锁、网络、相机与库存健康度</li></ul></div>
+          <div class="card"><h3>非功能指标</h3><ul><li>支付/开门链路 P95 ≤ 3 秒；支付服务月可用性目标 ≥ 99.95%</li><li>重复扣款 = 0；webhook 重放与断点恢复 100% 幂等</li><li>订单金额识别准确率 ≥ 99%（先限定 SKU 与陈列）</li><li>离线时默认不开新柜；已开 session 可安全关门并待恢复处理</li><li>敏感日志脱敏；事件、订单、支付证据可追溯 ≥ 合同/法规要求</li></ul></div>
+          <div class="card"><h3>后台能力</h3><ul><li>设备：在线、固件、信号、终端配对、远程重启</li><li>订单：CV 明细、人工改判、退款、差额追收</li><li>风控：卡别名 denylist、频率、金额、点位、设备风险</li><li>对账：授权/调额/捕获/退款/拒付/结算逐笔核对</li><li>告警：门未关、相机遮挡、捕获失败、库存漂移</li></ul></div>
+          <div class="card"><h3>POC 不做</h3><ul><li>全美多州税务自动化、复杂促销与忠诚度</li><li>所有钱包/EBT/FSA/HSA；先测 Visa/MC/Amex/Discover 与 Apple/Google Pay</li><li>完全离线开柜</li><li>多租户平台、白标结算与跨国部署</li><li>未经验证的高价值/受监管商品</li></ul></div>
+        </div>
+      </section>
+
+      <section id="poc" class="section">
+        <div class="section-head"><h2>07｜6 周 POC 计划</h2><p>双轨验证：支付可控性 + 成品上市速度</p></div>
+        <div class="timeline">
+          <div class="phase"><div class="week">Week 0–1</div><h3>商务与能力锁定</h3><ul><li>发 RFP / capability matrix</li><li>确认 MCC、卡种、终端与费率</li><li>获得 sandbox、测试机与书面支持</li></ul></div>
+          <div class="phase"><div class="week">Week 2–3</div><h3>实验室集成</h3><ul><li>预授权、锁控、CV session</li><li>调额、捕获、退款、webhook</li><li>故障注入与幂等测试</li></ul></div>
+          <div class="phase"><div class="week">Week 4–5</div><h3>封闭真实交易</h3><ul><li>50–100 名内部/受邀用户</li><li>真实卡种与钱包矩阵</li><li>$0 / $19 / $21 / $50 / $200 边界</li></ul></div>
+          <div class="phase"><div class="week">Week 6</div><h3>决策 Gate</h3><ul><li>成功率、延迟、差额损失与 TCO</li><li>安全/合规签字</li><li>量产路线与供应商选择</li></ul></div>
+        </div>
+        <div class="card" style="margin-top:14px"><h3>必须通过的测试矩阵</h3><div class="checklist"><div class="check">四大卡组织 × debit / credit / prepaid</div><div class="check">实体卡 × Apple Pay × Google Pay</div><div class="check">$20→$0 / $20 / $21 / $50 / $200</div><div class="check">调额拒绝 / 超时 / webhook 乱序 / 重复</div><div class="check">关门前断网 / 关门后断网 / 终端重启</div><div class="check">CV 改判、部分退款、全额退款、拒付</div><div class="check">同卡连续开柜、多人尾随、门未关</div><div class="check">结算单与内部账本逐笔一致</div></div></div>
+      </section>
+
+      <section id="decision" class="section">
+        <div class="section-head"><h2>08｜决策建议</h2><p>建议今日批准的事项</p></div>
+        <div class="grid g3">
+          <div class="card decision"><span class="tag good">Decision 1</span><h3>批准 Adyen 主 POC</h3><p>以 Terminal API + 无人终端验证完整支付状态机；保留自研 CV、订单、风控与设备编排，最大化长期差异化与数据控制。</p></div>
+          <div class="card"><span class="tag info">Decision 2</span><h3>并行获取 365 / Nayax 报价</h3><p>让成品方案提供上市时间与五年 TCO 基线；若 Adyen 商务准入、终端供货或调额资格未过 gate，可立即切换。</p></div>
+          <div class="card"><span class="tag watch">Decision 3</span><h3>暂不承诺 $200 可收回</h3><p>量产 PRD 采用“动态预授权 + 增额尝试 + token 合规追款 + 风险限额”，并为坏账、客服与争议预留预算。</p></div>
+        </div>
+        <div class="table-wrap" style="margin-top:14px"><table><thead><tr><th>Gate</th><th>Go 标准</th><th>No-Go / 切换条件</th><th>Owner</th></tr></thead><tbody>
+          <tr><td>支付能力</td><td>目标卡种调额与捕获在真实卡测试达到约定成功率；有书面支持矩阵</td><td>只支持特定高风险 MCC 之外的场景，或无法 token 追款</td><td>Payments / Legal</td></tr>
+          <tr><td>消费者体验</td><td>P95 开门 ≤ 3s；hold 与最终金额清晰；申诉闭环</td><td>hold 释放不可解释或错扣无法快速处理</td><td>Product / CX</td></tr>
+          <tr><td>经济模型</td><td>含坏账后的贡献毛利达到目标；五年 TCO 可控</td><td>平台费 + 处理费 + 运维侵蚀主要毛利</td><td>Finance</td></tr>
+          <tr><td>可运营性</td><td>远程监控、RMA、对账、数据导出与 SLA 达标</td><td>关键数据封闭或退出迁移成本不可接受</td><td>Ops / Engineering</td></tr>
+        </tbody></table></div>
+      </section>
+
+      <section id="sources" class="section">
+        <div class="section-head"><h2>09｜官方技术与案例索引</h2><p>点击进入原始资料；访问日期 2026-11-10</p></div>
+        <div class="source-list">
+          <a href="https://docs.adyen.com/point-of-sale/autonomous-stores/" target="_blank" rel="noopener"><b>Adyen</b> · Autonomous stores（完整支付流）</a>
+          <a href="https://docs.adyen.com/point-of-sale/pre-authorisation/" target="_blank" rel="noopener"><b>Adyen</b> · Pre-authorization & authorization adjustment</a>
+          <a href="https://docs.adyen.com/point-of-sale/offline-payment/" target="_blank" rel="noopener"><b>Adyen</b> · Offline payments</a>
+          <a href="https://www.adyen.com/devices" target="_blank" rel="noopener"><b>Adyen</b> · In-person devices / PCI</a>
+          <a href="https://www.nayax.com/blog/selfly-store-boosts-global-growth-for-its-smart-fridges-with-nayaxs-oem-cashless-solutions/" target="_blank" rel="noopener"><b>Nayax</b> · Selfly Store smart fridge case</a>
+          <a href="https://shop.nayax.com/usa_en/products/vpos-touch.html" target="_blank" rel="noopener"><b>Nayax</b> · VPOS Touch 美国公开硬件价</a>
+          <a href="https://stripe.com/terminal" target="_blank" rel="noopener"><b>Stripe</b> · Terminal overview & devices</a>
+          <a href="https://support.stripe.com/questions/using-terminal-in-attended-semi-attended-and-unattended-retail-environments" target="_blank" rel="noopener"><b>Stripe</b> · Unattended retail / UX700</a>
+          <a href="https://stripe.com/pricing" target="_blank" rel="noopener"><b>Stripe</b> · 美国 Terminal 标准费率</a>
+          <a href="https://www.cantaloupe.com/articles/casestudy/canteen-of-northern-california-sees-its-sales-explode-with-smart-stores/" target="_blank" rel="noopener"><b>Cantaloupe</b> · Smart Store case study</a>
+          <a href="https://365retailmarkets.com/blog/picocooler-vision-frequently-asked-questions" target="_blank" rel="noopener"><b>365</b> · PicoCooler Vision FAQ / pre-auth</a>
+          <a href="https://365retailmarkets.com/blog/picocooler-vision-smart-cooler-demonstration" target="_blank" rel="noopener"><b>365</b> · Smart cooler user journey</a>
+        </div>
+        <div class="foot">免责声明：本报告用于产品与供应商初筛，不构成法律、税务或卡组织合规意见。支付能力、费率、硬件供货与适用规则会变化；签约前应由供应商、收单行、QSA 与法律顾问书面确认。页面未修改仓库现有首页。</div>
+      </section>
+    </div>
+  </main>
+</div>
+</body>
+</html>
